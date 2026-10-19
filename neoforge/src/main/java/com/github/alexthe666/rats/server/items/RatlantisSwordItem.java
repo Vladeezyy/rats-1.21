@@ -20,7 +20,7 @@ import java.util.List;
 public class RatlantisSwordItem extends SwordItem {
 
 	public RatlantisSwordItem(Item.Properties properties) {
-		super(RatsToolMaterialRegistry.RATLANTIS, 3, -2.4F, properties);
+		super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(SwordItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 3, -2.4F)));
 	}
 
 	@Override

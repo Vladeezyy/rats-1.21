@@ -17,7 +17,7 @@ import java.util.List;
 
 public class PlagueScytheItem extends SwordItem {
 	public PlagueScytheItem(Item.Properties properties) {
-		super(RatsToolMaterialRegistry.PLAGUE_SCYTHE, 3, -0.5F, properties);
+		super(RatsToolMaterialRegistry.PLAGUE_SCYTHE, properties.attributes(SwordItem.createAttributes(RatsToolMaterialRegistry.PLAGUE_SCYTHE, 3, -0.5F)));
 	}
 
 	@Override

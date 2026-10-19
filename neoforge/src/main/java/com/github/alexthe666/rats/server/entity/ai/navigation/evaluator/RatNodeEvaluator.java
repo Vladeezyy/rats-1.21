@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.navigation.evaluator;
 
+import net.minecraft.world.level.pathfinder.PathfindingContext;
 import com.github.alexthe666.rats.server.block.*;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatUtils;
@@ -13,8 +14,13 @@ import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
 public class RatNodeEvaluator extends WalkNodeEvaluator {
 
+	// 1.21: the per-block hook of 1.20.1 (evaluateBlockPathType) is gone; the vanilla door and rail rules now run in
+	// getPathTypeWithinMobBB, the rat's own rules here
 	@Override
-	protected PathType evaluateBlockPathType(BlockGetter getter, BlockPos pos, PathType types) {
+	public PathType getPathType(PathfindingContext context, int x, int y, int z) {
+		PathType types = super.getPathType(context, x, y, z);
+		BlockGetter getter = context.level();
+		BlockPos pos = new BlockPos(x, y, z);
 		Block block = getter.getBlockState(pos).getBlock();
 		if (this.mob instanceof TamedRat rat) {
 			if (block instanceof RatHoleBlock || block instanceof RatTrapBlock || block instanceof RatCageBlock || RatUtils.isOpenRatTube(getter, pos)) {
@@ -25,18 +31,6 @@ public class RatNodeEvaluator extends WalkNodeEvaluator {
 			}
 			if (block instanceof SlabBlock) {
 				types = PathType.WALKABLE;
-			}
-
-			if (types == PathType.DOOR_WOOD_CLOSED && this.canOpenDoors() && this.canPassDoors()) {
-				types = PathType.WALKABLE_DOOR;
-			}
-
-			if (types == PathType.DOOR_OPEN && !this.canPassDoors()) {
-				types = PathType.BLOCKED;
-			}
-
-			if (types == PathType.RAIL && !(block instanceof BaseRailBlock) && !(getter.getBlockState(pos.below()).getBlock() instanceof BaseRailBlock)) {
-				types = PathType.UNPASSABLE_RAIL;
 			}
 
 			if (rat.isInCage()) {

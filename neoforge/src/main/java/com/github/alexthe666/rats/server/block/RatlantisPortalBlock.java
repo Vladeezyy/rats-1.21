@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block;
 
+import net.minecraft.world.level.portal.DimensionTransition;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.RatsMod;
@@ -55,13 +56,10 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 	@Override
 	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 		if (RatsMod.RATLANTIS_DATAPACK_ENABLED) {
-			if (!entity.isPassenger() && !entity.isVehicle() && entity.canChangeDimensions()) {
+			if (!entity.isPassenger() && !entity.isVehicle() && entity.canUsePortal(false)) {
 				if (entity.isOnPortalCooldown()) {
 					entity.setPortalCooldown();
 				} else {
-					if (!entity.level().isClientSide() && !pos.equals(entity.portalEntrancePos)) {
-						entity.portalEntrancePos = pos.immutable();
-					}
 					MinecraftServer server = entity.level().getServer();
 					ResourceKey<Level> destination = entity.level().dimension() == RatlantisDimensionRegistry.DIMENSION_KEY ? Level.OVERWORLD : RatlantisDimensionRegistry.DIMENSION_KEY;
 					if (server != null) {
@@ -69,8 +67,10 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 						if (dest != null && server.isNetherEnabled() && !entity.isPassenger()) {
 							entity.level().getProfiler().push("ratlantis_portal");
 							entity.setPortalCooldown();
-							entity.changeDimension(dest, new RatlantisTeleporter(dest));
-							entity.setDeltaMovement(Vec3.ZERO);
+							DimensionTransition transition = new RatlantisTeleporter(dest).transition(entity);
+							if (transition != null) {
+								entity.changeDimension(transition);
+							}
 							entity.level().getProfiler().pop();
 						}
 					}

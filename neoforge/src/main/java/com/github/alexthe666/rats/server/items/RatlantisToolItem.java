@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsToolMaterialRegistry;
 import com.mojang.datafixers.util.Pair;
@@ -33,7 +34,7 @@ public class RatlantisToolItem {
 	public static class Pickaxe extends PickaxeItem {
 
 		public Pickaxe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, 1, -2.8F, properties);
+			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 1, -2.8F)));
 		}
 
 		@Override
@@ -44,7 +45,7 @@ public class RatlantisToolItem {
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.BASE_STONE_OVERWORLD).contains(state.getBlock())) {
+			if (state.is(BlockTags.BASE_STONE_OVERWORLD)) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
 					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
@@ -59,13 +60,13 @@ public class RatlantisToolItem {
 
 	public static class Axe extends AxeItem {
 		public Axe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, 5.0F, -3.0F, properties);
+			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 5.0F, -3.0F)));
 		}
 
 		@Override
 		public float getDestroySpeed(ItemStack stack, BlockState state) {
-			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
-				return this.speed * 1.5F;
+			if (state.is(BlockTags.LEAVES)) {
+				return this.getTier().getSpeed() * 1.5F;
 			}
 			return super.getDestroySpeed(stack, state);
 		}
@@ -78,7 +79,7 @@ public class RatlantisToolItem {
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
+			if (state.is(BlockTags.LEAVES)) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
 					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
@@ -91,12 +92,12 @@ public class RatlantisToolItem {
 
 	public static class Shovel extends ShovelItem {
 		public Shovel(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, 1.5F, -3.0F, properties);
+			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 1.5F, -3.0F)));
 		}
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.SAND).contains(state.getBlock())) {
+			if (state.is(BlockTags.SAND)) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
 					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
@@ -115,7 +116,7 @@ public class RatlantisToolItem {
 
 	public static class Hoe extends HoeItem {
 		public Hoe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, -7, 0.0F, properties);
+			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, -7, 0.0F)));
 		}
 
 		@Override

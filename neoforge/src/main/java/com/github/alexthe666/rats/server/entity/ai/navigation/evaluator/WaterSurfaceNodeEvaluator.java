@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.navigation.evaluator;
 
+import net.minecraft.world.level.pathfinder.PathfindingContext;
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -39,8 +40,8 @@ public class WaterSurfaceNodeEvaluator extends NodeEvaluator {
 	}
 
 	@Override
-	public Target getGoal(double x, double y, double z) {
-		return this.getTargetFromNode(this.getNode(Mth.floor(x), Mth.floor(y), Mth.floor(z)));
+	public Target getTarget(double x, double y, double z) {
+		return this.getTargetNodeAt(x, y, z);
 	}
 
 	@Override
@@ -85,7 +86,7 @@ public class WaterSurfaceNodeEvaluator extends NodeEvaluator {
 				node = this.getNode(x, y, z);
 				node.type = blockpathtypes;
 				node.costMalus = Math.max(node.costMalus, f);
-				if (!this.level.getFluidState(new BlockPos(x, y, z)).isEmpty() && this.level.getFluidState(new BlockPos(x, y + 1, z)).isEmpty()) {
+				if (!this.currentContext.level().getFluidState(new BlockPos(x, y, z)).isEmpty() && this.currentContext.level().getFluidState(new BlockPos(x, y + 1, z)).isEmpty()) {
 					node.costMalus += 8.0F;
 				}
 			}
@@ -95,16 +96,17 @@ public class WaterSurfaceNodeEvaluator extends NodeEvaluator {
 	}
 
 	protected PathType getCachedBlockType(int x, int y, int z) {
-		return this.pathTypesByPosCache.computeIfAbsent(BlockPos.asLong(x, y, z), type -> this.getBlockPathType(this.level, x, y, z));
+		return this.pathTypesByPosCache.computeIfAbsent(BlockPos.asLong(x, y, z), type -> this.getPathType(this.currentContext, x, y, z));
 	}
 
 	@Override
-	public PathType getBlockPathType(BlockGetter getter, int x, int y, int z) {
-		return this.getBlockPathType(getter, x, y, z, this.mob);
+	public PathType getPathType(PathfindingContext context, int x, int y, int z) {
+		return this.getPathTypeOfMob(context, x, y, z, this.mob);
 	}
 
 	@Override
-	public PathType getBlockPathType(BlockGetter getter, int x, int y, int z, Mob mob) {
+	public PathType getPathTypeOfMob(PathfindingContext context, int x, int y, int z, Mob mob) {
+		BlockGetter getter = context.level();
 		BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
 		for (int i = x; i < x + this.entityWidth; ++i) {
@@ -112,7 +114,7 @@ public class WaterSurfaceNodeEvaluator extends NodeEvaluator {
 				for (int k = z; k < z + this.entityDepth; ++k) {
 					FluidState fluidstate = getter.getFluidState(mutablePos.set(i, j, k));
 					BlockState blockstate = getter.getBlockState(mutablePos.set(i, j, k));
-					if (fluidstate.isEmpty() && blockstate.isPathfindable(getter, mutablePos.below(), PathComputationType.WATER) && blockstate.isAir()) {
+					if (fluidstate.isEmpty() && blockstate.isPathfindable(PathComputationType.WATER) && blockstate.isAir()) {
 						return PathType.WATER;
 					}
 
@@ -125,6 +127,6 @@ public class WaterSurfaceNodeEvaluator extends NodeEvaluator {
 
 		BlockState currentState = getter.getBlockState(mutablePos);
 		BlockState aboveState = getter.getBlockState(mutablePos.above());
-		return currentState.isPathfindable(getter, mutablePos, PathComputationType.WATER) && aboveState.isAir() ? PathType.WATER : PathType.OPEN;
+		return currentState.isPathfindable(PathComputationType.WATER) && aboveState.isAir() ? PathType.WATER : PathType.OPEN;
 	}
 }

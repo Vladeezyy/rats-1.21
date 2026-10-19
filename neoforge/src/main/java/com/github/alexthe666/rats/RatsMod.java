@@ -90,6 +90,7 @@ public class RatsMod {
 		bus.addListener(RatVariantRegistry::registerRegistry);
 		RatVariantRegistry.RAT_VARIANTS.register(bus);
 		RatsArmorMaterialRegistry.MATERIALS.register(bus);
+		RatsAdvancementsRegistry.TRIGGERS.register(bus);
 
 		RatsBannerPatternRegistry.PATTERNS.register(bus);
 		RatsBlockRegistry.BLOCKS.register(bus);

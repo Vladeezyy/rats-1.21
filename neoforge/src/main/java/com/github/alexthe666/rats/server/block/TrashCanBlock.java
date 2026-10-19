@@ -118,7 +118,7 @@ public class TrashCanBlock extends BaseEntityBlock implements WorldlyContainerHo
 					level.playSound(null, pos, RatsSoundRegistry.TRASH_CAN_EMPTY.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 					return ItemInteractionResult.sidedSuccess(level.isClientSide());
 				} else if (state.getValue(LEVEL) < 7 && stack.getItem() instanceof BlockItem bi) {
-					if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(RatsBlockTags.TRASH_CAN_BLACKLIST).contains(bi.getBlock())) {
+					if (bi.is(RatsBlockTags.TRASH_CAN_BLACKLIST)) {
 						player.displayClientMessage(Component.literal("This block can't be used here.").withStyle(ChatFormatting.RED), true);
 						return ItemInteractionResult.CONSUME;
 					}

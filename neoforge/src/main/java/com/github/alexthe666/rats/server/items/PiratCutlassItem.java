@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import com.github.alexthe666.rats.registry.RatsToolMaterialRegistry;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -15,18 +17,15 @@ public class PiratCutlassItem extends SwordItem {
 	private final boolean ghost;
 
 	public PiratCutlassItem(Item.Properties properties, boolean ghost) {
-		super(ghost ? RatsToolMaterialRegistry.GHOST_CUTLASS : RatsToolMaterialRegistry.CUTLASS, ghost ? 7 : 5, 6.0F, properties);
+		super(ghost ? RatsToolMaterialRegistry.GHOST_CUTLASS : RatsToolMaterialRegistry.CUTLASS, properties.attributes(weapon(ghost ? 8D : 6.5D, -1D)));
 		this.ghost = ghost;
 	}
 
-	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot equipmentSlot, ItemStack stack) {
-		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.create();
-		if (equipmentSlot == EquipmentSlot.MAINHAND) {
-			multimap.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", this.ghost ? 8D : 6.5D, AttributeModifier.Operation.ADD_VALUE));
-			multimap.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -1, AttributeModifier.Operation.ADD_VALUE));
-		}
-		return multimap;
+	/** The weapon's main hand damage and speed (the original replaced the item's attribute map with these values) */
+	static ItemAttributeModifiers weapon(double damage, double speed) {
+		return ItemAttributeModifiers.builder()
+				.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, damage, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+				.add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, speed, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+				.build();
 	}
-
 }
