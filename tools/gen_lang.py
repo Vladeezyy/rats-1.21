@@ -3,11 +3,11 @@
 import json
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / "common/src/main/resources/assets/examplemod/lang"
+OUT = Path(__file__).resolve().parent.parent / "common/src/main/resources/assets/rats/lang"
 LANGS = ("en_us", "ru_ru", "uk_ua", "de_de", "es_es", "pt_br")
 STRINGS = {
-    "itemGroup.examplemod": ("Example Mod", "Пример мода", "Приклад мода", "Beispielmod", "Mod de ejemplo", "Mod de exemplo"),
-    "block.examplemod.example_block": ("Example Block", "Пример блока", "Приклад блока", "Beispielblock", "Bloque de ejemplo", "Bloco de exemplo"),
+    "itemGroup.rats": ("Rats", "Пример мода", "Приклад мода", "Beispielmod", "Mod de ejemplo", "Mod de exemplo"),
+    "block.rats.example_block": ("Example Block", "Пример блока", "Приклад блока", "Beispielblock", "Bloque de ejemplo", "Bloco de exemplo"),
 }
 
 

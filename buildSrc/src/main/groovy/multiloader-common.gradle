@@ -6,7 +6,7 @@ plugins {
 version = "${mod_version}+${minecraft_version}"
 
 base {
-    archivesName = project.name == 'common' ? 'ExampleMod-common' : "ExampleMod-${project.name}"
+    archivesName = project.name == 'common' ? 'Rats-common' : "Rats-${project.name}"
 }
 
 java {
@@ -45,8 +45,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
-    from(rootProject.file('LICENSE')) { rename { 'LICENSE_examplemod' } }
-    from(rootProject.file('licenses')) { into 'licenses/examplemod' }
+    from(rootProject.file('LICENSE')) { rename { 'LICENSE_rats' } }
+    from(rootProject.file('licenses')) { into 'licenses/rats' }
 }
 
 processResources {

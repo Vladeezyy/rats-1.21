@@ -40,14 +40,14 @@ neoForge {
         // tools/scenetest.sh: client scene with screenshots and checks
         scene {
             client()
-            systemProperty 'examplemod.scene', project.findProperty('scene') ?: 'main'
-            systemProperty 'examplemod.scene.lang', project.findProperty('scene_lang') ?: 'en_us'
+            systemProperty 'rats.scene', project.findProperty('scene') ?: 'main'
+            systemProperty 'rats.scene.lang', project.findProperty('scene_lang') ?: 'en_us'
         }
         // tools/selftest.sh: functional checks on a fresh world, then stops
         selftest {
             server()
             programArgument '--nogui'
-            systemProperty 'examplemod.selftest', 'true'
+            systemProperty 'rats.selftest', 'true'
         }
         // tools/nettest.sh: a dev client joins a dev dedicated server
         netServer {
@@ -57,7 +57,7 @@ neoForge {
         }
         netClient {
             client()
-            systemProperty 'examplemod.scene', 'net'
+            systemProperty 'rats.scene', 'net'
             programArguments.addAll('--quickPlayMultiplayer', 'localhost:25565')
         }
         // recipes and tags into common/src/generated/resources (both loaders use them)

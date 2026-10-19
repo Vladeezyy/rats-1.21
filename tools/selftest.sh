@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 LOADER=${LOADER:-neoforge}
 # processes of the dev runs: NeoForge passes the mod folders, Fabric's dev launcher the loom cache of the project
 case $LOADER in
-	neoforge) PROC='fml.modFolders=examplemod' ;;
+	neoforge) PROC='fml.modFolders=rats' ;;
 	fabric) PROC="$(basename "$PWD")/(fabric/)?\.gradle/loom-cache" ;;
 	*) echo "LOADER must be neoforge or fabric"; exit 2 ;;
 esac
@@ -15,16 +15,16 @@ rm -rf $LOADER/run/world build-selftest.log
 mkdir -p $LOADER/run && echo "eula=true" > $LOADER/run/eula.txt
 ./gradlew :$LOADER:runSelftest --console=plain "$@" > build-selftest.log 2>&1 &
 i=0
-until grep -qE 'Example Mod selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND' build-selftest.log 2>/dev/null || [ $i -gt 300 ]; do sleep 2; i=$((i+1)); done
+until grep -qE 'Rats selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND' build-selftest.log 2>/dev/null || [ $i -gt 300 ]; do sleep 2; i=$((i+1)); done
 sleep 5
 pkill -f "$PROC" 2>/dev/null; sleep 2; pkill -9 -f "$PROC" 2>/dev/null
 wait 2>/dev/null
 [ $i -gt 300 ] && echo "TIMEOUT (no result in 10 min)"
-grep -E 'Example Mod selftest\] (PASS|FAILED|FAIL )|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED' build-selftest.log | sed -E 's/^\[[^]]*\] //'
+grep -E 'Rats selftest\] (PASS|FAILED|FAIL )|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED' build-selftest.log | sed -E 's/^\[[^]]*\] //'
 echo "--- errors / warnings (vanilla dev noise filtered)"
 grep -E '/(ERROR|FATAL|WARN)\]|Caused by|Exception' build-selftest.log \
-  | grep -vE 'Example Mod selftest|server.properties|uses unexpected schema|OFFLINE/INSECURE|online-mode|hackers to connect|no attempt to authenticate|LanServerPinger|UnixException|Ambiguity between arguments' \
+  | grep -vE 'Rats selftest|server.properties|uses unexpected schema|OFFLINE/INSECURE|online-mode|hackers to connect|no attempt to authenticate|LanServerPinger|UnixException|Ambiguity between arguments' \
   | sed -E 's/^\[[^]]*\] //' | cut -c1-300 | sort | uniq -c | sort -rn | head -40
 
 # result: 0 if all checks passed
-grep -q "Example Mod selftest\] PASS" build-selftest.log
+grep -q "Rats selftest\] PASS" build-selftest.log

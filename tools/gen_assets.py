@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PIL import Image
 
-OUT = Path(__file__).resolve().parent.parent / "common/src/main/resources/assets/examplemod/textures"
+OUT = Path(__file__).resolve().parent.parent / "common/src/main/resources/assets/rats/textures"
 
 
 def example_block():

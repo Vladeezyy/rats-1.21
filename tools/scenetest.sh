@@ -8,12 +8,12 @@ cd "$(dirname "$0")/.."
 LOADER=${LOADER:-neoforge}
 # processes of the dev runs: NeoForge passes the mod folders, Fabric's dev launcher the loom cache of the project
 case $LOADER in
-	neoforge) PROC='fml.modFolders=examplemod' ;;
+	neoforge) PROC='fml.modFolders=rats' ;;
 	fabric) PROC="$(basename "$PWD")/(fabric/)?\.gradle/loom-cache" ;;
 	*) echo "LOADER must be neoforge or fabric"; exit 2 ;;
 esac
-rm -rf $LOADER/run/saves/examplemod_scene $LOADER/run/screenshots/scene_*.png build-scene.log
-rm -f $LOADER/run/config/examplemod-*.toml
+rm -rf $LOADER/run/saves/rats_scene $LOADER/run/screenshots/scene_*.png build-scene.log
+rm -f $LOADER/run/config/rats-*.toml
 perl -e 'alarm 900; exec @ARGV' ./gradlew :$LOADER:runScene --console=plain "$@" > build-scene.log 2>&1 &
 gradle_pid=$!
 while kill -0 $gradle_pid 2>/dev/null; do

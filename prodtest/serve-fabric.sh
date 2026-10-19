@@ -9,7 +9,7 @@ until grep -qE 'Done \(|crash report has been saved|Minecraft Crash Report|Faile
 sleep 3
 pkill -f "fabric.addMods=.*$(basename "$PWD")" 2>/dev/null; sleep 3; pkill -9 -f "fabric.addMods=.*$(basename "$PWD")" 2>/dev/null
 wait 2>/dev/null
-grep -E 'Loading [0-9]+ mods|examplemod|Done \(|crash report|Failed to start|Incompatible mods' build-prodfabric.log | head -8 | cut -c1-200
+grep -E 'Loading [0-9]+ mods|rats|Done \(|crash report|Failed to start|Incompatible mods' build-prodfabric.log | head -8 | cut -c1-200
 # the script stops the server after "Done": Gradle then reports exit value 143, which is not a failure
 grep -q 'Done (' build-prodfabric.log || grep -E 'BUILD FAILED|What went wrong' -A2 build-prodfabric.log | head -6
 echo "--- errors"

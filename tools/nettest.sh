@@ -7,13 +7,13 @@ cd "$(dirname "$0")/.."
 LOADER=${LOADER:-neoforge}
 # processes of the dev runs: NeoForge passes the mod folders, Fabric's dev launcher the loom cache of the project
 case $LOADER in
-	neoforge) PROC='fml.modFolders=examplemod' ;;
+	neoforge) PROC='fml.modFolders=rats' ;;
 	fabric) PROC="$(basename "$PWD")/(fabric/)?\.gradle/loom-cache" ;;
 	*) echo "LOADER must be neoforge or fabric"; exit 2 ;;
 esac
 pkill -f "$PROC" 2>/dev/null
 rm -rf $LOADER/run-net/world build-netserver.log build-netclient.log
-rm -f $LOADER/run/config/examplemod-*.toml $LOADER/run-net/config/examplemod-*.toml
+rm -f $LOADER/run/config/rats-*.toml $LOADER/run-net/config/rats-*.toml
 mkdir -p $LOADER/run-net/config && echo "eula=true" > $LOADER/run-net/eula.txt
 printf 'online-mode=false\nspawn-protection=0\ndifficulty=normal\n' > $LOADER/run-net/server.properties
 # The offline UUID of "Dev"

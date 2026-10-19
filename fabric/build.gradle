@@ -34,7 +34,7 @@ loom {
         "${mod_id}" {
             sourceSet sourceSets.main
         }
-        examplemod_selftest {
+        rats_selftest {
             sourceSet sourceSets.selftest
         }
     }
@@ -52,7 +52,7 @@ loom {
             server()
             name 'Self Test'
             source sourceSets.selftest
-            vmArg '-Dexamplemod.selftest=true'
+            vmArg '-Drats.selftest=true'
             runDir('run')
         }
         // tools/scenetest.sh LOADER=fabric
@@ -60,8 +60,8 @@ loom {
             client()
             name 'Scene'
             source sourceSets.selftest
-            vmArg "-Dexamplemod.scene=${project.findProperty('scene') ?: 'main'}"
-            vmArg "-Dexamplemod.scene.lang=${project.findProperty('scene_lang') ?: 'en_us'}"
+            vmArg "-Drats.scene=${project.findProperty('scene') ?: 'main'}"
+            vmArg "-Drats.scene.lang=${project.findProperty('scene_lang') ?: 'en_us'}"
             runDir('run')
         }
         // tools/nettest.sh LOADER=fabric
@@ -75,7 +75,7 @@ loom {
             client()
             name 'Net Client'
             source sourceSets.selftest
-            vmArg '-Dexamplemod.scene=net'
+            vmArg '-Drats.scene=net'
             // the test server makes "Dev" an operator (NeoForge dev clients are "Dev" already)
             programArgs '--quickPlayMultiplayer', 'localhost:25565', '--username', 'Dev'
             runDir('run')

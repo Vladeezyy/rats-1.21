@@ -12,10 +12,10 @@
   "license": "${license}",
   "environment": "*",
   "entrypoints": {
-    "main": ["dev.vladeezyy.examplemod.fabric.ExampleModFabric"],
-    "client": ["dev.vladeezyy.examplemod.fabric.ExampleModFabricClient"]
+    "main": ["dev.vladeezyy.rats.fabric.RatsFabric"],
+    "client": ["dev.vladeezyy.rats.fabric.RatsFabricClient"]
   },
-  "mixins": ["examplemod.fabric.mixins.json"],
+  "mixins": ["rats.fabric.mixins.json"],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",

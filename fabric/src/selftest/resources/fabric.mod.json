@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod_selftest",
+  "id": "rats_selftest",
   "version": "1.0.0",
-  "name": "Example Mod tests (dev only)",
+  "name": "Rats tests (dev only)",
   "environment": "*",
   "entrypoints": {
-    "main": ["dev.vladeezyy.examplemod.fabric.selftest.FabricTestHooks"],
-    "client": ["dev.vladeezyy.examplemod.fabric.selftest.FabricTestHooksClient"]
+    "main": ["dev.vladeezyy.rats.fabric.selftest.FabricTestHooks"],
+    "client": ["dev.vladeezyy.rats.fabric.selftest.FabricTestHooksClient"]
   },
   "depends": {
-    "examplemod": "*"
+    "rats": "*"
   }
 }
