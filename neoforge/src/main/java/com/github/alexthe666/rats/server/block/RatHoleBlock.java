@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.server.block.entity.RatHoleBlockEntity;
 import com.github.alexthe666.rats.server.entity.rat.DiggingRat;
 import net.minecraft.core.BlockPos;
@@ -30,6 +32,13 @@ import java.util.Objects;
 
 @SuppressWarnings("deprecation")
 public class RatHoleBlock extends BaseEntityBlock {
+    public static final MapCodec<RatHoleBlock> CODEC = simpleCodec(RatHoleBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatHoleBlock> codec() {
+        return CODEC;
+    }
+
 
 	public static final BooleanProperty NORTH = BooleanProperty.create("north");
 	public static final BooleanProperty EAST = BooleanProperty.create("east");

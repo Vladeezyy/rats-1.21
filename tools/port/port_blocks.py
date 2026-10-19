@@ -10,7 +10,7 @@ import sys
 
 ROOT = sys.argv[1]
 CODEC_CLASSES = set(sys.argv[2:])
-BLOCK = os.path.join(ROOT, 'neoforge', 'src', 'main', 'java', 'com', 'github', 'alexthe666', 'rats', 'block')
+BLOCK = os.path.join(ROOT, 'neoforge', 'src', 'main', 'java', 'com', 'github', 'alexthe666', 'rats', 'server', 'block')
 
 RESULTS = {'SUCCESS': 'SUCCESS', 'CONSUME': 'CONSUME', 'CONSUME_PARTIAL': 'CONSUME_PARTIAL', 'FAIL': 'FAIL',
            'PASS': 'PASS_TO_DEFAULT_BLOCK_INTERACTION'}

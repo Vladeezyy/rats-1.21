@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.events;
 
+import net.minecraft.world.entity.SpawnPlacementType;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
@@ -59,14 +60,14 @@ public class ModEvents {
 
 	@SubscribeEvent
 	public static void registerSpawnPlacements(SpawnPlacementRegisterEvent event) {
-		event.register(RatsEntityRegistry.RAT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Rat::checkRatSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatsEntityRegistry.PIED_PIPER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, PiedPiper::checkPiperSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatsEntityRegistry.DEMON_RAT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, DemonRat::canDemonRatSpawnOn, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.FERAL_RATLANTEAN.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, FeralRatlantean::checkRatlanteanSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.RATLANTEAN_SPIRIT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, RatlanteanSpirit::checkSpiritSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.PIRAT.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Pirat::checkPiratSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.GHOST_PIRAT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, GhostPirat::checkGhostPiratSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.RATFISH.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AbstractFish::checkSurfaceWaterAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
-		event.register(RatlantisEntityRegistry.RATLANTEAN_RATBOT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, RatlanteanRatbot::checkBotSpawnRule, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatsEntityRegistry.RAT.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Rat::checkRatSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatsEntityRegistry.PIED_PIPER.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, PiedPiper::checkPiperSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatsEntityRegistry.DEMON_RAT.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, DemonRat::canDemonRatSpawnOn, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.FERAL_RATLANTEAN.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, FeralRatlantean::checkRatlanteanSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.RATLANTEAN_SPIRIT.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, RatlanteanSpirit::checkSpiritSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.PIRAT.get(), SpawnPlacementType.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Pirat::checkPiratSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.GHOST_PIRAT.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, GhostPirat::checkGhostPiratSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.RATFISH.get(), SpawnPlacementType.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AbstractFish::checkSurfaceWaterAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+		event.register(RatlantisEntityRegistry.RATLANTEAN_RATBOT.get(), SpawnPlacementType.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, RatlanteanRatbot::checkBotSpawnRule, SpawnPlacementRegisterEvent.Operation.REPLACE);
 	}
 }

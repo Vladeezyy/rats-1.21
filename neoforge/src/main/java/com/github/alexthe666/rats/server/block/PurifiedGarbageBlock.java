@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
 import net.minecraft.core.BlockPos;
@@ -13,6 +15,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PurifiedGarbageBlock extends AbstractGarbageBlock {
+    public static final MapCodec<PurifiedGarbageBlock> CODEC = simpleCodec(PurifiedGarbageBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends PurifiedGarbageBlock> codec() {
+        return CODEC;
+    }
+
 
 	public PurifiedGarbageBlock(BlockBehaviour.Properties properties) {
 		super(properties, 1.0D);

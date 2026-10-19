@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.ItemInteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatTubeBlockEntity;
@@ -46,6 +49,13 @@ import java.util.Objects;
 
 @SuppressWarnings("deprecation")
 public class RatTubeBlock extends BaseEntityBlock {
+    public static final MapCodec<RatTubeBlock> CODEC = simpleCodec(RatTubeBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatTubeBlock> codec() {
+        return CODEC;
+    }
+
 
 	public static final BooleanProperty NORTH = BooleanProperty.create("north");
 	public static final BooleanProperty EAST = BooleanProperty.create("east");
@@ -248,9 +258,9 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (player.isCrouching() || player.getItemInHand(hand).getItem() instanceof BlockItem || player.getItemInHand(hand).getItem() instanceof RatTubeItem) {
-			return InteractionResult.PASS;
+			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 		} else {
 			Direction side = hit.getDirection();
 			BooleanProperty changing;
@@ -282,7 +292,7 @@ public class RatTubeBlock extends BaseEntityBlock {
 						.setValue(OPEN_DOWN, false));
 				updateTEOpening(level, pos, side, false);
 			}
-			return InteractionResult.SUCCESS;
+			return ItemInteractionResult.SUCCESS;
 		}
 	}
 
@@ -300,12 +310,12 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+	public @NotNull BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 		BlockEntity tileentity = level.getBlockEntity(pos);
 		if (tileentity instanceof RatTubeBlockEntity && !player.isCreative()) {
 			Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getTubeItem(level, pos));
 		}
-		super.playerWillDestroy(level, pos, state, player);
+		return super.playerWillDestroy(level, pos, state, player);
 	}
 
 	@Override

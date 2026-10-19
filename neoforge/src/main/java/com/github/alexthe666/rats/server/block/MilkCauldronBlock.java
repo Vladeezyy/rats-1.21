@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsCauldronRegistry;
 import com.github.alexthe666.rats.server.block.entity.MilkCauldronBlockEntity;
@@ -20,6 +22,13 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class MilkCauldronBlock extends AbstractCauldronBlock implements EntityBlock {
+    public static final MapCodec<MilkCauldronBlock> CODEC = simpleCodec(MilkCauldronBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends MilkCauldronBlock> codec() {
+        return CODEC;
+    }
+
 
 	public MilkCauldronBlock(BlockBehaviour.Properties properties) {
 		super(properties, RatsCauldronRegistry.MILK);

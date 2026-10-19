@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.Items;
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
 import dev.vladeezyy.rampart.animation.IAnimatedEntity;
@@ -565,5 +566,11 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 	@Override
 	protected void spawnSprintParticle() {
 
+	}
+
+	// 1.21: Animal.isFood is abstract; 1.20.1's default was wheat, which the rats used
+	@Override
+	public boolean isFood(ItemStack stack) {
+		return stack.is(Items.WHEAT);
 	}
 }

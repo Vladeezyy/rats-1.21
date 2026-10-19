@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatAttractorBlockEntity;
@@ -32,6 +34,13 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class RatAttractorBlock extends BaseEntityBlock {
+    public static final MapCodec<RatAttractorBlock> CODEC = simpleCodec(RatAttractorBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatAttractorBlock> codec() {
+        return CODEC;
+    }
+
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 	public static final BooleanProperty CONNECTED_UP = BooleanProperty.create("up");
 	private static final VoxelShape AABB = Block.box(4, 0, 4, 12, 8, 12);
@@ -105,7 +114,7 @@ public class RatAttractorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;
 	}
 }

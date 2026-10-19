@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity;
@@ -43,6 +46,13 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class AutoCurdlerBlock extends BaseEntityBlock {
+    public static final MapCodec<AutoCurdlerBlock> CODEC = simpleCodec(AutoCurdlerBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends AutoCurdlerBlock> codec() {
+        return CODEC;
+    }
+
 
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
 	private static final VoxelShape AABB_BASE = Block.box(1, 0, 1, 15, 8, 15);
@@ -76,7 +86,7 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isShiftKeyDown()) {
 			ItemStack stack = player.getItemInHand(hand);
 			if (AutoCurdlerBlockEntity.isMilk(stack) && level.getBlockEntity(pos) instanceof AutoCurdlerBlockEntity te) {
@@ -104,16 +114,16 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 						}
 					}
 				}
-				return InteractionResult.SUCCESS;
+				return ItemInteractionResult.SUCCESS;
 			}
 			if (level.isClientSide()) {
-				return InteractionResult.SUCCESS;
+				return ItemInteractionResult.SUCCESS;
 			} else {
 				player.openMenu(this.getMenuProvider(state, level, pos));
-				return InteractionResult.CONSUME;
+				return ItemInteractionResult.CONSUME;
 			}
 		}
-		return InteractionResult.PASS;
+		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 	}
 
 	@Override

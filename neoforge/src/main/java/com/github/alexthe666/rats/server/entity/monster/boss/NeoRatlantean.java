@@ -77,7 +77,7 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Override
-	public boolean canChangeDimensions() {
+	public boolean canChangeDimensions(Level from, Level to) {
 		return false;
 	}
 

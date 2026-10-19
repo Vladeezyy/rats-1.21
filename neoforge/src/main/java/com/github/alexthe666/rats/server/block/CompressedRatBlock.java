@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
@@ -18,6 +20,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class CompressedRatBlock extends HorizontalDirectionalBlock {
+    public static final MapCodec<CompressedRatBlock> CODEC = simpleCodec(CompressedRatBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends CompressedRatBlock> codec() {
+        return CODEC;
+    }
+
 
 	public CompressedRatBlock(BlockBehaviour.Properties properties) {
 		super(properties);

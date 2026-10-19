@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
+import net.minecraft.world.level.Level;
 import com.github.alexthe666.rats.server.misc.StoredItems;
 public class RatMineGoal {
 }/* extends BaseRatHarvestGoal {

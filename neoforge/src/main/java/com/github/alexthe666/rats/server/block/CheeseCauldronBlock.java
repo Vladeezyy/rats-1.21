@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.ItemInteractionResult;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -29,6 +32,14 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.util.Map;
 
 public class CheeseCauldronBlock extends AbstractCauldronBlock {
+	// 1.21 wants a codec per block class; these blocks are only made by the mod's registry, so it gives the same block
+	private final MapCodec<CheeseCauldronBlock> codec = simpleCodec(properties -> this);
+
+	@Override
+	protected MapCodec<? extends CheeseCauldronBlock> codec() {
+		return this.codec;
+	}
+
 
 	private final DeferredHolder<Block, Block> drop;
 
@@ -38,8 +49,8 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (super.use(state, level, pos, player, hand, hit) == InteractionResult.PASS) {
+	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (super.useItemOn(heldStack, state, level, pos, player, hand, hit) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
 			level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
 			level.playSound(null, pos, RatsSoundRegistry.CHEESE_CAULDRON_EMPTY.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 			level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -47,7 +58,7 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 				player.drop(new ItemStack(this.drop.get()), false);
 			}
 		}
-		return InteractionResult.SUCCESS;
+		return ItemInteractionResult.SUCCESS;
 	}
 
 	@Override

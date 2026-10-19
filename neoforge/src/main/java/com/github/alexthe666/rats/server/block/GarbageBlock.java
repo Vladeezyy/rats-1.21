@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import net.minecraft.world.entity.SpawnPlacementType;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import net.minecraft.core.BlockPos;
@@ -12,6 +14,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class GarbageBlock extends AbstractGarbageBlock {
+	// 1.21 wants a codec per block class; this block is only made by the mod's registry, so it gives the same block
+	private final MapCodec<GarbageBlock> codec = simpleCodec(properties -> this);
+
+	@Override
+	protected MapCodec<? extends GarbageBlock> codec() {
+		return this.codec;
+	}
+
 	public GarbageBlock(Properties properties, double spawnRateModifier) {
 		super(properties, spawnRateModifier);
 	}
@@ -33,7 +43,7 @@ public final class GarbageBlock extends AbstractGarbageBlock {
 	}
 
 	@Override
-	public boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacements.Type type, EntityType<?> entityType) {
+	public boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacementType type, EntityType<?> entityType) {
 		return entityType == RatsEntityRegistry.RAT.get();
 	}
 

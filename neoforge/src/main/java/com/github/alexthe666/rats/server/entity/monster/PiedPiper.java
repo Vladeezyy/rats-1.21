@@ -184,7 +184,7 @@ public class PiedPiper extends Raider implements RatSummoner {
 			if (this.getRatsSummoned() < 6 && this.ratCooldown == 0) {
 				this.level().broadcastEntityEvent(this, (byte) 82);
 				Rat rat = new Rat(RatsEntityRegistry.RAT.get(), this.level());
-				EventHooks.onFinalizeSpawn(rat, (ServerLevel) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+				EventHooks.finalizeMobSpawn(rat, (ServerLevel) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
 				rat.copyPosition(this);
 				this.level().addFreshEntity(rat);
 				rat.setPlagued(false);
@@ -256,8 +256,8 @@ public class PiedPiper extends Raider implements RatSummoner {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean playerKill) {
-		super.dropCustomDeathLoot(source, looting, playerKill);
+	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean playerKill) {
+		super.dropCustomDeathLoot(level, source, playerKill);
 		if (source.getEntity() instanceof AbstractRat) {
 			if (this.getRandom().nextBoolean()) {
 				this.spawnAtLocation(RatsItemRegistry.MUSIC_DISC_MICE_ON_VENUS.get(), 1);

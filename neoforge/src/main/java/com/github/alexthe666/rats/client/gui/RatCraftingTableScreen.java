@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.gui;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.inventory.RatCraftingTableMenu;
 import com.github.alexthe666.rats.server.message.CycleRatRecipePacket;
@@ -47,7 +48,7 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 
 		this.renderables.clear();
-		this.addRenderableWidget(new ImageButton(this.leftPos + 128, this.topPos + 65, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, button -> {
+		this.addRenderableWidget(new ImageButton(this.leftPos + 128, this.topPos + 65, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, button -> {
 			this.recipeBook.toggleVisibility();
 			this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
 			this.init();
@@ -94,9 +95,9 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 		}
 		RenderSystem.enableDepthTest();
 
-		Optional<CraftingRecipe> recipe = this.table.getCraftingTable().getGuideRecipe();
+		Optional<RecipeHolder<CraftingRecipe>> recipe = this.table.getCraftingTable().getGuideRecipe();
 		if (recipe.isPresent() && !this.table.getSlot(0).hasItem()) {
-			graphics.renderItem(recipe.get().getResultItem(Minecraft.getInstance().level.registryAccess()), this.leftPos + 130, this.topPos + 40);
+			graphics.renderItem(recipe.get().value().getResultItem(Minecraft.getInstance().level.registryAccess()), this.leftPos + 130, this.topPos + 40);
 			RenderSystem.disableDepthTest();
 			graphics.pose().pushPose();
 			graphics.pose().translate(this.leftPos, this.topPos, 300.0D);

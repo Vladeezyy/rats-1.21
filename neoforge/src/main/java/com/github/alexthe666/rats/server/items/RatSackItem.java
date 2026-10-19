@@ -39,7 +39,7 @@ public class RatSackItem extends Item {
 		CompoundTag ratTag = new CompoundTag();
 		rat.addAdditionalSaveData(ratTag);
 		if (rat.hasCustomName()) {
-			ratTag.putString("CustomName", Component.Serializer.toJson(rat.getCustomName()));
+			ratTag.putString("CustomName", Component.Serializer.toJson(rat.getCustomName(), rat.registryAccess()));
 		}
 		tag.put("Rat_" + ratCount, ratTag);
 	}

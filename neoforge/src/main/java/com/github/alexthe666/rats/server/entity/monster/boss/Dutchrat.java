@@ -130,7 +130,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public boolean canChangeDimensions() {
+	public boolean canChangeDimensions(Level from, Level to) {
 		return false;
 	}
 

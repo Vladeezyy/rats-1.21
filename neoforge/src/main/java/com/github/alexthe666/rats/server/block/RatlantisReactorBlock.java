@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.server.block.entity.RatlantisReactorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -10,6 +12,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class RatlantisReactorBlock extends BaseEntityBlock {
+    public static final MapCodec<RatlantisReactorBlock> CODEC = simpleCodec(RatlantisReactorBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatlantisReactorBlock> codec() {
+        return CODEC;
+    }
+
 
 	public RatlantisReactorBlock(BlockBehaviour.Properties properties) {
 		super(properties);

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.gui;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.server.inventory.RatCraftingTableMenu;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.world.inventory.Slot;
@@ -13,7 +14,7 @@ import java.util.Iterator;
 public class RatCraftingRecipeBookComponent extends RecipeBookComponent {
 
 	@Override
-	public void placeRecipe(int width, int height, int result, Recipe<?> recipe, Iterator<Ingredient> iterator, int zeroidk) {
+	public void placeRecipe(int width, int height, int result, RecipeHolder<?> recipe, Iterator<Ingredient> iterator, int zeroidk) {
 		if (this.menu instanceof RatCraftingTableMenu crafting) {
 			//clear grid
 			for (int slot = 0; slot < 9; slot++) {
@@ -26,9 +27,8 @@ public class RatCraftingRecipeBookComponent extends RecipeBookComponent {
 	}
 
 	@Override
-	public void addItemToSlot(Iterator<Ingredient> iterator, int slotIndex, int zeroidk, int width, int height) {
+	public void addItemToSlot(Ingredient ingredient, int slotIndex, int zeroidk, int width, int height) {
 		if (this.menu instanceof RatCraftingTableMenu crafting) {
-			Ingredient ingredient = iterator.next();
 			if (!ingredient.isEmpty()) {
 				Slot slot = this.menu.slots.get(slotIndex);
 				crafting.getCraftingTable().matrixHandler.ifPresent(handler -> handler.setStackInSlot(slot.index - 1, ingredient.getItems()[0]));

@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.data.tags.RatsBlockTags;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
@@ -28,6 +30,13 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemRarity {
+    public static final MapCodec<RatlantisPortalBlock> CODEC = simpleCodec(RatlantisPortalBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatlantisPortalBlock> codec() {
+        return CODEC;
+    }
+
 
 	public RatlantisPortalBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -107,7 +116,7 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;
 	}
 }

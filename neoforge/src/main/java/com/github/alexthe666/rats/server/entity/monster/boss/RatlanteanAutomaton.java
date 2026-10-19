@@ -131,7 +131,7 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 	}
 
 	@Override
-	public boolean canChangeDimensions() {
+	public boolean canChangeDimensions(Level from, Level to) {
 		return false;
 	}
 

@@ -22,12 +22,12 @@ public class PlagueMobEffect extends MobEffect {
 	}
 
 	@Override
-	public void applyEffectTick(LivingEntity entity, int amplifier) {
-
+	public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+		return true;
 	}
 
 	@Override
-	public boolean isDurationEffectTick(int duration, int amplifier) {
+	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
 		return duration > 0;
 	}
 

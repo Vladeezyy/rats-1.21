@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.server.level.ServerLevel;
 import com.github.alexthe666.rats.server.misc.RatsCaps;
 import net.minecraft.core.Holder;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
@@ -409,7 +411,7 @@ public class TamedRat extends InventoryRat {
 		tag.putInt("RandomEffectCooldown", this.randomEffectCooldown);
 		if (this.transportingFluid != null) {
 			CompoundTag fluidTag = new CompoundTag();
-			this.transportingFluid.writeToNBT(fluidTag);
+			fluidTag.merge((CompoundTag) this.transportingFluid.saveOptional(this.registryAccess()));
 			tag.put("TransportingFluid", fluidTag);
 		}
 	}
@@ -448,7 +450,7 @@ public class TamedRat extends InventoryRat {
 		if (tag.contains("TransportingFluid")) {
 			CompoundTag fluidTag = tag.getCompound("TransportingFluid");
 			if (!fluidTag.isEmpty()) {
-				this.transportingFluid = FluidStack.loadFluidStackFromNBT(fluidTag);
+				this.transportingFluid = FluidStack.parseOptional(this.registryAccess(), fluidTag);
 			}
 		}
 	}
@@ -488,7 +490,7 @@ public class TamedRat extends InventoryRat {
 			Entity entity = this.getMountEntityType().create(this.level());
 			entity.copyPosition(this);
 			if (entity instanceof Mob mob && this.level() instanceof ServerLevelAccessor accessor) {
-				EventHooks.onFinalizeSpawn(mob, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+				EventHooks.finalizeMobSpawn(mob, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
 			}
 			this.level().addFreshEntity(entity);
 
@@ -600,7 +602,7 @@ public class TamedRat extends InventoryRat {
 
 	@Override
 	public ItemStack getPickedResult(HitResult target) {
-		return new ItemStack(DeferredSpawnEggItem.fromEntityType(RatsEntityRegistry.RAT.get()));
+		return new ItemStack(SpawnEggItem.byId(RatsEntityRegistry.RAT.get()));
 	}
 
 	public void setFlying(boolean flying) {
@@ -826,11 +828,11 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean playerKill) {
+	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean playerKill) {
 		if (this.hasToga()) {
 			this.spawnAtLocation(new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
 		}
-		super.dropCustomDeathLoot(source, looting, playerKill);
+		super.dropCustomDeathLoot(level, source, playerKill);
 	}
 
 	public void spawnAngelCopy() {
@@ -921,7 +923,7 @@ public class TamedRat extends InventoryRat {
 					}
 				}
 				this.setToga(!this.hasToga());
-				this.playSound(SoundEvents.ARMOR_EQUIP_GENERIC, 1F, 1.5F);
+				this.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1F, 1.5F);
 				return InteractionResult.SUCCESS;
 			} else if (itemstack.is(RatsBlockRegistry.DYE_SPONGE.get().asItem()) && this.isDyed()) {
 				this.setDyed(false);
@@ -945,7 +947,7 @@ public class TamedRat extends InventoryRat {
 					return InteractionResult.PASS;
 				} else {
 					RatSackItem.packRatIntoSack(itemstack, this, RatSackItem.getRatsInSack(itemstack) + 1);
-					this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 1, 1);
+					this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1, 1);
 					this.discard();
 					player.swing(hand);
 					return InteractionResult.SUCCESS;
@@ -965,7 +967,7 @@ public class TamedRat extends InventoryRat {
 				CompoundTag ratTag = new CompoundTag();
 				this.addAdditionalSaveData(ratTag);
 				if (this.hasCustomName()) {
-					ratTag.putString("CustomName", Component.Serializer.toJson(this.getCustomName()));
+					ratTag.putString("CustomName", Component.Serializer.toJson(this.getCustomName(), this.registryAccess()));
 				}
 				tag.put("Rat", ratTag);
 				ItemNbt.setTag(arrow, tag);
@@ -1026,7 +1028,7 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public void setTame(boolean tamed) {
+	public void setTame(boolean tamed, boolean applyTamingSideEffects) {
 		if (tamed) {
 			Arrays.fill(this.armorDropChances, 1.1F);
 			Arrays.fill(this.handDropChances, 1.1F);

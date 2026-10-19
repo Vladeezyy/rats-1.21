@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatlantisBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatlantisTokenBlockEntity;
@@ -28,6 +30,13 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomItemRarity {
+    public static final MapCodec<ChunkyCheeseTokenBlock> CODEC = simpleCodec(ChunkyCheeseTokenBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends ChunkyCheeseTokenBlock> codec() {
+        return CODEC;
+    }
+
 
 	private static final VoxelShape AABB = Block.box(4, 4, 4, 12, 12, 12);
 
@@ -69,7 +78,7 @@ public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomIte
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;
 	}
 }

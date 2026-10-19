@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.inventory.slot;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.server.block.entity.RatCraftingTableBlockEntity;
 import com.google.common.collect.Lists;
 import net.minecraft.world.entity.player.Player;
@@ -75,9 +76,9 @@ public class RatCraftingResultSlot extends SlotItemHandler {
 		}
 		this.amountCrafted = 0;
 
-		Recipe<?> recipe = this.table.getRecipeUsed();
+		RecipeHolder<?> recipe = this.table.getRecipeUsed();
 		if (recipe != null && !recipe.isSpecial()) {
-			this.player.awardRecipes(Lists.newArrayList(recipe));
+			this.player.awardRecipes(java.util.List.of(recipe));
 		}
 	}
 

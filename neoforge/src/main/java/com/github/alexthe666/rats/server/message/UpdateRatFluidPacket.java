@@ -35,7 +35,7 @@ public record UpdateRatFluidPacket(int ratId, FluidStack fluid) implements Custo
 		buf.writeInt(packet.ratId);
 		CompoundTag fluidTag = new CompoundTag();
 		if (packet.fluid != null) {
-			packet.fluid.writeToNBT(fluidTag);
+			fluidTag.merge((CompoundTag) packet.fluid.saveOptional(this.registryAccess()));
 		}
 		PacketBufferUtils.writeTag(buf, fluidTag);
 	}

@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.inventory;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.CraftingInput;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsMenuRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatCraftingTableBlockEntity;
@@ -18,7 +21,7 @@ import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.Objects;
 
-public class RatCraftingTableMenu extends RecipeBookMenu<Container> {
+public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
 
 	private final RatCraftingTableBlockEntity table;
 	private final ContainerData data;
@@ -161,7 +164,7 @@ public class RatCraftingTableMenu extends RecipeBookMenu<Container> {
 	}
 
 	@Override
-	public boolean recipeMatches(Recipe<? super Container> recipe) {
+	public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipe) {
 		return true;
 	}
 

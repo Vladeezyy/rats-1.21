@@ -16,17 +16,18 @@ public class ConfitByaldiMobEffect extends MobEffect {
 	}
 
 	@Override
-	public void applyEffectTick(LivingEntity living, int amplifier) {
+	public boolean applyEffectTick(LivingEntity living, int amplifier) {
 		if (living.getHealth() < living.getMaxHealth()) {
 			living.heal(1.0F);
 		}
 		if (living instanceof Player player) {
 			player.getFoodData().eat(1, 0.1F);
 		}
+		return true;
 	}
 
 	@Override
-	public boolean isDurationEffectTick(int duration, int amplifier) {
+	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
 		return duration % 40 == 0;
 	}
 

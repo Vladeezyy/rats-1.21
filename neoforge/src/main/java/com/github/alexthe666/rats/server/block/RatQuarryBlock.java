@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatQuarryBlockEntity;
@@ -28,6 +31,13 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class RatQuarryBlock extends BaseEntityBlock {
+    public static final MapCodec<RatQuarryBlock> CODEC = simpleCodec(RatQuarryBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends RatQuarryBlock> codec() {
+        return CODEC;
+    }
+
 
 	public RatQuarryBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -61,17 +71,17 @@ public class RatQuarryBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isCrouching()) {
 			if (level.isClientSide()) {
-				return InteractionResult.SUCCESS;
+				return ItemInteractionResult.SUCCESS;
 			} else {
 				player.openMenu(state.getMenuProvider(level, pos));
-				return InteractionResult.CONSUME;
+				return ItemInteractionResult.CONSUME;
 			}
 
 		}
-		return InteractionResult.FAIL;
+		return ItemInteractionResult.FAIL;
 	}
 
 	@Override

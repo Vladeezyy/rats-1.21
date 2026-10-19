@@ -32,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
@@ -346,9 +345,7 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 		return direction == Direction.DOWN && index == 1;
 	}
 
-	@NotNull
 	@Override
-		@Override
 	protected Component getDefaultName() {
 		return Component.translatable(RatsLangConstants.UPGRADE_COMBINER);
 	}

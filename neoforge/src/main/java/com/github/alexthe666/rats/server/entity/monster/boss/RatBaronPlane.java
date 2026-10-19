@@ -322,7 +322,7 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 	}
 
 	@Override
-	public boolean canChangeDimensions() {
+	public boolean canChangeDimensions(Level from, Level to) {
 		return false;
 	}
 

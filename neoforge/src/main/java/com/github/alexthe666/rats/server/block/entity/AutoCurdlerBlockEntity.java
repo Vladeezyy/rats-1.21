@@ -32,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -145,7 +144,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		super.saveAdditional(compound, registries);
-		this.tank.writeToNBT(compound);
+		compound.merge((CompoundTag) this.tank.saveOptional(this.registryAccess()));
 		compound.putInt("CookTime", (short) this.cookTime);
 		compound.putInt("CookTimeTotal", (short) this.totalCookTime);
 		ContainerHelper.saveAllItems(compound, this.curdlerStacks, registries);
@@ -307,9 +306,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 		return Component.translatable(RatsLangConstants.CURDLER);
 	}
 
-	@Nonnull
 	@Override
-		@Override
 	protected AbstractContainerMenu createMenu(int id, Inventory inventory) {
 		return new AutoCurdlerMenu(id, this, inventory, this.data);
 	}

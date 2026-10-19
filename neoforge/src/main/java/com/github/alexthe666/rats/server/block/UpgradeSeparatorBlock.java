@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.UpgradeSeparatorBlockEntity;
@@ -27,6 +29,13 @@ import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class UpgradeSeparatorBlock extends BaseEntityBlock {
+    public static final MapCodec<UpgradeSeparatorBlock> CODEC = simpleCodec(UpgradeSeparatorBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends UpgradeSeparatorBlock> codec() {
+        return CODEC;
+    }
+
 	protected static final VoxelShape AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 
 	public UpgradeSeparatorBlock(BlockBehaviour.Properties properties) {
@@ -61,7 +70,7 @@ public class UpgradeSeparatorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;
 	}
 }

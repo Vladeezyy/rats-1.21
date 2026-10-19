@@ -179,7 +179,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public boolean canChangeDimensions() {
+	public boolean canChangeDimensions(Level from, Level to) {
 		return false;
 	}
 

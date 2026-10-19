@@ -1,5 +1,9 @@
 package com.github.alexthe666.rats.server.block;
 
+import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.ItemInteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.UpgradeCombinerBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -24,6 +28,13 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class UpgradeCombinerBlock extends BaseEntityBlock {
+    public static final MapCodec<UpgradeCombinerBlock> CODEC = simpleCodec(UpgradeCombinerBlock::new);
+
+    @Override
+    protected @NotNull MapCodec<? extends UpgradeCombinerBlock> codec() {
+        return CODEC;
+    }
+
 	protected static final VoxelShape AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 
 	public UpgradeCombinerBlock(BlockBehaviour.Properties properties) {
@@ -53,20 +64,20 @@ public class UpgradeCombinerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isCrouching()) {
 			if (level.isClientSide()) {
-				return InteractionResult.SUCCESS;
+				return ItemInteractionResult.SUCCESS;
 			} else {
 				player.openMenu(this.getMenuProvider(state, level, pos));
-				return InteractionResult.CONSUME;
+				return ItemInteractionResult.CONSUME;
 			}
 		}
-		return InteractionResult.FAIL;
+		return ItemInteractionResult.FAIL;
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, BlockGetter getter, BlockPos pos, PathComputationType type) {
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;
 	}
 }

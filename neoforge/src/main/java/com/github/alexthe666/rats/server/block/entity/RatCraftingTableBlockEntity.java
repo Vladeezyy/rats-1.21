@@ -26,7 +26,9 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.RecipeHolder;
+import net.minecraft.world.inventory.RecipeCraftingHolder;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
@@ -37,14 +39,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import java.util.Optional;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
-import net.neoforged.neoforge.items.wrapper.EmptyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "unchecked", "unused"})
-public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProvider, RecipeHolder, Clearable {
+public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProvider, RecipeCraftingHolder, Clearable {
 
 	private static final Component DEFAULT_NAME = Component.translatable(RatsLangConstants.RAT_CRAFTING_TABLE);
 	private Component customName;
@@ -64,9 +64,9 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	public boolean hasValidRecipe;
 	private int cookTime;
 	protected final StackedContents itemHelper = new StackedContents();
-	protected Optional<CraftingRecipe> guideRecipe = Optional.empty();
-	protected Optional<CraftingRecipe> recipeUsed = Optional.empty();
-	protected List<CraftingRecipe> possibleRecipes = List.of();
+	protected Optional<RecipeHolder<CraftingRecipe>> guideRecipe = Optional.empty();
+	protected Optional<RecipeHolder<CraftingRecipe>> recipeUsed = Optional.empty();
+	protected List<RecipeHolder<CraftingRecipe>> possibleRecipes = List.of();
 	public int totalCookTime = 200;
 	private int selectedRecipeIndex = 0;
 	private final ContainerData dataAccess = new ContainerData() {
@@ -91,13 +91,12 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 		}
 	};
 
-	private final static EmptyHandler EMPTYHANDLER = new EmptyHandler();
 	public final Optional<IItemHandlerModifiable> bufferHandler = Optional.of(new TableItemHandlers.BufferHandler(this));
 	public final Optional<IItemHandlerModifiable> matrixHandler = Optional.of(new TableItemHandlers.MatrixHandler(this));
 	public final Optional<IItemHandlerModifiable> resultHandler = Optional.of(new TableItemHandlers.ResultHandler(this));
 
-	protected final Optional<IItemHandlerModifiable> combinedHandler = Optional.of(new CombinedInvWrapper(this.matrixHandler.orElse(EMPTYHANDLER), this.bufferHandler.orElse(EMPTYHANDLER)));
-	public final Optional<CraftingContainer> matrixWrapper = Optional.of(new CraftingContainerWrapper(this.matrixHandler.orElse(EMPTYHANDLER)));
+	protected final Optional<IItemHandlerModifiable> combinedHandler = Optional.of(new CombinedInvWrapper(this.matrixHandler.get(), this.bufferHandler.get()));
+	public final Optional<CraftingContainer> matrixWrapper = Optional.of(new CraftingContainerWrapper(this.matrixHandler.get()));
 
 	public RatCraftingTableBlockEntity(BlockPos pos, BlockState state) {
 		super(RatsBlockEntityRegistry.RAT_CRAFTING_TABLE.get(), pos, state);
@@ -126,7 +125,7 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 			}
 			if (te.cookTime >= te.totalCookTime) {
 				te.cookTime = 0;
-				ItemStack addStack = te.recipeUsed.map(r -> r.assemble(te.matrixWrapper.orElseThrow(), level.registryAccess())).orElse(ItemStack.EMPTY);
+				ItemStack addStack = te.recipeUsed.map(r -> r.value().assemble(te.craftingInput(), level.registryAccess())).orElse(ItemStack.EMPTY);
 				te.resultHandler.ifPresent(h -> h.setStackInSlot(0, addStack.copyWithCount(addStack.getCount() + h.getStackInSlot(0).getCount())));
 				te.consumeIngredients(null);
 				te.updateRecipe();
@@ -151,7 +150,7 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 		AtomicBoolean flag = new AtomicBoolean(true);
 		if (this.getLevel() != null) {
 			this.matrixWrapper.ifPresent(w -> {
-				this.possibleRecipes = this.getLevel().getRecipeManager().getRecipesFor(RecipeType.CRAFTING, w, this.getLevel());
+				this.possibleRecipes = this.getLevel().getRecipeManager().getRecipesFor(RecipeType.CRAFTING, this.craftingInput(), this.getLevel());
 				if (this.possibleRecipes.isEmpty()) {
 					flag.set(false);
 				} else {
@@ -175,16 +174,16 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 		}
 	}
 
-	private boolean checkIfResultFits(Level level, Optional<CraftingRecipe> recipe) {
+	private boolean checkIfResultFits(Level level, Optional<RecipeHolder<CraftingRecipe>> recipe) {
 		if (recipe.isPresent() && this.resultHandler.isPresent()) {
 			ItemStack checkStack = this.resultHandler.get().getStackInSlot(0);
-			ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
+			ItemStack resultStack = recipe.get().value().getResultItem(level.registryAccess());
 			return (ItemStack.isSameItemSameComponents(checkStack, resultStack) && checkStack.getCount() + resultStack.getCount() <= checkStack.getMaxStackSize()) || checkStack.isEmpty();
 		}
 		return false;
 	}
 
-	private void checkIfRecipeIsValid(Optional<CraftingRecipe> recipe, StackedContents helper) {
+	private void checkIfRecipeIsValid(Optional<RecipeHolder<CraftingRecipe>> recipe, StackedContents helper) {
 		this.hasValidRecipe = recipe.isPresent() && helper.getBiggestCraftableStack(recipe.get(), null) > 0;
 	}
 
@@ -208,26 +207,37 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	}
 
 	@Override
-	public void setRecipeUsed(@Nullable Recipe<?> recipe) {
-		this.recipeUsed = Optional.ofNullable((CraftingRecipe) recipe);
+	@SuppressWarnings("unchecked")
+	public void setRecipeUsed(@Nullable RecipeHolder<?> recipe) {
+		this.recipeUsed = Optional.ofNullable((RecipeHolder<CraftingRecipe>) recipe);
 	}
 
 	@Override
-	public boolean setRecipeUsed(Level level, @Nullable ServerPlayer player, Recipe<?> recipe) {
-		return !level.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || recipe.isSpecial();
+	public boolean setRecipeUsed(Level level, @Nullable ServerPlayer player, RecipeHolder<?> recipe) {
+		return !level.getGameRules().getBoolean(GameRules.RULE_LIMITED_CRAFTING) || recipe.value().isSpecial();
 	}
 
 	@Nullable
 	@Override
-	public Recipe<?> getRecipeUsed() {
+	public RecipeHolder<?> getRecipeUsed() {
 		return this.recipeUsed.orElse(null);
 	}
 
-	public Optional<CraftingRecipe> getGuideRecipe() {
+	/** The 3x3 grid as a 1.21 recipe input */
+	public CraftingInput craftingInput() {
+		IItemHandlerModifiable matrix = this.matrixHandler.get();
+		java.util.List<ItemStack> items = new java.util.ArrayList<>(9);
+		for (int i = 0; i < 9; i++) {
+			items.add(matrix.getStackInSlot(i));
+		}
+		return CraftingInput.of(3, 3, items);
+	}
+
+	public Optional<RecipeHolder<CraftingRecipe>> getGuideRecipe() {
 		return this.guideRecipe;
 	}
 
-	public List<CraftingRecipe> getPossibleRecipes() {
+	public List<RecipeHolder<CraftingRecipe>> getPossibleRecipes() {
 		return this.possibleRecipes;
 	}
 
@@ -240,11 +250,11 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.@NotNull Provider registries) {
 		super.loadAdditional(tag, registries);
-		this.bufferHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(tag.getCompound("Buffer")));
-		this.matrixHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(tag.getCompound("Matrix")));
-		this.resultHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(tag.getCompound("Result")));
+		this.bufferHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(registries, tag.getCompound("Buffer")));
+		this.matrixHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(registries, tag.getCompound("Matrix")));
+		this.resultHandler.ifPresent(handler -> ((INBTSerializable<CompoundTag>) handler).deserializeNBT(registries, tag.getCompound("Result")));
 		if (tag.contains("CustomName", 8)) {
-			this.customName = Component.Serializer.fromJson(tag.getString("CustomName"));
+			this.customName = Component.Serializer.fromJson(tag.getString("CustomName"), registries);
 		}
 		this.cookTime = tag.getInt("CookTime");
 		this.selectedRecipeIndex = tag.getInt("SelectedRecipe");
@@ -253,11 +263,11 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	@Override
 	public void saveAdditional(CompoundTag tag, HolderLookup.@NotNull Provider registries) {
 		super.saveAdditional(tag, registries);
-		this.bufferHandler.ifPresent(h -> tag.put("Buffer", ((INBTSerializable<CompoundTag>) h).serializeNBT()));
-		this.matrixHandler.ifPresent(h -> tag.put("Matrix", ((INBTSerializable<CompoundTag>) h).serializeNBT()));
-		this.resultHandler.ifPresent(h -> tag.put("Result", ((INBTSerializable<CompoundTag>) h).serializeNBT()));
+		this.bufferHandler.ifPresent(h -> tag.put("Buffer", ((INBTSerializable<CompoundTag>) h).serializeNBT(registries)));
+		this.matrixHandler.ifPresent(h -> tag.put("Matrix", ((INBTSerializable<CompoundTag>) h).serializeNBT(registries)));
+		this.resultHandler.ifPresent(h -> tag.put("Result", ((INBTSerializable<CompoundTag>) h).serializeNBT(registries)));
 		if (this.hasCustomName()) {
-			tag.putString("CustomName", Component.Serializer.toJson(this.customName));
+			tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries, this.registryAccess()));
 		}
 		tag.putInt("CookTime", this.cookTime);
 		tag.putInt("SelectedRecipe", this.selectedRecipeIndex);
@@ -291,12 +301,11 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 
 	public void consumeIngredients(@Nullable Player player) {
 		this.recipeUsed.ifPresent(recipe -> {
-			NonNullList<ItemStack> remainingStacks = this.matrixWrapper.map(recipe::getRemainingItems)
-					.orElse(NonNullList.withSize(0, ItemStack.EMPTY));
+			NonNullList<ItemStack> remainingStacks = recipe.value().getRemainingItems(this.craftingInput());
 
 			if (this.hasValidRecipe) {
 				this.bufferHandler.ifPresent(h ->
-						recipe.getIngredients().forEach(i -> {
+						recipe.value().getIngredients().forEach(i -> {
 							for (int j = 0; j < h.getSlots(); j++) {
 								if (i.test(h.getStackInSlot(j))) {
 									h.extractItem(j, 1, false);
