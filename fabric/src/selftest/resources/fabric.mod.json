@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "examplemod_selftest",
+  "version": "1.0.0",
+  "name": "Example Mod tests (dev only)",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.vladeezyy.examplemod.fabric.selftest.FabricTestHooks"],
+    "client": ["dev.vladeezyy.examplemod.fabric.selftest.FabricTestHooksClient"]
+  },
+  "depends": {
+    "examplemod": "*"
+  }
+}
