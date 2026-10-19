@@ -35,7 +35,7 @@ public class RatArrowItem extends ArrowItem {
 		BlockPos offset = context.getClickedPos().relative(context.getClickedFace());
 		rat.readAdditionalSaveData(ratTag);
 		if (!ratTag.getString("CustomName").isEmpty()) {
-			rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), this.registryAccess()));
+			rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), rat.registryAccess()));
 		}
 		rat.moveTo(offset.getX() + 0.5D, offset.getY(), offset.getZ() + 0.5D, 0, 0);
 		if (!context.getLevel().isClientSide()) {
@@ -48,12 +48,12 @@ public class RatArrowItem extends ArrowItem {
 	}
 
 	@Override
-	public AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
+	public AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter, @org.jetbrains.annotations.Nullable ItemStack weapon) {
 		return new RatArrow(RatsEntityRegistry.RAT_ARROW.get(), level, shooter, stack);
 	}
 
 	@Override
-	public boolean isInfinite(ItemStack stack, ItemStack bow, Player player) {
+	public boolean isInfinite(ItemStack stack, ItemStack bow, LivingEntity player) {
 		return false;
 	}
 }

@@ -16,7 +16,7 @@ public class SmallArrow extends AbstractArrow {
 	}
 
 	public SmallArrow(Level level, LivingEntity shooter) {
-		super(RatsEntityRegistry.SMALL_ARROW.get(), shooter, level);
+		super(RatsEntityRegistry.SMALL_ARROW.get(), shooter, level, new ItemStack(Items.ARROW), null);
 	}
 
 	protected boolean canHitEntity(Entity entity) {
@@ -30,6 +30,11 @@ public class SmallArrow extends AbstractArrow {
 	}
 
 	protected ItemStack getPickupItem() {
+		return new ItemStack(Items.ARROW);
+	}
+
+	@Override
+	protected ItemStack getDefaultPickupItem() {
 		return new ItemStack(Items.ARROW);
 	}
 }

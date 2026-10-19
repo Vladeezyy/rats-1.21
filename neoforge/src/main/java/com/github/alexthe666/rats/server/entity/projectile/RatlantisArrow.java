@@ -16,12 +16,21 @@ public class RatlantisArrow extends AbstractArrow {
 	}
 
 	public RatlantisArrow(Level level, LivingEntity shooter) {
-		super(RatlantisEntityRegistry.RATLANTIS_ARROW.get(), shooter, level);
+		this(level, shooter, new ItemStack(Items.ARROW), null);
+	}
+
+	public RatlantisArrow(Level level, LivingEntity shooter, ItemStack pickup, @org.jetbrains.annotations.Nullable ItemStack weapon) {
+		super(RatlantisEntityRegistry.RATLANTIS_ARROW.get(), shooter, level, pickup, weapon);
 		this.setBaseDamage(4.0D);
 	}
 
 	@Override
 	protected ItemStack getPickupItem() {
+		return new ItemStack(Items.ARROW);
+	}
+
+	@Override
+	protected ItemStack getDefaultPickupItem() {
 		return new ItemStack(Items.ARROW);
 	}
 }

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -214,9 +215,8 @@ public abstract class ArrowlikeProjectile extends Projectile {
 			}
 
 			if (entity instanceof LivingEntity livingentity) {
-				if (!this.level().isClientSide() && entity1 instanceof LivingEntity) {
-					EnchantmentHelper.doPostHurtEffects(livingentity, entity1);
-					EnchantmentHelper.doPostDamageEffects((LivingEntity) entity1, livingentity);
+				if (this.level() instanceof ServerLevel serverLevel) {
+					EnchantmentHelper.doPostAttackEffects(serverLevel, livingentity, damagesource);
 				}
 			}
 

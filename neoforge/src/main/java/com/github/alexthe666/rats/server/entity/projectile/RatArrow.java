@@ -46,7 +46,7 @@ public class RatArrow extends AbstractArrow {
 	}
 
 	public RatArrow(EntityType<? extends AbstractArrow> type, Level level, LivingEntity shooter, ItemStack stack) {
-		super(type, shooter, level);
+		super(type, shooter, level, stack.copyWithCount(1), null);
 		this.stack = stack;
 	}
 
@@ -141,17 +141,11 @@ public class RatArrow extends AbstractArrow {
 					livingentity.setArrowCount(livingentity.getArrowCount() + 1);
 				}
 
-				if (this.getKnockback() > 0) {
-					double d0 = Math.max(0.0D, 1.0D - livingentity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
-					Vec3 vec3 = this.getDeltaMovement().multiply(1.0D, 0.0D, 1.0D).normalize().scale((double) this.getKnockback() * 0.6D * d0);
-					if (vec3.lengthSqr() > 0.0D) {
-						livingentity.push(vec3.x, 0.1D, vec3.z);
-					}
-				}
+				// 1.21: Punch is an enchantment effect of the bow that fired the arrow
+				this.doKnockback(livingentity, damagesource);
 
-				if (!this.level().isClientSide() && entity1 instanceof LivingEntity living) {
-					EnchantmentHelper.doPostHurtEffects(livingentity, entity1);
-					EnchantmentHelper.doPostDamageEffects(living, livingentity);
+				if (this.level() instanceof ServerLevel serverLevel) {
+					EnchantmentHelper.doPostAttackEffects(serverLevel, livingentity, damagesource);
 				}
 
 				this.doPostHurtEffects(livingentity);
@@ -202,5 +196,10 @@ public class RatArrow extends AbstractArrow {
 			}
 			this.discard();
 		}
+	}
+
+	@Override
+	protected ItemStack getDefaultPickupItem() {
+		return new ItemStack(Items.ARROW);
 	}
 }
