@@ -134,7 +134,7 @@ public class RatFishermanGoal extends BaseRatHarvestGoal {
 		hook.setPos(this.rat.position());
 		LootParams params = (new LootParams.Builder((ServerLevel) this.rat.level()))
 				.withParameter(LootContextParams.ORIGIN, this.rat.position())
-				.withParameter(LootContextParams.TOOL, EnchantmentHelper.enchantItem(this.rat.getRandom(), new ItemStack(Items.FISHING_ROD), 100, true))
+				.withParameter(LootContextParams.TOOL, EnchantmentHelper.enchantItem(this.rat.getRandom(), new ItemStack(Items.FISHING_ROD), 100, this.rat.level().registryAccess(), java.util.Optional.empty()))
 				.withParameter(LootContextParams.THIS_ENTITY, hook)
 				.withParameter(LootContextParams.ATTACKING_ENTITY, player)
 				.withLuck(luck + hook.luck)

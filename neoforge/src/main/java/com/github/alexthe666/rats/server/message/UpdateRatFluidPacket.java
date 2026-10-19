@@ -28,23 +28,19 @@ public record UpdateRatFluidPacket(int ratId, FluidStack fluid) implements Custo
 
 
 	public static UpdateRatFluidPacket decode(RegistryFriendlyByteBuf buf) {
-		return new UpdateRatFluidPacket(buf.readInt(), FluidStack.loadFluidStackFromNBT(PacketBufferUtils.readTag(buf)));
+		return new UpdateRatFluidPacket(buf.readInt(), FluidStack.OPTIONAL_STREAM_CODEC.decode(buf));
 	}
 
 	public static void encode(UpdateRatFluidPacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeInt(packet.ratId);
-		CompoundTag fluidTag = new CompoundTag();
-		if (packet.fluid != null) {
-			fluidTag.merge((CompoundTag) packet.fluid.saveOptional(this.registryAccess()));
-		}
-		PacketBufferUtils.writeTag(buf, fluidTag);
+		FluidStack.OPTIONAL_STREAM_CODEC.encode(buf, packet.fluid == null ? FluidStack.EMPTY : packet.fluid);
 	}
 
 	public static class Handler {
 
 		public static void handle(UpdateRatFluidPacket packet, IPayloadContext context) {
 			context.enqueueWork(() -> {
-				Player player = ((ServerPlayer) context.player());
+				Player player = context.player();
 				if (player != null) {
 					Entity entity = player.level().getEntity(packet.ratId());
 					if (entity instanceof TamedRat rat) {

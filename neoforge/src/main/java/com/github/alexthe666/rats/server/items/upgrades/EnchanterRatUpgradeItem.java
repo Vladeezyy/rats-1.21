@@ -9,7 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.block.EnchantmentTableBlock;
+import net.minecraft.world.level.block.EnchantingTableBlock;
 
 public class EnchanterRatUpgradeItem extends BaseRatUpgradeItem implements TickRatUpgrade {
 	public EnchanterRatUpgradeItem(Properties properties, int rarity, int textLength) {
@@ -48,12 +48,12 @@ public class EnchanterRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 				heldItem.shrink(1);
 				if (!disenchant) {
 					float power = 0;
-					for (BlockPos blockpos : EnchantmentTableBlock.BOOKSHELF_OFFSETS) {
-						if (EnchantmentTableBlock.isValidBookShelf(rat.level(), rat.blockPosition(), blockpos)) {
+					for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+						if (EnchantingTableBlock.isValidBookShelf(rat.level(), rat.blockPosition(), blockpos)) {
 							power += rat.level().getBlockState(rat.blockPosition().offset(blockpos)).getEnchantPowerBonus(rat.level(), rat.blockPosition().offset(blockpos));
 						}
 					}
-					burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), false);
+					burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), rat.level().registryAccess(), rat.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getTag(net.minecraft.tags.EnchantmentTags.IN_ENCHANTING_TABLE));
 				}
 				if (heldItem.isEmpty()) {
 					rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);

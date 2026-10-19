@@ -46,6 +46,6 @@ public class RatWaterBottleModel<T extends Entity> extends EntityModel<T> {
 
 	@Override
 	public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-		this.root.render(stack, consumer, light, overlay, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+		this.root.render(stack, consumer, light, overlay, color);
 	}
 }

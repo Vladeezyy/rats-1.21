@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.message;
 
+import com.github.alexthe666.rats.registry.RatsEffectRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -30,7 +32,8 @@ public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int 
 	private static final int FLAG_SHOW_ICON = 4;
 
 	public SyncPlaguePacket(int id, MobEffectInstance effect) {
-		this(id, (byte) (MobEffect.getId(effect.getEffect()) & 255), (byte) (effect.getAmplifier() & 255), Math.min(effect.getDuration(), 32767), getFlags(effect));
+		// only the plague is synced: no effect id (the original's byte id broke past 255 effects)
+		this(id, (byte) 0, (byte) (effect.getAmplifier() & 255), Math.min(effect.getDuration(), 32767), getFlags(effect));
 	}
 
 	private static byte getFlags(MobEffectInstance mobEffectInstance) {
@@ -86,8 +89,8 @@ public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int 
 
 					Entity entity = Minecraft.getInstance().level.getEntity(packet.entityId());
 					if (entity instanceof LivingEntity living) {
-						MobEffect mobeffect = MobEffect.byId(packet.effectId() & 0xFF);
-						if (mobeffect != null) {
+						Holder<MobEffect> mobeffect = RatsEffectRegistry.PLAGUE;
+						{
 							if (packet.duration() == 0) {
 								living.removeEffect(mobeffect);
 							} else {

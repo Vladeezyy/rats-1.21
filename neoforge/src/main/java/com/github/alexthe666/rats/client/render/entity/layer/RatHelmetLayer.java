@@ -157,7 +157,7 @@ public class RatHelmetLayer<T extends AbstractRat, M extends AbstractRatModel<T>
 	//copy of HumanoidArmorLayer.getArmorResource, a method provided by forge
 	public ResourceLocation getArmorResource(Entity entity, ItemStack stack, EquipmentSlot slot, @Nullable String type) {
 		ArmorItem item = (ArmorItem) stack.getItem();
-		String texture = item.getMaterial().getName();
+		String texture = item.getMaterial().unwrapKey().orElseThrow().location().getPath();
 		String domain = "minecraft";
 		int idx = texture.indexOf(':');
 		if (idx != -1) {

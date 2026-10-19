@@ -1,5 +1,9 @@
 package com.github.alexthe666.rats.compat.jei;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
+import mezz.jei.api.ingredients.subtypes.UidContext;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
@@ -46,7 +50,7 @@ public class RatsJEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registry) {
 		RecipeManager manager = Objects.requireNonNull(Minecraft.getInstance().level).getRecipeManager();
-		registry.addRecipes(RatsRecipeTypes.CHEF, manager.getAllRecipesFor(RatsRecipeRegistry.CHEF.get()));
+		registry.addRecipes(RatsRecipeTypes.CHEF, manager.getAllRecipesFor(RatsRecipeRegistry.CHEF.get()).stream().map(RecipeHolder::value).toList());
 		this.addDescription(registry, new ItemStack(RatsItemRegistry.CHEESE.get()));
 		this.addDescription(registry, new ItemStack(RatsItemRegistry.CHEESE_STICK.get()));
 		this.addDescription(registry, new ItemStack(RatsItemRegistry.RAT_FLUTE.get()));
@@ -58,7 +62,7 @@ public class RatsJEIPlugin implements IModPlugin {
 		this.addDescription(registry, new ItemStack(RatsBlockRegistry.RAT_CAGE.get()));
 		this.addDescription(registry, new ItemStack(RatsBlockRegistry.RAT_CRAFTING_TABLE.get()));
 		if (RatsMod.RATLANTIS_DATAPACK_ENABLED) {
-			registry.addRecipes(RatsRecipeTypes.ARCHEOLOGIST, manager.getAllRecipesFor(RatsRecipeRegistry.ARCHEOLOGIST.get()));
+			registry.addRecipes(RatsRecipeTypes.ARCHEOLOGIST, manager.getAllRecipesFor(RatsRecipeRegistry.ARCHEOLOGIST.get()).stream().map(RecipeHolder::value).toList());
 			this.addDescription(registry, new ItemStack(RatlantisItemRegistry.RAT_UPGRADE_ARCHEOLOGIST.get()));
 		} else {
 			if (!RatsMod.RATLANTIS_ITEMS.isEmpty()) {
@@ -95,7 +99,18 @@ public class RatsJEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		registration.useNbtForSubtypes(RatsItemRegistry.RAT_NUGGET_ORE.get());
+		// ore nuggets differ by the ore stored in their custom data
+		registration.registerSubtypeInterpreter(VanillaTypes.ITEM_STACK, RatsItemRegistry.RAT_NUGGET_ORE.get(), new ISubtypeInterpreter<>() {
+			@Override
+			public Object getSubtypeData(ItemStack stack, UidContext context) {
+				return ItemNbt.view(stack).toString();
+			}
+
+			@Override
+			public String getLegacyStringSubtypeInfo(ItemStack stack, UidContext context) {
+				return ItemNbt.view(stack).toString();
+			}
+		});
 	}
 
 	@Override

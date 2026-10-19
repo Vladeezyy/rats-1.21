@@ -90,9 +90,9 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 		if (!player.isShiftKeyDown()) {
 			ItemStack stack = player.getItemInHand(hand);
 			if (AutoCurdlerBlockEntity.isMilk(stack) && level.getBlockEntity(pos) instanceof AutoCurdlerBlockEntity te) {
-				if (!level.isClientSide() && FluidUtil.getFluidHandler(stack).resolve().isPresent()) {
+				if (!level.isClientSide() && FluidUtil.getFluidHandler(stack).isPresent()) {
 					FluidStack fluidStack = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
-					IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(stack).resolve().get();
+					IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(stack).get();
 					FluidStack drain = fluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
 					if (drain.getAmount() > 0 || stack.is(Items.MILK_BUCKET)) {
 						if (te.getTank().fill(fluidStack.copy(), IFluidHandler.FluidAction.SIMULATE) != 0) {

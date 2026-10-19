@@ -38,7 +38,7 @@ public record SyncThrownBlockPacket(int blockEntityId, long blockPos) implements
 
 		public static void handle(SyncThrownBlockPacket packet, IPayloadContext context) {
 			context.enqueueWork(() -> {
-				Player player = ((ServerPlayer) context.player());
+				Player player = context.player();
 				if (player != null) {
 					Entity entity = player.level().getEntity(packet.blockEntityId());
 					if (entity instanceof ThrownBlock blocc) {

@@ -52,7 +52,7 @@ public class DutchratHelmetLayer<T extends Dutchrat, M extends FlyingDutchratMod
 
 	public ResourceLocation getArmorResource(Entity entity, ItemStack stack, EquipmentSlot slot, @org.jetbrains.annotations.Nullable String type) {
 		ArmorItem item = (ArmorItem) stack.getItem();
-		String texture = item.getMaterial().getName();
+		String texture = item.getMaterial().unwrapKey().orElseThrow().location().getPath();
 		String domain = "minecraft";
 		int idx = texture.indexOf(':');
 		if (idx != -1) {
@@ -61,7 +61,7 @@ public class DutchratHelmetLayer<T extends Dutchrat, M extends FlyingDutchratMod
 		}
 		String s1 = String.format("%s:textures/models/armor/%s_layer_%d%s.png", domain, texture, (1), type == null ? "" : String.format("_%s", type));
 
-		s1 = net.minecraftforge.client.ClientHooks.getArmorTexture(entity, stack, s1, slot, type);
+		s1 = net.neoforged.neoforge.client.ClientHooks.getArmorTexture(entity, stack, s1, slot, type);
 		ResourceLocation resourcelocation = ARMOR_TEXTURE_RES_MAP.get(s1);
 
 		if (resourcelocation == null) {

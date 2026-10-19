@@ -119,7 +119,7 @@ public class RatKing extends Monster implements RatSummoner {
 
 	@Override
 	public void die(DamageSource source) {
-		if (net.minecraftforge.common.CommonHooks.onLivingDeath(this, source)) return;
+		if (net.neoforged.neoforge.common.CommonHooks.onLivingDeath(this, source)) return;
 		if (!this.isRemoved() && !this.dead) {
 			Entity entity = source.getEntity();
 			LivingEntity livingentity = this.getKillCredit();
@@ -150,9 +150,13 @@ public class RatKing extends Monster implements RatSummoner {
 			this.level().broadcastEntityEvent(this, (byte) 60);
 			this.remove(Entity.RemovalReason.KILLED);
 			if (this.getLastDamageSource() != null) {
-				this.dropAllDeathLoot(this.getLastDamageSource());
+				if (this.level() instanceof ServerLevel serverLevel) {
+			this.dropAllDeathLoot(serverLevel, this.getLastDamageSource());
+		}
 			} else {
-				this.dropAllDeathLoot(this.damageSources().generic());
+				if (this.level() instanceof ServerLevel serverLevel) {
+			this.dropAllDeathLoot(serverLevel, this.damageSources().generic());
+		}
 			}
 		}
 	}

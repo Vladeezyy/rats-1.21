@@ -24,8 +24,8 @@ public class RatlantisTrimRegistry {
 	}
 
 	public static void bootstrap(BootstrapContext<TrimMaterial> context) {
-		register(context, GEM_OF_RATLANTIS, RatlantisItemRegistry.GEM_OF_RATLANTIS.getHolder().get(), Style.EMPTY.withColor(10353514), 0.77F);
-		register(context, ORATCHALCUM, RatlantisItemRegistry.ORATCHALCUM_INGOT.getHolder().get(), Style.EMPTY.withColor(11243608), 0.66F);
+		register(context, GEM_OF_RATLANTIS, RatlantisItemRegistry.GEM_OF_RATLANTIS, Style.EMPTY.withColor(10353514), 0.77F);
+		register(context, ORATCHALCUM, RatlantisItemRegistry.ORATCHALCUM_INGOT, Style.EMPTY.withColor(11243608), 0.66F);
 	}
 
 	private static void register(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> trimKey, Holder<Item> trimItem, Style color, float itemModelIndex) {

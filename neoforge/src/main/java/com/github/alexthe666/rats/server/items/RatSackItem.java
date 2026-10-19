@@ -66,7 +66,7 @@ public class RatSackItem extends Item {
 					TamedRat rat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), level);
 					rat.readAdditionalSaveData(ratTag);
 					if (!ratTag.getString("CustomName").isEmpty()) {
-						rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), this.registryAccess()));
+						rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), level.registryAccess()));
 					}
 					rat.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, 0.0F, 0.0F);
 					if (!level.isClientSide()) {

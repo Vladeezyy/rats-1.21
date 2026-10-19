@@ -267,7 +267,7 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 		this.matrixHandler.ifPresent(h -> tag.put("Matrix", ((INBTSerializable<CompoundTag>) h).serializeNBT(registries)));
 		this.resultHandler.ifPresent(h -> tag.put("Result", ((INBTSerializable<CompoundTag>) h).serializeNBT(registries)));
 		if (this.hasCustomName()) {
-			tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries, this.registryAccess()));
+			tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
 		}
 		tag.putInt("CookTime", this.cookTime);
 		tag.putInt("SelectedRecipe", this.selectedRecipeIndex);
