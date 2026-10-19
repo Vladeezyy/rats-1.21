@@ -6,7 +6,7 @@
       "item": "minecraft:lava_bucket"
     },
     "G": {
-      "tag": "c:glass"
+      "tag": "c:glass_blocks"
     },
     "U": {
       "item": "rats:rat_upgrade_basic"

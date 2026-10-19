@@ -163,18 +163,18 @@
         },
         {
           "type": "minecraft:loot_table",
-          "name": "rats:chest/hammocks",
-          "weight": 3
+          "weight": 3,
+          "value": "rats:chest/hammocks"
         },
         {
           "type": "minecraft:loot_table",
-          "name": "rats:chest/igloos",
-          "weight": 3
+          "weight": 3,
+          "value": "rats:chest/igloos"
         },
         {
           "type": "minecraft:loot_table",
-          "name": "rats:chest/tubes",
-          "weight": 3
+          "weight": 3,
+          "value": "rats:chest/tubes"
         }
       ],
       "rolls": {

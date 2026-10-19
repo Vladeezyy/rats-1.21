@@ -6,10 +6,10 @@
       "item": "minecraft:pufferfish"
     },
     "G": {
-      "tag": "c:gravel"
+      "tag": "c:gravels"
     },
     "S": {
-      "tag": "c:sand"
+      "tag": "c:sands"
     },
     "U": {
       "item": "rats:rat_upgrade_basic"

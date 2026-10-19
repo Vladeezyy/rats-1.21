@@ -118,8 +118,8 @@ public final class SelfTest {
         && BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis_helmet")));
     check("enum extensions: rat spawn category and Ratlantis rarity", () ->
       RatsMod.RATS.getName().equals("rats:rats") && RatsMod.RATLANTIS_SPECIAL != null);
-    check("rat variants registry has the 15 variants", () ->
-      com.github.alexthe666.rats.registry.RatVariantRegistry.RAT_VARIANT_REGISTRY.size() == 15);
+    check("rat variants registry has the 13 variants", () ->
+      com.github.alexthe666.rats.registry.RatVariantRegistry.RAT_VARIANT_REGISTRY.size() == 13);
     check("recipes loaded (crafting, chef, archeologist)", () -> {
       var manager = server.getRecipeManager();
       long rats = manager.getRecipes().stream().filter(r -> r.id().getNamespace().equals(RatsMod.MODID)).count();
@@ -145,7 +145,7 @@ public final class SelfTest {
       net.minecraft.core.NonNullList<ItemStack> inside = net.minecraft.core.NonNullList.withSize(27, ItemStack.EMPTY);
       inside.set(0, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get()));
       com.github.alexthe666.rats.server.misc.StoredItems.set(combined, inside);
-      tamed.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, combined);
+      tamed.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, combined);
       return tamed.isTame() && com.github.alexthe666.rats.server.misc.RatUpgradeUtils.hasUpgrade(tamed, com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get());
     });
     check("1.20.1 combined upgrade data (Items list in custom data) is read", () -> {

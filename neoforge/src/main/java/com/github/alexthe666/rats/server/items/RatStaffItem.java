@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.client.util.ClientRatSelection;
 import net.neoforged.fml.loading.FMLEnvironment;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
 import net.minecraft.world.item.Item;
@@ -7,7 +8,6 @@ import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -30,8 +30,8 @@ public class RatStaffItem extends LoreTagItem {
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		super.appendHoverText(stack, level, tooltip, flag);
-		if (FMLEnvironment.dist.isClient() && Minecraft.getInstance().player != null && SelectedRats.of(Minecraft.getInstance().player).isPresent()) {
-			TamedRat rat = SelectedRats.of(Minecraft.getInstance().player).get().getSelectedRat();
+		if (FMLEnvironment.dist.isClient()) {
+			TamedRat rat = ClientRatSelection.selectedRat();
 			if (rat != null) {
 				tooltip.add(Component.translatable(RatsLangConstants.CHEESE_STAFF_SELECTED, rat.getDisplayName(), rat.getUUID().toString()).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 			}

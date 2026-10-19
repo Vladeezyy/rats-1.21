@@ -25,7 +25,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#c:gravel"
+            "items": "#c:gravels"
           }
         ]
       },
@@ -35,7 +35,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#c:sand"
+            "items": "#c:sands"
           }
         ]
       },
