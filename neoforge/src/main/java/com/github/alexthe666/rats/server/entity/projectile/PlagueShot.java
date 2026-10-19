@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.core.particles.ColorParticleOption;
 import com.github.alexthe666.rats.registry.RatsEffectRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -44,7 +45,7 @@ public class PlagueShot extends ArrowlikeProjectile {
 			if (this.random.nextBoolean()) {
 				this.level().addParticle(RatsParticleRegistry.BLACK_DEATH.get(), x, y + 0.5D, z, d0, d1, d2);
 			} else {
-				this.level().addParticle(ParticleTypes.ENTITY_EFFECT, x, y + 0.5D, z, d0, d1, d2);
+				this.level().addParticle(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, (float) (d0), (float) (d1), (float) (d2)), x, y + 0.5D, z, 0.0D, 0.0D, 0.0D);
 
 			}
 		}

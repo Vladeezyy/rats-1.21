@@ -49,7 +49,7 @@ public class RatTubeBlockEntity extends BlockEntity {
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId();
+		return this.saveWithId(registries);
 	}
 
 	private void updateRat(Rat rat) {

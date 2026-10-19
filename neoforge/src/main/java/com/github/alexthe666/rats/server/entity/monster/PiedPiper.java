@@ -69,7 +69,7 @@ public class PiedPiper extends Raider implements RatSummoner {
 	}
 
 	@Override
-	public void applyRaidBuffs(int wave, boolean alwaysFalseIdk) {
+	public void applyRaidBuffs(ServerLevel level, int wave, boolean alwaysFalseIdk) {
 
 	}
 
@@ -155,17 +155,13 @@ public class PiedPiper extends Raider implements RatSummoner {
 		this.getEntityData().set(RAT_COUNT, count);
 	}
 
-	@Override
-	public MobType getMobType() {
-		return MobType.ILLAGER;
-	}
 
 	@Nullable
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
 		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
-		this.populateDefaultEquipmentEnchantments(level.getRandom(), difficulty);
+		this.populateDefaultEquipmentEnchantments(level, level.getRandom(), difficulty);
 		return spawnData;
 	}
 

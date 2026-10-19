@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.monster;
 
+import net.minecraft.core.particles.ColorParticleOption;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.data.tags.RatsEntityTags;
 import com.github.alexthe666.rats.registry.RatsEffectRegistry;
@@ -71,7 +72,7 @@ public class PlagueCloud extends Monster {
 			if (this.getRandom().nextBoolean()) {
 				this.level().addParticle(RatsParticleRegistry.BLACK_DEATH.get(), x, y + 1.5F, z, d0, d1, d2);
 			} else {
-				this.level().addParticle(ParticleTypes.ENTITY_EFFECT, x, y + 1.5F, z, d0, d1, d2);
+				this.level().addParticle(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, (float) (d0), (float) (d1), (float) (d2)), x, y + 1.5F, z, 0.0D, 0.0D, 0.0D);
 
 			}
 		}

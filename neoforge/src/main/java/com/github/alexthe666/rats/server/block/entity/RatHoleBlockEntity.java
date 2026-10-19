@@ -35,7 +35,7 @@ public class RatHoleBlockEntity extends BlockEntity {
 
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId();
+		return this.saveWithId(registries);
 	}
 
 	@Override

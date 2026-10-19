@@ -16,4 +16,8 @@ public final class RatsBiomeTags {
 
 	private RatsBiomeTags() {
 	}
+
+	private static TagKey<Biome> create(ResourceLocation name) {
+		return TagKey.create(Registries.BIOME, name);
+	}
 }

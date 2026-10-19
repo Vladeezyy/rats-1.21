@@ -36,7 +36,7 @@ public class DecoratedRatCageBlockEntity extends BlockEntity {
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId();
+		return this.saveWithId(registries);
 	}
 
 	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {

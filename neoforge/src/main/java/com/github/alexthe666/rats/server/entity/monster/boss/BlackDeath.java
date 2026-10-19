@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
 
+import net.minecraft.server.level.ServerLevel;
 import com.github.alexthe666.rats.data.tags.RatsEntityTags;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
@@ -321,7 +322,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
 		SpawnGroupData finalData = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.populateDefaultEquipmentSlots(accessor.getRandom(), difficulty);
-		this.populateDefaultEquipmentEnchantments(accessor.getRandom(), difficulty);
+		this.populateDefaultEquipmentEnchantments(accessor, accessor.getRandom(), difficulty);
 		return finalData;
 	}
 }

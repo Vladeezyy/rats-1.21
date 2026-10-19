@@ -15,4 +15,8 @@ public final class RatlantisBiomeTags {
 
 	private RatlantisBiomeTags() {
 	}
+
+	private static TagKey<Biome> create(ResourceLocation name) {
+		return TagKey.create(Registries.BIOME, name);
+	}
 }

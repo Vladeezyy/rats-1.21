@@ -16,4 +16,8 @@ public final class RatsBannerPatternTags {
 
 	private RatsBannerPatternTags() {
 	}
+
+	private static TagKey<BannerPattern> create(String name) {
+		return TagKey.create(Registries.BANNER_PATTERN, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name));
+	}
 }

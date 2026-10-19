@@ -169,7 +169,7 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId();
+		return this.saveWithId(registries);
 	}
 
 	public int getRadius() {

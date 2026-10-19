@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.entity.misc;
 
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBannerPatternRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -66,9 +69,9 @@ public class PiratBoat extends Mob {
 
 	private ItemStack generateBanner() {
 		ItemStack itemstack = new ItemStack(Items.BLACK_BANNER);
-		CompoundTag tag = itemstack.getOrCreateTagElement("BlockEntityTag");
-		ListTag list = new BannerPattern.Builder().addPattern(RatsBannerPatternRegistry.RAT_AND_CROSSBONES_BANNER.getKey(), DyeColor.WHITE).toListTag();
-		tag.put("Patterns", list);
+		this.level().registryAccess().registry(Registries.BANNER_PATTERN)
+				.flatMap(patterns -> patterns.getHolder(RatsBannerPatternRegistry.RAT_AND_CROSSBONES_BANNER))
+				.ifPresent(pattern -> itemstack.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().add(pattern, DyeColor.WHITE).build()));
 		return itemstack;
 	}
 
@@ -105,11 +108,6 @@ public class PiratBoat extends Mob {
 	@Override
 	public void sinkInFluid(FluidType type) {
 
-	}
-
-	@Override
-	public boolean canBreatheUnderwater() {
-		return true;
 	}
 
 

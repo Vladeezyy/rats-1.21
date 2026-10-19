@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.server.level.ServerLevel;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -63,7 +64,7 @@ public class RatArrow extends AbstractArrow {
 			}
 			rat.readAdditionalSaveData(ratTag);
 			if (!ratTag.getString("CustomName").isEmpty()) {
-				rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName")));
+				rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), this.registryAccess()));
 			}
 			if (ratTag.isEmpty()) {
 				EventHooks.finalizeMobSpawn(rat, (ServerLevelAccessor) this.level(), this.level().getCurrentDifficultyAt(rat.blockPosition()), MobSpawnType.EVENT, null);

@@ -1,5 +1,9 @@
 package com.github.alexthe666.rats.server.message;
 
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -12,11 +16,11 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 
-public record UpdateRatMusicPacket(int id, RecordItem record) implements CustomPacketPayload {
+public record UpdateRatMusicPacket(int id, Item record) implements CustomPacketPayload {
 
 	public static final Type<UpdateRatMusicPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "update_rat_music"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, UpdateRatMusicPacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), UpdateRatMusicPacket::decode);
@@ -28,12 +32,12 @@ public record UpdateRatMusicPacket(int id, RecordItem record) implements CustomP
 
 
 	public static UpdateRatMusicPacket decode(RegistryFriendlyByteBuf buf) {
-		return new UpdateRatMusicPacket(buf.readInt(), (RecordItem) buf.readRegistryIdUnsafe(BuiltInRegistries.ITEM));
+		return new UpdateRatMusicPacket(buf.readInt(), ByteBufCodecs.registry(Registries.ITEM).decode(buf));
 	}
 
 	public static void encode(UpdateRatMusicPacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeInt(packet.id());
-		buf.writeRegistryIdUnsafe(BuiltInRegistries.ITEM, packet.record());
+		ByteBufCodecs.registry(Registries.ITEM).encode(buf, packet.record());
 	}
 
 	public static class Handler {
@@ -45,8 +49,11 @@ public record UpdateRatMusicPacket(int id, RecordItem record) implements CustomP
 					if (Minecraft.getInstance().level != null) {
 						Entity entity = Minecraft.getInstance().level.getEntity(packet.id());
 						if (entity instanceof TamedRat rat) {
-							Minecraft.getInstance().getSoundManager().queueTickingSound(new RatRecordSoundInstance(rat, packet.record()));
-							Minecraft.getInstance().gui.setNowPlaying(packet.record().getDisplayName());
+							// 1.21: discs play jukebox songs
+							JukeboxSong.fromStack(rat.level().registryAccess(), new ItemStack(packet.record())).ifPresent(song -> {
+								Minecraft.getInstance().getSoundManager().queueTickingSound(new RatRecordSoundInstance(rat, packet.record(), song.value().soundEvent().value()));
+								Minecraft.getInstance().gui.setNowPlaying(song.value().description());
+							});
 						}
 					}
 				}

@@ -18,4 +18,8 @@ public final class RatsEntityTags {
 
 	private RatsEntityTags() {
 	}
+
+	public static TagKey<EntityType<?>> create(String name) {
+		return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name));
+	}
 }

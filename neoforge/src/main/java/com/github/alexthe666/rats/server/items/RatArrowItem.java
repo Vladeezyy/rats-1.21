@@ -35,7 +35,7 @@ public class RatArrowItem extends ArrowItem {
 		BlockPos offset = context.getClickedPos().relative(context.getClickedFace());
 		rat.readAdditionalSaveData(ratTag);
 		if (!ratTag.getString("CustomName").isEmpty()) {
-			rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName")));
+			rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), this.registryAccess()));
 		}
 		rat.moveTo(offset.getX() + 0.5D, offset.getY(), offset.getZ() + 0.5D, 0, 0);
 		if (!context.getLevel().isClientSide()) {
