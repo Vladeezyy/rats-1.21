@@ -46,6 +46,10 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public boolean canUse() {
+		if (this.retryDelay > 0) {
+			this.retryDelay--;
+			return false;
+		}
 		if (!this.rat.canMove()) return false;
 		if (!this.rat.getCommand().workCommand) return false;
 		if (this.rat.getTarget() != null) return false;
@@ -110,6 +114,7 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public void start() {
+		this.progress.reset();
 		this.rat.isCurrentlyWorking = true;
 	}
 
@@ -124,10 +129,19 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public void tick() {
-		BlockEntity te = this.rat.level().getBlockEntity(this.targetBlock);
+		BlockEntity te = this.targetBlock == null ? null : this.rat.level().getBlockEntity(this.targetBlock);
+		if (this.targetBlock != null && te == null) {
+			// the container is gone: give up instead of waiting with the item forever
+			this.giveUp(null);
+			return;
+		}
 		if (this.targetBlock != null && te != null) {
 			this.rat.getNavigation().moveTo(this.getMovePos().x(), this.getMovePos().y(), this.getMovePos().z(), 1.25D);
 			double distance = Math.sqrt(this.rat.distanceToSqr(this.getMovePos().x(), this.getMovePos().y(), this.getMovePos().z()));
+			if (distance > 2.0D * this.rat.getRatDistanceModifier() && this.progress.stuck(distance)) {
+				this.giveUp(te);
+				return;
+			}
 			if (distance < 4.5D * this.rat.getRatDistanceModifier() && distance > 2.5D * this.rat.getRatDistanceModifier() && te instanceof Container container) {
 				this.toggleChest(container, true);
 			}
@@ -141,6 +155,18 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 				this.stop();
 			}
 		}
+	}
+
+	private final ProgressWatch progress = new ProgressWatch();
+	private int retryDelay;
+
+	private void giveUp(@org.jetbrains.annotations.Nullable BlockEntity te) {
+		if (te instanceof Container container) {
+			this.toggleChest(container, false);
+		}
+		this.targetBlock = null;
+		this.retryDelay = ProgressWatch.RETRY_DELAY;
+		this.stop();
 	}
 
 	public void toggleChest(Container te, boolean open) {
@@ -227,8 +253,7 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 								RatsNetworkHandler.toTrackingBlock(this.rat.level(), this.targetBlock, new UpdateCurdlerFluidPacket(this.targetBlock.asLong(), curdler.getTank().getFluid()));
 							}
 						}
-						SoundEvent sound = this.rat.transportingFluid.isEmpty() ? SoundEvents.BUCKET_EMPTY : SoundEvents.BUCKET_FILL;
-						this.rat.playSound(sound, 1, 1);
+						this.rat.playFluidSound(SoundEvents.BUCKET_EMPTY);
 					}
 				}
 			}

@@ -9,10 +9,12 @@
     "LivingEntityMixin",
     "LootTableMixin",
     "MobCategoryAccessor",
+    "MobCategoryMixin",
     "MobMixin",
     "NaturalSpawnerMixin",
     "RaidMixin",
     "RarityAccessor",
+    "RarityMixin",
     "ServerLevelMixin"
   ],
   "client": [

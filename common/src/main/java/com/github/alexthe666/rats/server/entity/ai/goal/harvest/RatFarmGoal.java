@@ -1,5 +1,9 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
+import net.minecraft.world.level.block.FarmBlock;
+
+import net.minecraft.world.item.BlockItem;
+
 import com.github.alexthe666.rats.data.tags.CommonTags;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatUtils;
@@ -59,16 +63,14 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 			if (this.holdingSeeds()) {
 				BlockState block = this.rat.level().getBlockState(this.getTargetBlock());
 				this.rat.getNavigation().moveTo(this.getTargetBlock().getX() + 0.5D, this.getTargetBlock().getY(), this.getTargetBlock().getZ() + 0.5D, 1.25D);
-				if (RatUtils.isFertile(block) && this.rat.level().isEmptyBlock(this.getTargetBlock().above())) {
+				if (this.canPlantAt(this.getTargetBlock(), block)) {
 					double distance = this.rat.getRatDistanceCenterSq(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ());
 					if (distance < this.rat.getRatHarvestDistance(0.0F)) {
-						if (this.holdingSeeds()) {
-							ItemStack seedStack = this.rat.getItemInHand(InteractionHand.MAIN_HAND).copy();
-							seedStack.setCount(1);
+						// any seed that places a block (modded seeds are often plain BlockItems); the seed is only used up
+						// when the plant is placed (the original took it even when nothing was planted)
+						if (this.rat.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof BlockItem item) {
+							this.rat.level().setBlockAndUpdate(this.getTargetBlock().above(), item.getBlock().defaultBlockState());
 							this.rat.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
-							if (seedStack.getItem() instanceof ItemNameBlockItem item) {
-								this.rat.level().setBlockAndUpdate(this.getTargetBlock().above(), item.getBlock().defaultBlockState());
-							}
 						}
 						this.stop();
 					}
@@ -118,7 +120,7 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 		} else if (this.holdingSeeds()) {
 			List<BlockPos> allBlocks = new ArrayList<>();
 			for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-				if (RatUtils.isFertile(this.rat.level().getBlockState(pos)) && this.rat.level().isEmptyBlock(pos.above()) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat)) {
+				if (this.canPlantAt(pos, this.rat.level().getBlockState(pos)) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat)) {
 					allBlocks.add(pos);
 				}
 			}
@@ -127,6 +129,18 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 				this.setTargetBlock(allBlocks.get(0));
 			}
 		}
+	}
+
+	/**
+	 * #902 / #920: the original planted only on wet farmland (Forge's isFertile), so a farm without water nearby got
+	 * nothing. Now any farmland where the held seed's plant can stay.
+	 */
+	private boolean canPlantAt(BlockPos soil, BlockState soilState) {
+		if (!(soilState.getBlock() instanceof FarmBlock) || !this.rat.level().isEmptyBlock(soil.above())) {
+			return false;
+		}
+		return this.rat.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof BlockItem item
+			&& item.getBlock().defaultBlockState().canSurvive(this.rat.level(), soil.above());
 	}
 
 	private boolean canPlantBeBonemealed(BlockPos pos, BlockState state) {

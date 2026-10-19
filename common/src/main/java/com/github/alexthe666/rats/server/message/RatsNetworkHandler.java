@@ -78,4 +78,17 @@ public final class RatsNetworkHandler {
 	public static void toAll(CustomPacketPayload payload) {
 		Platform.INSTANCE.sendToAll(payload);
 	}
+
+	/**
+	 * The tamed rat a player may control from a packet: theirs (or any, for operators). The original applied commands,
+	 * staff positions, patrol paths and upgrade visibility to any rat id a client sent.
+	 */
+	@org.jetbrains.annotations.Nullable
+	public static com.github.alexthe666.rats.server.entity.rat.TamedRat ownedRat(net.minecraft.world.entity.player.Player player, int id) {
+		Entity entity = player.level().getEntity(id);
+		if (entity instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat && (rat.isOwnedBy(player) || player.hasPermissions(2))) {
+			return rat;
+		}
+		return null;
+	}
 }

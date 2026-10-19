@@ -38,8 +38,8 @@ public record RatCommandPacket(int ratId, int newCommand) implements CustomPacke
 			context.enqueueWork(() -> {
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
-					Entity entity = player.level().getEntity(packet.ratId());
-					if (entity instanceof TamedRat rat) {
+					TamedRat rat = RatsNetworkHandler.ownedRat(player, packet.ratId());
+					if (rat != null) {
 						rat.setCommandInteger(packet.newCommand());
 					}
 				}

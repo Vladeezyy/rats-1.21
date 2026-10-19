@@ -32,17 +32,13 @@ public class RatSackItem extends Item {
 	}
 
 	public static void packRatIntoSack(ItemStack sack, TamedRat rat, int ratCount) {
-		CompoundTag tag = ItemNbt.getTag(sack);
-		if (tag == null) {
-			tag = new CompoundTag();
-			ItemNbt.setTag(sack, tag);
-		}
 		CompoundTag ratTag = new CompoundTag();
 		rat.addAdditionalSaveData(ratTag);
 		if (rat.hasCustomName()) {
 			ratTag.putString("CustomName", Component.Serializer.toJson(rat.getCustomName(), rat.registryAccess()));
 		}
-		tag.put("Rat_" + ratCount, ratTag);
+		// custom data is immutable in 1.21: the port first wrote into a copy, so packed rats were lost
+		ItemNbt.update(sack, tag -> tag.put("Rat_" + ratCount, ratTag));
 	}
 
 	public static int getRatsInSack(ItemStack sack) {

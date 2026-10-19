@@ -39,6 +39,10 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public boolean canUse() {
+		if (this.retryDelay > 0) {
+			this.retryDelay--;
+			return false;
+		}
 		if (!this.rat.canMove()) return false;
 		if (!this.canPickUp()) return false;
 		if (this.rat.getTarget() != null) return false;
@@ -77,6 +81,7 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public void start() {
+		this.progress.reset();
 		this.rat.isCurrentlyWorking = true;
 	}
 
@@ -87,10 +92,18 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 
 	@Override
 	public void tick() {
-		BlockEntity te = this.rat.level().getBlockEntity(this.targetBlock);
+		BlockEntity te = this.targetBlock == null ? null : this.rat.level().getBlockEntity(this.targetBlock);
+		if (this.targetBlock != null && te == null) {
+			this.giveUp(null);
+			return;
+		}
 		if (this.targetBlock != null && te != null) {
 			this.rat.getNavigation().moveTo(this.targetBlock.getX() + 0.5D, this.targetBlock.getY() + 0.5D, this.targetBlock.getZ() + 0.5D, 1.25D);
 			double distance = Math.sqrt(this.rat.getRatDistanceSq(this.targetBlock.getX() + 0.5D, this.targetBlock.getY() + 0.5D, this.targetBlock.getZ() + 0.5D));
+			if (distance > 2.5D * this.rat.getRatDistanceModifier() && this.progress.stuck(distance)) {
+				this.giveUp(te);
+				return;
+			}
 			if (distance < 3.5D * this.rat.getRatDistanceModifier() && distance > 2.5D * this.rat.getRatDistanceModifier() && te instanceof Container container) {
 				this.toggleChest(container, true);
 			}
@@ -104,6 +117,19 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 				this.stop();
 			}
 		}
+	}
+
+	private final ProgressWatch progress = new ProgressWatch();
+	private int retryDelay;
+
+	/** #887: the container is gone or out of reach: stop instead of waiting forever */
+	private void giveUp(@org.jetbrains.annotations.Nullable BlockEntity te) {
+		if (te instanceof Container container) {
+			this.toggleChest(container, false);
+		}
+		this.targetBlock = null;
+		this.retryDelay = ProgressWatch.RETRY_DELAY;
+		this.stop();
 	}
 
 	public void toggleChest(Container te, boolean open) {
@@ -189,7 +215,9 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 				} catch (Exception e) {
 					//container is empty
 				}
-				if (drainedStack != null) {
+				// #870: an empty drain is no pickup (a slowly filling source made the rat "pick up" 0 mB, play a sound and
+				// send a packet every tick)
+				if (drainedStack != null && !drainedStack.isEmpty()) {
 					if (this.rat.transportingFluid.isEmpty()) {
 						this.rat.transportingFluid = drainedStack.copy();
 					} else {
@@ -198,8 +226,8 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 					if (!this.rat.level().isClientSide()) {
 						RatsNetworkHandler.toTracking(this.rat, new UpdateRatFluidPacket(this.rat.getId(), this.rat.transportingFluid));
 					}
-					SoundEvent sound = this.rat.transportingFluid.isEmpty() ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
-					this.rat.playSound(sound, 1, 1);
+					// filling the bucket: the fill sound (the original played the empty sound), at most once a second
+					this.rat.playFluidSound(SoundEvents.BUCKET_FILL);
 				}
 			}
 		}

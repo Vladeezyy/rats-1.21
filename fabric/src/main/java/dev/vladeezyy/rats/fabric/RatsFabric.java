@@ -52,6 +52,7 @@ public final class RatsFabric implements ModInitializer {
         FabricConfig.load(ConfigHolder.SERVER_SPEC, "common");
         RatConfig.bakeServer();
         FabricMilk.register();
+        net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions.register(FabricPlasticCondition.TYPE);
 
         RatsMod.init();
         FabricPlatform.registerAll();
@@ -100,7 +101,8 @@ public final class RatsFabric implements ModInitializer {
         // the built-in Ratlantis datapack (resourcepacks/ratlantis in the jar, copied there by the build)
         ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis"),
             FabricLoader.getInstance().getModContainer(RatsMod.MODID).orElseThrow(), Component.literal("Ratlantis"),
-            RatConfig.ratlantisEnabledByDefault ? ResourcePackActivationType.DEFAULT_ENABLED : ResourcePackActivationType.NORMAL);
+            // NeoForge (and 1.20.1) make the pack required when the option is on: always enabled
+            RatConfig.ratlantisEnabledByDefault ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             RegistryAccessHolder.setServer(server);

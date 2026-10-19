@@ -53,8 +53,8 @@ public record SyncRatStaffPacket(int entityId, long pos, int facing, int control
 			context.enqueueWork(() -> {
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
-					Entity e = player.level().getEntity(packet.entityId());
-					if (e instanceof TamedRat rat) {
+					TamedRat rat = RatsNetworkHandler.ownedRat(player, packet.entityId());
+					if (rat != null) {
 						switch (packet.control) {
 							case 0 -> {//deposit
 								rat.setDepositPos(GlobalPos.of(player.level().dimension(), BlockPos.of(packet.pos())));

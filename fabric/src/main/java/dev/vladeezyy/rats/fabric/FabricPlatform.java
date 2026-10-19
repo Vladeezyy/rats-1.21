@@ -248,12 +248,12 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public MobCategory ratsCategory() {
-        return FabricEnums.RATS_CATEGORY;
+        return FabricEnumValues.ratsCategory();
     }
 
     @Override
     public Rarity ratlantisRarity() {
-        return FabricEnums.RATLANTIS_SPECIAL;
+        return FabricEnumValues.ratlantisRarity();
     }
 
     // --- network ---

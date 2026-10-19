@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rats:plastic_recipes",
+      "enabled": false
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "rats:plastic_recipes",
+      "enabled": false
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "tag": "c:glass_blocks/colorless"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "   ",
+    "PPP"
+  ],
+  "result": {
+    "count": 16,
+    "id": "rats:rat_tube_white"
+  },
+  "show_notification": true
+}

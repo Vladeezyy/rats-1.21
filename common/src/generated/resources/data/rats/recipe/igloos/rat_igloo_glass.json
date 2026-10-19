@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rats:plastic_recipes",
+      "enabled": false
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "rats:plastic_recipes",
+      "enabled": false
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "tag": "c:glass_blocks/colorless"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "P P"
+  ],
+  "result": {
+    "id": "rats:rat_igloo_white"
+  },
+  "show_notification": true
+}

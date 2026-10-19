@@ -39,7 +39,8 @@ public record ClearRatRecipePacket(long blockPos) implements CustomPacketPayload
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
 					BlockPos pos = BlockPos.of(packet.blockPos());
-					if (player.level().getBlockEntity(pos) instanceof RatCraftingTableBlockEntity table) {
+					if (player.containerMenu instanceof com.github.alexthe666.rats.server.inventory.RatCraftingTableMenu && pos.closerToCenterThan(player.position(), 8.0D)
+						&& player.level().getBlockEntity(pos) instanceof RatCraftingTableBlockEntity table) {
 						table.matrixHandler.ifPresent(handler -> {
 							for (int slot = 0; slot < handler.getSlots(); slot++) {
 								handler.setStackInSlot(slot, ItemStack.EMPTY);

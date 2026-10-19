@@ -34,6 +34,7 @@ public final class SelfTest {
   private static ServerPlayer player;
 
   static void check(String name, BooleanSupplier test) {
+    // also called by GameplayTest
     boolean result;
     try {
       result = test.getAsBoolean();
@@ -72,6 +73,7 @@ public final class SelfTest {
     }
     player = TestHooks.fakePlayer.apply(level, TestHooks.TESTER);
     player.setPos(origin.getX() + 0.5, origin.getY(), origin.getZ() - 2.5);
+    GameplayTest.start(level, player, origin);
     try {
       checks(server, level);
     } catch (RuntimeException e) {
@@ -87,6 +89,7 @@ public final class SelfTest {
       return;
     }
     tick++;
+    GameplayTest.tick(server.overworld());
     if (tick == 10) {
       try {
         laterChecks(server.overworld());
@@ -95,7 +98,7 @@ public final class SelfTest {
         failures.add("later checks crashed");
       }
     }
-    if (tick == 20) {
+    if (tick >= 20 && (GameplayTest.finished() || tick > 4000)) {
       int passed = checks - failures.size();
       if (failures.isEmpty()) {
         RatsMod.LOGGER.info(PREFIX + "PASS {}/{}", passed, checks);
@@ -125,6 +128,11 @@ public final class SelfTest {
       long rats = manager.getRecipes().stream().filter(r -> r.id().getNamespace().equals(RatsMod.MODID)).count();
       RatsMod.LOGGER.info(PREFIX + "{} rats recipes", rats);
       return rats > 100 && !manager.getAllRecipesFor(com.github.alexthe666.rats.registry.RatsRecipeRegistry.CHEF.get()).isEmpty();
+    });
+    check("#864: plastic recipes by default, the glass ones only with plastic off", () -> {
+      var manager = server.getRecipeManager();
+      return manager.byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_plastic")).isPresent() == com.github.alexthe666.rats.RatConfig.plasticRecipes
+        && manager.byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_glass")).isPresent() != com.github.alexthe666.rats.RatConfig.plasticRecipes;
     });
     check("rat loot table exists", () -> server.reloadableRegistries().getLootTable(
       net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);

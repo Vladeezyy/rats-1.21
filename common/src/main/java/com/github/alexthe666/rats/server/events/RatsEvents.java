@@ -180,15 +180,16 @@ public final class RatsEvents {
 			}
 		}
 
-		if (source.getDirectEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE.holder())) {
-			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 6000));
+		// an attacker with the plague gives it to what it hits (the original gave it to the attacker again)
+		if (source.getDirectEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE.holder()) && entity != living) {
+			entity.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 6000));
 		}
 		int protectors = getProtectorCount(entity);
 		if (protectors > 0) {
 			if (source != null && source.getEntity() != null) {
 				Entity trueSource = source.getEntity();
 				if (trueSource.distanceTo(entity) < 4.0D) {
-					trueSource.hurt(entity.damageSources().magic(), 0.75F * protectors);
+					trueSource.hurt(entity.damageSources().thorns(entity), 0.75F * protectors);
 					Vec3 vec3d = trueSource.getDeltaMovement();
 					double strength = 0.15D * protectors;
 					Vec3 vec3d1 = (new Vec3(entity.getX() - trueSource.getX(), 0.0D, entity.getZ() - trueSource.getZ())).normalize().scale(strength);

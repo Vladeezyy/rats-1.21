@@ -20,7 +20,7 @@ TAG_DIR_RENAMES = {
 C_RENAMES = {
     'string': 'strings', 'leather': 'leathers', 'stone': 'stones', 'slimeballs': 'slime_balls', 'obsidian': 'obsidians',
     'glass/colorless': 'glass_blocks/colorless', 'cobblestone': 'cobblestones', 'tools/bows': 'tools/bow',
-    'tools/tridents': 'tools/spear', 'raw_pork': 'foods/raw_meat', 'raw_mutton': 'foods/raw_meat',
+    'tools/tridents': 'tools/spear', 'shears': 'tools/shear', 'raw_pork': 'foods/raw_meat', 'raw_mutton': 'foods/raw_meat',
     'raw_chicken': 'foods/raw_meat', 'raw_beef': 'foods/raw_meat', 'cooked_pork': 'foods/cooked_meat',
     'cooked_mutton': 'foods/cooked_meat', 'cooked_chicken': 'foods/cooked_meat', 'cooked_beef': 'foods/cooked_meat',
 }
@@ -58,6 +58,27 @@ def fix_strings(node):
         if node.startswith('forge:') or node.startswith('#forge:'):
             return c_tag(node)
     return node
+
+
+NUMBER_PROVIDERS = ('minecraft:uniform', 'minecraft:clamped', 'minecraft:biased_to_bottom', 'minecraft:clamped_normal',
+                    'minecraft:trapezoid', 'minecraft:weighted_list', 'minecraft:constant', 'uniform', 'clamped')
+
+
+def flatten_providers(node):
+    """1.20.5 dropped the "value" wrapper of int/float providers: {"type": uniform, "value": {min, max}} -> {"type", min, max}."""
+    if isinstance(node, dict):
+        if node.get('type') in NUMBER_PROVIDERS and isinstance(node.get('value'), dict) and len(node) == 2:
+            merged = {'type': node['type']}
+            merged.update(flatten_providers(node['value']))
+            return merged
+        return {k: flatten_providers(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [flatten_providers(v) for v in node]
+    return node
+
+
+# mob categories added by mods get the mod id as prefix in 1.21 (NeoForge enum extensions): biome spawners keys
+SPAWN_CATEGORY_RENAMES = {'rats': 'rats:rats'}
 
 
 def fix_conditions(obj):
@@ -192,7 +213,9 @@ def main():
             if path.endswith('.json'):
                 with open(path, encoding='utf-8') as f:
                     data = json.load(f)
-                data = fix_strings(data)
+                data = flatten_providers(fix_strings(data))
+                if new_rel.endswith('.json') and '/worldgen/biome/' in new_rel and isinstance(data.get('spawners'), dict):
+                    data['spawners'] = {SPAWN_CATEGORY_RENAMES.get(k, k): v for k, v in data['spawners'].items()}
                 if kind == 'recipe':
                     data = fix_recipe(data)
                 elif kind == 'advancement':

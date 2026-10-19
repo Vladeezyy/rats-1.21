@@ -195,7 +195,15 @@ public class TamedRat extends InventoryRat {
 		this.goalSelector.addGoal(3, this.harvestGoal);
 		this.goalSelector.addGoal(4, this.depositGoal);
 		this.goalSelector.addGoal(5, this.pickupGoal);
-		this.goalSelector.addGoal(6, new SitWhenOrderedToGoal(this));
+		// #850 / #945: vanilla's SitWhenOrderedToGoal also "sits" a pet whose owner is offline (getOwner() == null): it
+		// restarted every tick and stopped the rat's path each time, so working rats froze when the owner left.
+		// Rats sit only when ordered to.
+		this.goalSelector.addGoal(6, new SitWhenOrderedToGoal(this) {
+			@Override
+			public boolean canUse() {
+				return TamedRat.this.isTame() && !TamedRat.this.isInWaterOrBubble() && TamedRat.this.onGround() && TamedRat.this.isOrderedToSit();
+			}
+		});
 		this.goalSelector.addGoal(7, new RatWanderGoal(this, 1.25D));
 		this.goalSelector.addGoal(7, new RatPatrolGoal(this));
 		this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, LivingEntity.class, 6.0F) {
@@ -319,6 +327,39 @@ public class TamedRat extends InventoryRat {
 			this.moveControl = new RatCageMoveControl(this);
 			this.navigation = new RatNavigation(this, this.level());
 			this.navigatorType = 5;
+		}
+	}
+
+	private int lastFluidSoundTick = -100;
+
+	/** #870: the bucket sounds of carrying fluids, at most once a second (a source filling every tick spammed them) */
+	public void playFluidSound(net.minecraft.sounds.SoundEvent sound) {
+		if (this.tickCount - this.lastFluidSoundTick >= 20) {
+			this.lastFluidSoundTick = this.tickCount;
+			this.playSound(sound, 1, 1);
+		}
+	}
+
+	private int stuckFoodTicks;
+
+	/**
+	 * #838: a rat holding food it may not eat under its command (hunt, gather, harvest, transport) and with nowhere to
+	 * deposit it kept it forever, and every work goal waits for an empty paw. It drops it after 5 seconds.
+	 */
+	private void dropUneatableFood() {
+		if (this.level().isClientSide()) {
+			return;
+		}
+		ItemStack held = this.getMainHandItem();
+		if (!held.isEmpty() && !this.getCommand().allowsEating && this.getDepositPos().isEmpty() && RatUtils.isRatFood(held)
+			&& !this.isCurrentlyWorking && !this.holdsItemInHandUpgrade()) {
+			if (++this.stuckFoodTicks >= 100) {
+				this.spawnAtLocation(held);
+				this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+				this.stuckFoodTicks = 0;
+			}
+		} else {
+			this.stuckFoodTicks = 0;
 		}
 	}
 
@@ -465,6 +506,7 @@ public class TamedRat extends InventoryRat {
 		if (this.isBaby() && this.getCommand() != RatCommand.SIT) {
 			this.setCommand(RatCommand.SIT);
 		}
+		this.dropUneatableFood();
 		if (this.breedCooldown > 0) {
 			this.breedCooldown--;
 		}

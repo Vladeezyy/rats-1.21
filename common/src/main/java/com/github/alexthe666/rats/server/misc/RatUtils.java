@@ -278,6 +278,10 @@ public class RatUtils {
 		newRat.readAdditionalSaveData(tag);
 		newRat.setColorVariant(rat.getColorVariant());
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			// #838: the cheese the wild rat was fed is eaten while it is tamed, not kept in its paw
+			if (slot == EquipmentSlot.MAINHAND && isRatFood(rat.getItemBySlot(slot))) {
+				continue;
+			}
 			newRat.setItemSlot(slot, rat.getItemBySlot(slot));
 		}
 		level.addFreshEntity(newRat);

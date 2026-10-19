@@ -42,11 +42,9 @@ public record SyncRatTagPacket(int ratId, List<GlobalPos> nodes) implements Cust
 				Player player = ((ServerPlayer) context.player());
 
 				if (player != null) {
-					Entity entity = player.level().getEntity(packet.ratId());
-					if (entity instanceof TamedRat rat) {
-						rat.getPatrolNodes().clear();
-						rat.getPatrolNodes().addAll(packet.nodes());
-						rat.addAdditionalSaveData(new CompoundTag());
+					TamedRat rat = RatsNetworkHandler.ownedRat(player, packet.ratId());
+					if (rat != null) {
+						rat.setPatrolNodes(packet.nodes());
 					}
 				}
 

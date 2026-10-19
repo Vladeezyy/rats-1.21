@@ -119,11 +119,12 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 		this.setRadius(tag.getInt("SearchRadius"));
 
 		if (tag.contains("PatrolNodesTag")) {
-			ListTag listTag = tag.getList("PatrolNodesTag", Tag.TAG_COMPOUND);
-
-			for (Tag pos : listTag) {
-				GlobalPos.CODEC.parse(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error).ifPresent(globalPos -> this.getPatrolNodes().add(globalPos));
+			// #787: a new list set into the entity data (adding to the synced list in place never reached the clients)
+			List<GlobalPos> nodes = new ArrayList<>();
+			for (Tag pos : tag.getList("PatrolNodesTag", Tag.TAG_COMPOUND)) {
+				GlobalPos.CODEC.parse(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error).ifPresent(nodes::add);
 			}
+			this.setPatrolNodes(nodes);
 		}
 	}
 
@@ -314,6 +315,14 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 		} else {
 			return this.getRadiusCenter().get().pos();
 		}
+	}
+
+	/**
+	 * #787: sets a new list. Changing the synced list in place kept it identical to the default value, so it was never
+	 * sent to players joining later (the patrol path looked gone after a restart).
+	 */
+	public void setPatrolNodes(List<GlobalPos> nodes) {
+		this.getEntityData().set(PATROL_NODES, new ArrayList<>(nodes));
 	}
 
 	public List<GlobalPos> getPatrolNodes() {

@@ -1,4 +1,16 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "rats:plastic_recipes",
+      "enabled": true
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "rats:plastic_recipes",
+      "enabled": true
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {

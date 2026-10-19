@@ -39,7 +39,8 @@ public record DismountRatPacket(int ratId) implements CustomPacketPayload {
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
 					Entity entity = player.level().getEntity(packet.ratId());
-					if (entity instanceof TamedRat rat) {
+					// only a rat riding this player
+					if (entity instanceof TamedRat rat && rat.getVehicle() == player) {
 						rat.stopRiding();
 						Vec3 dismountPos = rat.getDismountLocationForPassenger(player);
 						rat.setPos(dismountPos.x(), dismountPos.y(), dismountPos.z());

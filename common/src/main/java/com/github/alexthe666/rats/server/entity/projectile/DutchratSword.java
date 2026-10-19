@@ -65,7 +65,7 @@ public class DutchratSword extends ThrowableProjectile {
 	@Override
 	protected void onHitEntity(EntityHitResult result) {
 		super.onHitEntity(result);
-		DamageSource source = this.damageSources().magic();
+		DamageSource source = this.damageSources().indirectMagic(this, this.getOwner());
 		if (this.getOwner() instanceof LivingEntity living) {
 			source = this.damageSources().mobAttack(living);
 		}

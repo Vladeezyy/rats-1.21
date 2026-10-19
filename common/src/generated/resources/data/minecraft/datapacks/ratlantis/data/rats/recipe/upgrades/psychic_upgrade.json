@@ -15,7 +15,7 @@
       "tag": "c:gems/prismarine"
     },
     "S": {
-      "tag": "c:dusts/prismarine"
+      "item": "minecraft:prismarine_shard"
     },
     "U": {
       "item": "rats:rat_upgrade_basic_ratlantean"

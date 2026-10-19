@@ -41,8 +41,8 @@ public record RatUpgradeVisibilityPacket(int ratId, EquipmentSlot slot, boolean 
 			context.enqueueWork(() -> {
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
-					Entity entity = player.level().getEntity(packet.ratId());
-					if (entity instanceof TamedRat rat) {
+					TamedRat rat = RatsNetworkHandler.ownedRat(player, packet.ratId());
+					if (rat != null) {
 						rat.setSlotVisibility(packet.slot(), packet.visible());
 					}
 				}

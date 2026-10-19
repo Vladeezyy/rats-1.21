@@ -64,8 +64,11 @@ public final class RatsNeoForge {
     private static ModConfigSpec clientSpec;
     private static ModConfigSpec serverSpec;
 
+    private static final DeferredRegister<MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>> CONDITIONS = DeferredRegister.create(NeoForgeRegistries.Keys.CONDITION_CODECS, RatsMod.MODID);
+
     static {
         LOOT_MODIFIERS.register("add_item", () -> GenericAddItemLootModifier.CODEC);
+        CONDITIONS.register("plastic_recipes", () -> PlasticRecipesCondition.CODEC);
     }
 
     public RatsNeoForge(IEventBus bus, ModContainer container) {
@@ -79,6 +82,7 @@ public final class RatsNeoForge {
         RatsMod.init();
         NeoForgePlatform.registerAll(bus);
         LOOT_MODIFIERS.register(bus);
+        CONDITIONS.register(bus);
 
         bus.addListener(RatsNeoForge::reloadConfigs);
         bus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(RatsMod::setup));

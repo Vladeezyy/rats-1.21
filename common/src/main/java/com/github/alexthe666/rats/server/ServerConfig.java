@@ -10,6 +10,7 @@ public class ServerConfig {
 	public final ConfigSpec.IntValue piperSpawnDecrease;
 	public final ConfigSpec.BooleanValue ratsSpawnLikeMonsters;
 	public final ConfigSpec.BooleanValue cheesemaking;
+	public final ConfigSpec.BooleanValue plasticRecipes;
 	public final ConfigSpec.IntValue milkCauldronTime;
 	public final ConfigSpec.IntValue ratSackCapacity;
 	public final ConfigSpec.BooleanValue ratsDigBlocks;
@@ -127,6 +128,7 @@ public class ServerConfig {
 
 		builder.pop().push("Cheesemaking");
 		this.cheesemaking = buildBoolean(builder, "Cheesemaking", true, "True if cheese can be created in cauldrons");
+		this.plasticRecipes = buildBoolean(builder, "Plastic in Recipes", true, "True if rat tubes and igloos are crafted from raw plastic. False: from glass (for worlds where plastic does not fit). Applied when datapacks load (/reload).");
 		this.milkCauldronTime = buildInt(builder, "Milk Curdling Time", 150, 20, 1000000, "The time in ticks(20 per second) it takes for milk to turn into cheese in a cauldron");
 		this.ratFluteDistance = buildInt(builder, "Rat Flute Distance", 2, 1, 100, "The how many chunks away can a rat here a rat flute");
 

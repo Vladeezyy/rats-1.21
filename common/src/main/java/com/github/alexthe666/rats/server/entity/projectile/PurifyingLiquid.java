@@ -78,7 +78,9 @@ public class PurifyingLiquid extends ThrowableItemProjectile {
 									living.removeEffect(RatsEffectRegistry.PLAGUE.holder());
 								}
 								if (living.getType().is(RatsEntityTags.PLAGUE_LEGION)) {
-									living.hurt(this.damageSources().magic(), 10);
+									// #827: magic damage with the thrower as its cause (a plague mob killed by plain magic had no killer in its loot
+									// context, which crashed with mods that read it unchecked), and the thrower gets the kill
+									living.hurt(this.damageSources().indirectMagic(this, this.getOwner()), 10);
 								}
 								if (living instanceof ZombieVillager zomb && !zomb.isConverting()) {
 									zomb.startConverting(this.getOwner() != null ? this.getOwner().getUUID() : null, 200);

@@ -12,14 +12,21 @@ case $LOADER in
 esac
 pkill -f "$PROC" 2>/dev/null
 rm -rf $LOADER/run/world build-selftest.log
-mkdir -p $LOADER/run && echo "eula=true" > $LOADER/run/eula.txt
+mkdir -p $LOADER/run/config && echo "eula=true" > $LOADER/run/eula.txt
+# the test world has the Ratlantis datapack on (the gameplay checks go through its portal)
+CFG=$LOADER/run/config/rats-common.toml
+if [ -f $CFG ]; then
+	perl -pi -e 's/"Ratlantis Datapack Enabled by Default" = false/"Ratlantis Datapack Enabled by Default" = true/' $CFG
+else
+	printf '[Ratlantis]\n\t"Ratlantis Datapack Enabled by Default" = true\n' > $CFG
+fi
 ./gradlew :$LOADER:runSelftest --console=plain "$@" > build-selftest.log 2>&1 &
 i=0
-until grep -qE 'Rats selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND' build-selftest.log 2>/dev/null || [ $i -gt 300 ]; do sleep 2; i=$((i+1)); done
+until grep -qE 'Rats selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND|Failed to load registries|Exception in server tick loop' build-selftest.log 2>/dev/null || [ $i -gt 450 ]; do sleep 2; i=$((i+1)); done
 sleep 5
 pkill -f "$PROC" 2>/dev/null; sleep 2; pkill -9 -f "$PROC" 2>/dev/null
 wait 2>/dev/null
-[ $i -gt 300 ] && echo "TIMEOUT (no result in 10 min)"
+[ $i -gt 450 ] && echo "TIMEOUT (no result in 15 min)"
 grep -E 'Rats selftest\] (PASS|FAILED|FAIL )|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED' build-selftest.log | sed -E 's/^\[[^]]*\] //'
 echo "--- errors / warnings (vanilla dev noise filtered)"
 grep -E '/(ERROR|FATAL|WARN)\]|Caused by|Exception' build-selftest.log \

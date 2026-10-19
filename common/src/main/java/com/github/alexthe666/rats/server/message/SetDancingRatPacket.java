@@ -42,7 +42,8 @@ public record SetDancingRatPacket(int ratId, boolean setDancing, long blockPos, 
 				Player player = ((ServerPlayer) context.player());
 				if (player != null) {
 					Entity entity = player.level().getEntity(packet.ratId());
-					if (entity instanceof TamedRat rat) {
+					// a jukebox the player hears: rats near the player
+					if (entity instanceof TamedRat rat && rat.distanceToSqr(player) < 64 * 64) {
 						if (!rat.isDancing() && packet.setDancing()) {
 							rat.setDanceMoves(packet.moves());
 						}
