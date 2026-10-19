@@ -165,7 +165,7 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.handleUpdateTag(packet.getTag(), lookupProvider);
+		this.handleUpdateTag(packet.getTag(), registries);
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
@@ -224,5 +224,16 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 	@Nullable
 	public IItemHandler getItemHandler(@Nullable Direction side) {
 		return side == null ? null : this.handlers[0];
+	}
+
+	// 1.21: BaseContainerBlockEntity works on the item list
+	@Override
+	protected NonNullList<ItemStack> getItems() {
+		return this.inventory;
+	}
+
+	@Override
+	protected void setItems(NonNullList<ItemStack> items) {
+		this.inventory = items;
 	}
 }

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.gui;
 
+import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.client.util.EntityRenderingUtil;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -81,7 +82,7 @@ public class CheeseStaffScreen extends Screen {
 			List<Component> namelist = null;
 			ItemStack pick = state.getBlock().getCloneItemStack(this.rat.level(), this.pos, state);
 			try {
-				namelist = pick.getTooltipLines(Minecraft.getInstance().player, TooltipFlag.Default.NORMAL);
+				namelist = pick.getTooltipLines(Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player, TooltipFlag.Default.NORMAL);
 			} catch (Throwable ignored) {
 			}
 			if (namelist != null && !namelist.isEmpty()) {

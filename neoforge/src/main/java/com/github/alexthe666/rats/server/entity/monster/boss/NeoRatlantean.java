@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
 
+import net.minecraft.world.entity.EntityDimensions;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.data.ratlantis.tags.RatlantisEntityTags;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
@@ -92,8 +93,8 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Override
-	public float getEyeHeight(Pose pose) {
-		return 0.9F;
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		return super.getDefaultDimensions(pose).withEyeHeight(0.9F);
 	}
 
 	@Override

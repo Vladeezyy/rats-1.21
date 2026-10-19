@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.misc;
 
+import net.minecraft.core.registries.Registries;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
@@ -96,7 +97,7 @@ public class RatTreeUtils {
 	public static Block getSaplingFromLeaves(ServerLevel level, Block leaves) {
 		try {
 			LootTable loot = level.getServer().reloadableRegistries().getLootTable(leaves.getLootTable());
-			LootParams.Builder context = new LootParams.Builder(level).withParameter(LootContextParams.TOOL, createMaxHoe()).withParameter(LootContextParams.BLOCK_STATE, leaves.defaultBlockState()).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).withLuck(Float.MAX_VALUE);
+			LootParams.Builder context = new LootParams.Builder(level).withParameter(LootContextParams.TOOL, createMaxHoe(level)).withParameter(LootContextParams.BLOCK_STATE, leaves.defaultBlockState()).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).withLuck(Float.MAX_VALUE);
 			for (int i = 0; i < 25; i++) {
 				ObjectArrayList<ItemStack> lootStacks = loot.getRandomItems(context.create(LootContextParamSets.BLOCK));
 				for (ItemStack stack : lootStacks) {
@@ -111,9 +112,9 @@ public class RatTreeUtils {
 		return null;
 	}
 
-	private static ItemStack createMaxHoe() {
+	private static ItemStack createMaxHoe(ServerLevel level) {
 		ItemStack hoe = new ItemStack(Items.NETHERITE_HOE);
-		hoe.enchant(Enchantments.BLOCK_FORTUNE, Byte.MAX_VALUE);
+		hoe.enchant(level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.FORTUNE), Byte.MAX_VALUE);
 		return hoe;
 	}
 

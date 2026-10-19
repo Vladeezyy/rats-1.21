@@ -99,7 +99,6 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 		}
 	}
 
-	@Override
 	public AABB getRenderBoundingBox() {
 		return new AABB(Vec3.atLowerCornerOf(this.getBlockPos()), Vec3.atLowerCornerOf(this.getBlockPos().offset(1, 2, 1)));
 	}
@@ -363,5 +362,16 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 			return null;
 		}
 		return side == Direction.UP ? this.handlers[0] : side == Direction.DOWN ? this.handlers[1] : this.handlers[2];
+	}
+
+	// 1.21: BaseContainerBlockEntity works on the item list
+	@Override
+	protected NonNullList<ItemStack> getItems() {
+		return this.combinerStacks;
+	}
+
+	@Override
+	protected void setItems(NonNullList<ItemStack> items) {
+		this.combinerStacks = items;
 	}
 }

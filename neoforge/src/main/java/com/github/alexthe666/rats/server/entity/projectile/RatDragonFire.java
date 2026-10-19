@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -20,7 +22,7 @@ public class RatDragonFire extends Fireball {
 	}
 
 	public RatDragonFire(EntityType<? extends Fireball> type, LivingEntity shooter, Level level, double accelX, double accelY, double accelZ) {
-		super(type, shooter, accelX, accelY, accelZ, level);
+		super(type, shooter, new Vec3(accelX, accelY, accelZ), level);
 	}
 
 	@Override
@@ -67,7 +69,9 @@ public class RatDragonFire extends Fireball {
 			entity.igniteForSeconds(10);
 			boolean flag = entity.hurt(this.damageSources().fireball(this, this.getOwner()), 5.0F);
 			if (flag && this.getOwner() instanceof LivingEntity living) {
-				this.doEnchantDamageEffects(living, entity);
+				if (this.level() instanceof ServerLevel serverLevel) {
+					EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().fireball(this, living));
+				}
 			}
 
 			if (!this.level().isClientSide()) {

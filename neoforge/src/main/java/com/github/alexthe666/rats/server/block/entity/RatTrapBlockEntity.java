@@ -68,7 +68,7 @@ public class RatTrapBlockEntity extends BlockEntity {
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.handleUpdateTag(packet.getTag(), lookupProvider);
+		this.handleUpdateTag(packet.getTag(), registries);
 	}
 
 	@Override

@@ -172,7 +172,7 @@ public class RatlanteanAutomatonModel<T extends Mob & IAnimatedEntity> extends A
 		this.animator.endKeyframe();
 	}
 
-	public void renderHead(PoseStack stack, VertexConsumer buffer, int light, int overlay, float red, float green, float blue, float alpha) {
+	public void renderHead(PoseStack stack, VertexConsumer buffer, int light, int overlay, int color) {
 		this.headBase.render(stack, buffer, light, overlay, color);
 	}
 

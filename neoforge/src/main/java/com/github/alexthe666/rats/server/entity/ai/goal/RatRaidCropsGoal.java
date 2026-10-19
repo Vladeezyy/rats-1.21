@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.goal;
 
+import net.minecraft.world.level.block.Block;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.server.entity.rat.DiggingRat;
 import com.github.alexthe666.rats.server.misc.RatPathingHelper;
@@ -54,7 +55,7 @@ public class RatRaidCropsGoal extends RatMoveToBlockGoal {
 			double distance = this.rat.distanceToSqr(cropsPos.getX(), cropsPos.getY(), cropsPos.getZ());
 			if (distance < 3.5F) {
 				LootParams.Builder loot = new LootParams.Builder((ServerLevel) this.rat.level()).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withParameter(LootContextParams.ORIGIN, this.rat.position()).withLuck(1.0F);
-				List<ItemStack> drops = block.getBlock().getDrops(block, loot);
+				List<ItemStack> drops = Block.getDrops(block, (ServerLevel) this.rat.level(), cropsPos, null);
 				if (drops.isEmpty()) {
 					this.stop();
 					return;

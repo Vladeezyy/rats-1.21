@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 
-@EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class RatlantisPackEvents {
 
 	@SubscribeEvent

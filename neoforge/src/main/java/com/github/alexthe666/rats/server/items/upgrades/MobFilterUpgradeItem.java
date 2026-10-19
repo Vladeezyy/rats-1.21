@@ -63,7 +63,7 @@ public class MobFilterUpgradeItem extends BaseRatUpgradeItem {
 				tag.add(StringTag.valueOf(mob));
 			}
 		}
-		ItemNbt.update(stack, tag -> tag.put("Mobs", tag));
+		ItemNbt.update(stack, data -> data.put("Mobs", tag));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.core.RegistryAccess;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
@@ -89,7 +90,7 @@ public class RatSackItem extends Item {
 					ratCount++;
 					String ratName = I18n.get("entity.rats.rat");
 					if (!ratTag.getString("CustomName").isEmpty()) {
-						Component ratNameTag = Component.Serializer.fromJson(ratTag.getString("CustomName", this.registryAccess()));
+						Component ratNameTag = Component.Serializer.fromJson(ratTag.getString("CustomName"), level.registries() != null ? level.registries() : RegistryAccess.EMPTY);
 						if (ratNameTag != null) {
 							ratName = ratNameTag.getString();
 						}

@@ -401,7 +401,7 @@ public class ForgeClientEvents {
 						}
 
 						if (node.dimension().equals(Minecraft.getInstance().player.level().dimension())) {
-							RatsIconRenderUtil.renderPOIIcon(RAT_PATROL_NODE_TEXTURE, viewPosition, node.pos(), bob, stack, buffer, tessellator);
+							RatsIconRenderUtil.renderPOIIcon(RAT_PATROL_NODE_TEXTURE, viewPosition, node.pos(), bob, stack, tessellator);
 						}
 					}
 				}

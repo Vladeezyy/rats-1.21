@@ -43,11 +43,6 @@ public final class GarbageBlock extends AbstractGarbageBlock {
 	}
 
 	@Override
-	public boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacementType type, EntityType<?> entityType) {
-		return entityType == RatsEntityRegistry.RAT.get();
-	}
-
-	@Override
 	public int getDustColor(BlockState state, BlockGetter getter, BlockPos pos) {
 		return 0X79695B;
 	}

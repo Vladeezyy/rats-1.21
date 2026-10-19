@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.navigation.control;
 
+import net.minecraft.core.BlockPos;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -39,7 +40,7 @@ public class RatTubeMoveControl extends RatMoveControl {
 			PathNavigation pathnavigate = this.rat.getNavigation();
 
 			NodeEvaluator nodeprocessor = pathnavigate.getNodeEvaluator();
-			if (nodeprocessor.getBlockPathType(this.rat.level(), Mth.floor(this.rat.getX() + (double) f7), Mth.floor(this.rat.getY()), Mth.floor(this.rat.getZ() + (double) f8)) != PathType.WALKABLE) {
+			if (nodeprocessor.getPathType(this.rat, BlockPos.containing(this.rat.getX() + (double) f7, this.rat.getY(), this.rat.getZ() + (double) f8)) != PathType.WALKABLE) {
 				this.strafeForwards = 1.0F;
 				this.strafeRight = 0.0F;
 				f1 = f;

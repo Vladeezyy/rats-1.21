@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 public class RatUseShearsGoal extends BaseRatHarvestGoal {
 	private static final ItemStack SHEAR_STACK = new ItemStack(Items.SHEARS);
 	private final TamedRat rat;
-	private final Predicate<LivingEntity> SHEAR_PREDICATE = entity -> entity instanceof IShearable && ((IShearable) entity).isShearable(SHEAR_STACK, entity.level(), entity.blockPosition());
+	private final Predicate<LivingEntity> SHEAR_PREDICATE = entity -> entity instanceof IShearable && ((IShearable) entity).isShearable(null, SHEAR_STACK, entity.level(), entity.blockPosition());
 
 	public RatUseShearsGoal(TamedRat rat) {
 		super(rat);
@@ -56,7 +56,7 @@ public class RatUseShearsGoal extends BaseRatHarvestGoal {
 			this.rat.getNavigation().moveTo(this.getTargetEntity(), 1.25D);
 			if (this.rat.distanceToSqr(this.getTargetEntity()) < this.rat.getRatHarvestDistance(0.0D)) {
 				if (this.getTargetEntity() instanceof IShearable shearable) {
-					List<ItemStack> drops = shearable.onSheared(null, SHEAR_STACK, this.rat.level(), this.getTargetEntity().blockPosition(), 0);
+					List<ItemStack> drops = shearable.onSheared(null, SHEAR_STACK, this.rat.level(), this.getTargetEntity().blockPosition());
 					this.rat.gameEvent(GameEvent.ENTITY_INTERACT);
 					for (ItemStack stack : drops) {
 						this.getTargetEntity().spawnAtLocation(stack, 0.0F);

@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.effect;
 
+import com.github.alexthe666.rats.RatsMod;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,7 +14,7 @@ public class ConfitByaldiMobEffect extends MobEffect {
 
 	public ConfitByaldiMobEffect() {
 		super(MobEffectCategory.BENEFICIAL, 0XFFDD59);
-		this.addAttributeModifier(Attributes.ATTACK_SPEED, "5D6F0BA2-1186-46AC-B896-C61C5CEE99CC", 1.0D, AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(Attributes.ATTACK_SPEED, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "effect.synesthesia"), 1.0D, AttributeModifier.Operation.ADD_VALUE);
 	}
 
 	@Override

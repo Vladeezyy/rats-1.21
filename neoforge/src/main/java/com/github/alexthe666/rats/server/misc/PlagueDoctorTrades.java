@@ -26,7 +26,7 @@ public class PlagueDoctorTrades extends VillagerTrades {
 						new EmeraldForItems(Items.POISONOUS_POTATO, 2, 12, 2),
 						new EmeraldForItems(RatsItemRegistry.CONTAMINATED_FOOD.get(), 5, 12, 2),
 						new ItemsForEmeralds(RatsItemRegistry.COOKED_RAT.get(), 1, 5, 1),
-						new ItemsAndEmeraldsToItems(Items.POPPY, 5, 1, RatsItemRegistry.HERB_BUNDLE.get(), 3, 12, 2),
+						new ItemsAndEmeraldsToItems(Items.POPPY, 5, 1, RatsItemRegistry.HERB_BUNDLE.get(), 3, 12, 2, 0.05F),
 						new ItemsForEmeralds(RatsItemRegistry.TREACLE.get(), 1, 2, 1),
 						new ItemsForEmeralds(RatsBlockRegistry.GARBAGE_PILE.get().asItem(), 1, 4, 3),
 						new ItemsForEmeralds(RatsBlockRegistry.CURSED_GARBAGE.get().asItem(), 1, 2, 3),

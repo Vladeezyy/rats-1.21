@@ -98,12 +98,13 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 		}
 	}
 
+	// 1.21: getDimensions is final; the default dimensions are scaled like the original's
 	@Override
-	public EntityDimensions getDimensions(Pose pose) {
+	public EntityDimensions getDefaultDimensions(Pose pose) {
 		if (this.getAnimation() == ANIMATION_SLASH || this.getAnimation() == ANIMATION_SNIFF) {
 			return EntityDimensions.fixed(1.85F, 2.25F);
 		}
-		return super.getDimensions(pose);
+		return super.getDefaultDimensions(pose);
 	}
 
 	public int getColorVariant() {

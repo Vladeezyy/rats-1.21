@@ -23,7 +23,7 @@ public class RatGolemMountCracksLayer extends RenderLayer<RatGolemMount, RatGole
 			RatGolemMount.Cracks cracks = entity.getCracks();
 			if (cracks != RatGolemMount.Cracks.NONE) {
 				ResourceLocation resourcelocation = CRACK_MAP.get(cracks);
-				renderColoredCutoutModel(this.getParentModel(), resourcelocation, stack, buffer, light, entity, 1.0F, 1.0F, 1.0F);
+				renderColoredCutoutModel(this.getParentModel(), resourcelocation, stack, buffer, light, entity, -1);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.world;
 
+import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.SpawnPlacementType;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
@@ -129,7 +130,7 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 			int k = pos.getZ() + level.getRandom().nextInt(distance * 2) - distance;
 			int l = level.getHeight(Heightmap.Types.WORLD_SURFACE, j, k);
 			BlockPos blockpos1 = new BlockPos(j, l, k);
-			if (NaturalSpawner.isSpawnPositionOk(SpawnPlacementType.ON_GROUND, level, blockpos1, EntityType.WANDERING_TRADER)) {
+			if (SpawnPlacementTypes.ON_GROUND.isSpawnPositionOk(level, blockpos1, EntityType.WANDERING_TRADER)) {
 				blockpos = blockpos1;
 				break;
 			}

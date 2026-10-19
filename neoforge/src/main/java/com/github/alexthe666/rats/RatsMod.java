@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats;
 
+import java.util.Optional;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackLocationInfo;
 import com.github.alexthe666.rats.registry.*;
 import com.github.alexthe666.rats.registry.worldgen.RatlantisFeatureRegistry;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
@@ -65,8 +68,8 @@ import java.util.List;
 public class RatsMod {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final String MODID = "rats";
-	public static final Rarity RATLANTIS_SPECIAL = Rarity.create("RATS_RATLANTIS_SPECIAL", ChatFormatting.GREEN);
-	public static final MobCategory RATS = MobCategory.create("RATS_RATS", "rats", 25, true, false, 128);
+	public static final Rarity RATLANTIS_SPECIAL = RatsEnums.RATLANTIS_SPECIAL.getValue();
+	public static final MobCategory RATS = RatsEnums.RATS_CATEGORY.getValue();
 
 	public static final BlockSetType PIRAT_WOOD_SET = BlockSetType.register(new BlockSetType(ResourceLocation.fromNamespaceAndPath(MODID, "pirat").toString(), true, true, true, BlockSetType.PressurePlateSensitivity.EVERYTHING, SoundType.NETHER_WOOD, SoundEvents.NETHER_WOOD_DOOR_CLOSE, SoundEvents.NETHER_WOOD_DOOR_OPEN, SoundEvents.NETHER_WOOD_TRAPDOOR_CLOSE, SoundEvents.NETHER_WOOD_TRAPDOOR_OPEN, SoundEvents.NETHER_WOOD_PRESSURE_PLATE_CLICK_OFF, SoundEvents.NETHER_WOOD_PRESSURE_PLATE_CLICK_ON, SoundEvents.NETHER_WOOD_BUTTON_CLICK_OFF, SoundEvents.NETHER_WOOD_BUTTON_CLICK_ON));
 	public static final WoodType PIRAT_WOOD_TYPE = WoodType.register(new WoodType(ResourceLocation.fromNamespaceAndPath(MODID, "pirat").toString(), PIRAT_WOOD_SET, SoundType.NETHER_WOOD, SoundType.NETHER_WOOD_HANGING_SIGN, SoundEvents.NETHER_WOOD_FENCE_GATE_CLOSE, SoundEvents.NETHER_WOOD_FENCE_GATE_OPEN));
@@ -130,9 +133,12 @@ public class RatsMod {
 	public void addRatlantisDatapack(AddPackFindersEvent event) {
 		if (event.getPackType() == PackType.SERVER_DATA) {
 			var resourcePath = ModList.get().getModFileById(MODID).getFile().findResource("data", "minecraft", "datapacks", "ratlantis");
-			var pack = Pack.readMetaAndCreate("ratlantis", Component.literal("Ratlantis"), RatConfig.ratlantisEnabledByDefault,
-					name -> new PathPackResources(name, resourcePath, true), PackType.SERVER_DATA, Pack.Position.TOP, PackSource.FEATURE);
-			event.addRepositorySource(packConsumer -> packConsumer.accept(pack));
+			var info = new PackLocationInfo("rats:ratlantis", Component.literal("Ratlantis"), PackSource.FEATURE, Optional.empty());
+			var pack = Pack.readMetaAndCreate(info, new PathPackResources.PathResourcesSupplier(resourcePath), PackType.SERVER_DATA,
+					new PackSelectionConfig(RatConfig.ratlantisEnabledByDefault, Pack.Position.TOP, false));
+			if (pack != null) {
+				event.addRepositorySource(packConsumer -> packConsumer.accept(pack));
+			}
 		}
 	}
 
@@ -155,8 +161,6 @@ public class RatsMod {
 			RatsCauldronRegistry.init();
 			RatsDispenserRegistry.init();
 
-			Raid.RaiderType.create("RATS_PIPER", RatsEntityRegistry.PIED_PIPER.get(), new int[]{0, 0, 1, 0, 0, 1, 1, 2});
-			GiveGiftToHero.GIFTS.put(RatsVillagerRegistry.PET_SHOP_OWNER.get(), RatsLootRegistry.PET_SHOP_HOTV);
 
 			CauldronInteraction.WATER.map().put(RatsItemRegistry.PARTY_HAT.get(), CauldronInteraction.DYED_ITEM);
 
@@ -244,7 +248,7 @@ public class RatsMod {
 	public static List<Pair<String, Component>> getCachedMobList(@Nullable Level level) {
 		if (level != null && MOB_CACHE.isEmpty()) {
 			List<Pair<String, Component>> unsortedCache = new ArrayList<>();
-			for (var entry : BuiltInRegistries.ENTITY_TYPE.getEntries()) {
+			for (var entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
 				try {
 					Entity entity = entry.getValue().create(level);
 					if (entry.getValue() == EntityType.PLAYER || entity instanceof Mob) {

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.block;
 
+import net.minecraft.world.phys.AABB;
 import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatlanteanSpiritModel;
@@ -44,5 +45,11 @@ public class UpgradeCombinerRenderer implements BlockEntityRenderer<UpgradeCombi
 		VertexConsumer consumer = buffer.getBuffer(TEXTURE);
 		MODEL_SPIRIT.renderToBuffer(stack, consumer, 244, overlay, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
 		stack.popPose();
+	}
+
+	// 1.21: the renderer gives the render bounds (the original overrode BlockEntity.getRenderBoundingBox)
+	@Override
+	public AABB getRenderBoundingBox(UpgradeCombinerBlockEntity blockEntity) {
+		return blockEntity.getRenderBoundingBox();
 	}
 }

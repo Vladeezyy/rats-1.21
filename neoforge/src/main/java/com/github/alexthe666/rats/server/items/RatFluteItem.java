@@ -47,9 +47,10 @@ public class RatFluteItem extends Item {
 			if (commandInt > RatCommand.values().length - 1) {
 				commandInt = 0;
 			}
-			ItemNbt.update(stack, tag -> tag.putInt("Command", commandInt));
+			int newCommand = commandInt;
+			ItemNbt.update(stack, tag -> tag.putInt("Command", newCommand));
 			ratCommand = RatCommand.values()[Mth.clamp(commandInt, 0, RatCommand.values().length - 1)];
-			level.playSound(player, player.blockPosition(), SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0F, 1.25F);
+			level.playSound(player, player.blockPosition(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.NEUTRAL, 1.0F, 1.25F);
 			player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COMMAND, Component.translatable(ratCommand.getTranslateName())), true);
 		} else {
 			player.getCooldowns().addCooldown(this, 60);

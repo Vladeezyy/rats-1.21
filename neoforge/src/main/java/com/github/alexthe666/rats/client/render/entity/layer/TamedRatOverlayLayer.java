@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity.layer;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.AbstractRatModel;
@@ -58,7 +59,7 @@ public class TamedRatOverlayLayer extends RenderLayer<TamedRat, AbstractRatModel
 					} else {
 						consumer = buffer.getBuffer(TEXTURE_DYED);
 						float[] color = RatColorUtil.getDyeRgb(DyeColor.byId(rat.getDyeColor()));
-						this.getParentModel().renderToBuffer(stack, consumer, light, LivingEntityRenderer.getOverlayCoords(rat, 0), color[0], color[1], color[2], 1.0F);
+						this.getParentModel().renderToBuffer(stack, consumer, light, LivingEntityRenderer.getOverlayCoords(rat, 0), FastColor.ARGB32.colorFromFloat(1.0F, color[0], color[1], color[2]));
 					}
 				}
 

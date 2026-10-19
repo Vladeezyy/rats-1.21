@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.registry;
 
+import net.minecraft.core.Holder;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.events.ModClientEvents;
@@ -381,7 +382,8 @@ public class RatsCreativeTabRegistry {
 			level = ModClientEvents.getClientLevel();
 		}
 		if (level != null) {
-			for (Item item : BuiltInRegistries.ITEM.tags().getTag(Tags.Items.ORES)) {
+			for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(Tags.Items.ORES)) {
+			Item item = holder.value();
 				ItemStack oreDrop = OreRatNuggetItem.getIngot(level, new ItemStack(item));
 				if (!uniqueOres.contains(oreDrop) && !oreDrop.isEmpty()) {
 					uniqueOres.add(oreDrop);

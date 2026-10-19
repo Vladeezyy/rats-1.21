@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.item.BlockItem;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import net.minecraft.ChatFormatting;
@@ -46,7 +47,7 @@ public class RatTubeItem extends Item {
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		InteractionResult actionresulttype = this.tryPlace(new BlockPlaceContext(context));
-		return actionresulttype != InteractionResult.SUCCESS && this.has(net.minecraft.core.component.DataComponents.FOOD) ? this.use(context.getLevel(), context.getPlayer(), context.getHand()).getResult() : actionresulttype;
+		return actionresulttype != InteractionResult.SUCCESS && this.components().has(net.minecraft.core.component.DataComponents.FOOD) ? this.use(context.getLevel(), context.getPlayer(), context.getHand()).getResult() : actionresulttype;
 	}
 
 	public InteractionResult tryPlace(BlockPlaceContext context) {
@@ -125,29 +126,7 @@ public class RatTubeItem extends Item {
 	}
 
 	public void setBlockEntityTag(Level level, @Nullable Player player, BlockPos pos, ItemStack stack) {
-		MinecraftServer minecraftserver = level.getServer();
-		if (minecraftserver != null) {
-			CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
-			if (compoundnbt != null) {
-				BlockEntity tileentity = level.getBlockEntity(pos);
-				if (tileentity != null) {
-					if (!level.isClientSide() && tileentity.onlyOpCanSetNbt() && (player == null || !player.canUseGameMasterBlocks())) {
-						return;
-					}
-
-					CompoundTag compoundnbt1 = tileentity.serializeNBT();
-					CompoundTag compoundnbt2 = compoundnbt1.copy();
-					compoundnbt1.merge(compoundnbt);
-					compoundnbt1.putInt("x", pos.getX());
-					compoundnbt1.putInt("y", pos.getY());
-					compoundnbt1.putInt("z", pos.getZ());
-					if (!compoundnbt1.equals(compoundnbt2)) {
-						tileentity.load(compoundnbt1);
-						tileentity.setChanged();
-					}
-				}
-			}
-
-		}
+		// 1.21: the block entity data component, applied like vanilla's BlockItem
+		BlockItem.updateCustomBlockEntityTag(level, player, pos, stack);
 	}
 }

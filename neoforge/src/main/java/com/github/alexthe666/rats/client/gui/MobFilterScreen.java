@@ -195,7 +195,6 @@ public class MobFilterScreen extends Screen {
 
 	@Override
 	public void tick() {
-		this.searchBar.tick();
 	}
 
 	private int getOffscreenRows() {
@@ -309,7 +308,7 @@ public class MobFilterScreen extends Screen {
 				List<TagKey<EntityType<?>>> tags = BuiltInRegistries.ENTITY_TYPE.getTagNames().filter(key -> key.location().toString().contains(tagName)).toList();
 				if (!tags.isEmpty()) {
 					tags.forEach(key -> {
-						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> BuiltInRegistries.ENTITY_TYPE.tags().getTag(key).contains(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(pair.getFirst())))).toList());
+						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(pair.getFirst())).is(key)).toList());
 						this.visibleTags.add(key);
 					});
 				}

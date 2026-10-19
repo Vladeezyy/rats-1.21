@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import net.minecraft.world.phys.Vec3;
 import com.github.alexthe666.rats.server.misc.StoredItems;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import net.minecraft.core.HolderLookup;
@@ -73,6 +74,6 @@ public class UpgradeSeparatorBlockEntity extends BlockEntity {
 	}
 
 	public AABB getRenderBoundingBox() {
-		return new AABB(this.getBlockPos(), this.getBlockPos().offset(1, 2, 1));
+		return new AABB(Vec3.atLowerCornerOf(this.getBlockPos()), Vec3.atLowerCornerOf(this.getBlockPos().offset(1, 2, 1)));
 	}
 }

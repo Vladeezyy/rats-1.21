@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.server.level.ServerLevel;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
@@ -21,7 +23,7 @@ public class RatlanteanFlame extends Fireball {
 	}
 
 	public RatlanteanFlame(Level level, LivingEntity shooter, double accelX, double accelY, double accelZ) {
-		super(RatlantisEntityRegistry.RATLANTEAN_FLAME.get(), shooter.getX(), shooter.getY() + shooter.getBbHeight() * 0.5D, shooter.getZ(), accelX, accelY, accelZ, level);
+		super(RatlantisEntityRegistry.RATLANTEAN_FLAME.get(), shooter.getX(), shooter.getY() + shooter.getBbHeight() * 0.5D, shooter.getZ(), new Vec3(accelX, accelY, accelZ), level);
 		this.setOwner(shooter);
 	}
 
@@ -71,7 +73,9 @@ public class RatlanteanFlame extends Fireball {
 			}
 			boolean flag = result.getEntity().hurt(this.damageSources().fireball(this, this.getOwner()), 2.0F);
 			if (flag) {
-				this.doEnchantDamageEffects((LivingEntity) this.getOwner(), result.getEntity());
+				if (this.level() instanceof ServerLevel serverLevel) {
+					EnchantmentHelper.doPostAttackEffects(serverLevel, result.getEntity(), this.damageSources().fireball(this, this.getOwner()));
+				}
 			}
 		}
 	}

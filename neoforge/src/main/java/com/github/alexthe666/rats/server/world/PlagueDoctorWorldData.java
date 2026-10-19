@@ -25,7 +25,7 @@ public class PlagueDoctorWorldData extends SavedData {
 		if (level instanceof ServerLevel) {
 			ServerLevel server = level.getServer().getLevel(level.dimension());
 			DimensionDataStorage storage = server.getDataStorage();
-			return storage.computeIfAbsent(PlagueDoctorWorldData::read, PlagueDoctorWorldData::new, IDENTIFIER);
+			return storage.computeIfAbsent(new SavedData.Factory<>(PlagueDoctorWorldData::new, PlagueDoctorWorldData::read, null), IDENTIFIER);
 		}
 		return null;
 	}
@@ -53,7 +53,7 @@ public class PlagueDoctorWorldData extends SavedData {
 		this.setDirty();
 	}
 
-	public static PlagueDoctorWorldData read(CompoundTag tag) {
+	public static PlagueDoctorWorldData read(CompoundTag tag, HolderLookup.Provider registries) {
 		PlagueDoctorWorldData data = new PlagueDoctorWorldData();
 		if (tag.contains("PlagueDoctorSpawnDelay", 99)) {
 			data.doctorSpawnDelay = tag.getInt("PlagueDoctorSpawnDelay");

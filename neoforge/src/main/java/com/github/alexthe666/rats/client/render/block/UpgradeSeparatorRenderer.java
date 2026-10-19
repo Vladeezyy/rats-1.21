@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.block;
 
+import net.minecraft.world.phys.AABB;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.server.block.entity.UpgradeSeparatorBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -38,5 +39,11 @@ public class UpgradeSeparatorRenderer implements BlockEntityRenderer<UpgradeSepa
 		stack.mulPose(Axis.XP.rotationDegrees(90));
 		Minecraft.getInstance().getItemRenderer().renderStatic(RENDER_STACK, ItemDisplayContext.FIXED, light, overlay, stack, buffer, null, 0);
 		stack.popPose();
+	}
+
+	// 1.21: the renderer gives the render bounds (the original overrode BlockEntity.getRenderBoundingBox)
+	@Override
+	public AABB getRenderBoundingBox(UpgradeSeparatorBlockEntity blockEntity) {
+		return blockEntity.getRenderBoundingBox();
 	}
 }

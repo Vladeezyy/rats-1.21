@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.world;
 
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.worldgen.RatlantisFeatureRegistry;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class CopyInputStateRuleProcessor extends StructureProcessor {
 
-	public static final Codec<CopyInputStateRuleProcessor> CODEC = ProcessorRule.CODEC.listOf().fieldOf("rules").xmap(CopyInputStateRuleProcessor::new, config -> config.rules).codec();
+	public static final MapCodec<CopyInputStateRuleProcessor> CODEC = ProcessorRule.CODEC.listOf().fieldOf("rules").xmap(CopyInputStateRuleProcessor::new, config -> config.rules);
 
 	private final ImmutableList<ProcessorRule> rules;
 

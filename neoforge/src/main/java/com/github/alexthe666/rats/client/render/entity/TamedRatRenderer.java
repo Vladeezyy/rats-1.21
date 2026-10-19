@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.world.entity.EntityAttachment;
+import net.minecraft.world.phys.Vec3;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.events.ModClientEvents;
 import com.github.alexthe666.rats.client.model.entity.AbstractRatModel;
@@ -104,7 +106,8 @@ public class TamedRatRenderer extends AbstractRatRenderer<TamedRat, AbstractRatM
 	protected void renderAdditionalInfo(TamedRat entity, PoseStack stack, MultiBufferSource source, int light) {
 		double d0 = this.entityRenderDispatcher.distanceToSqr(entity);
 		if (ClientHooks.isNameplateInRenderDistance(entity, d0)) {
-			float f = entity.getNameTagOffsetY();
+			Vec3 nameTag = entity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entity.getYRot());
+			float f = nameTag == null ? entity.getBbHeight() + 0.5F : (float) nameTag.y;
 			stack.pushPose();
 			stack.translate(0.0F, f, 0.0F);
 			stack.mulPose(this.entityRenderDispatcher.cameraOrientation());

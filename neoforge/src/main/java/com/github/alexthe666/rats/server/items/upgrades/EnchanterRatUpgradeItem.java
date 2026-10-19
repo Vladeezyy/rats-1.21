@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import net.minecraft.core.component.DataComponents;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
@@ -38,7 +39,7 @@ public class EnchanterRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 		}
 		if (disenchant && heldItem.isEnchanted()) {
 			burntItem = heldItem.copy();
-			burntItem.getEnchantmentTags().clear();
+			burntItem.remove(DataComponents.ENCHANTMENTS);
 		}
 		if (burntItem.isEmpty()) {
 			rat.cookingProgress = 0;

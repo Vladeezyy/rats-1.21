@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.world;
 
+import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.worldgen.RatlantisFeatureRegistry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,7 +24,7 @@ import java.util.function.Function;
 
 public class ThickBranchingTrunkPlacer extends TrunkPlacer {
 
-	public static final Codec<ThickBranchingTrunkPlacer> CODEC = RecordCodecBuilder.create(instance ->
+	public static final MapCodec<ThickBranchingTrunkPlacer> CODEC = RecordCodecBuilder.mapCodec(instance ->
 			trunkPlacerParts(instance).and(instance.group(
 					Codec.INT.fieldOf("trunk_width").forGetter(o -> o.trunkWidth),
 					Codec.INT.fieldOf("base_radius").forGetter(o -> o.baseRadius),

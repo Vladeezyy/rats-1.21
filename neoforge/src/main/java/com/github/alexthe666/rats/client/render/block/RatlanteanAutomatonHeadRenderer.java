@@ -42,9 +42,9 @@ public class RatlanteanAutomatonHeadRenderer implements BlockEntityRenderer<Ratl
 		stack.mulPose(Axis.YP.rotationDegrees(rotation));
 		VertexConsumer consumer = buffer.getBuffer(GOLEM_TEXTURE);
 		AUTOMATON_MODEL.setTERotationAngles(tickCount);
-		AUTOMATON_MODEL.renderHead(stack, consumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
+		AUTOMATON_MODEL.renderHead(stack, consumer, light, overlay, -1);
 		VertexConsumer ivertexbuilder2 = buffer.getBuffer(GLOW_TEXTURE);
-		AUTOMATON_MODEL.renderHead(stack, ivertexbuilder2, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
+		AUTOMATON_MODEL.renderHead(stack, ivertexbuilder2, light, overlay, -1);
 		stack.popPose();
 	}
 }

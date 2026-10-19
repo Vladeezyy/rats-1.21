@@ -13,6 +13,6 @@ public class GhostPiratHatModel extends PiratHatModel {
 
 	@Override
 	public void renderToBuffer(PoseStack stack, VertexConsumer builder, int light, int overlay, int color) {
-		super.renderToBuffer(stack, builder, 0xF000F0, overlay, FastColor.ARGB32.colorFromFloat(scale, red, green, blue));
+		super.renderToBuffer(stack, builder, 0xF000F0, overlay, color);
 	}
 }

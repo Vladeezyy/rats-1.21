@@ -61,7 +61,7 @@ public class LaserBeamRenderer extends EntityRenderer<LaserBeam> {
 	}
 
 	public void vertex(Matrix4f m4f, PoseStack.Pose m3f, VertexConsumer consumer, float x, float y, float z, float u, float v, int normX, int normZ, int normY, int light, int red, int green, int blue) {
-		consumer.addVertex(m4f, x, y, z).setColor(red, green, blue, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrixstack$entry, (float) normX, (float) normY, (float) normZ);
+		consumer.addVertex(m4f, x, y, z).setColor(red, green, blue, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(m3f, (float) normX, (float) normY, (float) normZ);
 	}
 
 	@Override

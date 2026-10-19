@@ -77,7 +77,7 @@ public class RatCraftingResultSlot extends SlotItemHandler {
 		this.amountCrafted = 0;
 
 		RecipeHolder<?> recipe = this.table.getRecipeUsed();
-		if (recipe != null && !recipe.isSpecial()) {
+		if (recipe != null && !recipe.value().isSpecial()) {
 			this.player.awardRecipes(java.util.List.of(recipe));
 		}
 	}

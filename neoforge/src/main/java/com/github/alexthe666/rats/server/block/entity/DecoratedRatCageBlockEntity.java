@@ -32,7 +32,7 @@ public class DecoratedRatCageBlockEntity extends BlockEntity {
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.handleUpdateTag(packet.getTag(), lookupProvider);
+		this.handleUpdateTag(packet.getTag(), registries);
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.block;
 
+import net.minecraft.world.phys.AABB;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import com.github.alexthe666.rats.server.block.ChunkyCheeseTokenBlock;
@@ -127,5 +128,11 @@ public class RatlantisTokenRenderer implements BlockEntityRenderer<RatlantisToke
 
 	private static void vertex4(VertexConsumer consumer, Matrix4f matrix, float y, float x) {
 		consumer.addVertex(matrix, 0.0F, y, x).setColor(255, 169, 33, 0);
+	}
+
+	// 1.21: the renderer gives the render bounds (the original overrode BlockEntity.getRenderBoundingBox)
+	@Override
+	public AABB getRenderBoundingBox(RatlantisTokenBlockEntity blockEntity) {
+		return blockEntity.getRenderBoundingBox();
 	}
 }

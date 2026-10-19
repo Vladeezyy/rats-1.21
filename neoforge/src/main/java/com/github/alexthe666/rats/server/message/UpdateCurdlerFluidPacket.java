@@ -27,12 +27,12 @@ public record UpdateCurdlerFluidPacket(long blockPos, FluidStack fluid) implemen
 
 
 	public static UpdateCurdlerFluidPacket decode(RegistryFriendlyByteBuf buf) {
-		return new UpdateCurdlerFluidPacket(buf.readLong(), FluidStack.readFromPacket(buf));
+		return new UpdateCurdlerFluidPacket(buf.readLong(), FluidStack.OPTIONAL_STREAM_CODEC.decode(buf));
 	}
 
 	public static void encode(UpdateCurdlerFluidPacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeLong(packet.blockPos());
-		packet.fluid().writeToPacket(buf);
+		FluidStack.OPTIONAL_STREAM_CODEC.encode(buf, packet.fluid());
 	}
 
 	public static class Handler {

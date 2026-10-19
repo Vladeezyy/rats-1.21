@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
@@ -48,8 +50,10 @@ public class OreRatNuggetItem extends Item {
 
 	public static ItemStack getStoredItem(ItemStack poopItem, ItemStack fallback) {
 		if (ItemNbt.view(poopItem).contains("OreItem")) {
+			// the ore by its id ("id" in 1.20.1's saved stack too); ores carry no other data
 			CompoundTag poopTag = ItemNbt.view(poopItem).getCompound("OreItem");
-			ItemStack oreItem = ItemStack.of(poopTag);
+			ResourceLocation id = ResourceLocation.tryParse(poopTag.getString("id"));
+			ItemStack oreItem = id == null ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.get(id));
 			if (oreItem.isEmpty()) {
 				return fallback;
 			} else {
@@ -71,7 +75,7 @@ public class OreRatNuggetItem extends Item {
 		ItemStack stack = new ItemStack(RatsItemRegistry.RAT_NUGGET_ORE.get());
 		CompoundTag nuggetTag = new CompoundTag();
 		CompoundTag oreTag = new CompoundTag();
-		resource.save(oreTag);
+		oreTag.putString("id", BuiltInRegistries.ITEM.getKey(resource.getItem()).toString());
 		nuggetTag.put("OreItem", oreTag);
 		ItemNbt.setTag(stack, nuggetTag);
 		return stack;

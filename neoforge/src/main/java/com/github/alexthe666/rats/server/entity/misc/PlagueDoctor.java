@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.misc;
 
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.alchemy.PotionContents;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
@@ -158,8 +159,14 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 			}
 
 			if (this.munchCounter == 10 && stack.getFoodProperties(this) != null) {
-				this.heal(Objects.requireNonNull(stack.getFoodProperties(this)).getNutrition());
-				this.addEatEffect(stack, this.level(), this);
+				FoodProperties food = Objects.requireNonNull(stack.getFoodProperties(this));
+				this.heal(food.nutrition());
+				// the food's effects (1.20.1's LivingEntity.addEatEffect)
+				for (FoodProperties.PossibleEffect effect : food.effects()) {
+					if (this.getRandom().nextFloat() < effect.probability()) {
+						this.addEffect(effect.effect());
+					}
+				}
 				stack.shrink(1);
 				this.munchCounter = 0;
 				this.eating = false;
@@ -215,7 +222,7 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 		if (!stack.isEmpty() && !this.level().isClientSide()) {
 			ItemEntity itementity = new ItemEntity(this.level(), this.getX() + this.getLookAngle().x(), this.getY() + 1.0D, this.getZ() + this.getLookAngle().z(), stack);
 			itementity.setPickUpDelay(40);
-			itementity.setThrower(this.getUUID());
+			itementity.setThrower(this);
 			this.level().addFreshEntity(itementity);
 		}
 	}
@@ -223,7 +230,7 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 	public boolean canHoldItem(ItemStack stack) {
 		Item item = stack.getItem();
 		ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-		return itemstack.isEmpty() || (item.has(net.minecraft.core.component.DataComponents.FOOD) && !itemstack.has(net.minecraft.core.component.DataComponents.FOOD));
+		return itemstack.isEmpty() || (stack.has(net.minecraft.core.component.DataComponents.FOOD) && !itemstack.has(net.minecraft.core.component.DataComponents.FOOD));
 	}
 
 	@Override
@@ -273,7 +280,7 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 		this.restockedToday = compound.getBoolean("RestockedToday");
 
 		if (compound.contains("WanderTarget")) {
-			this.wanderTarget = NbtUtils.readBlockPos(compound.getCompound("WanderTarget"));
+			this.wanderTarget = NbtUtils.readBlockPos(compound, "WanderTarget").orElse(null);
 		}
 
 		this.setAge(Math.max(0, this.getAge()));

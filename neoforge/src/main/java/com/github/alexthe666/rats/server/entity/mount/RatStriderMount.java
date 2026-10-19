@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
+import com.github.alexthe666.rats.RatsMod;
+import net.minecraft.resources.ResourceLocation;
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
@@ -38,8 +40,8 @@ import java.util.UUID;
 
 public class RatStriderMount extends RatMountBase {
 
-	private static final UUID SUFFOCATING_MODIFIER_UUID = UUID.fromString("9e362924-01de-4ddd-a2b2-d0f7a405a174");
-	private static final AttributeModifier SUFFOCATING_MODIFIER = new AttributeModifier(SUFFOCATING_MODIFIER_UUID, "Strider suffocating modifier", -0.34F, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+	private static final ResourceLocation SUFFOCATING_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "strider_suffocating");
+	private static final AttributeModifier SUFFOCATING_MODIFIER = new AttributeModifier(SUFFOCATING_MODIFIER_ID, -0.34F, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	private static final EntityDataAccessor<Boolean> DATA_SUFFOCATING = SynchedEntityData.defineId(RatStriderMount.class, EntityDataSerializers.BOOLEAN);
 
 	public RatStriderMount(EntityType<? extends PathfinderMob> type, Level level) {
@@ -64,7 +66,7 @@ public class RatStriderMount extends RatMountBase {
 		this.entityData.set(DATA_SUFFOCATING, suffocating);
 		AttributeInstance attribute = this.getAttribute(Attributes.MOVEMENT_SPEED);
 		if (attribute != null) {
-			attribute.removeModifier(SUFFOCATING_MODIFIER_UUID);
+			attribute.removeModifier(SUFFOCATING_MODIFIER_ID);
 			if (suffocating) {
 				attribute.addTransientModifier(SUFFOCATING_MODIFIER);
 			}

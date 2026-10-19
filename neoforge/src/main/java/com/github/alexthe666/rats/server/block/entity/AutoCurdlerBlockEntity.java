@@ -134,7 +134,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	@Override
 	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		super.loadAdditional(compound, registries);
-		this.tank.readFromNBT(compound);
+		this.tank.readFromNBT(registries, compound);
 		this.curdlerStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(compound, this.curdlerStacks, registries);
 		this.cookTime = compound.getInt("CookTime");
@@ -144,7 +144,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		super.saveAdditional(compound, registries);
-		compound.merge((CompoundTag) this.tank.saveOptional(this.registryAccess()));
+		this.tank.writeToNBT(registries, compound);
 		compound.putInt("CookTime", (short) this.cookTime);
 		compound.putInt("CookTimeTotal", (short) this.totalCookTime);
 		ContainerHelper.saveAllItems(compound, this.curdlerStacks, registries);
@@ -323,5 +323,16 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	/** The milk tank (registered as the block's fluid handler capability) */
 	public IFluidHandler getFluidHandler(@Nullable Direction side) {
 		return this.tank;
+	}
+
+	// 1.21: BaseContainerBlockEntity works on the item list
+	@Override
+	protected NonNullList<ItemStack> getItems() {
+		return this.curdlerStacks;
+	}
+
+	@Override
+	protected void setItems(NonNullList<ItemStack> items) {
+		this.curdlerStacks = items;
 	}
 }

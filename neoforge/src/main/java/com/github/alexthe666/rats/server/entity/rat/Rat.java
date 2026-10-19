@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import com.github.alexthe666.rats.RatConfig;
@@ -37,7 +39,6 @@ import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -166,7 +167,7 @@ public class Rat extends DiggingRat {
 
 	@Override
 	protected int getBaseExperienceReward() {
-		return this.hasPlague() ? 10 : super.getExperienceReward();
+		return this.hasPlague() ? 10 : super.getBaseExperienceReward();
 	}
 
 	@Nullable
@@ -255,7 +256,7 @@ public class Rat extends DiggingRat {
 				this.setGuaranteedDrop(EquipmentSlot.HEAD);
 			} else if ((RatsDateFetcher.isNewYearsEve() && this.getRandom().nextFloat() <= 0.25F) || RatsDateFetcher.isAlexsBDay() || RatsDateFetcher.isGizmosBDay() || (RatConfig.ratsSpawnWithPartyHats && this.getRandom().nextInt(100) == 0)) {
 				ItemStack stack = new ItemStack(RatsItemRegistry.PARTY_HAT.get());
-				((DyeableLeatherItem) stack.getItem()).setColor(stack, (int) (this.getRandom().nextFloat() * 0xFFFFFF));
+				stack.set(DataComponents.DYED_COLOR, new DyedItemColor((int) (this.getRandom().nextFloat() * 0xFFFFFF), true));
 				this.setItemSlot(EquipmentSlot.HEAD, stack);
 				this.setGuaranteedDrop(EquipmentSlot.HEAD);
 			} else if (RatsDateFetcher.isPirateDay() && this.getRandom().nextFloat() <= 0.25F) {
