@@ -217,7 +217,7 @@ public class MobFilterScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double x, double y, double direction) {
+	public boolean mouseScrolled(double x, double y, double scrollX, double direction) {
 		if (this.filteredMobs.size() > MAX_MOB_BUTTONS) {
 			int i = this.getOffscreenRows();
 			this.scrollOffs = (float) ((double) this.scrollOffs - direction / (double) i);

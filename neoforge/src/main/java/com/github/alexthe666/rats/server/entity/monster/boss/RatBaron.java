@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
@@ -53,9 +55,10 @@ public class RatBaron extends AbstractRat implements Enemy {
 		});
 	}
 
+	// 1.21: riding offsets are attachment points (the original's getMyRidingOffset was 0.45D)
 	@Override
-	public double getMyRidingOffset() {
-		return 0.45D;
+	public Vec3 getVehicleAttachmentPoint(Entity vehicle) {
+		return new Vec3(0.0D, -0.45D, 0.0D);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {

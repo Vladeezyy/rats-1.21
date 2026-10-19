@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.entity.LivingEntity;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.render.RatsBEWLR;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
@@ -25,14 +26,10 @@ public class RatsBlockItem extends BlockItem {
 	}
 
 	@Override
-	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, LivingEntity entity) {
 		return this.getBlock() instanceof WearableOnHead && EquipmentSlot.HEAD == armorType;
 	}
 
-	@Override
-	public Rarity getRarity(ItemStack stack) {
-		return this.getBlock() instanceof CustomItemRarity rarity ? rarity.getRarity() : super.getRarity(stack);
-	}
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {

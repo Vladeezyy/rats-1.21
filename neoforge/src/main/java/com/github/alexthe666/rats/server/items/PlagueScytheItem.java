@@ -31,7 +31,7 @@ public class PlagueScytheItem extends SwordItem {
 	}
 
 	@Override
-	public boolean isCorrectToolForDrops(BlockState state) {
+	public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
 		return false;
 	}
 

@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.events;
 
+import org.jetbrains.annotations.Nullable;
+import com.github.alexthe666.rats.server.effect.ConfitByaldiMobEffect;
+import com.github.alexthe666.rats.server.effect.PlagueMobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
@@ -467,4 +470,25 @@ public class ForgeEvents {
 		}
 	}
 
+	// 1.21: MobEffect has no removal hook with the entity, so the plague and confit byaldi clean up here
+	@SubscribeEvent
+	public static void onEffectRemoved(MobEffectEvent.Remove event) {
+		effectEnded(event.getEntity(), event.getEffectInstance());
+	}
+
+	@SubscribeEvent
+	public static void onEffectExpired(MobEffectEvent.Expired event) {
+		effectEnded(event.getEntity(), event.getEffectInstance());
+	}
+
+	private static void effectEnded(LivingEntity entity, @Nullable MobEffectInstance instance) {
+		if (instance == null) {
+			return;
+		}
+		if (instance.getEffect().is(RatsEffectRegistry.PLAGUE)) {
+			PlagueMobEffect.onRemoved(entity);
+		} else if (instance.getEffect().is(RatsEffectRegistry.SYNESTHESIA)) {
+			ConfitByaldiMobEffect.onRemoved(entity, instance.getAmplifier());
+		}
+	}
 }

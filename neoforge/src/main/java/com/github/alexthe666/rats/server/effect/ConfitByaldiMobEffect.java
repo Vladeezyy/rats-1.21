@@ -31,9 +31,8 @@ public class ConfitByaldiMobEffect extends MobEffect {
 		return duration % 40 == 0;
 	}
 
-	@Override
-	public void removeAttributeModifiers(LivingEntity living, AttributeMap map, int amplifier) {
-		super.removeAttributeModifiers(living, map, amplifier);
+	/** The effect ended or was removed (called from the effect events, see PlagueMobEffect.onRemoved) */
+	public static void onRemoved(LivingEntity living, int amplifier) {
 		living.setAbsorptionAmount(living.getAbsorptionAmount() - (float) (20 * (amplifier + 1)));
 		if (living.getHealth() > living.getMaxHealth()) {
 			living.setHealth(living.getMaxHealth());
@@ -41,8 +40,7 @@ public class ConfitByaldiMobEffect extends MobEffect {
 	}
 
 	@Override
-	public void addAttributeModifiers(LivingEntity living, AttributeMap map, int amplifier) {
+	public void onEffectStarted(LivingEntity living, int amplifier) {
 		living.setAbsorptionAmount(living.getAbsorptionAmount() + (float) (20 * (amplifier + 1)));
-		super.addAttributeModifiers(living, map, amplifier);
 	}
 }

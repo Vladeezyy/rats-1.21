@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -117,9 +119,10 @@ public class DemonRat extends AbstractRat implements Enemy {
 		return true;
 	}
 
+	// 1.21: riding offsets are attachment points (the original's getMyRidingOffset was 0.25D)
 	@Override
-	public double getMyRidingOffset() {
-		return 0.25D;
+	public Vec3 getVehicleAttachmentPoint(Entity vehicle) {
+		return new Vec3(0.0D, -0.25D, 0.0D);
 	}
 
 	@Nullable

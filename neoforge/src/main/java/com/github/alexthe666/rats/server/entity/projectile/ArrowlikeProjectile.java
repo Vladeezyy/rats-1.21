@@ -296,8 +296,8 @@ public abstract class ArrowlikeProjectile extends Projectile {
 	}
 
 	@Override
-	protected float getEyeHeight(Pose pose, EntityDimensions dimensions) {
-		return 0.13F;
+	public EntityDimensions getDimensions(Pose pose) {
+		return super.getDimensions(pose).withEyeHeight(0.13F);
 	}
 
 	public abstract boolean explodesOnHit();

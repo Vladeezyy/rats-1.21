@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.monster;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -93,9 +95,10 @@ public class Pirat extends AbstractRat implements RangedAttackMob, Enemy {
 		}
 	}
 
+	// 1.21: riding offsets are attachment points (the original's getMyRidingOffset was 0.3D)
 	@Override
-	public double getMyRidingOffset() {
-		return 0.3D;
+	public Vec3 getVehicleAttachmentPoint(Entity vehicle) {
+		return new Vec3(0.0D, -0.3D, 0.0D);
 	}
 
 	@Override

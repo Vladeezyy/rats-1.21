@@ -38,7 +38,8 @@ public abstract class AbstractGarbageBlock extends FallingBlock {
 	public final double spawnRateModifier;
 
 	public AbstractGarbageBlock(BlockBehaviour.Properties properties, double spawnRateModifier) {
-		super(properties);
+		// only the garbage's own mob spawns on it (the original overrode isValidSpawn)
+		super(properties.isValidSpawn((state, level, pos, type) -> state.getBlock() instanceof AbstractGarbageBlock garbage && type == garbage.getEntityToSpawn()));
 		this.spawnReason = MobSpawnType.SPAWNER;
 		this.spawnRateModifier = spawnRateModifier;
 	}
@@ -100,8 +101,4 @@ public abstract class AbstractGarbageBlock extends FallingBlock {
 		tooltip.add(Component.translatable(this.getDescriptionId() + ".desc").withStyle(ChatFormatting.GRAY));
 	}
 
-	@Override
-	public boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacementType type, EntityType<?> entityType) {
-		return entityType == this.getEntityToSpawn();
-	}
 }

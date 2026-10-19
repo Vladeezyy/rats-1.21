@@ -298,11 +298,11 @@ public class ModClientEvents {
 					int colorToUse;
 					if (tintIndex == 0) {
 						colorToUse = stack.getItem() instanceof PartyHatItem hat
-								? hat.getColor(stack)
+								? PartyHatItem.getColor(stack)
 								: 0x25C9E7;
 					} else {
 						colorToUse = stack.getItem() instanceof PartyHatItem hat
-								? invertColor(hat.getColor(stack))
+								? invertColor(PartyHatItem.getColor(stack))
 								: invertColor(0x25C9E7);
 					}
 					return colorToUse;

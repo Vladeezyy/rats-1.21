@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.world;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -70,7 +71,7 @@ public class PlagueDoctorWorldData extends SavedData {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public CompoundTag save(CompoundTag compound, HolderLookup.Provider registries) {
 		compound.putInt("PlagueDoctorSpawnDelay", this.doctorSpawnDelay);
 		compound.putInt("PlagueDoctorSpawnChance", this.doctorSpawnChance);
 		if (this.doctorID != null) {

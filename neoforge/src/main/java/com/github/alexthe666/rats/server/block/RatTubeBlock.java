@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block;
 
+import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.ItemInteractionResult;
@@ -319,7 +320,7 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter getter, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader getter, BlockPos pos, Player player) {
 		return getTubeItem(getter, pos);
 	}
 

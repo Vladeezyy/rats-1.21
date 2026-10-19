@@ -32,8 +32,9 @@ public class RatChickenMount extends RatMountBase {
 	}
 
 	@Override
-	protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
-		return this.isBaby() ? dimensions.height * 0.85F : dimensions.height * 0.92F;
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		EntityDimensions dimensions = super.getDefaultDimensions(pose);
+		return dimensions.withEyeHeight(dimensions.height() * (this.isBaby() ? 0.85F : 0.92F));
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {

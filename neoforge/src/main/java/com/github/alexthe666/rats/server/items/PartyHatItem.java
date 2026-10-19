@@ -1,12 +1,14 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.DyedItemColor;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -15,20 +17,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PartyHatItem extends Item implements DyeableLeatherItem {
+public class PartyHatItem extends Item {
 	public PartyHatItem(Properties properties) {
 		super(properties);
 	}
 
-	@Override
-	public int getColor(ItemStack stack) {
-		CompoundTag compoundtag = stack.getTagElement("display");
-		return compoundtag != null && compoundtag.contains("color", 99) ? compoundtag.getInt("color") : 0x25C9E7;
+	/** 1.21: the color is the dyed_color component (the item is in #minecraft:dyeable) */
+	public static int getColor(ItemStack stack) {
+		return DyedItemColor.getOrDefault(stack, 0x25C9E7);
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		if (!ItemNbt.hasTag(stack) || !ItemNbt.view(stack).getCompound("display").contains("color", 99)) {
+		if (!stack.has(DataComponents.DYED_COLOR)) {
 			tooltip.add(Component.translatable("item.rats.party_hat.desc").withStyle(ChatFormatting.GRAY));
 		}
 	}
@@ -39,7 +40,7 @@ public class PartyHatItem extends Item implements DyeableLeatherItem {
 	}
 
 	@Override
-	public boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity) {
+	public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
 		return slot == EquipmentSlot.HEAD;
 	}
 }
