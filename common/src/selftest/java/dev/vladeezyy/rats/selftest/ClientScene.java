@@ -2,8 +2,7 @@ package dev.vladeezyy.rats.selftest;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
-import dev.vladeezyy.rats.ModRegistry;
-import dev.vladeezyy.rats.Rats;
+import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -45,7 +44,7 @@ public final class ClientScene {
   private static final String MODE = System.getProperty("rats.scene", "");
   private static final boolean ENABLED = MODE.equals("main");
   static final String LANG = System.getProperty("rats.scene.lang", "en_us");
-  private static final String WORLD = Rats.MOD_ID + "_scene";
+  private static final String WORLD = RatsMod.MODID + "_scene";
   private static final List<Pair<Integer, Consumer<Minecraft>>> STEPS = new ArrayList<>();
   private static boolean opened;
   private static int tick, checks, failures;
@@ -60,7 +59,7 @@ public final class ClientScene {
     if (!ok) {
       failures++;
     }
-    Rats.LOG.info("[scene] CHECK " + (ok ? "OK " : "FAIL ") + name + (ok ? "" : " (" + detail + ")"));
+    RatsMod.LOGGER.info("[scene] CHECK " + (ok ? "OK " : "FAIL ") + name + (ok ? "" : " (" + detail + ")"));
   }
 
   static void server(Minecraft mc, Consumer<ServerPlayer> action) {
@@ -70,13 +69,13 @@ public final class ClientScene {
         action.accept(server.getPlayerList().getPlayer(mc.player.getUUID()));
       } catch (RuntimeException | LinkageError e) {
         check("server step ran", false, e);
-        Rats.LOG.error("[scene] server step failed", e);
+        RatsMod.LOGGER.error("[scene] server step failed", e);
       }
     });
   }
 
   static void shot(Minecraft mc, String name) {
-    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), c -> Rats.LOG.info("[scene] " + c.getString()));
+    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), c -> RatsMod.LOGGER.info("[scene] " + c.getString()));
   }
 
   static void lookAt(ServerPlayer player, double x, double y, double z, double tx, double ty, double tz) {
@@ -98,8 +97,10 @@ public final class ClientScene {
       p.setGameMode(GameType.SURVIVAL);
       p.getInventory().clearContent();
       int slot = 0;
-      for (var item : ModRegistry.TAB_ITEMS) {
-        p.getInventory().setItem(slot++, new ItemStack(item.get()));
+      for (var item : BuiltInRegistries.ITEM) {
+        if (slot < 36 && BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(RatsMod.MODID)) {
+          p.getInventory().setItem(slot++, new ItemStack(item));
+        }
       }
     }));
     at(t += 10, mc -> mc.setScreen(new InventoryScreen(mc.player)));
@@ -110,7 +111,7 @@ public final class ClientScene {
     });
     at(t += 5, ClientScene::checkTranslations);
     at(t += 10, mc -> {
-      Rats.LOG.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
+      RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
       mc.level.disconnect();
       mc.disconnect(new TitleScreen());
       mc.stop();
@@ -166,7 +167,7 @@ public final class ClientScene {
           step.getSecond().accept(mc);
         } catch (RuntimeException | LinkageError e) {
           check("step at tick " + tick + " ran", false, e);
-          Rats.LOG.error("[scene] step failed", e);
+          RatsMod.LOGGER.error("[scene] step failed", e);
         }
       }
     }
@@ -186,7 +187,7 @@ public final class ClientScene {
     // the mod's blocks in a row, in front of the camera
     List<Block> blocks = new ArrayList<>();
     for (Block block : BuiltInRegistries.BLOCK) {
-      if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Rats.MOD_ID)) {
+      if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(RatsMod.MODID)) {
         blocks.add(block);
       }
     }
@@ -201,27 +202,27 @@ public final class ClientScene {
   private static void checkTranslations(Minecraft mc) {
     List<String> needed = new ArrayList<>();
     for (Item item : BuiltInRegistries.ITEM) {
-      if (BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Rats.MOD_ID)) {
+      if (BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(RatsMod.MODID)) {
         needed.add(item.getDescriptionId());
       }
     }
     for (Block block : BuiltInRegistries.BLOCK) {
-      if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Rats.MOD_ID)) {
+      if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(RatsMod.MODID)) {
         needed.add(block.getDescriptionId());
       }
     }
     for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
-      if (BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(Rats.MOD_ID)) {
+      if (BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(RatsMod.MODID)) {
         needed.add(type.getDescriptionId());
       }
     }
     // other texts the mod shows (messages, death messages, effects, ...)
-    needed.add("itemGroup." + Rats.MOD_ID);
+    needed.add("itemGroup." + RatsMod.MODID);
     Language language = Language.getInstance();
     List<String> missing = needed.stream().distinct().filter(key -> !language.has(key)).toList();
     check("translations: every text in " + LANG, missing.isEmpty(), missing);
     List<String> unused = new ArrayList<>();
-    try (var reader = mc.getResourceManager().openAsReader(Rats.id("lang/" + LANG + ".json"))) {
+    try (var reader = mc.getResourceManager().openAsReader(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "lang/" + LANG + ".json"))) {
       for (String key : com.google.gson.JsonParser.parseReader(reader).getAsJsonObject().keySet()) {
         if (!needed.contains(key)) {
           unused.add(key);

@@ -1,7 +1,6 @@
 package dev.vladeezyy.rats.selftest;
 
-import dev.vladeezyy.rats.Rats;
-import dev.vladeezyy.rats.ModRegistry;
+import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
@@ -39,15 +38,15 @@ public final class SelfTest {
     try {
       result = test.getAsBoolean();
     } catch (RuntimeException e) {
-      Rats.LOG.error(PREFIX + "exception in {}", name, e);
+      RatsMod.LOGGER.error(PREFIX + "exception in {}", name, e);
       result = false;
     }
     checks++;
     if (result) {
-      Rats.LOG.info(PREFIX + "ok   {}", name);
+      RatsMod.LOGGER.info(PREFIX + "ok   {}", name);
     } else {
       failures.add(name);
-      Rats.LOG.error(PREFIX + "FAIL {}", name);
+      RatsMod.LOGGER.error(PREFIX + "FAIL {}", name);
     }
   }
 
@@ -76,7 +75,7 @@ public final class SelfTest {
     try {
       checks(server, level);
     } catch (RuntimeException e) {
-      Rats.LOG.error(PREFIX + "checks crashed", e);
+      RatsMod.LOGGER.error(PREFIX + "checks crashed", e);
       failures.add("checks crashed");
     }
     tick = 0;
@@ -92,40 +91,83 @@ public final class SelfTest {
       try {
         laterChecks(server.overworld());
       } catch (RuntimeException e) {
-        Rats.LOG.error(PREFIX + "later checks crashed", e);
+        RatsMod.LOGGER.error(PREFIX + "later checks crashed", e);
         failures.add("later checks crashed");
       }
     }
     if (tick == 20) {
       int passed = checks - failures.size();
       if (failures.isEmpty()) {
-        Rats.LOG.info(PREFIX + "PASS {}/{}", passed, checks);
+        RatsMod.LOGGER.info(PREFIX + "PASS {}/{}", passed, checks);
       } else {
-        Rats.LOG.error(PREFIX + "FAILED {}/{}: {}", passed, checks, failures);
+        RatsMod.LOGGER.error(PREFIX + "FAILED {}/{}: {}", passed, checks, failures);
       }
       tick = -1;
       server.halt(false);
     }
   }
 
+  private static net.minecraft.world.entity.Entity spawned;
+  private static com.github.alexthe666.rats.server.entity.rat.TamedRat tamed;
+
   private static void checks(MinecraftServer server, ServerLevel level) {
-    check("example block registered", () -> BuiltInRegistries.BLOCK.getKey(ModRegistry.exampleBlock.get()).equals(Rats.id("example_block")));
-    check("example block placed in the world", () -> {
-      level.setBlock(at(0, 0, 0), ModRegistry.exampleBlock.get().defaultBlockState(), Block.UPDATE_ALL);
-      return level.getBlockState(at(0, 0, 0)).is(ModRegistry.exampleBlock.get());
+    check("items, blocks and entities registered", () ->
+      BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "cheese"))
+        && BuiltInRegistries.BLOCK.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "rat_crafting_table"))
+        && BuiltInRegistries.ENTITY_TYPE.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tamed_rat"))
+        && BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis_helmet")));
+    check("enum extensions: rat spawn category and Ratlantis rarity", () ->
+      RatsMod.RATS.getName().equals("rats:rats") && RatsMod.RATLANTIS_SPECIAL != null);
+    check("rat variants registry has the 15 variants", () ->
+      com.github.alexthe666.rats.registry.RatVariantRegistry.RAT_VARIANT_REGISTRY.size() == 15);
+    check("recipes loaded (crafting, chef, archeologist)", () -> {
+      var manager = server.getRecipeManager();
+      long rats = manager.getRecipes().stream().filter(r -> r.id().getNamespace().equals(RatsMod.MODID)).count();
+      RatsMod.LOGGER.info(PREFIX + "{} rats recipes", rats);
+      return rats > 100 && !manager.getAllRecipesFor(com.github.alexthe666.rats.registry.RatsRecipeRegistry.CHEF.get()).isEmpty();
     });
-    check("example block drops itself (loot table)", () -> {
-      LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(at(0, 0, 0)))
-        .withParameter(LootContextParams.TOOL, new ItemStack(Items.IRON_PICKAXE))
-        .withParameter(LootContextParams.BLOCK_STATE, ModRegistry.exampleBlock.get().defaultBlockState()).create(LootContextParamSets.BLOCK);
-      List<ItemStack> drops = level.getServer().reloadableRegistries().getLootTable(ModRegistry.exampleBlock.get().getLootTable()).getRandomItems(params);
-      return drops.size() == 1 && drops.get(0).is(ModRegistry.exampleBlockItem.get());
+    check("rat loot table exists", () -> server.reloadableRegistries().getLootTable(
+      net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);
+    check("banner patterns registered", () -> server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BANNER_PATTERN)
+      .containsKey(com.github.alexthe666.rats.registry.RatsBannerPatternRegistry.RAT_PATTERN));
+    check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().contains("rats:ratlantis"));
+    check("wild rat spawns", () -> {
+      spawned = com.github.alexthe666.rats.registry.RatsEntityRegistry.RAT.get().spawn(level, at(1, 0, 1), net.minecraft.world.entity.MobSpawnType.COMMAND);
+      return spawned != null && spawned.isAlive();
     });
-    check("a pickaxe is the right tool", () -> new ItemStack(Items.IRON_PICKAXE).isCorrectToolForDrops(ModRegistry.exampleBlock.get().defaultBlockState()));
+    check("tamed rat with a combined upgrade holding a speed upgrade", () -> {
+      tamed = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().spawn(level, at(-1, 0, 1), net.minecraft.world.entity.MobSpawnType.COMMAND);
+      if (tamed == null) {
+        return false;
+      }
+      tamed.tame(player);
+      ItemStack combined = new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
+      net.minecraft.core.NonNullList<ItemStack> inside = net.minecraft.core.NonNullList.withSize(27, ItemStack.EMPTY);
+      inside.set(0, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get()));
+      com.github.alexthe666.rats.server.misc.StoredItems.set(combined, inside);
+      tamed.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, combined);
+      return tamed.isTame() && com.github.alexthe666.rats.server.misc.RatUpgradeUtils.hasUpgrade(tamed, com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get());
+    });
+    check("1.20.1 combined upgrade data (Items list in custom data) is read", () -> {
+      ItemStack old = new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
+      com.github.alexthe666.rats.server.misc.RegistryAccessHolder.setServer(server);
+      net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+      net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+      net.minecraft.nbt.CompoundTag entry = new net.minecraft.nbt.CompoundTag();
+      entry.putByte("Slot", (byte) 3);
+      entry.putString("id", "rats:rat_upgrade_health");
+      entry.putByte("Count", (byte) 1);
+      list.add(entry);
+      tag.put("Items", list);
+      com.github.alexthe666.rats.server.misc.ItemNbt.setTag(old, tag);
+      return com.github.alexthe666.rats.server.misc.StoredItems.view(old, 27).get(3).is(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_HEALTH.get());
+    });
   }
 
   /** Checks that need a few server ticks first */
   private static void laterChecks(ServerLevel level) {
-    check("example block still there after 10 ticks", () -> level.getBlockState(at(0, 0, 0)).is(ModRegistry.exampleBlock.get()));
+    check("wild rat still alive after 10 ticks", () -> spawned != null && spawned.isAlive());
+    check("tamed rat applied the speed boost", () -> tamed != null && tamed.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)
+      > tamed.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED));
   }
 }

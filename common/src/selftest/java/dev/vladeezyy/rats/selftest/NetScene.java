@@ -1,7 +1,6 @@
 package dev.vladeezyy.rats.selftest;
 
-import dev.vladeezyy.rats.Rats;
-import dev.vladeezyy.rats.ModRegistry;
+import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.core.BlockPos;
@@ -28,7 +27,7 @@ public final class NetScene {
     if (!ok) {
       failures++;
     }
-    Rats.LOG.info("[scene] CHECK " + (ok ? "OK " : "FAIL ") + name + (ok ? "" : " (" + detail + ")"));
+    RatsMod.LOGGER.info("[scene] CHECK " + (ok ? "OK " : "FAIL ") + name + (ok ? "" : " (" + detail + ")"));
   }
 
   private static void command(Minecraft mc, String command) {
@@ -72,7 +71,7 @@ public final class NetScene {
       step(mc);
     } catch (RuntimeException e) {
       check("net step at tick " + tick + " ran", false, e);
-      Rats.LOG.error("[scene] net step failed", e);
+      RatsMod.LOGGER.error("[scene] net step failed", e);
     }
   }
 
@@ -89,13 +88,13 @@ public final class NetScene {
         command(mc, "fill -4 " + Y + " -4 8 " + (Y + 3) + " 8 minecraft:air");
         command(mc, "gamemode survival");
         command(mc, "tp @s 0.5 " + Y + " 0.5 -45 30");
-        command(mc, "item replace entity @s weapon.mainhand with " + Rats.MOD_ID + ":example_block");
+        command(mc, "item replace entity @s weapon.mainhand with " + RatsMod.MODID + ":block_of_cheese");
       }
       // after the teleport the client needs a moment to get the chunks
-      case 100 -> check("the item arrived in the hand", mc.player.getMainHandItem().is(ModRegistry.exampleBlockItem.get()), mc.player.getMainHandItem());
+      case 100 -> check("the item arrived in the hand", mc.player.getMainHandItem().is(com.github.alexthe666.rats.registry.RatsBlockRegistry.BLOCK_OF_CHEESE.get().asItem()), mc.player.getMainHandItem());
       case 105 -> mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
         new BlockHitResult(Vec3.atCenterOf(PLACE.below()).add(0, 0.5, 0), Direction.UP, PLACE.below(), false));
-      case 125 -> check("the server confirmed the placed block", mc.level.getBlockState(PLACE).is(ModRegistry.exampleBlock.get()), mc.level.getBlockState(PLACE));
+      case 125 -> check("the server confirmed the placed block", mc.level.getBlockState(PLACE).is(com.github.alexthe666.rats.registry.RatsBlockRegistry.BLOCK_OF_CHEESE.get()), mc.level.getBlockState(PLACE));
       case 130 -> check("still connected", mc.getConnection() != null && mc.getConnection().getConnection().isConnected(), "");
       case 135 -> {
         quitting = true;
@@ -107,7 +106,7 @@ public final class NetScene {
   }
 
   private static void done(Minecraft mc) {
-    Rats.LOG.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
+    RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
     if (mc.level != null) {
       mc.level.disconnect();
     }

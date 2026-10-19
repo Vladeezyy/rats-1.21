@@ -44,3 +44,41 @@ Open issues of `AlexModGuy/Rats` (72 open, 2026-10-19), the ones about 1.19–1.
 | [#870](https://github.com/AlexModGuy/Rats/issues/870) | Bucket upgrade works every tick (sound spam) | Cooldown |
 | [#864](https://github.com/AlexModGuy/Rats/issues/864) | The "disable plastic" config option is gone | Bring it back (recipe condition) |
 | [#867](https://github.com/AlexModGuy/Rats/issues/867) | Server lag with rats (1.20.1) | Profile with the stress test (MSPT vs vanilla) |
+
+## 2026-10-19 — NeoForge 1.21.1: the code compiles (2457 compile errors → 0)
+
+Mechanical converters in `tools/port/` (imports, holders, 1.21 data, API renames, payloads, item NBT), then by hand.
+What changed beyond renames, and why:
+- **Data generators dropped**: the original generated its JSON with datagen classes; the generated JSON (converted to
+  1.21 folders and formats, including the built-in Ratlantis datapack) is now the source. Tag classes keep only their
+  `TagKey` constants.
+- **Item data**: item NBT → `minecraft:custom_data` with the same keys (1.20.1 items keep their data, `ItemNbt`).
+  Items stored inside combined upgrades and the black/white lists → `minecraft:container`, parsed once; the original
+  parsed the NBT list every time a rat checked an upgrade (several times per tick per rat). 1.20.1 stacks are
+  migrated on first read (`StoredItems`).
+- **Capabilities**: the selected rat is a per-player map (it was never saved); block and entity item/fluid/energy
+  handlers are registered with `RegisterCapabilitiesEvent`; lookups go through `RatsCaps`.
+- **Network**: 19 `SimpleChannel` messages → payloads. Entity/block state (rat fluid, thrown block, curdler tank) now
+  goes to the players tracking the entity/chunk, not to every player of the server.
+- **Enums**: the rats spawn category (`rats:rats`), the Ratlantis rarity and the Pied Piper raider type are NeoForge
+  enum extensions (`META-INF/enumextensions.json`, `RatsEnums`).
+- **Data-driven 1.21 registries**: armor materials (registry entries; durability as item property, same values),
+  banner patterns (`data/rats/banner_pattern`), jukebox songs (`data/rats/jukebox_song`), hero gifts (NeoForge data
+  map `raid_hero_gifts`), entity type tags `can_breathe_under_water` (pirat boat) and `illager` (Pied Piper), item tags
+  `meat` and `dyeable`.
+- **Vanilla API moves**: projectiles (arrows take a pickup stack and weapon; the Ratlantis bow is vanilla's bow with
+  `createProjectile`, so Power/Punch/Flame/Infinity work as enchantment effects), riding offsets → attachment points,
+  eye heights → dimensions, dimension change → `DimensionTransition`, path evaluators → `PathfindingContext`,
+  recipes → `RecipeHolder` / recipe inputs / codecs, loot conditions/modifier → `MapCodec`, follow-owner goal (the
+  1.21 check is final: the rat keeps its own rules, so rats on their mounts still follow).
+
+### Bugs of the original fixed on the way
+- Client-bound packets `UpdateRatFluidPacket` and `SyncThrownBlockPacket` read the sender player, which is always null
+  on the client: they never did anything (rats' carried fluid and thrown blocks were not synced).
+- `UpdateSelectedRatPacket` crashed with a null rat when the selection was cleared.
+- `SyncArmSwingPacket` trusted the item stack sent by the client (any plague scythe damage); the server now uses the
+  item in the player's hand.
+- `SyncPlaguePacket` sent the effect id as a byte (wrong past 255 effects); only the plague is synced, so no id.
+- Projectiles fired from dispensers (cheese cannonball, rat capture net, vial of sentience) started at 0, 0, 0.
+- #847: a rat teleported to its owner kept its old fall distance ("fell from a great height").
+- `Animal.isFood` defaulted to wheat in 1.20.1; kept explicitly (1.21 made it abstract).

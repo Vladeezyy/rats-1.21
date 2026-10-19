@@ -18,7 +18,7 @@ import java.util.function.UnaryOperator;
  * the rats spawn category, the Ratlantis item rarity and the Pied Piper as a raider.
  */
 public final class RatsEnums {
-	public static final EnumProxy<MobCategory> RATS_CATEGORY = new EnumProxy<>(MobCategory.class, "rats", 25, true, false, 128);
+	public static final EnumProxy<MobCategory> RATS_CATEGORY = new EnumProxy<>(MobCategory.class, "rats:rats", 25, true, false, 128);
 	public static final EnumProxy<Rarity> RATLANTIS_SPECIAL = new EnumProxy<>(Rarity.class, -1, "rats:ratlantis_special", (UnaryOperator<Style>) style -> style.withColor(ChatFormatting.GREEN));
 	public static final EnumProxy<Raid.RaiderType> PIPER = new EnumProxy<>(Raid.RaiderType.class, (Supplier<EntityType<? extends Raider>>) () -> RatsEntityRegistry.PIED_PIPER.get(), new int[]{0, 0, 1, 0, 0, 1, 1, 2});
 

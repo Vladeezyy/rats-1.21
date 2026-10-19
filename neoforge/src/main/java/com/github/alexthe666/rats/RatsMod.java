@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats;
 
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import com.github.alexthe666.rats.server.misc.RegistryAccessHolder;
 import java.util.Optional;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -126,6 +128,9 @@ public class RatsMod {
 		bus.addListener(RatsNetworkHandler::register);
 		bus.addListener(com.github.alexthe666.rats.server.events.RatsCapabilityEvents::register);
 		NeoForge.EVENT_BUS.addListener(this::addPetShops);
+		// registries for item data read without a level (1.20.1 combined upgrades)
+		NeoForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) -> RegistryAccessHolder.setServer(event.getServer()));
+		NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> RegistryAccessHolder.setServer(null));
 		bus.addListener(this::addRatlantisDatapack);
 	}
 
