@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.misc;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.CombinedUpgrade;
@@ -27,10 +29,8 @@ public class RatUpgradeUtils {
 					return stack;
 				}
 				if (stack.getItem() instanceof CombinedUpgrade combined) {
-					CompoundTag tag = stack.getTag();
-					if (tag != null && tag.contains("Items", 9)) {
-						NonNullList<ItemStack> upgradeList = NonNullList.withSize(combined.getUpgradeSlots(), ItemStack.EMPTY);
-						ContainerHelper.loadAllItems(tag, upgradeList);
+					if (StoredItems.has(stack)) {
+						NonNullList<ItemStack> upgradeList = StoredItems.view(stack, combined.getUpgradeSlots());
 						for (ItemStack selectedUpgrade : upgradeList) {
 							if (selectedUpgrade.getItem() == item) {
 								return selectedUpgrade;
@@ -59,10 +59,8 @@ public class RatUpgradeUtils {
 					function.accept(stack, slot);
 				}
 				if (stack.getItem() instanceof CombinedUpgrade combined) {
-					CompoundTag tag = stack.getTag();
-					if (tag != null && tag.contains("Items", 9)) {
-						NonNullList<ItemStack> upgradeList = NonNullList.withSize(combined.getUpgradeSlots(), ItemStack.EMPTY);
-						ContainerHelper.loadAllItems(tag, upgradeList);
+					if (StoredItems.has(stack)) {
+						NonNullList<ItemStack> upgradeList = StoredItems.view(stack, combined.getUpgradeSlots());
 						for (ItemStack selectedUpgrade : upgradeList) {
 							if (upgrade.test(selectedUpgrade.getItem())) {
 								function.accept(selectedUpgrade, slot);
@@ -79,10 +77,8 @@ public class RatUpgradeUtils {
 			ItemStack stack = rat.getItemBySlot(slot);
 			if (!stack.isEmpty()) {
 				if (stack.getItem() instanceof CombinedUpgrade combined) {
-					CompoundTag tag = stack.getTag();
-					if (tag != null && tag.contains("Items", 9)) {
-						NonNullList<ItemStack> upgradeList = NonNullList.withSize(combined.getUpgradeSlots(), ItemStack.EMPTY);
-						ContainerHelper.loadAllItems(tag, upgradeList);
+					if (StoredItems.has(stack)) {
+						NonNullList<ItemStack> upgradeList = StoredItems.view(stack, combined.getUpgradeSlots());
 						for (ItemStack selectedUpgrade : upgradeList) {
 							if (selectedUpgrade.getItem() instanceof BaseRatUpgradeItem upgrade && function.apply(upgrade) != def) {
 								return function.apply(upgrade);

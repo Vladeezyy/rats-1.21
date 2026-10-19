@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.data.tags.RatsBlockTags;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
@@ -25,11 +26,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -127,15 +128,15 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 		}
 	}
 
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.inventory);
+		ContainerHelper.loadAllItems(compound, this.inventory, registries);
 	}
 
-	public void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
-		ContainerHelper.saveAllItems(compound, this.inventory);
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.saveAdditional(compound, registries);
+		ContainerHelper.saveAllItems(compound, this.inventory, registries);
 	}
 
 	@Override
@@ -162,7 +163,7 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 	@NotNull
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (!this.remove && facing != null && capability == ForgeCapabilities.ITEM_HANDLER) {
+		if (!this.remove && facing != null && capability == Capabilities.ITEM_HANDLER) {
 			return handlers[0].cast();
 		}
 		return super.getCapability(capability, facing);
@@ -174,11 +175,11 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
 		this.handleUpdateTag(packet.getTag());
 	}
 
-	public CompoundTag getUpdateTag() {
+	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
 		return this.saveWithId();
 	}
 

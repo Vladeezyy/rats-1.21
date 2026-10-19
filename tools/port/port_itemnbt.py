@@ -45,8 +45,8 @@ for d, _, fs in os.walk(SRC):
         old = open(p, encoding='utf-8', newline='').read()
         new = port(old)
         if new != old:
-            if 'import com.github.alexthe666.iceandfire.util.ItemNbt;' not in new:
-                new = re.sub(r'(package [^;]+;\r?\n)', lambda m: m.group(1) + '\r\nimport com.github.alexthe666.iceandfire.util.ItemNbt;', new, count=1)
+            if 'import com.github.alexthe666.rats.server.misc.ItemNbt;' not in new:
+                new = re.sub(r'(package [^;]+;\r?\n)', lambda m: m.group(1) + '\nimport com.github.alexthe666.rats.server.misc.ItemNbt;', new, count=1)
             open(p, 'w', encoding='utf-8', newline='') .write(new)
             for i, line in enumerate(new.splitlines(), 1):
                 if re.search(r'ItemNbt\.(getTag|getOrEmpty)\(', line) or re.search(r'\.getTag\(\)|getOrCreateTag', line):

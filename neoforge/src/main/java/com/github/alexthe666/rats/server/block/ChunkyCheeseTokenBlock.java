@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block;
 
+import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatlantisBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatlantisTokenBlockEntity;
 import net.minecraft.ChatFormatting;
@@ -35,7 +36,7 @@ public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomIte
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable BlockGetter getter, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext getter, List<Component> tooltip, TooltipFlag flag) {
 		tooltip.add(Component.translatable("block.rats.chunky_cheese_token.desc0").withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable("block.rats.chunky_cheese_token.desc1").withStyle(ChatFormatting.GRAY));
 	}

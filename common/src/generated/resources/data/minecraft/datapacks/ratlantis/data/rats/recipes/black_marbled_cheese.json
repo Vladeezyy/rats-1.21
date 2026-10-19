@@ -3,7 +3,7 @@
   "category": "building",
   "key": {
     "D": {
-      "tag": "forge:dyes/black"
+      "tag": "c:dyes/black"
     },
     "M": {
       "item": "rats:marbled_cheese"

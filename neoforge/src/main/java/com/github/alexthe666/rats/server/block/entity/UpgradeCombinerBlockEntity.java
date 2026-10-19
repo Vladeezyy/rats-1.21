@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
@@ -29,11 +32,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -136,7 +139,7 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	@Override
 	public void setItem(int index, ItemStack stack) {
 		ItemStack itemstack = this.combinerStacks.get(index);
-		boolean flag = !stack.isEmpty() && stack.is(itemstack.getItem()) && ItemStack.isSameItemSameTags(stack, itemstack);
+		boolean flag = !stack.isEmpty() && stack.is(itemstack.getItem()) && ItemStack.isSameItemSameComponents(stack, itemstack);
 		this.combinerStacks.set(index, stack);
 
 		if (stack.getCount() > this.getMaxStackSize()) {
@@ -151,10 +154,10 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.combinerStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.combinerStacks);
+		ContainerHelper.loadAllItems(compound, this.combinerStacks, registries);
 		this.burnTime = compound.getInt("BurnTime");
 		this.cookTime = compound.getInt("CookTime");
 		this.totalCookTime = compound.getInt("CookTimeTotal");
@@ -162,12 +165,12 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.saveAdditional(compound, registries);
 		compound.putInt("BurnTime", (short) this.burnTime);
 		compound.putInt("CookTime", (short) this.cookTime);
 		compound.putInt("CookTimeTotal", (short) this.totalCookTime);
-		ContainerHelper.saveAllItems(compound, this.combinerStacks);
+		ContainerHelper.saveAllItems(compound, this.combinerStacks, registries);
 	}
 
 	@Override
@@ -279,27 +282,15 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	}
 
 	private ItemStack getCombinerResult(ItemStack combiner, ItemStack stack) {
-		if (!combiner.hasTag()) {
-			combiner.setTag(new CompoundTag());
-		}
-		CompoundTag tag = combiner.getTag();
-		NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-		if (tag != null && tag.contains("Items")) {
-			ContainerHelper.loadAllItems(tag, nonnulllist);
-		}
-		int addIndex = -1;
-		for (int i = 0; i < nonnulllist.size(); i++) {
-			if (nonnulllist.get(i) == ItemStack.EMPTY) {
-				addIndex = i;
-				break;
+		NonNullList<ItemStack> items = StoredItems.view(combiner, 27);
+		for (int i = 0; i < items.size(); i++) {
+			if (items.get(i).isEmpty()) {
+				items.set(i, stack.copy());
+				ItemStack result = combiner.copy();
+				StoredItems.set(result, items);
+				return result;
 			}
 		}
-		if (addIndex == -1) {
-			return combiner.copy();
-		}
-		nonnulllist.set(addIndex, stack.copy());
-		ContainerHelper.saveAllItems(tag, nonnulllist);
-		combiner.setTag(tag);
 		return combiner.copy();
 	}
 
@@ -359,7 +350,7 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	@NotNull
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (!this.remove && facing != null && capability == ForgeCapabilities.ITEM_HANDLER) {
+		if (!this.remove && facing != null && capability == Capabilities.ITEM_HANDLER) {
 			if (facing == Direction.UP)
 				return handlers[0].cast();
 			else if (facing == Direction.DOWN)

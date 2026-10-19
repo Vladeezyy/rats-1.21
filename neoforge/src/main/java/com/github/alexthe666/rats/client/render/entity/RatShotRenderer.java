@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.StaticRatModel;
 import com.github.alexthe666.rats.server.entity.projectile.RatShot;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.LightLayer;
 
 public class RatShotRenderer extends EntityRenderer<RatShot> {
 
-	private static final RenderType TEXTURE_EYES = RenderType.eyes(new ResourceLocation(RatsMod.MODID, "textures/entity/rat/eyes/glow.png"));
+	private static final RenderType TEXTURE_EYES = RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/glow.png"));
 	private static final StaticRatModel<RatShot> MODEL_STATIC_RAT = new StaticRatModel<>();
 
 	public RatShotRenderer(EntityRendererProvider.Context context) {
@@ -56,7 +57,7 @@ public class RatShotRenderer extends EntityRenderer<RatShot> {
 		}
 		stack.popPose();
 
-		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
+		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
 	}
 
 	@Override

@@ -52,10 +52,10 @@ public class RatKing extends Monster implements RatSummoner {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(RAT_COLORS, "000000000000000");
-		this.getEntityData().define(SUMMONED_RATS, 0);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(RAT_COLORS, "000000000000000");
+		builder.define(SUMMONED_RATS, 0);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -119,7 +119,7 @@ public class RatKing extends Monster implements RatSummoner {
 
 	@Override
 	public void die(DamageSource source) {
-		if (net.minecraftforge.common.ForgeHooks.onLivingDeath(this, source)) return;
+		if (net.minecraftforge.common.CommonHooks.onLivingDeath(this, source)) return;
 		if (!this.isRemoved() && !this.dead) {
 			Entity entity = source.getEntity();
 			LivingEntity livingentity = this.getKillCredit();
@@ -187,8 +187,8 @@ public class RatKing extends Monster implements RatSummoner {
 
 	@Override
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		for (int i = 0; i < RAT_COUNT; i++) {
 			int color = this.getRandom().nextInt(4);
 			this.setRatColors(i, color);

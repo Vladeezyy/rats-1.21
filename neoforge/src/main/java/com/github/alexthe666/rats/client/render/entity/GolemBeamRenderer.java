@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.projectile.GolemBeam;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,7 +18,7 @@ import org.joml.Matrix4f;
 
 public class GolemBeamRenderer extends EntityRenderer<GolemBeam> {
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/ratlantean_automaton/automaton_beam.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_automaton/automaton_beam.png");
 
 	public GolemBeamRenderer(EntityRendererProvider.Context context) {
 		super(context);
@@ -58,11 +59,11 @@ public class GolemBeamRenderer extends EntityRenderer<GolemBeam> {
 		}
 
 		stack.popPose();
-		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
+		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
 	}
 
 	public void vertex(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer consumer, int x, int y, int z, float u, float v, int xNorm, int zNorm, int yNorm, int light) {
-		consumer.vertex(matrix4f, (float) x, (float) y, (float) z).color(255, 255, 255, 255).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(matrix3f, (float) xNorm, (float) yNorm, (float) zNorm).endVertex();
+		consumer.addVertex(matrix4f, (float) x, (float) y, (float) z).setColor(255, 255, 255, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrix3f, (float) xNorm, (float) yNorm, (float) zNorm);
 	}
 
 	@Override

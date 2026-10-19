@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -37,14 +39,14 @@ public class RatCageBreedingLanternBlockEntity extends DecoratedRatCageBlockEnti
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		compound.putInt("BreedingCooldown", this.breedingCooldown);
-		super.saveAdditional(compound);
+		super.saveAdditional(compound, registries);
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.breedingCooldown = compound.getInt("BreedingCooldown");
 	}
 

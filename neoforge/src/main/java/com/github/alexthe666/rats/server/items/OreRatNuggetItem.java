@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
@@ -44,8 +45,8 @@ public class OreRatNuggetItem extends Item {
 	}
 
 	public static ItemStack getStoredItem(ItemStack poopItem, ItemStack fallback) {
-		if (poopItem.getOrCreateTag().contains("OreItem")) {
-			CompoundTag poopTag = poopItem.getOrCreateTag().getCompound("OreItem");
+		if (ItemNbt.view(poopItem).contains("OreItem")) {
+			CompoundTag poopTag = ItemNbt.view(poopItem).getCompound("OreItem");
 			ItemStack oreItem = ItemStack.of(poopTag);
 			if (oreItem.isEmpty()) {
 				return fallback;
@@ -71,12 +72,12 @@ public class OreRatNuggetItem extends Item {
 		CompoundTag oreTag = new CompoundTag();
 		resource.save(oreTag);
 		nuggetTag.put("OreItem", oreTag);
-		stack.setTag(nuggetTag);
+		ItemNbt.setTag(stack, nuggetTag);
 		return stack;
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		if (flag.isCreative()) {
 			ItemStack ingot = getStoredItem(stack, new ItemStack(Items.AIR));
 			tooltip.add(Component.translatable(RatsLangConstants.ORE_NUGGET_CONTAINS, ingot.getDisplayName().getString()).withStyle(ChatFormatting.GRAY));

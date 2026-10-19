@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -16,10 +17,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.EnergyStorage;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.energy.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -50,17 +51,17 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		compound.putInt("UseTicks", this.useTicks);
 		compound.put("Energy", this.energyStorage.serializeNBT());
 
 		compound.putInt("DismountCooldown", this.dismountCooldown);
-		super.saveAdditional(compound);
+		super.saveAdditional(compound, registries);
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.useTicks = compound.getInt("UseTicks");
 		this.dismountCooldown = compound.getInt("DismountCooldown");
 		if (compound.contains("Energy")) {
@@ -135,7 +136,7 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 			BlockEntity blockEntity = level.getBlockEntity(pos.relative(facing));
 			if (blockEntity == null)
 				continue;
-			blockEntity.getCapability(ForgeCapabilities.ENERGY, facing.getOpposite()).ifPresent(handler -> {
+			blockEntity.getCapability(Capabilities.ENERGY, facing.getOpposite()).ifPresent(handler -> {
 				if (handler.canReceive()) {
 					int received = handler.receiveEnergy(Math.min(capacity.get(), 10), false);
 					capacity.addAndGet(-received);
@@ -155,6 +156,6 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 	@NotNull
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		return capability == ForgeCapabilities.ENERGY ? this.energyCap.cast() : super.getCapability(capability, facing);
+		return capability == Capabilities.ENERGY ? this.energyCap.cast() : super.getCapability(capability, facing);
 	}
 }

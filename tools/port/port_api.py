@@ -202,7 +202,7 @@ def port(path, t):
     t = synched_data(t)
     t = spawn_packets(t)
     t = open_screen(t)
-    if os.sep + 'tile' + os.sep in path or 'BlockEntity' in os.path.basename(path) or 'TileEntity' in os.path.basename(path):
+    if os.sep + 'tile' + os.sep in path or (os.sep + 'block' + os.sep + 'entity' + os.sep) in path or 'BlockEntity' in os.path.basename(path) or 'TileEntity' in os.path.basename(path):
         t = block_entities(t)
     if os.sep + 'client' + os.sep in path or os.sep + 'compat' + os.sep in path:
         t = vertex_chains(t)

@@ -22,9 +22,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 
 public class TamedRatOverlayLayer extends RenderLayer<TamedRat, AbstractRatModel<TamedRat>> {
-	private static final RenderType TEXTURE_DYED_NOT = RenderType.entitySmoothCutout(new ResourceLocation(RatsMod.MODID, "textures/entity/rat/undyed_part.png"));
-	private static final RenderType TEXTURE_DYED = RenderType.entityNoOutline(new ResourceLocation(RatsMod.MODID, "textures/entity/rat/dyed_part.png"));
-	private static final RenderType TOGA_TEX = RenderType.entitySmoothCutout(new ResourceLocation(RatsMod.MODID, "textures/entity/rat/upgrades/toga.png"));
+	private static final RenderType TEXTURE_DYED_NOT = RenderType.entitySmoothCutout(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/undyed_part.png"));
+	private static final RenderType TEXTURE_DYED = RenderType.entityNoOutline(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/dyed_part.png"));
+	private static final RenderType TOGA_TEX = RenderType.entitySmoothCutout(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/toga.png"));
 
 	public TamedRatOverlayLayer(RenderLayerParent<TamedRat, AbstractRatModel<TamedRat>> parent) {
 		super(parent);
@@ -34,15 +34,15 @@ public class TamedRatOverlayLayer extends RenderLayer<TamedRat, AbstractRatModel
 	public void render(PoseStack stack, MultiBufferSource buffer, int light, TamedRat rat, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (rat.getRespawnCountdown() > 0 && RatConfig.ratAngelGlint) {
 			VertexConsumer consumer = buffer.getBuffer(RatsRenderType.getWhiteGlint());
-			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 		} else {
 			if (rat.hasCustomName() && rat.getCustomName().getString().equalsIgnoreCase("ultrakill")) {
 				VertexConsumer vertexBuilder = buffer.getBuffer(RatsRenderType.getGreenGlint());
-				this.getParentModel().renderToBuffer(stack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+				this.getParentModel().renderToBuffer(stack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, -1);
 			} else {
 				if (RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_GOD.get()) && RatConfig.ratGodGlint) {
 					VertexConsumer vertexBuilder = ItemRenderer.getFoilBuffer(buffer, RenderType.entityCutoutNoCull(this.getTextureLocation(rat)), false, true);
-					this.getParentModel().renderToBuffer(stack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+					this.getParentModel().renderToBuffer(stack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, -1);
 				}
 
 				if (rat.isDyed()) {
@@ -68,14 +68,14 @@ public class TamedRatOverlayLayer extends RenderLayer<TamedRat, AbstractRatModel
 						if (overlay != null) {
 							VertexConsumer consumer = buffer.getBuffer(overlay);
 							this.getParentModel().setupAnim(rat, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-							this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+							this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 						}
 					}
 				});
 
 				if (rat.hasToga()) {
 					VertexConsumer consumer = buffer.getBuffer(TOGA_TEX);
-					this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+					this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 				}
 			}
 		}

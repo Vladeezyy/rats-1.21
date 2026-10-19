@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.events;
 
+import com.github.alexthe666.rats.server.capability.SelectedRats;
+import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.data.tags.RatsEntityTags;
@@ -64,26 +66,26 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.VanillaGameEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.item.ItemExpireEvent;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.player.ItemFishedEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.village.VillagerTradesEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.event.VanillaGameEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
+import net.neoforged.neoforge.event.entity.living.*;
+import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = RatsMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.FORGE)
 public class ForgeEvents {
 
 	@SubscribeEvent
@@ -176,7 +178,7 @@ public class ForgeEvents {
 	public static void hackySetFireFix(LivingAttackEvent event) {
 		if (!event.getEntity().fireImmune()) {
 			if (event.getSource().getEntity() instanceof TamedRat rat && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_DEMON.get())) {
-				event.getEntity().setSecondsOnFire(1);
+				event.getEntity().igniteForSeconds(1);
 			}
 		}
 	}
@@ -264,7 +266,7 @@ public class ForgeEvents {
 					DemonRat demonRat = RatsEntityRegistry.DEMON_RAT.get().create(event.getLevel().getLevel());
 					if (demonRat != null) {
 						demonRat.moveTo(strider.getX(), strider.getY(), strider.getZ(), strider.getYRot(), 0.0F);
-						demonRat.finalizeSpawn(event.getLevel(), event.getDifficulty(), MobSpawnType.JOCKEY, null, null);
+						demonRat.finalizeSpawn(event.getLevel(), event.getDifficulty(), MobSpawnType.JOCKEY, null);
 						demonRat.startRiding(strider, true);
 						demonRat.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
 						strider.equipSaddle(null);
@@ -308,9 +310,9 @@ public class ForgeEvents {
 	}
 
 	private static ItemStack checkHandsForRod(Player player) {
-		if (player.getMainHandItem().canPerformAction(ToolActions.FISHING_ROD_CAST)) {
+		if (player.getMainHandItem().canPerformAction(ItemAbilities.FISHING_ROD_CAST)) {
 			return player.getMainHandItem();
-		} else if (player.getOffhandItem().canPerformAction(ToolActions.FISHING_ROD_CAST)) {
+		} else if (player.getOffhandItem().canPerformAction(ItemAbilities.FISHING_ROD_CAST)) {
 			return player.getOffhandItem();
 		}
 		return ItemStack.EMPTY;
@@ -428,8 +430,8 @@ public class ForgeEvents {
 			event.setCancellationResult(InteractionResult.FAIL);
 			event.setCanceled(true);
 			TamedRat rat = null;
-			if (event.getEntity().getCapability(RatsCapabilityRegistry.SELECTED_RAT).resolve().isPresent()) {
-				rat = event.getEntity().getCapability(RatsCapabilityRegistry.SELECTED_RAT).resolve().get().getSelectedRat();
+			if (SelectedRats.of(event.getEntity()).isPresent()) {
+				rat = SelectedRats.of(event.getEntity()).get().getSelectedRat();
 			}
 			if (rat != null) {
 				event.getEntity().swing(event.getHand());

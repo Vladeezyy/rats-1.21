@@ -1,13 +1,12 @@
 package com.github.alexthe666.rats.server.message;
 
-import com.github.alexthe666.rats.registry.RatsCapabilityRegistry;
-import com.github.alexthe666.rats.server.capability.SelectedRat;
+import com.github.alexthe666.rats.server.capability.SelectedRats;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -35,7 +34,7 @@ public record UpdateSelectedRatPacket(int entityId, int ratId) {
 				public void run() {
 					Entity entity = Minecraft.getInstance().level.getEntity(packet.entityId());
 					if (entity instanceof LivingEntity) {
-						entity.getCapability(RatsCapabilityRegistry.SELECTED_RAT).ifPresent(cap -> cap.setSelectedRat((TamedRat) Minecraft.getInstance().level.getEntity(packet.ratId())));
+						SelectedRats.of(entity).ifPresent(cap -> cap.setSelectedRat((TamedRat) Minecraft.getInstance().level.getEntity(packet.ratId())));
 					}
 				}
 			});

@@ -1,10 +1,11 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import com.github.alexthe666.citadel.animation.IAnimatedEntity;
-import com.github.alexthe666.citadel.client.model.AdvancedEntityModel;
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
-import com.github.alexthe666.citadel.client.model.ModelAnimator;
-import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
+import net.minecraft.util.FastColor;
+import dev.vladeezyy.rampart.animation.IAnimatedEntity;
+import dev.vladeezyy.rampart.client.model.AdvancedEntityModel;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.ModelAnimator;
+import dev.vladeezyy.rampart.client.model.basic.BasicModelPart;
 import com.github.alexthe666.rats.server.entity.monster.boss.RatlanteanAutomaton;
 import com.github.alexthe666.rats.server.entity.mount.RatAutomatonMount;
 import com.google.common.collect.ImmutableList;
@@ -172,7 +173,7 @@ public class RatlanteanAutomatonModel<T extends Mob & IAnimatedEntity> extends A
 	}
 
 	public void renderHead(PoseStack stack, VertexConsumer buffer, int light, int overlay, float red, float green, float blue, float alpha) {
-		this.headBase.render(stack, buffer, light, overlay, red, green, blue, alpha);
+		this.headBase.render(stack, buffer, light, overlay, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
 	}
 
 	public void setTERotationAngles(float tickCount) {

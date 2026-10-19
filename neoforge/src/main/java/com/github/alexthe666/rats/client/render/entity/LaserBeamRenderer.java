@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.projectile.LaserBeam;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,8 +18,8 @@ import org.joml.Matrix4f;
 
 public class LaserBeamRenderer extends EntityRenderer<LaserBeam> {
 
-	private static final ResourceLocation TEXTURE_RED = new ResourceLocation(RatsMod.MODID, "textures/entity/neo_ratlantean/laser_beam.png");
-	private static final ResourceLocation TEXTURE_BLUE = new ResourceLocation(RatsMod.MODID, "textures/entity/neo_ratlantean/laser_beam_blue.png");
+	private static final ResourceLocation TEXTURE_RED = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/neo_ratlantean/laser_beam.png");
+	private static final ResourceLocation TEXTURE_BLUE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/neo_ratlantean/laser_beam_blue.png");
 	private static final RenderType RENDER_TYPE_RED = RenderType.eyes(TEXTURE_RED);
 	private static final RenderType RENDER_TYPE_BLUE = RenderType.eyes(TEXTURE_BLUE);
 
@@ -57,11 +58,11 @@ public class LaserBeamRenderer extends EntityRenderer<LaserBeam> {
 		this.vertex(matrix4f, matrix3f, consumer, -7, -2, 2, 0.15625F, 0.3125F, 1, 0, 0, light, r, g, b);
 		this.vertex(matrix4f, matrix3f, consumer, -7, -2, -2, 0.0F, 0.3125F, 1, 0, 0, light, r, g, b);
 		stack.popPose();
-		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
+		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
 	}
 
 	public void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer consumer, float x, float y, float z, float u, float v, int normX, int normZ, int normY, int light, int red, int green, int blue) {
-		consumer.vertex(m4f, x, y, z).color(red, green, blue, 255).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(m3f, (float) normX, (float) normY, (float) normZ).endVertex();
+		consumer.addVertex(m4f, x, y, z).setColor(red, green, blue, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(m3f, (float) normX, (float) normY, (float) normZ);
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 {
   "values": [
-    "#forge:ores/oratchalcum",
-    "#forge:ores/gem_of_ratlantis",
-    "#forge:ores/cheese"
+    "#c:ores/oratchalcum",
+    "#c:ores/gem_of_ratlantis",
+    "#c:ores/cheese"
   ]
 }

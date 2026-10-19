@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import net.minecraft.core.BlockPos;
@@ -26,7 +26,7 @@ public class RatChickenMount extends RatMountBase {
 
 	public RatChickenMount(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
-		this.setMaxUpStep(1.0F);
+		this.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(1.0F);
 		this.riderY = 0.55F;
 		this.riderXZ = 0.1F;
 	}

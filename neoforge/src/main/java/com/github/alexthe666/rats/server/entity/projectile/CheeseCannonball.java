@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -25,7 +26,7 @@ public class CheeseCannonball extends ThrowableProjectile implements ItemSupplie
 	}
 
 	@Override
-	protected void defineSynchedData() {
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
 	}
 

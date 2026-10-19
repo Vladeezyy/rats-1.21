@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -25,21 +26,21 @@ public class DemonRatUpgradeItem extends StatBoostingRatUpgradeItem implements G
 	}
 
 	public static boolean isSoulVersion(ItemStack stack) {
-		return stack.getTag() != null && stack.getTag().getBoolean("Soul");
+		return ItemNbt.hasTag(stack) && ItemNbt.view(stack).getBoolean("Soul");
 	}
 
 	public static ItemStack getDemonUpgrade(boolean soul) {
 		ItemStack stack = new ItemStack(RatsItemRegistry.RAT_UPGRADE_DEMON.get());
-		stack.getOrCreateTag().putBoolean("Soul", soul);
+		ItemNbt.update(stack, tag -> tag.putBoolean("Soul", soul));
 		return stack;
 	}
 
 	@Override
 	public RenderType getEyeTexture(ItemStack stack) {
 		if (isSoulVersion(stack)) {
-			return RenderType.eyes(new ResourceLocation(RatsMod.MODID, "textures/entity/demon_rat/soul_demon_rat_eye.png"));
+			return RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/demon_rat/soul_demon_rat_eye.png"));
 		}
-		return RenderType.eyes(new ResourceLocation(RatsMod.MODID, "textures/entity/demon_rat/demon_rat_eye.png"));
+		return RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/demon_rat/demon_rat_eye.png"));
 	}
 
 	@Override
@@ -49,14 +50,14 @@ public class DemonRatUpgradeItem extends StatBoostingRatUpgradeItem implements G
 
 	@Override
 	public void afterHit(TamedRat rat, LivingEntity target) {
-		if (!target.fireImmune()) target.setSecondsOnFire(10);
+		if (!target.fireImmune()) target.igniteForSeconds(10);
 	}
 
 	@Override
 	public @Nullable RenderType getOverlayTexture(ItemStack stack, TamedRat rat, float partialTicks) {
 		if (isSoulVersion(stack)) {
-			return RenderType.entitySmoothCutout(new ResourceLocation(RatsMod.MODID, "textures/entity/demon_rat/soul_demon_rat.png"));
+			return RenderType.entitySmoothCutout(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/demon_rat/soul_demon_rat.png"));
 		}
-		return RenderType.entitySmoothCutout(new ResourceLocation(RatsMod.MODID, "textures/entity/demon_rat/demon_rat.png"));
+		return RenderType.entitySmoothCutout(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/demon_rat/demon_rat.png"));
 	}
 }

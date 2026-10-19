@@ -4,32 +4,32 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
 import com.github.alexthe666.rats.server.message.UpdateSelectedRatPacket;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-public class SelectedRatCapability implements SelectedRat {
+public class SelectedRatCapability {
 
 	private Player host;
 	@Nullable
 	private TamedRat rat;
 
-	@Override
+
 	public void setPlayer(Player player) {
 		this.host = player;
 	}
 
-	@Override
+
 	public void clearSelectedRat() {
 		this.rat = null;
 	}
 
 	@Nullable
-	@Override
+
 	public TamedRat getSelectedRat() {
 		return this.rat;
 	}
 
-	@Override
+
 	public void setSelectedRat(@Nullable TamedRat rat) {
 		this.rat = rat;
 		this.sendPacket();

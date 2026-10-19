@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.misc;
 
-import com.github.alexthe666.citadel.client.model.basic.BasicModelPart;
+import dev.vladeezyy.rampart.client.model.basic.BasicModelPart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;

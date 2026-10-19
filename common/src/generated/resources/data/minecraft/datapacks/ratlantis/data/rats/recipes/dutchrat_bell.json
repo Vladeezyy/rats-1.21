@@ -9,7 +9,7 @@
       "item": "rats:pirat_fence"
     },
     "G": {
-      "tag": "forge:ingots/ratlantis_gem"
+      "tag": "c:ingots/ratlantis_gem"
     },
     "L": {
       "tag": "rats:pirat_logs"

@@ -1,9 +1,9 @@
 package com.github.alexthe666.rats.server.message;
 
+import com.github.alexthe666.rats.server.capability.SelectedRats;
 import com.github.alexthe666.rats.client.gui.CheeseStaffScreen;
 import com.github.alexthe666.rats.client.gui.PatrolStaffScreen;
 import com.github.alexthe666.rats.client.gui.RadiusStaffScreen;
-import com.github.alexthe666.rats.registry.RatsCapabilityRegistry;
 import com.github.alexthe666.rats.server.capability.SelectedRatCapability;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.client.Minecraft;
@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -42,7 +42,7 @@ public record ManageRatStaffPacket(int entityId, BlockPos pos, int dirOrd, boole
 				@Override
 				public void run() {
 					if (packet.clear()) {
-						Minecraft.getInstance().player.getCapability(RatsCapabilityRegistry.SELECTED_RAT).ifPresent(SelectedRatCapability::clearSelectedRat);
+						SelectedRats.of(Minecraft.getInstance().player).ifPresent(SelectedRatCapability::clearSelectedRat);
 					} else {
 						Entity e = Minecraft.getInstance().player.level().getEntity(packet.entityId());
 						if (e instanceof TamedRat rat) {

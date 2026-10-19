@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -29,23 +31,23 @@ public class DecoratedRatCageBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
 		this.handleUpdateTag(packet.getTag());
 	}
 
-	public CompoundTag getUpdateTag() {
+	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
 		return this.saveWithId();
 	}
 
-	public void saveAdditional(CompoundTag compound) {
-		ContainerHelper.saveAllItems(compound, this.containedDeco);
-		super.saveAdditional(compound);
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		ContainerHelper.saveAllItems(compound, this.containedDeco, registries);
+		super.saveAdditional(compound, registries);
 	}
 
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		containedDeco = NonNullList.withSize(1, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, containedDeco);
+		ContainerHelper.loadAllItems(compound, containedDeco, registries);
 	}
 
 	public ItemStack getContainedItem() {

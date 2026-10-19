@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import net.minecraft.core.BlockPos;
@@ -30,24 +30,24 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraftforge.common.ForgeMod;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 import java.util.UUID;
 
 public class RatStriderMount extends RatMountBase {
 
 	private static final UUID SUFFOCATING_MODIFIER_UUID = UUID.fromString("9e362924-01de-4ddd-a2b2-d0f7a405a174");
-	private static final AttributeModifier SUFFOCATING_MODIFIER = new AttributeModifier(SUFFOCATING_MODIFIER_UUID, "Strider suffocating modifier", -0.34F, AttributeModifier.Operation.MULTIPLY_BASE);
+	private static final AttributeModifier SUFFOCATING_MODIFIER = new AttributeModifier(SUFFOCATING_MODIFIER_UUID, "Strider suffocating modifier", -0.34F, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	private static final EntityDataAccessor<Boolean> DATA_SUFFOCATING = SynchedEntityData.defineId(RatStriderMount.class, EntityDataSerializers.BOOLEAN);
 
 	public RatStriderMount(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
-		this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
-		this.setPathfindingMalus(BlockPathTypes.LAVA, 0.0F);
-		this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, 0.0F);
-		this.setPathfindingMalus(BlockPathTypes.DAMAGE_FIRE, 0.0F);
+		this.setPathfindingMalus(PathType.WATER, -1.0F);
+		this.setPathfindingMalus(PathType.LAVA, 0.0F);
+		this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
+		this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -55,9 +55,9 @@ public class RatStriderMount extends RatMountBase {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(DATA_SUFFOCATING, false);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_SUFFOCATING, false);
 	}
 
 	public void setSuffocating(boolean suffocating) {
@@ -118,7 +118,7 @@ public class RatStriderMount extends RatMountBase {
 		if (!this.isNoAi()) {
 			BlockState blockstate = this.level().getBlockState(this.blockPosition());
 			BlockState blockstate1 = this.getBlockStateOn();
-			boolean flag = blockstate.is(BlockTags.STRIDER_WARM_BLOCKS) || blockstate1.is(BlockTags.STRIDER_WARM_BLOCKS) || this.getFluidTypeHeight(ForgeMod.LAVA_TYPE.get()) > 0.0D;
+			boolean flag = blockstate.is(BlockTags.STRIDER_WARM_BLOCKS) || blockstate1.is(BlockTags.STRIDER_WARM_BLOCKS) || this.getFluidTypeHeight(NeoForgeMod.LAVA_TYPE.get()) > 0.0D;
 
 			this.setSuffocating(!flag);
 		}
@@ -195,8 +195,8 @@ public class RatStriderMount extends RatMountBase {
 			super(strider, level);
 		}
 
-		protected boolean hasValidPathType(BlockPathTypes types) {
-			return types == BlockPathTypes.LAVA || types == BlockPathTypes.DAMAGE_FIRE || types == BlockPathTypes.DANGER_FIRE || super.hasValidPathType(types);
+		protected boolean hasValidPathType(PathType types) {
+			return types == PathType.LAVA || types == PathType.DAMAGE_FIRE || types == PathType.DANGER_FIRE || super.hasValidPathType(types);
 		}
 
 		public boolean isStableDestination(BlockPos pos) {

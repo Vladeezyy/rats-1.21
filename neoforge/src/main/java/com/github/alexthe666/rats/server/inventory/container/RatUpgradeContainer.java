@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.inventory.container;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.items.RatListUpgradeItem;
 import com.github.alexthe666.rats.server.items.upgrades.CombinedRatUpgradeItem;
 import net.minecraft.core.Direction;
@@ -17,16 +19,11 @@ public class RatUpgradeContainer implements WorldlyContainer {
 
 	public RatUpgradeContainer(ItemStack upgradeStack) {
 		this.upgradeStack = upgradeStack;
-		this.readFromNBT(upgradeStack.getOrCreateTag());
+		this.items = StoredItems.view(upgradeStack, 27).stream().map(ItemStack::copy).collect(NonNullList::create, NonNullList::add, NonNullList::addAll);
 	}
 
-	private void readFromNBT(CompoundTag tagCompound) {
-		this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(tagCompound, this.items);
-	}
-
-	private void writeToNBT(CompoundTag tagCompound) {
-		ContainerHelper.saveAllItems(tagCompound, this.items);
+	private void save() {
+		StoredItems.set(this.upgradeStack, this.items);
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class RatUpgradeContainer implements WorldlyContainer {
 	public void setItem(int index, ItemStack stack) {
 		ItemStack itemstack = this.items.get(index);
 		this.items.set(index, stack);
-		boolean flag = !stack.isEmpty() && stack.is(itemstack.getItem()) && ItemStack.isSameItemSameTags(stack, itemstack);
+		boolean flag = !stack.isEmpty() && stack.is(itemstack.getItem()) && ItemStack.isSameItemSameComponents(stack, itemstack);
 		if (stack.getCount() > this.getMaxStackSize()) {
 			stack.setCount(this.getMaxStackSize());
 		}
@@ -75,7 +72,7 @@ public class RatUpgradeContainer implements WorldlyContainer {
 
 	@Override
 	public void setChanged() {
-		this.writeToNBT(this.upgradeStack.getOrCreateTag());
+		this.save();
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class RatUpgradeContainer implements WorldlyContainer {
 
 	@Override
 	public void stopOpen(Player player) {
-		this.writeToNBT(this.upgradeStack.getOrCreateTag());
+		this.save();
 	}
 
 	@Override

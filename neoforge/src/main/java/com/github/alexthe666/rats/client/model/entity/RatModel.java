@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import com.github.alexthe666.citadel.animation.IAnimatedEntity;
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.animation.IAnimatedEntity;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.data.tags.RatsItemTags;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.AdjustsRatTail;

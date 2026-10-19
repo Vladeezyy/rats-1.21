@@ -15,7 +15,7 @@ import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public record RatKilledAndHasUpgradeCondition(Item upgrade) implements LootItemCondition {
 
@@ -39,13 +39,13 @@ public record RatKilledAndHasUpgradeCondition(Item upgrade) implements LootItemC
 
 	public static class RatSerializer implements Serializer<RatKilledAndHasUpgradeCondition> {
 		public void serialize(JsonObject object, RatKilledAndHasUpgradeCondition condition, JsonSerializationContext context) {
-			object.addProperty("upgrade", ForgeRegistries.ITEMS.getKey(condition.upgrade()).toString());
+			object.addProperty("upgrade", BuiltInRegistries.ITEM.getKey(condition.upgrade()).toString());
 		}
 
 		public RatKilledAndHasUpgradeCondition deserialize(JsonObject object, JsonDeserializationContext context) {
 			Item upgrade;
 			try {
-				upgrade = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(GsonHelper.getAsString(object, "upgrade")));
+				upgrade = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(GsonHelper.getAsString(object, "upgrade")));
 				return new RatKilledAndHasUpgradeCondition(upgrade);
 			} catch (Exception e) {
 				throw new RuntimeException(e);

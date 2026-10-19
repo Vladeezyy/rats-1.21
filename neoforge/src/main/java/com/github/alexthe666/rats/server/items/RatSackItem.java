@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -30,10 +31,10 @@ public class RatSackItem extends Item {
 	}
 
 	public static void packRatIntoSack(ItemStack sack, TamedRat rat, int ratCount) {
-		CompoundTag tag = sack.getTag();
+		CompoundTag tag = ItemNbt.getTag(sack);
 		if (tag == null) {
 			tag = new CompoundTag();
-			sack.setTag(tag);
+			ItemNbt.setTag(sack, tag);
 		}
 		CompoundTag ratTag = new CompoundTag();
 		rat.addAdditionalSaveData(ratTag);
@@ -45,8 +46,8 @@ public class RatSackItem extends Item {
 
 	public static int getRatsInSack(ItemStack sack) {
 		int ratCount = 0;
-		if (sack.getTag() != null) {
-			for (String tagInfo : sack.getTag().getAllKeys()) {
+		if (ItemNbt.hasTag(sack)) {
+			for (String tagInfo : ItemNbt.view(sack).getAllKeys()) {
 				if (tagInfo.contains("Rat")) {
 					ratCount++;
 				}
@@ -57,11 +58,11 @@ public class RatSackItem extends Item {
 
 	public static int ejectRatsFromSack(ItemStack stack, Level level, BlockPos pos) {
 		int ratCount = 0;
-		if (stack.getTag() != null) {
-			for (String tagInfo : stack.getTag().getAllKeys()) {
+		if (ItemNbt.hasTag(stack)) {
+			for (String tagInfo : ItemNbt.view(stack).getAllKeys()) {
 				if (tagInfo.contains("Rat")) {
 					ratCount++;
-					CompoundTag ratTag = stack.getTag().getCompound(tagInfo);
+					CompoundTag ratTag = ItemNbt.view(stack).getCompound(tagInfo);
 					TamedRat rat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), level);
 					rat.readAdditionalSaveData(ratTag);
 					if (!ratTag.getString("CustomName").isEmpty()) {
@@ -78,13 +79,13 @@ public class RatSackItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		int ratCount = 0;
 		List<String> ratNames = new ArrayList<>();
-		if (stack.getTag() != null) {
-			for (String tagInfo : stack.getTag().getAllKeys()) {
+		if (ItemNbt.hasTag(stack)) {
+			for (String tagInfo : ItemNbt.view(stack).getAllKeys()) {
 				if (tagInfo.contains("Rat")) {
-					CompoundTag ratTag = stack.getTag().getCompound(tagInfo);
+					CompoundTag ratTag = ItemNbt.view(stack).getCompound(tagInfo);
 					ratCount++;
 					String ratName = I18n.get("entity.rats.rat");
 					if (!ratTag.getString("CustomName").isEmpty()) {
@@ -120,7 +121,7 @@ public class RatSackItem extends Item {
 
 			if (ratCount > 0) {
 				context.getPlayer().displayClientMessage(Component.translatable(RatsLangConstants.RAT_SACK_RELEASED_RATS, ratCount), true);
-				stack.setTag(new CompoundTag());
+				ItemNbt.setTag(stack, new CompoundTag());
 				return InteractionResult.SUCCESS;
 			}
 		}

@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
@@ -29,19 +31,19 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -50,7 +52,7 @@ import java.util.Optional;
 public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, MenuProvider {
 	private static final int[] SLOTS_TOP = new int[]{0};
 	private static final int[] SLOTS_BOTTOM = new int[]{1};
-	private final FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME * 5, fluidStack -> fluidStack.getFluid().isSame(ForgeMod.MILK.get()));
+	private final FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME * 5, fluidStack -> fluidStack.getFluid().isSame(NeoForgeMod.MILK.get()));
 	final LazyOptional<? extends IItemHandler>[] handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN);
 	private final LazyOptional<IFluidHandler> holder = LazyOptional.of(() -> this.tank);
 	private NonNullList<ItemStack> curdlerStacks = NonNullList.withSize(2, ItemStack.EMPTY);
@@ -89,7 +91,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 			return true;
 		}
 		Optional<FluidStack> fluidStack = FluidUtil.getFluidContained(stack);
-		return fluidStack.isPresent() && fluidStack.get().getFluid().isSame(ForgeMod.MILK.get());
+		return fluidStack.isPresent() && fluidStack.get().getFluid().isSame(NeoForgeMod.MILK.get());
 	}
 
 	@Override
@@ -134,22 +136,22 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.tank.readFromNBT(compound);
 		this.curdlerStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.curdlerStacks);
+		ContainerHelper.loadAllItems(compound, this.curdlerStacks, registries);
 		this.cookTime = compound.getInt("CookTime");
 		this.totalCookTime = compound.getInt("CookTimeTotal");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.saveAdditional(compound, registries);
 		this.tank.writeToNBT(compound);
 		compound.putInt("CookTime", (short) this.cookTime);
 		compound.putInt("CookTimeTotal", (short) this.totalCookTime);
-		ContainerHelper.saveAllItems(compound, this.curdlerStacks);
+		ContainerHelper.saveAllItems(compound, this.curdlerStacks, registries);
 	}
 
 	@Override
@@ -311,13 +313,13 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	@Nonnull
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (!this.remove && facing != null && capability == ForgeCapabilities.ITEM_HANDLER) {
+		if (!this.remove && facing != null && capability == Capabilities.ITEM_HANDLER) {
 			if (facing == Direction.DOWN)
 				return this.handlers[1].cast();
 			else
 				return this.handlers[0].cast();
 		}
-		if (capability == ForgeCapabilities.FLUID_HANDLER)
+		if (capability == Capabilities.FLUID_HANDLER)
 			return this.holder.cast();
 		return LazyOptional.empty();
 	}

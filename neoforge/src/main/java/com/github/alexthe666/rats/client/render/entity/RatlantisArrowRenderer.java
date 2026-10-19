@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.render.RatsRenderType;
 import com.github.alexthe666.rats.server.entity.projectile.RatlantisArrow;
@@ -16,7 +17,7 @@ import org.joml.Matrix4f;
 
 public class RatlantisArrowRenderer extends ArrowRenderer<RatlantisArrow> {
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/ratlantis_arrow.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantis_arrow.png");
 
 	public RatlantisArrowRenderer(EntityRendererProvider.Context context) {
 		super(context);
@@ -58,7 +59,7 @@ public class RatlantisArrowRenderer extends ArrowRenderer<RatlantisArrow> {
 		}
 
 		stack.popPose();
-		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
+		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
 	}
 
 	@Override

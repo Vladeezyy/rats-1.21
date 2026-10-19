@@ -1,6 +1,6 @@
 package dev.vladeezyy.rats.neoforge;
 
-import dev.vladeezyy.rats.Rats;
+import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -43,7 +43,7 @@ public final class NeoForgePlatform implements Platform {
   @SuppressWarnings("unchecked")
   public <R, T extends R> Supplier<T> register(ResourceKey<? extends Registry<R>> registry, String name, Supplier<T> factory) {
     DeferredRegister<R> register = (DeferredRegister<R>) REGISTERS.computeIfAbsent(registry,
-      key -> DeferredRegister.create((ResourceKey<? extends Registry<R>>) key, Rats.MOD_ID));
+      key -> DeferredRegister.create((ResourceKey<? extends Registry<R>>) key, RatsMod.MODID));
     return register.register(name, factory);
   }
 

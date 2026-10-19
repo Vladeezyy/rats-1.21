@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import com.github.alexthe666.rats.server.entity.monster.GhostPirat;
 import com.github.alexthe666.rats.server.entity.monster.boss.Dutchrat;
@@ -35,7 +36,7 @@ public class DutchratSword extends ThrowableProjectile {
 	}
 
 	@Override
-	protected void defineSynchedData() {
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
 	}
 

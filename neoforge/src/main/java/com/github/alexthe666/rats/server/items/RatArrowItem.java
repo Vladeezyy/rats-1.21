@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.RatArrow;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -27,8 +28,8 @@ public class RatArrowItem extends ArrowItem {
 	public InteractionResult useOn(UseOnContext context) {
 		ItemStack stack = context.getPlayer().getItemInHand(context.getHand());
 		CompoundTag ratTag = new CompoundTag();
-		if (stack.getTag() != null) {
-			ratTag = stack.getTag().getCompound("Rat");
+		if (ItemNbt.hasTag(stack)) {
+			ratTag = ItemNbt.view(stack).getCompound("Rat");
 		}
 		TamedRat rat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), context.getLevel());
 		BlockPos offset = context.getClickedPos().relative(context.getClickedFace());

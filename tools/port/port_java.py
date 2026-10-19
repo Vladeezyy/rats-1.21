@@ -160,6 +160,9 @@ def port(text):
     text = re.sub(r'\bIEntityAdditionalSpawnData\b', 'IEntityWithComplexSpawn', text)
     text = re.sub(r'\bRegistryObject\b', 'DeferredHolder', text)
     text = replace_resource_locations(text)
+    # Citadel's model and animation classes live in Rampart (our library, NeoForge + Fabric, every version)
+    text = text.replace('com.github.alexthe666.citadel.server.message.PacketBufferUtils', 'net.minecraft.network.FriendlyByteBuf')
+    text = text.replace('com.github.alexthe666.citadel.', 'dev.vladeezyy.rampart.')
     if '@EventBusSubscriber' in text and 'import net.neoforged.fml.common.EventBusSubscriber;' not in text:
         text = re.sub(r'(\npackage [^;]+;\r?\n)', r'\1\nimport net.neoforged.fml.common.EventBusSubscriber;', text, 1)
     if 'BuiltInRegistries.' in text and 'import net.minecraft.core.registries.BuiltInRegistries;' not in text:

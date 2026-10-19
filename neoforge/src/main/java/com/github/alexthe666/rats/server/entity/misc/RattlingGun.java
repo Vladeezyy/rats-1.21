@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.misc;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -71,8 +71,8 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		this.getEntityData().define(FIRING, false);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		builder.define(FIRING, false);
 	}
 
 	public boolean isFiring() {

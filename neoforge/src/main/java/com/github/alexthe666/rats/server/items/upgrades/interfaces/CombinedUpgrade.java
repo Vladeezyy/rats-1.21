@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades.interfaces;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
@@ -15,11 +17,8 @@ public interface CombinedUpgrade {
 	int getUpgradeSlots();
 
 	default void addTooltip(ItemStack stack, List<Component> tooltip) {
-		CompoundTag tag = stack.getTag();
-
-		if (tag != null && tag.contains("Items", 9)) {
-			NonNullList<ItemStack> nonnulllist = NonNullList.withSize(this.getUpgradeSlots(), ItemStack.EMPTY);
-			ContainerHelper.loadAllItems(tag, nonnulllist);
+		if (StoredItems.has(stack)) {
+			NonNullList<ItemStack> nonnulllist = StoredItems.view(stack, this.getUpgradeSlots());
 			int i = 0;
 			for (ItemStack itemstack : nonnulllist) {
 				if (!itemstack.isEmpty()) {

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity.layer;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.client.model.entity.AbstractRatModel;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesTextureUpgrade;
@@ -36,11 +37,11 @@ public class TamedRatEyesLayer extends RatEyesLayer<TamedRat, AbstractRatModel<T
 			if (!skip.get()) {
 				if (tex.get() != null || RatUpgradeUtils.forEachUpgradeBool(rat, upgrade -> upgrade instanceof ChangesTextureUpgrade eyeTex && eyeTex.makesEyesGlowByDefault(), false)) {
 					VertexConsumer consumer = buffer.getBuffer(tex.get());
-					this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+					this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 				}
 			}
 		} else {
-			super.render(stack, buffer, light, rat, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+			super.render(stack, buffer, light, rat, limbSwing, limbSwingAmount, FastColor.ARGB32.colorFromFloat(headPitch, partialTicks, ageInTicks, netHeadYaw));
 		}
 	}
 }

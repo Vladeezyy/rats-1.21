@@ -1,6 +1,9 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
-import com.github.alexthe666.citadel.animation.Animation;
+import com.github.alexthe666.rats.server.capability.SelectedRats;
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
+import dev.vladeezyy.rampart.animation.Animation;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.events.ForgeClientEvents;
@@ -85,17 +88,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -272,22 +275,22 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(TOGA, false);
-		this.getEntityData().define(DANCING, false);
-		this.getEntityData().define(DANCE_MOVES, 0);
-		this.getEntityData().define(HELD_RF, 0);
-		this.getEntityData().define(RESPAWN_COUNTDOWN, 0);
-		this.getEntityData().define(VISUAL_FLAG, false);
-		this.getEntityData().define(DYED, false);
-		this.getEntityData().define(FLYING, false);
-		this.getEntityData().define(DYE_COLOR, (byte) 0);
-		this.getEntityData().define(DEPOSIT_POS, Optional.empty());
-		this.getEntityData().define(PICKUP_POS, Optional.empty());
-		this.getEntityData().define(IS_IN_WHEEL, false);
-		this.getEntityData().define(SPECIAL_DYE, "rainbow");
-		this.getEntityData().define(MOUNT_RESPAWN_COOLDOWN, 20);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(TOGA, false);
+		builder.define(DANCING, false);
+		builder.define(DANCE_MOVES, 0);
+		builder.define(HELD_RF, 0);
+		builder.define(RESPAWN_COUNTDOWN, 0);
+		builder.define(VISUAL_FLAG, false);
+		builder.define(DYED, false);
+		builder.define(FLYING, false);
+		builder.define(DYE_COLOR, (byte) 0);
+		builder.define(DEPOSIT_POS, Optional.empty());
+		builder.define(PICKUP_POS, Optional.empty());
+		builder.define(IS_IN_WHEEL, false);
+		builder.define(SPECIAL_DYE, "rainbow");
+		builder.define(MOUNT_RESPAWN_COOLDOWN, 20);
 	}
 
 	public void switchNavigator(int type) {
@@ -343,7 +346,7 @@ public class TamedRat extends InventoryRat {
 		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		if (flag) {
 			this.doEnchantDamageEffects(this, entity);
-			this.getMainHandItem().hurtAndBreak(1, this, rat -> rat.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+			this.getMainHandItem().hurtAndBreak(1, this, EquipmentSlot.MAINHAND);
 			RatUpgradeUtils.forEachUpgrade(this, item -> item instanceof PostAttackUpgrade, (stack, slot) -> ((PostAttackUpgrade) stack.getItem()).afterHit(this, (LivingEntity) entity));
 		}
 		return flag;
@@ -379,7 +382,7 @@ public class TamedRat extends InventoryRat {
 
 	@Override
 	public boolean canDrownInFluidType(FluidType type) {
-		return type == ForgeMod.WATER_TYPE.get() && (!RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()) || !RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDERWATER.get()));
+		return type == NeoForgeMod.WATER_TYPE.get() && (!RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()) || !RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDERWATER.get()));
 	}
 
 	@Override
@@ -484,7 +487,7 @@ public class TamedRat extends InventoryRat {
 			Entity entity = this.getMountEntityType().create(this.level());
 			entity.copyPosition(this);
 			if (entity instanceof Mob mob && this.level() instanceof ServerLevelAccessor accessor) {
-				ForgeEventFactory.onFinalizeSpawn(mob, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+				EventHooks.onFinalizeSpawn(mob, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
 			}
 			this.level().addFreshEntity(entity);
 
@@ -596,7 +599,7 @@ public class TamedRat extends InventoryRat {
 
 	@Override
 	public ItemStack getPickedResult(HitResult target) {
-		return new ItemStack(ForgeSpawnEggItem.fromEntityType(RatsEntityRegistry.RAT.get()));
+		return new ItemStack(DeferredSpawnEggItem.fromEntityType(RatsEntityRegistry.RAT.get()));
 	}
 
 	public void setFlying(boolean flying) {
@@ -764,10 +767,10 @@ public class TamedRat extends InventoryRat {
 		baby.setAge(-24000);
 		baby.setCommand(RatCommand.SIT);
 		if (mother.isTame()) {
-			baby.setTame(true);
+			baby.setTame(true, true);
 			baby.setOwnerUUID(mother.getOwnerUUID());
 		} else if (father.isTame()) {
-			baby.setTame(true);
+			baby.setTame(true, true);
 			baby.setOwnerUUID(father.getOwnerUUID());
 		}
 		this.level().addFreshEntity(baby);
@@ -795,7 +798,7 @@ public class TamedRat extends InventoryRat {
 		if (this.level().getBlockEntity(this.blockPosition()) != null) {
 			BlockEntity te = this.level().getBlockEntity(this.blockPosition());
 			if (te != null) {
-				LazyOptional<IItemHandler> handler = te.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
+				LazyOptional<IItemHandler> handler = te.getCapability(Capabilities.ITEM_HANDLER, Direction.UP);
 				if (handler.resolve().isPresent()) {
 					if (ItemHandlerHelper.insertItem(handler.resolve().get(), burntItem, true).isEmpty()) {
 						ItemHandlerHelper.insertItem(handler.resolve().get(), burntItem, false);
@@ -861,7 +864,7 @@ public class TamedRat extends InventoryRat {
 	@Override
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
-		if (this.getRespawnCountdown() > 0 || itemstack.is(ForgeRegistries.ITEMS.getValue(new ResourceLocation(RatsMod.MODID, "rat_spawn_egg")))) {
+		if (this.getRespawnCountdown() > 0 || itemstack.is(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "rat_spawn_egg")))) {
 			return InteractionResult.PASS;
 		}
 		if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_CARRAT.get())) {
@@ -947,7 +950,7 @@ public class TamedRat extends InventoryRat {
 					return InteractionResult.SUCCESS;
 				}
 			} else if (itemstack.getItem() instanceof RatStaffItem) {
-				player.getCapability(RatsCapabilityRegistry.SELECTED_RAT).ifPresent(cap -> cap.setSelectedRat(this));
+				SelectedRats.of(player).ifPresent(cap -> cap.setSelectedRat(this));
 				player.swing(hand);
 				if (!this.level().isClientSide() && player instanceof ServerPlayer sp) {
 					RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new ManageRatStaffPacket(this.getId(), BlockPos.ZERO, Direction.NORTH.ordinal(), false, false));
@@ -964,7 +967,7 @@ public class TamedRat extends InventoryRat {
 					ratTag.putString("CustomName", Component.Serializer.toJson(this.getCustomName()));
 				}
 				tag.put("Rat", ratTag);
-				arrow.setTag(tag);
+				ItemNbt.setTag(arrow, tag);
 				if (itemstack.isEmpty()) {
 					player.setItemInHand(hand, arrow);
 				} else if (!player.getInventory().add(arrow)) {
@@ -1027,7 +1030,7 @@ public class TamedRat extends InventoryRat {
 			Arrays.fill(this.armorDropChances, 1.1F);
 			Arrays.fill(this.handDropChances, 1.1F);
 		}
-		super.setTame(tamed);
+		super.setTame(tamed, true);
 	}
 
 	@Override
@@ -1094,7 +1097,7 @@ public class TamedRat extends InventoryRat {
 			return RatsSoundRegistry.RAT_SANTA.get();
 		}
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("iceandfire", "firedragon_child_idle"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_idle"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1104,7 +1107,7 @@ public class TamedRat extends InventoryRat {
 
 	protected SoundEvent getDeathSound() {
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("iceandfire", "firedragon_child_death"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_death"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1114,7 +1117,7 @@ public class TamedRat extends InventoryRat {
 
 	protected SoundEvent getHurtSound(DamageSource source) {
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("iceandfire", "firedragon_child_hurt"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_hurt"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1134,37 +1137,21 @@ public class TamedRat extends InventoryRat {
 		if (stack.isEmpty()) {
 			return false;
 		}
-		if ((RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get()) || RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_WHITELIST.get()))) {
-			CompoundTag tag;
-			if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get())) {
-				tag = RatUpgradeUtils.getUpgrade(this, RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get()).getTag();
-			} else {
-				tag = RatUpgradeUtils.getUpgrade(this, RatsItemRegistry.RAT_UPGRADE_WHITELIST.get()).getTag();
-			}
-			String ourItemID = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem())).toString();
-			if (tag != null && tag.contains("Items", 9)) {
-				ListTag list = tag.getList("Items", 10);
-				if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get())) {
-					for (int i = 0; i < list.size(); ++i) {
-						String itemID = list.getCompound(i).getString("id");
-						if (ourItemID.equals(itemID)) {
-							return false;
-						}
-					}
-					return true;
-				} else {
-					//whitelist
-					for (int i = 0; i < list.size(); ++i) {
-						String itemID = list.getCompound(i).getString("id");
-						if (ourItemID.equals(itemID)) {
-							return true;
-						}
-					}
-					return false;
-				}
+		// the filter upgrades hold up to 27 items; compared by item (the original compared registry name strings
+		// parsed from the upgrade's NBT for every item the rat looked at)
+		ItemStack blacklist = RatUpgradeUtils.getUpgrade(this, RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get());
+		ItemStack filter = blacklist.isEmpty() ? RatUpgradeUtils.getUpgrade(this, RatsItemRegistry.RAT_UPGRADE_WHITELIST.get()) : blacklist;
+		if (filter.isEmpty() || !StoredItems.has(filter)) {
+			return true;
+		}
+		boolean listed = false;
+		for (ItemStack entry : StoredItems.view(filter, 27)) {
+			if (!entry.isEmpty() && entry.is(stack.getItem())) {
+				listed = true;
+				break;
 			}
 		}
-		return true;
+		return blacklist.isEmpty() == listed;
 	}
 
 	@Override
@@ -1308,7 +1295,7 @@ public class TamedRat extends InventoryRat {
 	}
 
 	public void tryIncreaseStat(String itemName, Attribute stat, double value) {
-		AttributeModifier modifier = new AttributeModifier(itemName + " " + Component.translatable(stat.getDescriptionId()).getString() + " Modifier", value, AttributeModifier.Operation.ADDITION);
+		AttributeModifier modifier = new AttributeModifier(itemName + " " + Component.translatable(stat.getDescriptionId()).getString() + " Modifier", value, AttributeModifier.Operation.ADD_VALUE);
 		Objects.requireNonNull(this.getAttribute(stat)).addTransientModifier(modifier);
 		this.attributeChanges.put(stat, modifier);
 	}

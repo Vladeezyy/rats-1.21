@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.TrashCanBlock;
 import net.minecraft.core.BlockPos;
@@ -33,11 +35,11 @@ public class TrashCanBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
 		this.handleUpdateTag(packet.getTag());
 	}
 
-	public CompoundTag getUpdateTag() {
+	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
 		return this.saveWithId();
 	}
 }

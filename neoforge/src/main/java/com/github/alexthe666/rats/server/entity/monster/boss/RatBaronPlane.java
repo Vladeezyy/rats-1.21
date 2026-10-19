@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -285,10 +285,10 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(FIRING, false);
-		this.getEntityData().define(PLANE_PITCH, 0F);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(FIRING, false);
+		builder.define(PLANE_PITCH, 0F);
 	}
 
 	public boolean isFiring() {

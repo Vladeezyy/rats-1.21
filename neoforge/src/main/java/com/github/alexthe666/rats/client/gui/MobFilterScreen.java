@@ -28,7 +28,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -36,8 +36,8 @@ import java.util.*;
 
 public class MobFilterScreen extends Screen {
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/gui/container/mob_filter.png");
-	private static final ResourceLocation TEXTURE_BACKDROP = new ResourceLocation(RatsMod.MODID, "textures/gui/container/mob_filter_backdrop.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter.png");
+	private static final ResourceLocation TEXTURE_BACKDROP = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter_backdrop.png");
 
 	private static final int SCROLL_X_START = 218;
 	private static final int SCROLL_Y_START = 21;
@@ -140,7 +140,7 @@ public class MobFilterScreen extends Screen {
 				List<FormattedCharSequence> tooltipParts = new ArrayList<>();
 				tooltipParts.add(Component.literal(this.hoveredEntityName.toString()).getVisualOrderText());
 				this.visibleTags.forEach(key -> {
-					if (ForgeRegistries.ENTITY_TYPES.getValue(this.hoveredEntityName).is(key)) {
+					if (BuiltInRegistries.ENTITY_TYPE.get(this.hoveredEntityName).is(key)) {
 						tooltipParts.add(Component.literal("#" + key.location()).withStyle(ChatFormatting.DARK_PURPLE).getVisualOrderText());
 					}
 
@@ -297,14 +297,14 @@ public class MobFilterScreen extends Screen {
 		this.filteredMobs.clear();
 		this.visibleTags.clear();
 		if (this.selectedMobsShown.selected) {
-			this.selectedMobs.forEach(s -> this.filteredMobs.add(Pair.of(s, ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(s)).getDescription())));
+			this.selectedMobs.forEach(s -> this.filteredMobs.add(Pair.of(s, BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(s)).getDescription())));
 		} else {
 			if (this.searchBar.getValue().startsWith("#")) {
 				String tagName = this.searchBar.getValue().substring(1).trim();
 				List<TagKey<EntityType<?>>> tags = BuiltInRegistries.ENTITY_TYPE.getTagNames().filter(key -> key.location().toString().contains(tagName)).toList();
 				if (!tags.isEmpty()) {
 					tags.forEach(key -> {
-						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> ForgeRegistries.ENTITY_TYPES.tags().getTag(key).contains(ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(pair.getFirst())))).toList());
+						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> BuiltInRegistries.ENTITY_TYPE.tags().getTag(key).contains(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(pair.getFirst())))).toList());
 						this.visibleTags.add(key);
 					});
 				}

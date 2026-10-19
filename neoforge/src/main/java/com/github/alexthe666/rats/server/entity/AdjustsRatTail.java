@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 
 /**

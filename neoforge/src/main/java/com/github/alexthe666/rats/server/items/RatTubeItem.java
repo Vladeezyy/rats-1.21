@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -36,7 +37,7 @@ public class RatTubeItem extends Item {
 		this.color = color;
 	}
 
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flagIn) {
 		tooltip.add(Component.translatable("block.rats.rat_tube.desc0").withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable("block.rats.rat_tube.desc1").withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable("block.rats.rat_tube.desc2").withStyle(ChatFormatting.GRAY));
@@ -90,7 +91,7 @@ public class RatTubeItem extends Item {
 
 	private BlockState stateWithTag(BlockPos pos, Level level, ItemStack stack, BlockState state) {
 		BlockState blockstate = state;
-		CompoundTag compoundnbt = stack.getTag();
+		CompoundTag compoundnbt = ItemNbt.getTag(stack);
 		if (compoundnbt != null) {
 			CompoundTag compoundnbt1 = compoundnbt.getCompound("BlockStateTag");
 			StateDefinition<Block, BlockState> statecontainer = state.getBlock().getStateDefinition();

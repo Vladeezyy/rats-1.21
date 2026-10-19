@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": {
+      "tag": "c:ingots/gold"
+    },
+    "N": {
+      "tag": "c:nuggets/gold"
+    }
+  },
+  "pattern": [
+    "NGN",
+    "N N",
+    "NGN"
+  ],
+  "result": {
+    "id": "rats:halo_hat"
+  },
+  "show_notification": true
+}

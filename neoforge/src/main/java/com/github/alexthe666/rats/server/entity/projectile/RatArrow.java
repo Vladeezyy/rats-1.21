@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.projectile;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.RatCommand;
@@ -29,7 +30,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -57,15 +58,15 @@ public class RatArrow extends AbstractArrow {
 		if (this.pickup == Pickup.ALLOWED) {
 			TamedRat rat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), this.level());
 			CompoundTag ratTag = new CompoundTag();
-			if (this.stack.getTag() != null && !this.stack.getTag().getCompound("Rat").isEmpty()) {
-				ratTag = this.stack.getTag().getCompound("Rat");
+			if (ItemNbt.hasTag(this.stack) && !ItemNbt.view(this.stack).getCompound("Rat").isEmpty()) {
+				ratTag = ItemNbt.view(this.stack).getCompound("Rat");
 			}
 			rat.readAdditionalSaveData(ratTag);
 			if (!ratTag.getString("CustomName").isEmpty()) {
 				rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName")));
 			}
 			if (ratTag.isEmpty()) {
-				ForgeEventFactory.onFinalizeSpawn(rat, (ServerLevelAccessor) this.level(), this.level().getCurrentDifficultyAt(rat.blockPosition()), MobSpawnType.EVENT, null, null);
+				EventHooks.onFinalizeSpawn(rat, (ServerLevelAccessor) this.level(), this.level().getCurrentDifficultyAt(rat.blockPosition()), MobSpawnType.EVENT, null, null);
 				if (this.getOwner() instanceof Player player) {
 					rat.tame(player);
 				}
@@ -122,7 +123,7 @@ public class RatArrow extends AbstractArrow {
 		boolean flag = entity.getType() == EntityType.ENDERMAN;
 		int k = entity.getRemainingFireTicks();
 		if (this.isOnFire() && !flag) {
-			entity.setSecondsOnFire(5);
+			entity.igniteForSeconds(5);
 		}
 
 		if (entity.hurt(damagesource, (float) i)) {

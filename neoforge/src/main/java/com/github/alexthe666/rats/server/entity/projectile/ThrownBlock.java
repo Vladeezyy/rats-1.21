@@ -46,8 +46,8 @@ public class ThrownBlock extends Entity {
 		this.shootingEntity = entityNeoRatlantean;
 	}
 
-	protected void defineSynchedData() {
-		this.getEntityData().define(CARRIED_BLOCK, Optional.empty());
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		builder.define(CARRIED_BLOCK, Optional.empty());
 	}
 
 	public void setHeldBlockState(@Nullable BlockState state) {

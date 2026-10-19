@@ -1,8 +1,8 @@
 package com.github.alexthe666.rats.server.entity.monster;
 
-import com.github.alexthe666.citadel.animation.Animation;
-import com.github.alexthe666.citadel.animation.AnimationHandler;
-import com.github.alexthe666.citadel.animation.IAnimatedEntity;
+import dev.vladeezyy.rampart.animation.Animation;
+import dev.vladeezyy.rampart.animation.AnimationHandler;
+import dev.vladeezyy.rampart.animation.IAnimatedEntity;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.RatlanteanFlame;

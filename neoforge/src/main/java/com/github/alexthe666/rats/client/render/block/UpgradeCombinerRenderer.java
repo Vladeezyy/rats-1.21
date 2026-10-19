@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.block;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatlanteanSpiritModel;
 import com.github.alexthe666.rats.client.render.RatsRenderType;
@@ -17,7 +18,7 @@ import net.minecraft.util.Mth;
 
 public class UpgradeCombinerRenderer implements BlockEntityRenderer<UpgradeCombinerBlockEntity> {
 	private static final RatlanteanSpiritModel<?> MODEL_SPIRIT = new RatlanteanSpiritModel<>();
-	private static final RenderType TEXTURE = RatsRenderType.getGlowingTranslucent(new ResourceLocation(RatsMod.MODID, "textures/entity/upgrade_combiner.png"));
+	private static final RenderType TEXTURE = RatsRenderType.getGlowingTranslucent(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/upgrade_combiner.png"));
 
 	public UpgradeCombinerRenderer(BlockEntityRendererProvider.Context context) {
 	}
@@ -41,7 +42,7 @@ public class UpgradeCombinerRenderer implements BlockEntityRenderer<UpgradeCombi
 		stack.mulPose(Axis.ZP.rotationDegrees(180));
 		stack.scale(1.5F, 1.5F, 1.5F);
 		VertexConsumer consumer = buffer.getBuffer(TEXTURE);
-		MODEL_SPIRIT.renderToBuffer(stack, consumer, 244, overlay, 1.0F, 1.0F, 1.0F, 0.5F);
+		MODEL_SPIRIT.renderToBuffer(stack, consumer, 244, overlay, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
 		stack.popPose();
 	}
 }

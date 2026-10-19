@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity.layer;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.entity.PinkieModel;
@@ -60,9 +61,9 @@ public class PartyHatLayer<T extends LivingEntity, M extends EntityModel<T>, A e
 			}
 			boolean flag1 = itemstack.hasFoil();
 			int i = hat.getColor(itemstack);
-			this.renderModel(stack, source, light, flag1, this.partyHat, (float) (i >> 16 & 255) / 255.0F, (float) (i >> 8 & 255) / 255.0F, (float) (i & 255) / 255.0F, new ResourceLocation(RatsMod.MODID, "textures/model/hat/party_hat_layer_1.png"));
+			this.renderModel(stack, source, light, flag1, this.partyHat, (float) (i >> 16 & 255) / 255.0F, (float) (i >> 8 & 255) / 255.0F, (float) (i & 255) / 255.0F, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/party_hat_layer_1.png"));
 			i = this.invertColor(hat.getColor(itemstack));
-			this.renderModel(stack, source, light, flag1, this.partyHat, (float) (i >> 16 & 255) / 255.0F, (float) (i >> 8 & 255) / 255.0F, (float) (i & 255) / 255.0F, new ResourceLocation(RatsMod.MODID, "textures/model/hat/party_hat_layer_2.png"));
+			this.renderModel(stack, source, light, flag1, this.partyHat, (float) (i >> 16 & 255) / 255.0F, (float) (i >> 8 & 255) / 255.0F, (float) (i & 255) / 255.0F, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/party_hat_layer_2.png"));
 			stack.popPose();
 		}
 	}
@@ -81,6 +82,6 @@ public class PartyHatLayer<T extends LivingEntity, M extends EntityModel<T>, A e
 
 	private void renderModel(PoseStack stack, MultiBufferSource source, int light, boolean glint, Model model, float red, float green, float blue, ResourceLocation texture) {
 		VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(source, RenderType.armorCutoutNoCull(texture), false, glint);
-		model.renderToBuffer(stack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, red, green, blue, 1.0F);
+		model.renderToBuffer(stack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(1.0F, red, green, blue));
 	}
 }

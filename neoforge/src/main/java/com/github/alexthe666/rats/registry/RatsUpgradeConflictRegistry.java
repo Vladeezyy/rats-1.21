@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.registry;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.CombinedUpgrade;
 import com.google.common.collect.Maps;
@@ -48,10 +50,8 @@ public class RatsUpgradeConflictRegistry {
 			return true;
 		Item[] arr = REGISTERED_CONFLICTS.get(newItem.getItem());
 		if (newItem.getItem() instanceof CombinedUpgrade combined) {
-			CompoundTag tag = newItem.getTag();
-			if (tag != null && tag.contains("Items", 9)) {
-				NonNullList<ItemStack> upgradeList = NonNullList.withSize(combined.getUpgradeSlots(), ItemStack.EMPTY);
-				ContainerHelper.loadAllItems(tag, upgradeList);
+			if (StoredItems.has(newItem)) {
+				NonNullList<ItemStack> upgradeList = StoredItems.view(newItem, combined.getUpgradeSlots());
 				for (ItemStack selectedUpgrade : upgradeList) {
 					if (doesConflict(selectedUpgrade, existingItem)) {
 						return true;
@@ -59,10 +59,8 @@ public class RatsUpgradeConflictRegistry {
 				}
 			}
 		} else if (existingItem.getItem() instanceof CombinedUpgrade combined) {
-			CompoundTag tag = existingItem.getTag();
-			if (tag != null && tag.contains("Items", 9)) {
-				NonNullList<ItemStack> upgradeList = NonNullList.withSize(combined.getUpgradeSlots(), ItemStack.EMPTY);
-				ContainerHelper.loadAllItems(tag, upgradeList);
+			if (StoredItems.has(existingItem)) {
+				NonNullList<ItemStack> upgradeList = StoredItems.view(existingItem, combined.getUpgradeSlots());
 				for (ItemStack selectedUpgrade : upgradeList) {
 					if (doesConflict(selectedUpgrade, newItem)) {
 						return true;

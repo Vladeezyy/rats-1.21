@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
 public class RatMineGoal {
 }/* extends BaseRatHarvestGoal {
 	private final TamedRat rat;
@@ -40,12 +41,7 @@ public class RatMineGoal {
 	@Nullable
 	private NonNullList<ItemStack> getMiningList() {
 		if (RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER.get())) {
-			CompoundTag tag = RatUpgradeUtils.getUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER.get()).getTag();
-			NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-			if (tag != null && tag.contains("Items", 9)) {
-				ContainerHelper.loadAllItems(tag, nonnulllist);
-			}
-			return nonnulllist;
+			return StoredItems.view(RatUpgradeUtils.getUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER.get()), 27);
 		} else {
 			return null;
 		}

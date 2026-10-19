@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.entity.BlackDeathModel;
@@ -14,8 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class BlackDeathRenderer extends MobRenderer<BlackDeath, BlackDeathModel<BlackDeath>> {
 
-	private static final ResourceLocation BLACK_DEATH_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/black_death/black_death.png");
-	private static final ResourceLocation GLOW_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/black_death/black_death_overlay.png");
+	private static final ResourceLocation BLACK_DEATH_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/black_death/black_death.png");
+	private static final ResourceLocation GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/black_death/black_death_overlay.png");
 
 	public BlackDeathRenderer(EntityRendererProvider.Context context) {
 		super(context, new BlackDeathModel<>(context.bakeLayer(RatsModelLayers.BLACK_DEATH)), 0.5F);
@@ -23,7 +24,7 @@ public class BlackDeathRenderer extends MobRenderer<BlackDeath, BlackDeathModel<
 		this.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()) {
 			public void render(PoseStack stack, MultiBufferSource buffer, int light, BlackDeath entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 				if (entity.isSummoning() || entity.isMeleeAttacking()) {
-					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, FastColor.ARGB32.colorFromFloat(headPitch, partialTicks, ageInTicks, netHeadYaw));
 				}
 			}
 		});

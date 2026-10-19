@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -26,8 +27,8 @@ public class PartyHatItem extends Item implements DyeableLeatherItem {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-		if (stack.getTag() == null || !stack.getTag().getCompound("display").contains("color", 99)) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+		if (!ItemNbt.hasTag(stack) || !ItemNbt.view(stack).getCompound("display").contains("color", 99)) {
 			tooltip.add(Component.translatable("item.rats.party_hat.desc").withStyle(ChatFormatting.GRAY));
 		}
 	}

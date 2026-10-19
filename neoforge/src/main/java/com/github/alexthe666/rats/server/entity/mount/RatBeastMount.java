@@ -1,9 +1,9 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
-import com.github.alexthe666.citadel.animation.Animation;
-import com.github.alexthe666.citadel.animation.AnimationHandler;
-import com.github.alexthe666.citadel.animation.IAnimatedEntity;
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.animation.Animation;
+import dev.vladeezyy.rampart.animation.AnimationHandler;
+import dev.vladeezyy.rampart.animation.IAnimatedEntity;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
@@ -33,7 +33,7 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 
 	public RatBeastMount(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
-		this.setMaxUpStep(1.0F);
+		this.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(1.0F);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -54,9 +54,9 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(COLOR_VARIANT, 0);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(COLOR_VARIANT, 0);
 	}
 
 
@@ -130,8 +130,8 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.setColorVariant(this.getRandom().nextInt(4));
 		return spawnData;
 	}

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatlanteanSpiritModel;
 import com.github.alexthe666.rats.server.entity.projectile.PlagueShot;
@@ -17,7 +18,7 @@ import net.minecraft.util.Mth;
 
 public class PlagueShotRenderer extends EntityRenderer<PlagueShot> {
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/plague_cloud.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/plague_cloud.png");
 	private static final RatlanteanSpiritModel<PlagueShot> MODEL_SPIRIT = new RatlanteanSpiritModel<>();
 
 	public PlagueShotRenderer(EntityRendererProvider.Context context) {
@@ -31,10 +32,10 @@ public class PlagueShotRenderer extends EntityRenderer<PlagueShot> {
 		stack.mulPose(Axis.XP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
 		stack.translate(0F, -1.5F, 0F);
 		VertexConsumer consumer = ItemRenderer.getFoilBuffer(buffer, RenderType.entityCutoutNoCull(TEXTURE), false, true);
-		MODEL_SPIRIT.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+		MODEL_SPIRIT.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 		stack.popPose();
 
-		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
+		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
 	}
 
 	@Override

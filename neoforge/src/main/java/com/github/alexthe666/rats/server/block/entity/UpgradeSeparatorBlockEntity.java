@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
@@ -36,11 +39,9 @@ public class UpgradeSeparatorBlockEntity extends BlockEntity {
 		for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB((double) i - d0, (double) j - d0, (double) k - d0, (double) i + d0, (double) j + d0, (double) k + d0))) {
 			ItemStack item = itemEntity.getItem();
 			if (item.getItem() instanceof CombinedRatUpgradeItem) {
-				CompoundTag CompoundNBT1 = item.getTag();
 				int spawnedItem = 0;
-				if (CompoundNBT1 != null && CompoundNBT1.contains("Items", 9)) {
-					NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-					ContainerHelper.loadAllItems(CompoundNBT1, nonnulllist);
+				if (StoredItems.has(item)) {
+					NonNullList<ItemStack> nonnulllist = StoredItems.view(item, 27);
 					for (ItemStack itemstack : nonnulllist) {
 						if (!itemstack.isEmpty()) {
 							ItemEntity splitEntity = new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), itemstack.copy());

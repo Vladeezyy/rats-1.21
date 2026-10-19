@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:storage_blocks/iron"
+            "tag": "c:storage_blocks/iron"
           }
         ]
       },
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/iron"
+            "tag": "c:ingots/iron"
           }
         ]
       },

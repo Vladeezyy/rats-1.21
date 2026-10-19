@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.rat.RatCommand;
@@ -39,14 +40,14 @@ public class RatFluteItem extends Item {
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 
-		int commandInt = stack.getOrCreateTag().getInt("Command");
+		int commandInt = ItemNbt.view(stack).getInt("Command");
 		RatCommand ratCommand = RatCommand.values()[Mth.clamp(commandInt, 0, RatCommand.values().length - 1)];
 		if (player.isShiftKeyDown()) {
 			commandInt++;
 			if (commandInt > RatCommand.values().length - 1) {
 				commandInt = 0;
 			}
-			stack.getOrCreateTag().putInt("Command", commandInt);
+			ItemNbt.update(stack, tag -> tag.putInt("Command", commandInt));
 			ratCommand = RatCommand.values()[Mth.clamp(commandInt, 0, RatCommand.values().length - 1)];
 			level.playSound(player, player.blockPosition(), SoundEvents.UI_BUTTON_CLICK.get(), SoundSource.NEUTRAL, 1.0F, 1.25F);
 			player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COMMAND, Component.translatable(ratCommand.getTranslateName())), true);
@@ -73,11 +74,11 @@ public class RatFluteItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		tooltip.add(Component.translatable("item.rats.rat_flute.desc0").withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable("item.rats.rat_flute.desc1").withStyle(ChatFormatting.GRAY));
-		if (stack.getTag() != null) {
-			RatCommand ratCommand = RatCommand.values()[Mth.clamp(stack.getTag().getInt("Command"), 0, RatCommand.values().length - 1)];
+		if (ItemNbt.hasTag(stack)) {
+			RatCommand ratCommand = RatCommand.values()[Mth.clamp(ItemNbt.view(stack).getInt("Command"), 0, RatCommand.values().length - 1)];
 			tooltip.add(Component.translatable(RatsLangConstants.RAT_CURRENT_COMMAND, Component.translatable(ratCommand.getTranslateName())).withStyle(ChatFormatting.GRAY));
 		}
 	}

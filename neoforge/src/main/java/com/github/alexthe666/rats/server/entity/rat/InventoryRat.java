@@ -28,13 +28,13 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,14 +61,14 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(COMMAND, 0);
-		this.getEntityData().define(RADIUS_CENTER, Optional.empty());
-		this.getEntityData().define(HOME_POS, Optional.empty());
-		this.getEntityData().define(SEARCH_RADIUS, RatConfig.defaultRatRadius);
-		this.getEntityData().define(PATROL_NODES, new ArrayList<>());
-		this.getEntityData().define(VISIBILITY_FLAGS, (byte) 0);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(COMMAND, 0);
+		builder.define(RADIUS_CENTER, Optional.empty());
+		builder.define(HOME_POS, Optional.empty());
+		builder.define(SEARCH_RADIUS, RatConfig.defaultRatRadius);
+		builder.define(PATROL_NODES, new ArrayList<>());
+		builder.define(VISIBILITY_FLAGS, (byte) 0);
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 	@NotNull
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (this.isAlive() && capability == ForgeCapabilities.ITEM_HANDLER && this.itemHandler != null)
+		if (this.isAlive() && capability == Capabilities.ITEM_HANDLER && this.itemHandler != null)
 			return this.itemHandler.cast();
 		return super.getCapability(capability, facing);
 	}
@@ -227,7 +227,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			sp.containerMenu = new RatMenu(sp.containerCounter, this.getInventory(), sp.getInventory());
 			sp.initMenu(sp.containerMenu);
 			this.inventoryOpen = true;
-			MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(sp, sp.containerMenu));
+			NeoForge.EVENT_BUS.post(new PlayerContainerEvent.Open(sp, sp.containerMenu));
 		}
 	}
 

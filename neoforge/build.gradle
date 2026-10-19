@@ -83,9 +83,16 @@ configurations {
 
 repositories {
     maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+    maven { url = 'https://maven.blamejared.com/' } // JEI
+    mavenLocal() { content { includeGroup 'dev.vladeezyy.rampart' } } // Rampart: ./gradlew publishToMavenLocal there
 }
 
 dependencies {
+    implementation "dev.vladeezyy.rampart:rampart-neoforge:${rampart_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    compileOnly "maven.modrinth:jade:${jade_version}"
+
     if (project.hasProperty('with_compat')) {
         localRuntime "maven.modrinth:sodium:${compat_sodium}"
         localRuntime "maven.modrinth:iris:${compat_iris}"
@@ -118,3 +125,6 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 }
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
+
+// the port: see every compile error at once
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ['-Xmaxerrs', '10000'] }

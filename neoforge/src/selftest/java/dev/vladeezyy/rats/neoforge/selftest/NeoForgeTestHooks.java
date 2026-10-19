@@ -1,6 +1,6 @@
 package dev.vladeezyy.rats.neoforge.selftest;
 
-import dev.vladeezyy.rats.Rats;
+import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.selftest.ClientScene;
 import dev.vladeezyy.rats.selftest.NetScene;
 import dev.vladeezyy.rats.selftest.SelfTest;
@@ -18,7 +18,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 public final class NeoForgeTestHooks {
   private NeoForgeTestHooks() {}
 
-  @EventBusSubscriber(modid = Rats.MOD_ID)
+  @EventBusSubscriber(modid = RatsMod.MODID)
   static final class Server {
     static {
       TestHooks.fakePlayer = FakePlayerFactory::get;
@@ -37,7 +37,7 @@ public final class NeoForgeTestHooks {
     }
   }
 
-  @EventBusSubscriber(modid = Rats.MOD_ID, value = Dist.CLIENT)
+  @EventBusSubscriber(modid = RatsMod.MODID, value = Dist.CLIENT)
   static final class Client {
     private Client() {}
 

@@ -9,7 +9,7 @@
       "item": "minecraft:rotten_flesh"
     },
     "S": {
-      "tag": "forge:string"
+      "tag": "c:strings"
     }
   },
   "pattern": [

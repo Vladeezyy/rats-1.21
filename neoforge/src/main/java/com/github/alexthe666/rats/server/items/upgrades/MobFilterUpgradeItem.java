@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import com.github.alexthe666.rats.server.misc.ItemNbt;
+import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.client.events.ModClientEvents;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.ChatFormatting;
@@ -36,17 +38,17 @@ public class MobFilterUpgradeItem extends BaseRatUpgradeItem {
 	}
 
 	public static boolean isWhitelist(ItemStack stack) {
-		return stack.getTag() != null && stack.getTag().getBoolean("Whitelist");
+		return ItemNbt.hasTag(stack) && ItemNbt.view(stack).getBoolean("Whitelist");
 	}
 
 	public static void setWhitelist(ItemStack stack, boolean whitelist) {
-		stack.getOrCreateTag().putBoolean("Whitelist", whitelist);
+		ItemNbt.update(stack, tag -> tag.putBoolean("Whitelist", whitelist));
 	}
 
 	public static List<String> getSelectedMobs(ItemStack stack) {
-		if (stack.getTag() == null) return new ArrayList<>();
+		if (!ItemNbt.hasTag(stack)) return new ArrayList<>();
 		List<String> mobs = new ArrayList<>();
-		ListTag tag = stack.getTag().getList("Mobs", Tag.TAG_STRING);
+		ListTag tag = ItemNbt.view(stack).getList("Mobs", Tag.TAG_STRING);
 		for (int i = 0; i < tag.size(); ++i) {
 			String s = tag.getString(i);
 			mobs.add(s);
@@ -57,15 +59,15 @@ public class MobFilterUpgradeItem extends BaseRatUpgradeItem {
 	public static void setMobs(ItemStack stack, List<String> mobs) {
 		ListTag tag = new ListTag();
 		for (String mob : mobs) {
-			if (BuiltInRegistries.ENTITY_TYPE.containsKey(new ResourceLocation(mob))) {
+			if (BuiltInRegistries.ENTITY_TYPE.containsKey(ResourceLocation.parse(mob))) {
 				tag.add(StringTag.valueOf(mob));
 			}
 		}
-		stack.getOrCreateTag().put("Mobs", tag);
+		ItemNbt.update(stack, tag -> tag.put("Mobs", tag));
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		super.appendHoverText(stack, level, tooltip, flag);
 		tooltip.add(Component.translatable(RatsLangConstants.MOB_FILTER_MODE, Component.translatable(isWhitelist(stack) ? RatsLangConstants.MOB_FILTER_WHITELIST : RatsLangConstants.MOB_FILTER_BLACKLIST)).withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable(RatsLangConstants.MOB_FILTER_SELECTED_MOBS).withStyle(ChatFormatting.GRAY));

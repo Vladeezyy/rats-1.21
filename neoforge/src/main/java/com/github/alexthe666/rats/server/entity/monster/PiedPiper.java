@@ -40,7 +40,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 public class PiedPiper extends Raider implements RatSummoner {
@@ -63,9 +63,9 @@ public class PiedPiper extends Raider implements RatSummoner {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(RAT_COUNT, 0);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(RAT_COUNT, 0);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class PiedPiper extends Raider implements RatSummoner {
 		if (reason.shouldDestroy()) {
 			for (Rat rat : this.level().getEntitiesOfClass(Rat.class, new AABB(this.getX() - dist, this.getY() - dist, this.getZ() - dist, this.getX() + dist, this.getY() + dist, this.getZ() + dist))) {
 				if (rat.isOwnedBy(this)) {
-					rat.setTame(false);
+					rat.setTame(false, true);
 					rat.setOwnerUUID(null);
 					rat.setFleePos(rat.blockPosition());
 					rat.setTarget(null);
@@ -162,8 +162,8 @@ public class PiedPiper extends Raider implements RatSummoner {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
 		this.populateDefaultEquipmentEnchantments(level.getRandom(), difficulty);
 		return spawnData;
@@ -184,11 +184,11 @@ public class PiedPiper extends Raider implements RatSummoner {
 			if (this.getRatsSummoned() < 6 && this.ratCooldown == 0) {
 				this.level().broadcastEntityEvent(this, (byte) 82);
 				Rat rat = new Rat(RatsEntityRegistry.RAT.get(), this.level());
-				ForgeEventFactory.onFinalizeSpawn(rat, (ServerLevel) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+				EventHooks.onFinalizeSpawn(rat, (ServerLevel) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
 				rat.copyPosition(this);
 				this.level().addFreshEntity(rat);
 				rat.setPlagued(false);
-				rat.setTame(false);
+				rat.setTame(false, true);
 				rat.setOwnerUUID(this.getUUID());
 				if (this.getTarget() != null) {
 					rat.setTarget(this.getTarget());

@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.RatTubeBlock;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
@@ -46,7 +48,7 @@ public class RatTubeBlockEntity extends BlockEntity {
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
 
-	public CompoundTag getUpdateTag() {
+	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
 		return this.saveWithId();
 	}
 
@@ -83,15 +85,15 @@ public class RatTubeBlockEntity extends BlockEntity {
 		return false;
 	}
 
-	public void saveAdditional(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
 		compound.putBoolean("RatNode", isNode);
 		compound.putInt("OpenSide", opening == null ? -1 : opening.ordinal());
 		compound.putInt("TubeColor", color);
-		super.saveAdditional(compound);
+		super.saveAdditional(compound, registries);
 	}
 
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		isNode = compound.getBoolean("RatNode");
 		int i = compound.getInt("OpenSide");
 		if (i == -1) {

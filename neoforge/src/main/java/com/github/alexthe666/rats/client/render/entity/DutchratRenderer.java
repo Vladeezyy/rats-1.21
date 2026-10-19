@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.render.entity;
 
+import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.FlyingDutchratModel;
 import com.github.alexthe666.rats.client.render.RatsRenderType;
@@ -20,7 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class DutchratRenderer extends MobRenderer<Dutchrat, FlyingDutchratModel<Dutchrat>> {
 
-	private static final ResourceLocation DUTCHRAT_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/entity/dutchrat/dutchrat.png");
+	private static final ResourceLocation DUTCHRAT_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/dutchrat/dutchrat.png");
 
 	public DutchratRenderer(EntityRendererProvider.Context context) {
 		super(context, new FlyingDutchratModel<>(), 0.5F);
@@ -29,7 +30,7 @@ public class DutchratRenderer extends MobRenderer<Dutchrat, FlyingDutchratModel<
 		this.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()) {
 			public void render(PoseStack stack, MultiBufferSource buffer, int light, Dutchrat entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 				if (!entity.hasThrownSword() && entity.getBellSummonTicks() <= 0) {
-					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, FastColor.ARGB32.colorFromFloat(headPitch, partialTicks, ageInTicks, netHeadYaw));
 				}
 			}
 		});
@@ -40,8 +41,8 @@ public class DutchratRenderer extends MobRenderer<Dutchrat, FlyingDutchratModel<
 	}
 
 	public static class DutchratGlowLayer<T extends Dutchrat, M extends FlyingDutchratModel<T>> extends RenderLayer<T, M> {
-		private static final ResourceLocation GLOW_1 = new ResourceLocation(RatsMod.MODID, "textures/entity/dutchrat/dutchrat_glow_1.png");
-		private static final ResourceLocation GLOW_2 = new ResourceLocation(RatsMod.MODID, "textures/entity/dutchrat/dutchrat_glow_2.png");
+		private static final ResourceLocation GLOW_1 = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/dutchrat/dutchrat_glow_1.png");
+		private static final ResourceLocation GLOW_2 = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/dutchrat/dutchrat_glow_2.png");
 
 		public DutchratGlowLayer(RenderLayerParent<T, M> parent) {
 			super(parent);
@@ -51,8 +52,8 @@ public class DutchratRenderer extends MobRenderer<Dutchrat, FlyingDutchratModel<
 		public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 			VertexConsumer glow1 = buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_1));
 			VertexConsumer glow2 = buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_2));
-			this.getParentModel().renderToBuffer(stack, glow1, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-			this.getParentModel().renderToBuffer(stack, glow2, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.5F);
+			this.getParentModel().renderToBuffer(stack, glow1, light, OverlayTexture.NO_OVERLAY, -1);
+			this.getParentModel().renderToBuffer(stack, glow2, light, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
 		}
 	}
 }

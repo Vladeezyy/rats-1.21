@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsToolMaterialRegistry;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
@@ -18,8 +19,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -36,16 +37,16 @@ public class RatlantisToolItem {
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(ForgeRegistries.BLOCKS.tags()).getTag(BlockTags.BASE_STONE_OVERWORLD).contains(state.getBlock())) {
+			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.BASE_STONE_OVERWORLD).contains(state.getBlock())) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
-					stack.hurtAndBreak(0, living, user -> user.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
 				return true;
 			} else {
@@ -63,23 +64,23 @@ public class RatlantisToolItem {
 
 		@Override
 		public float getDestroySpeed(ItemStack stack, BlockState state) {
-			if (Objects.requireNonNull(ForgeRegistries.BLOCKS.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
+			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
 				return this.speed * 1.5F;
 			}
 			return super.getDestroySpeed(stack, state);
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(ForgeRegistries.BLOCKS.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
+			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.LEAVES).contains(state.getBlock())) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
-					stack.hurtAndBreak(0, living, user -> user.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
 				return true;
 			} else {
@@ -95,9 +96,9 @@ public class RatlantisToolItem {
 
 		@Override
 		public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity living) {
-			if (Objects.requireNonNull(ForgeRegistries.BLOCKS.tags()).getTag(BlockTags.SAND).contains(state.getBlock())) {
+			if (Objects.requireNonNull(BuiltInRegistries.BLOCK.tags()).getTag(BlockTags.SAND).contains(state.getBlock())) {
 				if (!level.isClientSide() && state.getDestroySpeed(level, pos) != 0.0F) {
-					stack.hurtAndBreak(0, living, user -> user.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+					stack.hurtAndBreak(0, living, EquipmentSlot.MAINHAND);
 				}
 				return true;
 			} else {
@@ -106,7 +107,7 @@ public class RatlantisToolItem {
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
@@ -124,7 +125,7 @@ public class RatlantisToolItem {
 			for (int x = -1; x <= 1; x++) {
 				for (int z = -1; z <= 1; z++) {
 					BlockPos pos = context.getClickedPos().offset(x, 0, z);
-					BlockState toolModifiedState = level.getBlockState(pos).getToolModifiedState(context, ToolActions.HOE_TILL, false);
+					BlockState toolModifiedState = level.getBlockState(pos).getToolModifiedState(context, ItemAbilities.HOE_TILL, false);
 					Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = toolModifiedState == null ? null : Pair.of(ctx -> true, changeIntoState(toolModifiedState));
 					if (pair != null) {
 						Predicate<UseOnContext> predicate = pair.getFirst();
@@ -143,7 +144,7 @@ public class RatlantisToolItem {
 			}
 
 			if (tilledAny && context.getPlayer() != null) {
-				context.getItemInHand().hurtAndBreak(1, context.getPlayer(), user -> user.broadcastBreakEvent(context.getHand()));
+				context.getItemInHand().hurtAndBreak(1, context.getPlayer(), LivingEntity.getSlotForHand(context.getHand()));
 				return InteractionResult.SUCCESS;
 			}
 			return InteractionResult.PASS;
@@ -151,7 +152,7 @@ public class RatlantisToolItem {
 
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 			super.appendHoverText(stack, level, tooltip, flag);
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
 			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));

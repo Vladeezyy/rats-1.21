@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
@@ -77,7 +76,7 @@ public class RatCraftingTableBlock extends BaseEntityBlock {
 			} else {
 				BlockEntity be = level.getBlockEntity(pos);
 				if (be instanceof RatCraftingTableBlockEntity table) {
-					NetworkHooks.openScreen((ServerPlayer) player, table, pos);
+					player.openMenu(table, pos);
 					player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
 					return InteractionResult.CONSUME;
 				}

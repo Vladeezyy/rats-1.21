@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -38,7 +38,7 @@ public class RatBiplaneMount extends RatMountBase implements Plane {
 
 	public RatBiplaneMount(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
-		this.setMaxUpStep(1.0F);
+		this.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(1.0F);
 		this.riderY = 1.35F;
 		this.riderXZ = -0.35F;
 		this.moveControl = new PlaneMoveControl<>(this);
@@ -73,10 +73,10 @@ public class RatBiplaneMount extends RatMountBase implements Plane {
 	}
 
 	@Override
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(FIRING, false);
-		this.getEntityData().define(PLANE_PITCH, 0F);
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(FIRING, false);
+		builder.define(PLANE_PITCH, 0F);
 	}
 
 	public boolean removeWhenFarAway(double dist) {

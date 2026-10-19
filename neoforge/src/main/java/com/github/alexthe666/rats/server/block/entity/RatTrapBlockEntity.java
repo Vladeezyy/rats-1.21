@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.block.RatTrapBlock;
@@ -65,27 +67,27 @@ public class RatTrapBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
 		this.handleUpdateTag(packet.getTag());
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
+	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
 		return this.saveWithId();
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
-		ContainerHelper.saveAllItems(compound, this.baitStack);
+	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		ContainerHelper.saveAllItems(compound, this.baitStack, registries);
 		compound.putFloat("ShutProgress", this.shutProgress);
-		super.saveAdditional(compound);
+		super.saveAdditional(compound, registries);
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+		super.loadAdditional(compound, registries);
 		this.baitStack = NonNullList.withSize(1, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.baitStack);
+		ContainerHelper.loadAllItems(compound, this.baitStack, registries);
 		this.shutProgress = compound.getFloat("ShutProgress");
 	}
 

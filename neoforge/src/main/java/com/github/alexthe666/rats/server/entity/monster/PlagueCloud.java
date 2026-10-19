@@ -115,9 +115,9 @@ public class PlagueCloud extends Monster {
 		return d0 * d0 + d1 * d1 + d2 * d2;
 	}
 
-	protected void defineSynchedData() {
-		super.defineSynchedData();
-		this.getEntityData().define(OWNER_UNIQUE_ID, Optional.empty());
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(OWNER_UNIQUE_ID, Optional.empty());
 	}
 
 	protected void registerGoals() {

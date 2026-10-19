@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.client.model.deco;
 
+import net.minecraft.util.FastColor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -41,7 +42,7 @@ public class RatIglooModel<T extends Entity> extends EntityModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float red, float green, float blue, float alpha) {
-		this.root.render(stack, consumer, light, overlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
+		this.root.render(stack, consumer, light, overlay, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
 	}
 }

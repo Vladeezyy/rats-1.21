@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.client.events;
 
+import com.github.alexthe666.rats.server.capability.SelectedRats;
+import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.StaticRatModel;
@@ -49,30 +51,30 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import org.joml.Matrix4f;
 
 import java.util.Objects;
 
-@Mod.EventBusSubscriber(modid = RatsMod.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = RatsMod.MODID, value = Dist.CLIENT)
 public class ForgeClientEvents {
 
-	public static final ResourceLocation PLAGUE_HEART_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/gui/plague_hearts.png");
-	private static final ResourceLocation RADIUS_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/misc/rat_radius.png");
-	private static final ResourceLocation QUARRY_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/misc/quarry_radius.png");
-	private static final ResourceLocation HOME_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/misc/rat_home.png");
-	private static final ResourceLocation RAT_DEPOSIT_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/misc/rat_deposit.png");
-	private static final ResourceLocation RAT_PICKUP_TEXTURE = new ResourceLocation(RatsMod.MODID, "textures/misc/rat_pickup.png");
-	private static final ResourceLocation RAT_PATROL_NODE_TEXTURE = new ResourceLocation("rats:textures/misc/rat_patrol.png");
-	private static final ResourceLocation SYNESTHESIA = new ResourceLocation(RatsMod.MODID, "shaders/post/synesthesia.json");
+	public static final ResourceLocation PLAGUE_HEART_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/plague_hearts.png");
+	private static final ResourceLocation RADIUS_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/misc/rat_radius.png");
+	private static final ResourceLocation QUARRY_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/misc/quarry_radius.png");
+	private static final ResourceLocation HOME_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/misc/rat_home.png");
+	private static final ResourceLocation RAT_DEPOSIT_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/misc/rat_deposit.png");
+	private static final ResourceLocation RAT_PICKUP_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/misc/rat_pickup.png");
+	private static final ResourceLocation RAT_PATROL_NODE_TEXTURE = ResourceLocation.parse("rats:textures/misc/rat_patrol.png");
+	private static final ResourceLocation SYNESTHESIA = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "shaders/post/synesthesia.json");
 	private static float synesthesiaProgress = 0;
 	private static float prevSynesthesiaProgress = 0;
 	private static final float MAX_SYNESTESIA = 40;
@@ -308,7 +310,7 @@ public class ForgeClientEvents {
 				float f = (event.getEntity().tickCount + event.getPartialTick()) * 0.5F;
 				float f1 = 1;
 				RAT_MODEL.setupAnim(event.getEntity(), f, f1, event.getEntity().tickCount + event.getPartialTick(), event.getPartialTick(), 0);
-				RAT_MODEL.renderToBuffer(event.getPoseStack(), textureBuilder, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+				RAT_MODEL.renderToBuffer(event.getPoseStack(), textureBuilder, event.getPackedLight(), OverlayTexture.NO_OVERLAY, -1);
 				stack.popPose();
 				stack.popPose();
 			}
@@ -318,8 +320,8 @@ public class ForgeClientEvents {
 	@SubscribeEvent
 	public static void onRenderWorld(RenderLevelStageEvent event) {
 		if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-			if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getCapability(RatsCapabilityRegistry.SELECTED_RAT).resolve().isPresent()) {
-				TamedRat rat = Minecraft.getInstance().player.getCapability(RatsCapabilityRegistry.SELECTED_RAT).resolve().get().getSelectedRat();
+			if (Minecraft.getInstance().player != null && SelectedRats.of(Minecraft.getInstance().player).isPresent()) {
+				TamedRat rat = SelectedRats.of(Minecraft.getInstance().player).get().getSelectedRat();
 				if (rat == null) return;
 				ItemStack heldItem = Minecraft.getInstance().player.getItemInHand(InteractionHand.MAIN_HAND);
 				Tesselator tessellator = Tesselator.getInstance();
@@ -391,8 +393,8 @@ public class ForgeClientEvents {
 							float pdz = (float) (node.pos().getZ() - prev.pos().getZ());
 							buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 							Matrix4f matrix4f = stack.last().pose();
-							buffer.vertex(matrix4f, pdx, pdy, pdz).color(r, g, b, 1.0F).endVertex();
-							buffer.vertex(matrix4f, 0.0F, 0.0F, 0.0F).color(r, g, b, 1.0F).endVertex();
+							buffer.addVertex(matrix4f, pdx, pdy, pdz).setColor(r, g, b, 1.0F);
+							buffer.addVertex(matrix4f, 0.0F, 0.0F, 0.0F).setColor(r, g, b, 1.0F);
 							tessellator.end();
 							stack.popPose();
 						}
@@ -410,8 +412,8 @@ public class ForgeClientEvents {
 		if (Minecraft.getInstance().player != null) {
 			LocalPlayer player = Minecraft.getInstance().player;
 			if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof RatStaffItem || player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof RatStaffItem) {
-				LazyOptional<SelectedRatCapability> cap = player.getCapability(RatsCapabilityRegistry.SELECTED_RAT);
-				return cap.resolve().isPresent() && Objects.equals(cap.resolve().get().getSelectedRat(), rat);
+				java.util.Optional<SelectedRatCapability> cap = SelectedRats.of(player);
+				return cap.isPresent() && Objects.equals(cap.get().getSelectedRat(), rat);
 			}
 		}
 		return false;

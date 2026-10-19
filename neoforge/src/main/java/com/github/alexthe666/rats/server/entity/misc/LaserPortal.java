@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.misc;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -159,7 +160,7 @@ public class LaserPortal extends Entity {
 	}
 
 	@Override
-	protected void defineSynchedData() {
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
 	}
 }

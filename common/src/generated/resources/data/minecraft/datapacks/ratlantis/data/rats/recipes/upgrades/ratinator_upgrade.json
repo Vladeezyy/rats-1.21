@@ -12,7 +12,7 @@
       "item": "rats:marbled_cheese_rat_head"
     },
     "I": {
-      "tag": "forge:storage_blocks/iron"
+      "tag": "c:storage_blocks/iron"
     },
     "U": {
       "item": "rats:rat_upgrade_basic_ratlantean"

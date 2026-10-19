@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "tag": "c:cheese"
+    },
+    "L": {
+      "tag": "c:leathers"
+    }
+  },
+  "pattern": [
+    "L L",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "id": "rats:rat_sack"
+  },
+  "show_notification": true
+}

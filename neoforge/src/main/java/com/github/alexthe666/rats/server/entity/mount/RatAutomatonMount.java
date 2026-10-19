@@ -1,9 +1,9 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
-import com.github.alexthe666.citadel.animation.Animation;
-import com.github.alexthe666.citadel.animation.AnimationHandler;
-import com.github.alexthe666.citadel.animation.IAnimatedEntity;
-import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
+import dev.vladeezyy.rampart.animation.Animation;
+import dev.vladeezyy.rampart.animation.AnimationHandler;
+import dev.vladeezyy.rampart.animation.IAnimatedEntity;
+import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -29,7 +29,7 @@ public class RatAutomatonMount extends RatMountBase implements IAnimatedEntity {
 
 	public RatAutomatonMount(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
-		this.setMaxUpStep(2.0F);
+		this.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(2.0F);
 		this.riderY = 2.725F;
 		this.moveControl = new FlyingMoveControl(this, 10, false);
 	}

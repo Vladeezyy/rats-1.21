@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import com.github.alexthe666.rats.server.misc.StoredItems;
+import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.inventory.JuryRiggedRatUpgradeMenu;
 import com.github.alexthe666.rats.server.inventory.container.RatUpgradeContainer;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.CombinedUpgrade;
@@ -19,7 +21,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class JuryRiggedRatUpgradeItem extends BaseRatUpgradeItem implements Comb
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		super.appendHoverText(stack, level, tooltip, flag);
 		tooltip.add(Component.translatable("item.rats.rat_upgrade_combined.desc").withStyle(ChatFormatting.GRAY));
 		this.addTooltip(stack, tooltip);
@@ -53,7 +54,7 @@ public class JuryRiggedRatUpgradeItem extends BaseRatUpgradeItem implements Comb
 
 		if (!player.isShiftKeyDown() && !this.isUpgradeLocked(stack)) {
 			if (!level.isClientSide()) {
-				NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
+				player.openMenu(new MenuProvider() {
 					@Override
 					public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player1) {
 						return new JuryRiggedRatUpgradeMenu(id, new RatUpgradeContainer(stack), player1.getInventory(), stack);
@@ -71,10 +72,8 @@ public class JuryRiggedRatUpgradeItem extends BaseRatUpgradeItem implements Comb
 	}
 
 	private boolean isUpgradeLocked(ItemStack stack) {
-		CompoundTag tag = stack.getTag();
-		if (tag != null && tag.contains("Items", 9)) {
-			NonNullList<ItemStack> nonnulllist = NonNullList.withSize(this.getUpgradeSlots(), ItemStack.EMPTY);
-			ContainerHelper.loadAllItems(tag, nonnulllist);
+		if (StoredItems.has(stack)) {
+			NonNullList<ItemStack> nonnulllist = StoredItems.view(stack, this.getUpgradeSlots());
 			return !nonnulllist.get(0).isEmpty() && !nonnulllist.get(1).isEmpty();
 		}
 		return false;
