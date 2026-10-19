@@ -173,7 +173,8 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 			}
 		}
 
-		if (!this.willDespawn()) {
+		// offers live on the server (1.21 throws when the client asks for them)
+		if (!this.level().isClientSide() && !this.willDespawn()) {
 			if (this.level().isNight() && this.restockedToday) this.restockedToday = false;
 
 			if (!this.restockedToday && this.exhaustedAnyTrades() && this.level().isDay()) {

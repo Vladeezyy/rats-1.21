@@ -50,10 +50,8 @@ public class DutchratRenderer extends MobRenderer<Dutchrat, FlyingDutchratModel<
 
 		@Override
 		public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-			VertexConsumer glow1 = buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_1));
-			VertexConsumer glow2 = buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_2));
-			this.getParentModel().renderToBuffer(stack, glow1, light, OverlayTexture.NO_OVERLAY, -1);
-			this.getParentModel().renderToBuffer(stack, glow2, light, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
+			this.getParentModel().renderToBuffer(stack, buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_1)), light, OverlayTexture.NO_OVERLAY, -1);
+			this.getParentModel().renderToBuffer(stack, buffer.getBuffer(RatsRenderType.getGlowingTranslucent(GLOW_2)), light, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
 		}
 	}
 }

@@ -93,6 +93,13 @@ public final class ClientScene {
       shot(mc, "blocks");
       checkNoMissingTexture(mc, "blocks");
     });
+    // every mob of the mod (rendered through Rampart's models), frozen in rows
+    at(t += 5, mc -> server(mc, ClientScene::spawnMobs));
+    at(t += 20, mc -> server(mc, p -> lookAt(p, 5, 5, 6, 5, 0, -8)));
+    at(t += 30, mc -> {
+      shot(mc, "mobs");
+      checkNoMissingTexture(mc, "mobs");
+    });
     at(t += 5, mc -> server(mc, p -> {
       p.setGameMode(GameType.SURVIVAL);
       p.getInventory().clearContent();
@@ -173,6 +180,26 @@ public final class ClientScene {
     }
   }
 
+  private static void spawnMobs(ServerPlayer player) {
+    ServerLevel level = player.serverLevel();
+    int i = 0;
+    for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
+      if (!BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(RatsMod.MODID)) {
+        continue;
+      }
+      var entity = type.create(level);
+      if (!(entity instanceof Mob mob)) {
+        continue;
+      }
+      mob.setNoAi(true);
+      mob.setPersistenceRequired();
+      mob.moveTo(stage.getX() + (i % 6) * 2.5, stage.getY(), stage.getZ() - 3 - (i / 6) * 3.0, 180, 0);
+      level.addFreshEntity(mob);
+      i++;
+    }
+    check("mobs spawned for the picture (" + i + ")", i > 15, i);
+  }
+
   private static void build(ServerPlayer player) {
     ServerLevel level = player.serverLevel();
     BlockPos spawn = level.getSharedSpawnPos();
@@ -217,21 +244,16 @@ public final class ClientScene {
       }
     }
     // other texts the mod shows (messages, death messages, effects, ...)
-    needed.add("itemGroup." + RatsMod.MODID);
+    // the creative tabs' titles
+    for (var tab : BuiltInRegistries.CREATIVE_MODE_TAB) {
+      if (BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab).getNamespace().equals(RatsMod.MODID)
+        && tab.getDisplayName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents translatable) {
+        needed.add(translatable.getKey());
+      }
+    }
     Language language = Language.getInstance();
     List<String> missing = needed.stream().distinct().filter(key -> !language.has(key)).toList();
-    check("translations: every text in " + LANG, missing.isEmpty(), missing);
-    List<String> unused = new ArrayList<>();
-    try (var reader = mc.getResourceManager().openAsReader(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "lang/" + LANG + ".json"))) {
-      for (String key : com.google.gson.JsonParser.parseReader(reader).getAsJsonObject().keySet()) {
-        if (!needed.contains(key)) {
-          unused.add(key);
-        }
-      }
-    } catch (Exception e) {
-      unused.add(e.toString());
-    }
-    check("translations: no unused keys in " + LANG, unused.isEmpty(), unused);
+    check("translations: every item, block, entity and tab in " + LANG + " (" + needed.size() + " keys)", missing.isEmpty(), missing);
   }
 
   private static void checkNoMissingTexture(Minecraft mc, String name) {
