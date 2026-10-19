@@ -80,7 +80,6 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,8 +114,8 @@ public class ForgeEvents {
 				}
 			}
 		}
-		if (event.getTarget() instanceof LivingEntity living && event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE.get())) {
-			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 6000));
+		if (event.getTarget() instanceof LivingEntity living && event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE)) {
+			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 		}
 	}
 
@@ -185,15 +184,15 @@ public class ForgeEvents {
 
 	@SubscribeEvent
 	public static void checkIfPlagueCanApplyToMob(MobEffectEvent.Applicable event) {
-		if (event.getEffectInstance().getEffect() == RatsEffectRegistry.PLAGUE.get() && (!RatConfig.plagueSpread || event.getEntity().getType().is(RatsEntityTags.PLAGUE_IMMUNE))) {
+		if (event.getEffectInstance().getEffect() == RatsEffectRegistry.PLAGUE && (!RatConfig.plagueSpread || event.getEntity().getType().is(RatsEntityTags.PLAGUE_IMMUNE))) {
 			event.setResult(Event.Result.DENY);
 		}
 	}
 
 	@SubscribeEvent
 	public static void onHitEntity(LivingAttackEvent event) {
-		if (event.getSource().getDirectEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE.get())) {
-			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 6000));
+		if (event.getSource().getDirectEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE)) {
+			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 		}
 		int protectors = getProtectorCount(event.getEntity());
 		if (protectors > 0) {
@@ -303,7 +302,7 @@ public class ForgeEvents {
 					.withParameter(LootContextParams.KILLER_ENTITY, player)
 					.withParameter(LootContextParams.THIS_ENTITY, hook)
 					.withLuck((float) hook.luck + player.getLuck());
-			LootTable loottable = level.getServer().getLootData().getLootTable(RatsLootRegistry.RATLANTIS_FISH);
+			LootTable loottable = level.getServer().reloadableRegistries().getLootTable(RatsLootRegistry.RATLANTIS_FISH);
 			List<ItemStack> list = loottable.getRandomItems(builder.create(LootContextParamSets.FISHING));
 			event.getDrops().addAll(list);
 		}
@@ -369,12 +368,12 @@ public class ForgeEvents {
 						passenger.stopRiding();
 						Vec3 dismountPos = passenger.getDismountLocationForPassenger(event.getEntity());
 						passenger.setPos(dismountPos.x(), dismountPos.y(), dismountPos.z());
-						RatsNetworkHandler.CHANNEL.sendToServer(new DismountRatPacket(passenger.getId()));
+						RatsNetworkHandler.toServer(new DismountRatPacket(passenger.getId()));
 					}
 				}
 			}
 			handleArmSwing(event.getItemStack(), event.getEntity());
-			RatsNetworkHandler.CHANNEL.sendToServer(new SyncArmSwingPacket(event.getItemStack()));
+			RatsNetworkHandler.toServer(new SyncArmSwingPacket(event.getItemStack()));
 		}
 	}
 
@@ -394,14 +393,14 @@ public class ForgeEvents {
 
 	@SubscribeEvent
 	public static void onLivingHeal(LivingHealEvent event) {
-		if (event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE.get())) {
+		if (event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE)) {
 			event.setCanceled(true);
 		}
 	}
 
 	@SubscribeEvent
 	public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
-		if (event.getEntity().level().isClientSide() && event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE.get())) {
+		if (event.getEntity().level().isClientSide() && event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE)) {
 			RandomSource rand = event.getEntity().getRandom();
 			if (rand.nextInt(4) == 0) {
 				int entitySize = 1;
@@ -436,7 +435,7 @@ public class ForgeEvents {
 			if (rat != null) {
 				event.getEntity().swing(event.getHand());
 				if (!event.getLevel().isClientSide()) {
-					RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.getEntity()), new ManageRatStaffPacket(rat.getId(), event.getPos(), event.getFace().ordinal(), false, true, staff.getStaff(stack)));
+					RatsNetworkHandler.toPlayer((ServerPlayer) event.getEntity(), new ManageRatStaffPacket(rat.getId(), event.getPos(), event.getFace().ordinal(), false, true, staff.getStaff(stack)));
 				}
 			} else {
 				event.getEntity().displayClientMessage(Component.translatable(RatsLangConstants.RAT_STAFF_NO_RAT).withStyle(ChatFormatting.RED), true);

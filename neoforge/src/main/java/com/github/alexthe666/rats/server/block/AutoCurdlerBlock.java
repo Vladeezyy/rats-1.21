@@ -37,7 +37,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -101,7 +100,7 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 									player.getInventory().add(new ItemStack(Items.BUCKET));
 								}
 							}
-							RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new UpdateCurdlerFluidPacket(pos.asLong(), te.getTank().getFluid()));
+							RatsNetworkHandler.toTrackingBlock(level, pos, new UpdateCurdlerFluidPacket(pos.asLong(), te.getTank().getFluid()));
 						}
 					}
 				}

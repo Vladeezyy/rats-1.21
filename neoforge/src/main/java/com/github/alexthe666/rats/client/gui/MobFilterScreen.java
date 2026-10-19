@@ -102,8 +102,9 @@ public class MobFilterScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(graphics);
+	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+		// 1.21: Screen.render draws the background first, so the backdrop, the entity and the panel go here
+		super.renderBackground(graphics, mouseX, mouseY, partialTicks);
 		//render background behind entity
 		graphics.blit(TEXTURE_BACKDROP, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 		//render entity, scissor out everything around the backdrop
@@ -116,6 +117,10 @@ public class MobFilterScreen extends Screen {
 		graphics.disableScissor();
 		//render normal GUI
 		graphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 		super.render(graphics, mouseX, mouseY, partialTicks);
 		//draw title
 		graphics.drawString(this.font, this.title, this.leftPos + 7, this.topPos + 7, 4210752, false);
@@ -322,7 +327,7 @@ public class MobFilterScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		RatsNetworkHandler.CHANNEL.sendToServer(new UpdateMobFilterPacket(this.hand, this.isWhitelist, this.selectedMobs));
+		RatsNetworkHandler.toServer(new UpdateMobFilterPacket(this.hand, this.isWhitelist, this.selectedMobs));
 		super.onClose();
 	}
 

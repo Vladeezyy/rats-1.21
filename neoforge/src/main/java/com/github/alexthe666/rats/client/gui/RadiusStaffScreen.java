@@ -40,7 +40,7 @@ public class RadiusStaffScreen extends Screen {
 		Component secondText = Component.translatable(RatsLangConstants.RAT_STAFF_RESET_RADIUS);
 		int maxLength = Math.max(150, Minecraft.getInstance().font.width(topText.getString()) + 20);
 		this.addRenderableWidget(Button.builder(topText, button -> {
-			RatsNetworkHandler.CHANNEL.sendToServer(new SyncRatStaffPacket(this.rat.getId(), this.pos, Direction.UP, 4, 0));
+			RatsNetworkHandler.toServer(new SyncRatStaffPacket(this.rat.getId(), this.pos, Direction.UP, 4, 0));
 			this.rat.setRadiusCenter(GlobalPos.of(this.rat.level().dimension(), this.pos));
 			this.sliderValue = this.rat.getRadius();
 		}).bounds(i - maxLength / 2, j + 60, maxLength, 20).build());
@@ -58,12 +58,12 @@ public class RadiusStaffScreen extends Screen {
 			@Override
 			protected void applyValue() {
 				RadiusStaffScreen.this.sliderValue = Mth.floor(Mth.clampedLerp(0, RatConfig.maxRatRadius, this.value));
-				RatsNetworkHandler.CHANNEL.sendToServer(new SyncRatStaffPacket(rat.getId(), BlockPos.ZERO, Direction.UP, 5, RadiusStaffScreen.this.sliderValue));
+				RatsNetworkHandler.toServer(new SyncRatStaffPacket(rat.getId(), BlockPos.ZERO, Direction.UP, 5, RadiusStaffScreen.this.sliderValue));
 				RadiusStaffScreen.this.rat.setRadius(RadiusStaffScreen.this.sliderValue);
 			}
 		});
 		this.addRenderableWidget(Button.builder(secondText, button -> {
-			RatsNetworkHandler.CHANNEL.sendToServer(new SyncRatStaffPacket(this.rat.getId(), BlockPos.ZERO, Direction.UP, 6, 0));
+			RatsNetworkHandler.toServer(new SyncRatStaffPacket(this.rat.getId(), BlockPos.ZERO, Direction.UP, 6, 0));
 			this.sliderValue = RatConfig.defaultRatRadius;
 			this.rat.setRadiusCenter(null);
 			this.rat.setRadius(RatConfig.defaultRatRadius);
@@ -72,8 +72,6 @@ public class RadiusStaffScreen extends Screen {
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(graphics);
-
 		super.render(graphics, mouseX, mouseY, partialTicks);
 		int i = (this.width - 248) / 2 + 10;
 		int j = (this.height - 166) / 2 + 8;

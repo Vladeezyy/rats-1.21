@@ -65,7 +65,7 @@ import java.util.function.Predicate;
 public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 
 	private static final EntityDataAccessor<Boolean> WILL_DESPAWN = SynchedEntityData.defineId(PlagueDoctor.class, EntityDataSerializers.BOOLEAN);
-	private static final Predicate<LivingEntity> PLAGUE_PREDICATE = entity -> entity != null && (entity.hasEffect(RatsEffectRegistry.PLAGUE.get()) || entity.getType().is(RatsEntityTags.PLAGUE_LEGION) || (entity instanceof Rat rat && rat.hasPlague()));
+	private static final Predicate<LivingEntity> PLAGUE_PREDICATE = entity -> entity != null && (entity.hasEffect(RatsEffectRegistry.PLAGUE) || entity.getType().is(RatsEntityTags.PLAGUE_LEGION) || (entity instanceof Rat rat && rat.hasPlague()));
 
 	private BlockPos wanderTarget;
 	private int despawnDelay;
@@ -223,7 +223,7 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 	public boolean canHoldItem(ItemStack stack) {
 		Item item = stack.getItem();
 		ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-		return itemstack.isEmpty() || (item.isEdible() && !itemstack.getItem().isEdible());
+		return itemstack.isEmpty() || (item.has(net.minecraft.core.component.DataComponents.FOOD) && !itemstack.getItem().has(net.minecraft.core.component.DataComponents.FOOD));
 	}
 
 	@Override

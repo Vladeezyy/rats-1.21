@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
@@ -41,14 +42,14 @@ public class DragonRatUpgradeItem extends BaseFlightRatUpgradeItem implements St
 	}
 
 	@Override
-	public Map<Attribute, Double> getAttributeBoosts() {
+	public Map<Holder<Attribute>, Double> getAttributeBoosts() {
 		return Map.of(Attributes.MAX_HEALTH, RatConfig.dragonHealthUpgrade, Attributes.ARMOR, RatConfig.dragonArmorUpgrade, Attributes.ATTACK_DAMAGE, RatConfig.dragonDamageUpgrade);
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
 		super.appendHoverText(stack, level, tooltip, flag);
-		this.getAttributeBoosts().forEach((attribute, aDouble) -> tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_STAT_BOOST, aDouble.toString(), Component.translatable(attribute.getDescriptionId())).withStyle(ChatFormatting.AQUA)));
+		this.getAttributeBoosts().forEach((attribute, aDouble) -> tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_STAT_BOOST, aDouble.toString(), Component.translatable(attribute.value().getDescriptionId())).withStyle(ChatFormatting.AQUA)));
 	}
 
 	@Override

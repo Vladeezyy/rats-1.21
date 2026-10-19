@@ -54,11 +54,11 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 		}));
 		this.addRenderableWidget(new CycleResultButton(this.leftPos + 100, this.topPos + 58, false, button -> {
 			this.table.incrementRecipeIndex(false);
-			RatsNetworkHandler.CHANNEL.sendToServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), false));
+			RatsNetworkHandler.toServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), false));
 		}));
 		this.addRenderableWidget(new CycleResultButton(this.leftPos + 100, this.topPos + 28, true, button -> {
 			this.table.incrementRecipeIndex(true);
-			RatsNetworkHandler.CHANNEL.sendToServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), true));
+			RatsNetworkHandler.toServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), true));
 		}));
 		this.addWidget(this.recipeBook);
 	}
@@ -71,9 +71,8 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(graphics);
 		if (this.recipeBook.isVisible() && this.widthTooNarrow) {
-			this.renderBg(graphics, partialTicks, mouseX, mouseY);
+			this.renderBackground(graphics, mouseX, mouseY, partialTicks);
 			this.recipeBook.render(graphics, mouseX, mouseY, partialTicks);
 		} else {
 			this.recipeBook.render(graphics, mouseX, mouseY, partialTicks);
@@ -109,7 +108,6 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 
 	@Override
 	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		this.renderBackground(graphics);
 		graphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 		int l = this.table.getCookProgressionScaled();
 		graphics.blit(TEXTURE, this.leftPos + 96, this.topPos + 39, 0, 211, l, 16);

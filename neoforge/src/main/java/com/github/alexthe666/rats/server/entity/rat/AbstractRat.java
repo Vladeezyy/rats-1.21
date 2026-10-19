@@ -141,7 +141,7 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 					this.onItemEaten();
 				}
 				int healAmount = 1;
-				if (this.getMainHandItem().getItem().isEdible()) {
+				if (this.getMainHandItem().getItem().has(net.minecraft.core.component.DataComponents.FOOD)) {
 					healAmount = Objects.requireNonNull(this.getMainHandItem().getItem().getFoodProperties(this.getMainHandItem(), this)).getNutrition();
 				}
 				this.heal(healAmount);

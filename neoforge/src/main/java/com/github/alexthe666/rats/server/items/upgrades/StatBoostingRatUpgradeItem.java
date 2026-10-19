@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.StatBoostingUpgrade;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
@@ -17,21 +18,21 @@ import java.util.function.Supplier;
 
 public class StatBoostingRatUpgradeItem extends BaseRatUpgradeItem implements StatBoostingUpgrade {
 
-	private final Supplier<Map<Attribute, Double>> statChanges;
+	private final Supplier<Map<Holder<Attribute>, Double>> statChanges;
 	private final boolean regens;
 
-	public StatBoostingRatUpgradeItem(Properties properties, int rarity, Supplier<Map<Attribute, Double>> statChanges) {
+	public StatBoostingRatUpgradeItem(Properties properties, int rarity, Supplier<Map<Holder<Attribute>, Double>> statChanges) {
 		this(properties, rarity, 0, statChanges, false);
 	}
 
-	public StatBoostingRatUpgradeItem(Properties properties, int rarity, int textLength, Supplier<Map<Attribute, Double>> statChanges, boolean regens) {
+	public StatBoostingRatUpgradeItem(Properties properties, int rarity, int textLength, Supplier<Map<Holder<Attribute>, Double>> statChanges, boolean regens) {
 		super(properties, rarity, textLength);
 		this.statChanges = statChanges;
 		this.regens = regens;
 	}
 
 	@Override
-	public Map<Attribute, Double> getAttributeBoosts() {
+	public Map<Holder<Attribute>, Double> getAttributeBoosts() {
 		return this.statChanges.get();
 	}
 
@@ -45,7 +46,7 @@ public class StatBoostingRatUpgradeItem extends BaseRatUpgradeItem implements St
 		super.appendHoverText(stack, level, tooltip, flag);
 		this.statChanges.get().forEach((attribute, aDouble) -> {
 			if (aDouble > 0.0D) {
-				tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_STAT_BOOST, aDouble.toString(), Component.translatable(attribute.getDescriptionId())).withStyle(ChatFormatting.AQUA));
+				tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_STAT_BOOST, aDouble.toString(), Component.translatable(attribute.value().getDescriptionId())).withStyle(ChatFormatting.AQUA));
 			}
 		});
 

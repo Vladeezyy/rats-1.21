@@ -1,16 +1,30 @@
 package com.github.alexthe666.rats.server.message;
 
+import net.minecraft.server.level.ServerPlayer;
+import com.github.alexthe666.rats.RatsMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
 
-public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int duration, byte flags) {
+public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int duration, byte flags) implements CustomPacketPayload {
+
+	public static final Type<SyncPlaguePacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "sync_plague"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, SyncPlaguePacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), SyncPlaguePacket::decode);
+
+	@Override
+	public Type<SyncPlaguePacket> type() {
+		return TYPE;
+	}
+
 	private static final int FLAG_AMBIENT = 1;
 	private static final int FLAG_VISIBLE = 2;
 	private static final int FLAG_SHOW_ICON = 4;
@@ -48,11 +62,11 @@ public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int 
 		return (this.flags() & 4) == 4;
 	}
 
-	public static SyncPlaguePacket decode(FriendlyByteBuf buf) {
+	public static SyncPlaguePacket decode(RegistryFriendlyByteBuf buf) {
 		return new SyncPlaguePacket(buf.readVarInt(), buf.readByte(), buf.readByte(), buf.readVarInt(), buf.readByte());
 	}
 
-	public static void encode(SyncPlaguePacket packet, FriendlyByteBuf buf) {
+	public static void encode(SyncPlaguePacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeVarInt(packet.entityId());
 		buf.writeByte(packet.effectId());
 		buf.writeByte(packet.amplifier());
@@ -62,8 +76,8 @@ public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int 
 
 	public static class Handler {
 		@SuppressWarnings("Convert2Lambda")
-		public static void handle(SyncPlaguePacket packet, Supplier<NetworkEvent.Context> context) {
-			context.get().enqueueWork(new Runnable() {
+		public static void handle(SyncPlaguePacket packet, IPayloadContext context) {
+			context.enqueueWork(new Runnable() {
 				@Override
 				public void run() {
 					if (Minecraft.getInstance().level == null) {
@@ -84,7 +98,6 @@ public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int 
 					}
 				}
 			});
-			context.get().setPacketHandled(true);
 		}
 	}
 }

@@ -134,7 +134,7 @@ public class PlagueCloud extends Monster {
 	public boolean doHurtTarget(Entity entity) {
 		boolean flag = super.doHurtTarget(entity);
 		if (flag && entity instanceof LivingEntity living) {
-			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 600));
+			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 600));
 		}
 		return flag;
 	}

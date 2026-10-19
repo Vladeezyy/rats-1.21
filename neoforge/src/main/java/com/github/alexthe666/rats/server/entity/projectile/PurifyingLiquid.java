@@ -74,8 +74,8 @@ public class PurifyingLiquid extends ThrowableItemProjectile {
 								if (living instanceof Rat rat && rat.hasPlague()) {
 									rat.setPlagued(false);
 								}
-								if (living.hasEffect(RatsEffectRegistry.PLAGUE.get())) {
-									living.removeEffect(RatsEffectRegistry.PLAGUE.get());
+								if (living.hasEffect(RatsEffectRegistry.PLAGUE)) {
+									living.removeEffect(RatsEffectRegistry.PLAGUE);
 								}
 								if (living.getType().is(RatsEntityTags.PLAGUE_LEGION)) {
 									living.hurt(this.damageSources().magic(), 10);

@@ -1,39 +1,84 @@
 package com.github.alexthe666.rats.server.message;
 
-import com.github.alexthe666.rats.RatsMod;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-public class RatsNetworkHandler {
+/**
+ * The packets of Rats and who receives them. The original sent the state of single entities and blocks (a rat's
+ * fluid, a thrown block, the curdler's tank) to every player on the server; here it goes to the players that see them.
+ */
+public final class RatsNetworkHandler {
 
-	private static final String PROTOCOL_VERSION = "1";
-	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-			ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "channel"),
-			() -> PROTOCOL_VERSION,
-			PROTOCOL_VERSION::equals,
-			PROTOCOL_VERSION::equals
-	);
+	private RatsNetworkHandler() {
+	}
 
-	@SuppressWarnings("UnusedAssignment")
-	public static void init() {
-		int id = 0;
-		CHANNEL.registerMessage(id++, ChangeRatlantisStatusPacket.class, ChangeRatlantisStatusPacket::encode, ChangeRatlantisStatusPacket::decode, ChangeRatlantisStatusPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, ClearRatRecipePacket.class, ClearRatRecipePacket::encode, ClearRatRecipePacket::decode, ClearRatRecipePacket.Handler::handle);
-		CHANNEL.registerMessage(id++, CycleRatRecipePacket.class, CycleRatRecipePacket::encode, CycleRatRecipePacket::decode, CycleRatRecipePacket.Handler::handle);
-		CHANNEL.registerMessage(id++, DismountRatPacket.class, DismountRatPacket::encode, DismountRatPacket::decode, DismountRatPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, ManageRatStaffPacket.class, ManageRatStaffPacket::encode, ManageRatStaffPacket::decode, ManageRatStaffPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, OpenRatScreenPacket.class, OpenRatScreenPacket::encode, OpenRatScreenPacket::decode, OpenRatScreenPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, RatCommandPacket.class, RatCommandPacket::encode, RatCommandPacket::decode, RatCommandPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, RatUpgradeVisibilityPacket.class, RatUpgradeVisibilityPacket::encode, RatUpgradeVisibilityPacket::decode, RatUpgradeVisibilityPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SetDancingRatPacket.class, SetDancingRatPacket::encode, SetDancingRatPacket::decode, SetDancingRatPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SyncArmSwingPacket.class, SyncArmSwingPacket::encode, SyncArmSwingPacket::decode, SyncArmSwingPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SyncPlaguePacket.class, SyncPlaguePacket::encode, SyncPlaguePacket::decode, SyncPlaguePacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SyncRatStaffPacket.class, SyncRatStaffPacket::encode, SyncRatStaffPacket::decode, SyncRatStaffPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SyncRatTagPacket.class, SyncRatTagPacket::encode, SyncRatTagPacket::decode, SyncRatTagPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, SyncThrownBlockPacket.class, SyncThrownBlockPacket::encode, SyncThrownBlockPacket::decode, SyncThrownBlockPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, UpdateCurdlerFluidPacket.class, UpdateCurdlerFluidPacket::encode, UpdateCurdlerFluidPacket::decode, UpdateCurdlerFluidPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, UpdateMobFilterPacket.class, UpdateMobFilterPacket::encode, UpdateMobFilterPacket::decode, UpdateMobFilterPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, UpdateRatFluidPacket.class, UpdateRatFluidPacket::encode, UpdateRatFluidPacket::decode, UpdateRatFluidPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, UpdateRatMusicPacket.class, UpdateRatMusicPacket::encode, UpdateRatMusicPacket::decode, UpdateRatMusicPacket.Handler::handle);
-		CHANNEL.registerMessage(id++, UpdateSelectedRatPacket.class, UpdateSelectedRatPacket::encode, UpdateSelectedRatPacket::decode, UpdateSelectedRatPacket.Handler::handle);
+	public static void register(RegisterPayloadHandlersEvent event) {
+		PayloadRegistrar registrar = event.registrar("1");
+		// server -> client
+		toClient(registrar, ChangeRatlantisStatusPacket.TYPE, ChangeRatlantisStatusPacket.CODEC, ChangeRatlantisStatusPacket.Handler::handle);
+		toClient(registrar, ManageRatStaffPacket.TYPE, ManageRatStaffPacket.CODEC, ManageRatStaffPacket.Handler::handle);
+		toClient(registrar, OpenRatScreenPacket.TYPE, OpenRatScreenPacket.CODEC, OpenRatScreenPacket.Handler::handle);
+		toClient(registrar, SyncPlaguePacket.TYPE, SyncPlaguePacket.CODEC, SyncPlaguePacket.Handler::handle);
+		toClient(registrar, UpdateCurdlerFluidPacket.TYPE, UpdateCurdlerFluidPacket.CODEC, UpdateCurdlerFluidPacket.Handler::handle);
+		toClient(registrar, UpdateRatMusicPacket.TYPE, UpdateRatMusicPacket.CODEC, UpdateRatMusicPacket.Handler::handle);
+		toClient(registrar, UpdateSelectedRatPacket.TYPE, UpdateSelectedRatPacket.CODEC, UpdateSelectedRatPacket.Handler::handle);
+		toClient(registrar, UpdateRatFluidPacket.TYPE, UpdateRatFluidPacket.CODEC, UpdateRatFluidPacket.Handler::handle);
+		toClient(registrar, SyncThrownBlockPacket.TYPE, SyncThrownBlockPacket.CODEC, SyncThrownBlockPacket.Handler::handle);
+		// client -> server
+		toServer(registrar, ClearRatRecipePacket.TYPE, ClearRatRecipePacket.CODEC, ClearRatRecipePacket.Handler::handle);
+		toServer(registrar, CycleRatRecipePacket.TYPE, CycleRatRecipePacket.CODEC, CycleRatRecipePacket.Handler::handle);
+		toServer(registrar, DismountRatPacket.TYPE, DismountRatPacket.CODEC, DismountRatPacket.Handler::handle);
+		toServer(registrar, RatCommandPacket.TYPE, RatCommandPacket.CODEC, RatCommandPacket.Handler::handle);
+		toServer(registrar, RatUpgradeVisibilityPacket.TYPE, RatUpgradeVisibilityPacket.CODEC, RatUpgradeVisibilityPacket.Handler::handle);
+		toServer(registrar, SetDancingRatPacket.TYPE, SetDancingRatPacket.CODEC, SetDancingRatPacket.Handler::handle);
+		toServer(registrar, SyncArmSwingPacket.TYPE, SyncArmSwingPacket.CODEC, SyncArmSwingPacket.Handler::handle);
+		toServer(registrar, SyncRatStaffPacket.TYPE, SyncRatStaffPacket.CODEC, SyncRatStaffPacket.Handler::handle);
+		toServer(registrar, SyncRatTagPacket.TYPE, SyncRatTagPacket.CODEC, SyncRatTagPacket.Handler::handle);
+		toServer(registrar, UpdateMobFilterPacket.TYPE, UpdateMobFilterPacket.CODEC, UpdateMobFilterPacket.Handler::handle);
+	}
+
+	private static <T extends CustomPacketPayload> void toClient(PayloadRegistrar registrar, CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, IPayloadHandler<T> handler) {
+		registrar.playToClient(type, codec, handler);
+	}
+
+	private static <T extends CustomPacketPayload> void toServer(PayloadRegistrar registrar, CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, IPayloadHandler<T> handler) {
+		registrar.playToServer(type, codec, handler);
+	}
+
+	public static void toServer(CustomPacketPayload payload) {
+		PacketDistributor.sendToServer(payload);
+	}
+
+	public static void toPlayer(ServerPlayer player, CustomPacketPayload payload) {
+		PacketDistributor.sendToPlayer(player, payload);
+	}
+
+	public static void toTracking(Entity entity, CustomPacketPayload payload) {
+		PacketDistributor.sendToPlayersTrackingEntity(entity, payload);
+	}
+
+	public static void toTrackingAndSelf(Entity entity, CustomPacketPayload payload) {
+		PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, payload);
+	}
+
+	public static void toTrackingBlock(Level level, BlockPos pos, CustomPacketPayload payload) {
+		if (level instanceof ServerLevel server) {
+			PacketDistributor.sendToPlayersTrackingChunk(server, new ChunkPos(pos), payload);
+		}
+	}
+
+	public static void toAll(CustomPacketPayload payload) {
+		PacketDistributor.sendToAllPlayers(payload);
 	}
 }

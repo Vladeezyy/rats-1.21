@@ -39,7 +39,7 @@ public class RatlantisBlockRegistry {
 			return Block.box(5.0D, 0.0D, 5.0D, 11.0D, 13.0D, 11.0D).move(vec3.x(), vec3.y(), vec3.z());
 		}
 	});
-	public static final DeferredHolder<Block, Block> POTTED_RATGLOVE_FLOWER = BLOCKS.register("potted_ratglove_flower", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RATGLOVE_FLOWER, BlockBehaviour.Properties.copy(Blocks.FLOWER_POT)));
+	public static final DeferredHolder<Block, Block> POTTED_RATGLOVE_FLOWER = BLOCKS.register("potted_ratglove_flower", () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RATGLOVE_FLOWER, BlockBehaviour.Properties.ofFullCopy(Blocks.FLOWER_POT)));
 	public static final DeferredHolder<Block, Block> CHUNKY_CHEESE_TOKEN = register("chunky_cheese_token", () -> new ChunkyCheeseTokenBlock(BlockBehaviour.Properties.of().sound(SoundType.METAL).noOcclusion().strength(2.0F, 1000.0F)));
 	public static final DeferredHolder<Block, Block> CHEESE_ORE = register("cheese_ore", () -> new Block(BlockBehaviour.Properties.of().sound(SoundType.STONE).requiresCorrectToolForDrops().strength(2.0F, 3.0F)));
 	public static final DeferredHolder<Block, Block> RATLANTEAN_GEM_ORE = register("ratlantean_gem_ore", () -> new Block(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().sound(SoundType.STONE).strength(10.0F, 100.0F)));
@@ -93,36 +93,36 @@ public class RatlantisBlockRegistry {
 		}
 	});
 	public static final DeferredHolder<Block, Block> PIRAT_PLANKS = register("pirat_planks", () -> new HalfTransparentBlock(Block.Properties.of().ignitedByLava().mapColor(MapColor.COLOR_GREEN).lightLevel(value -> 3).noOcclusion().strength(2.0F, 3.0F).sound(SoundType.WOOD)));
-	public static final DeferredHolder<Block, Block> PIRAT_PRESSURE_PLATE = register("pirat_pressure_plate", () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET));
-	public static final DeferredHolder<Block, Block> PIRAT_TRAPDOOR = register("pirat_trapdoor", () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()), RatsMod.PIRAT_WOOD_SET));
-	public static final DeferredHolder<Block, Block> PIRAT_STAIRS = register("pirat_stairs", () -> new StairBlock(() -> PIRAT_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion()));
-	public static final DeferredHolder<Block, Block> PIRAT_BUTTON = register("pirat_button", () -> new ButtonBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET, 30, true));
-	public static final DeferredHolder<Block, Block> PIRAT_SLAB = register("pirat_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion()));
-	public static final DeferredHolder<Block, Block> PIRAT_FENCE_GATE = register("pirat_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_TYPE));
-	public static final DeferredHolder<Block, Block> PIRAT_FENCE = register("pirat_fence", () -> new FenceBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion()));
-	public static final DeferredHolder<Block, Block> PIRAT_DOOR = register("pirat_door", () -> new DoorBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET));
-	public static final DeferredHolder<Block, Block> PIRAT_SIGN = BLOCKS.register("pirat_sign", () -> new StandingSignBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
+	public static final DeferredHolder<Block, Block> PIRAT_PRESSURE_PLATE = register("pirat_pressure_plate", () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET));
+	public static final DeferredHolder<Block, Block> PIRAT_TRAPDOOR = register("pirat_trapdoor", () -> new TrapDoorBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()), RatsMod.PIRAT_WOOD_SET));
+	public static final DeferredHolder<Block, Block> PIRAT_STAIRS = register("pirat_stairs", () -> new StairBlock(() -> PIRAT_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion()));
+	public static final DeferredHolder<Block, Block> PIRAT_BUTTON = register("pirat_button", () -> new ButtonBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET, 30, true));
+	public static final DeferredHolder<Block, Block> PIRAT_SLAB = register("pirat_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion()));
+	public static final DeferredHolder<Block, Block> PIRAT_FENCE_GATE = register("pirat_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_TYPE));
+	public static final DeferredHolder<Block, Block> PIRAT_FENCE = register("pirat_fence", () -> new FenceBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion()));
+	public static final DeferredHolder<Block, Block> PIRAT_DOOR = register("pirat_door", () -> new DoorBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noOcclusion(), RatsMod.PIRAT_WOOD_SET));
+	public static final DeferredHolder<Block, Block> PIRAT_SIGN = BLOCKS.register("pirat_sign", () -> new StandingSignBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 			return new PiratSignBlockEntity(pos, state);
 		}
 	});
 
-	public static final DeferredHolder<Block, Block> PIRAT_WALL_SIGN = BLOCKS.register("pirat_wall_sign", () -> new WallSignBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).dropsLike(PIRAT_SIGN.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
+	public static final DeferredHolder<Block, Block> PIRAT_WALL_SIGN = BLOCKS.register("pirat_wall_sign", () -> new WallSignBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).dropsLike(PIRAT_SIGN.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 			return new PiratSignBlockEntity(pos, state);
 		}
 	});
 
-	public static final DeferredHolder<Block, Block> PIRAT_HANGING_SIGN = BLOCKS.register("pirat_hanging_sign", () -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
+	public static final DeferredHolder<Block, Block> PIRAT_HANGING_SIGN = BLOCKS.register("pirat_hanging_sign", () -> new CeilingHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 			return new PiratHangingSignBlockEntity(pos, state);
 		}
 	});
 
-	public static final DeferredHolder<Block, Block> PIRAT_WALL_HANGING_SIGN = BLOCKS.register("pirat_wall_hanging_sign", () -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(PIRAT_PLANKS.get()).dropsLike(PIRAT_HANGING_SIGN.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
+	public static final DeferredHolder<Block, Block> PIRAT_WALL_HANGING_SIGN = BLOCKS.register("pirat_wall_hanging_sign", () -> new WallHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(PIRAT_PLANKS.get()).dropsLike(PIRAT_HANGING_SIGN.get()).noCollission().noOcclusion().strength(1.0F), RatsMod.PIRAT_WOOD_TYPE) {
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 			return new PiratHangingSignBlockEntity(pos, state);

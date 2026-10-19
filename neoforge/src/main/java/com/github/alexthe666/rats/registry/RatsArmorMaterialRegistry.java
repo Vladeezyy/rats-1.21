@@ -1,156 +1,70 @@
 package com.github.alexthe666.rats.registry;
 
+import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
-public enum RatsArmorMaterialRegistry implements ArmorMaterial {
-	PIPER_HAT("piper_hat", 25, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 2);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(RatsBlockRegistry.PIED_WOOL.get()))),
-	CHEF_TOQUE("chef_toque", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Blocks.WHITE_WOOL))),
-	PLAGUE_MASK("plague_mask", 25, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 3);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 1.0F, 0.0F, () -> Ingredient.of(new ItemStack(RatsItemRegistry.PLAGUE_ESSENCE.get()))),
-	RATLANTIS("ratlantis", 40, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 5);
-		map.put(ArmorItem.Type.LEGGINGS, 8);
-		map.put(ArmorItem.Type.CHESTPLATE, 10);
-		map.put(ArmorItem.Type.HELMET, 5);
-	}), 17, SoundEvents.ARMOR_EQUIP_NETHERITE, 4.0F, 0.1F, () -> Ingredient.of(new ItemStack(RatlantisItemRegistry.ORATCHALCUM_INGOT.get()))),
+/**
+ * Armor materials (1.21: registry entries; the 1.20.1 original was an enum). Values as in the original. Durability is
+ * an item property in 1.21: {@link #durability} gives the original's value (multiplier x vanilla base per slot).
+ */
+public final class RatsArmorMaterialRegistry {
+	public static final DeferredRegister<ArmorMaterial> MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RatsMod.MODID);
+	private static final Map<String, Integer> DURABILITY_MULTIPLIERS = new HashMap<>();
 
-	FARMER_HAT("farmer_hat", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.HAY_BLOCK))),
-	TOP_HAT("top_hat", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.BLACK_WOOL))),
-	FEZ("fez", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 100, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.RED_WOOL))),
-	SANTA_HAT("santa_hat", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.RED_WOOL))),
-	HALO("halo", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.GOLD_NUGGET))),
-	CROWN("crown", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.GOLD_INGOT))),
-	GHOST_HAT("ghost_hat", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_ECTOPLASM.get()))),
-	GENERIC_HAT("generic_hat", 0, Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-		map.put(ArmorItem.Type.BOOTS, 1);
-		map.put(ArmorItem.Type.LEGGINGS, 1);
-		map.put(ArmorItem.Type.CHESTPLATE, 1);
-		map.put(ArmorItem.Type.HELMET, 1);
-	}), 100, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(new ItemStack(Items.LEATHER)));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> PIPER_HAT = register("piper_hat", 25, defense(1, 1, 1, 2), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(RatsBlockRegistry.PIED_WOOL.get()));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> CHEF_TOQUE = register("chef_toque", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Blocks.WHITE_WOOL));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> PLAGUE_MASK = register("plague_mask", 25, defense(1, 1, 1, 3), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 1.0F, 0.0F, () -> Ingredient.of(RatsItemRegistry.PLAGUE_ESSENCE.get()));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> RATLANTIS = register("ratlantis", 40, defense(5, 8, 10, 5), 17, SoundEvents.ARMOR_EQUIP_NETHERITE, 4.0F, 0.1F, () -> Ingredient.of(RatlantisItemRegistry.ORATCHALCUM_INGOT.get()));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> FARMER_HAT = register("farmer_hat", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.HAY_BLOCK));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> TOP_HAT = register("top_hat", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.BLACK_WOOL));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> FEZ = register("fez", 0, defense(1, 1, 1, 1), 100, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.RED_WOOL));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> SANTA_HAT = register("santa_hat", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.RED_WOOL));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> HALO = register("halo", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.GOLD_NUGGET));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> CROWN = register("crown", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.GOLD_INGOT));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> GHOST_HAT = register("ghost_hat", 0, defense(1, 1, 1, 1), 15, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(RatlantisItemRegistry.GHOST_PIRAT_ECTOPLASM.get()));
+	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> GENERIC_HAT = register("generic_hat", 0, defense(1, 1, 1, 1), 100, SoundEvents.ARMOR_EQUIP_GENERIC, 0.0F, 0.0F, () -> Ingredient.of(Items.LEATHER));
 
-	private static final EnumMap<ArmorItem.Type, Integer> HEALTH_FUNCTION_FOR_TYPE = Util.make(new EnumMap<>(ArmorItem.Type.class), (p_266653_) -> {
-		p_266653_.put(ArmorItem.Type.BOOTS, 13);
-		p_266653_.put(ArmorItem.Type.LEGGINGS, 15);
-		p_266653_.put(ArmorItem.Type.CHESTPLATE, 16);
-		p_266653_.put(ArmorItem.Type.HELMET, 11);
-	});
-	private final String name;
-	private final int durabilityMultiplier;
-	private final EnumMap<ArmorItem.Type, Integer> protectionFunctionForType;
-	private final int enchantability;
-	private final SoundEvent equipSound;
-	private final float toughness;
-	private final float knockback;
-	private final Supplier<Ingredient> repairMaterial;
-
-	RatsArmorMaterialRegistry(String name, int durability, EnumMap<ArmorItem.Type, Integer> damageReduction, int enchantability, SoundEvent sound, float toughness, float knockback, Supplier<Ingredient> repairMaterial) {
-		this.name = name;
-		this.durabilityMultiplier = durability;
-		this.protectionFunctionForType = damageReduction;
-		this.enchantability = enchantability;
-		this.equipSound = sound;
-		this.toughness = toughness;
-		this.knockback = knockback;
-		this.repairMaterial = repairMaterial;
+	private RatsArmorMaterialRegistry() {
 	}
 
-	@Override
-	public String getName() {
-		return this.name;
+	/** boots, leggings, chestplate, helmet */
+	private static EnumMap<ArmorItem.Type, Integer> defense(int boots, int leggings, int chestplate, int helmet) {
+		return Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+			map.put(ArmorItem.Type.BOOTS, boots);
+			map.put(ArmorItem.Type.LEGGINGS, leggings);
+			map.put(ArmorItem.Type.CHESTPLATE, chestplate);
+			map.put(ArmorItem.Type.HELMET, helmet);
+			map.put(ArmorItem.Type.BODY, chestplate);
+		});
 	}
 
-	@Override
-	public int getDurabilityForType(ArmorItem.Type type) {
-		return HEALTH_FUNCTION_FOR_TYPE.get(type) * this.durabilityMultiplier;
+	private static DeferredHolder<ArmorMaterial, ArmorMaterial> register(String name, int durabilityMultiplier, EnumMap<ArmorItem.Type, Integer> defense, int enchantability, Holder<SoundEvent> sound, float toughness, float knockback, Supplier<Ingredient> repair) {
+		DURABILITY_MULTIPLIERS.put(name, durabilityMultiplier);
+		List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name)));
+		return MATERIALS.register(name, () -> new ArmorMaterial(defense, enchantability, sound, repair, layers, toughness, knockback));
 	}
 
-	@Override
-	public int getDefenseForType(ArmorItem.Type type) {
-		return this.protectionFunctionForType.get(type);
-	}
-
-	@Override
-	public int getEnchantmentValue() {
-		return enchantability;
-	}
-
-	@Override
-	public SoundEvent getEquipSound() {
-		return equipSound;
-	}
-
-	@Override
-	public float getToughness() {
-		return toughness;
-	}
-
-	@Override
-	public Ingredient getRepairIngredient() {
-		return repairMaterial.get();
-	}
-
-	@Override
-	public float getKnockbackResistance() {
-		return this.knockback;
+	/** The item durability the 1.20.1 material gave (0: no durability) */
+	public static int durability(Holder<ArmorMaterial> material, ArmorItem.Type type) {
+		int multiplier = DURABILITY_MULTIPLIERS.getOrDefault(material.unwrapKey().orElseThrow().location().getPath(), 0);
+		return multiplier == 0 ? 0 : type.getDurability(multiplier);
 	}
 }

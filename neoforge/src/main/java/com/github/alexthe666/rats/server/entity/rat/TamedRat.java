@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.core.Holder;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
 import com.github.alexthe666.rats.server.misc.StoredItems;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
@@ -97,7 +98,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
@@ -156,7 +156,7 @@ public class TamedRat extends InventoryRat {
 	public int randomEffectCooldown = 0;
 	private int updateNavigationCooldown;
 	public boolean isCurrentlyWorking;
-	private final Multimap<Attribute, AttributeModifier> attributeChanges = HashMultimap.create();
+	private final Multimap<Holder<Attribute>, AttributeModifier> attributeChanges = HashMultimap.create();
 
 	public TamedRat(EntityType<? extends TamableAnimal> type, Level level) {
 		super(type, level);
@@ -953,7 +953,7 @@ public class TamedRat extends InventoryRat {
 				SelectedRats.of(player).ifPresent(cap -> cap.setSelectedRat(this));
 				player.swing(hand);
 				if (!this.level().isClientSide() && player instanceof ServerPlayer sp) {
-					RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new ManageRatStaffPacket(this.getId(), BlockPos.ZERO, Direction.NORTH.ordinal(), false, false));
+					RatsNetworkHandler.toPlayer(sp, new ManageRatStaffPacket(this.getId(), BlockPos.ZERO, Direction.NORTH.ordinal(), false, false));
 				}
 				player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_STAFF_BIND, this.getName()), true);
 				return InteractionResult.SUCCESS;
@@ -1294,8 +1294,9 @@ public class TamedRat extends InventoryRat {
 		this.setNoGravity(RatUpgradeUtils.hasUpgrade(this, RatlantisItemRegistry.RAT_UPGRADE_ETHEREAL.get()) || this.isFlying());
 	}
 
-	public void tryIncreaseStat(String itemName, Attribute stat, double value) {
-		AttributeModifier modifier = new AttributeModifier(itemName + " " + Component.translatable(stat.getDescriptionId()).getString() + " Modifier", value, AttributeModifier.Operation.ADD_VALUE);
+	public void tryIncreaseStat(String itemName, Holder<Attribute> stat, double value) {
+		// 1.21: modifiers have ids; one per boost of this rat (two equal upgrades in a combined upgrade both count)
+		AttributeModifier modifier = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "upgrade_boost_" + this.attributeChanges.size()), value, AttributeModifier.Operation.ADD_VALUE);
 		Objects.requireNonNull(this.getAttribute(stat)).addTransientModifier(modifier);
 		this.attributeChanges.put(stat, modifier);
 	}
@@ -1332,7 +1333,7 @@ public class TamedRat extends InventoryRat {
 		this.setDancing(partying);
 		this.jukeboxPos = pos;
 		if (this.level().isClientSide()) {
-			RatsNetworkHandler.CHANNEL.sendToServer(new SetDancingRatPacket(this.getId(), partying, pos.asLong(), moves));
+			RatsNetworkHandler.toServer(new SetDancingRatPacket(this.getId(), partying, pos.asLong(), moves));
 		}
 	}
 

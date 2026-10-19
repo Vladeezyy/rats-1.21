@@ -84,7 +84,7 @@ public class ForgeClientEvents {
 	public static void adjustSynesthesiaFOV(ViewportEvent.ComputeFov event) {
 		if (RatConfig.synesthesiaShader) {
 			if (prevSynesthesiaProgress > 0) {
-				float prog = (prevSynesthesiaProgress + (synesthesiaProgress - prevSynesthesiaProgress) * Minecraft.getInstance().getPartialTick());
+				float prog = (prevSynesthesiaProgress + (synesthesiaProgress - prevSynesthesiaProgress) * Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true));
 				float renderProg;
 				if (prevSynesthesiaProgress <= synesthesiaProgress) {
 					renderProg = (float) Math.sin(prog / MAX_SYNESTESIA * Math.PI) * 40.0F;
@@ -121,7 +121,7 @@ public class ForgeClientEvents {
 		if (RatConfig.synesthesiaShader) {
 			if (event.getEntity() == Minecraft.getInstance().player) {
 				GameRenderer renderer = Minecraft.getInstance().gameRenderer;
-				boolean active = event.getEntity().hasEffect(RatsEffectRegistry.SYNESTHESIA.get());
+				boolean active = event.getEntity().hasEffect(RatsEffectRegistry.SYNESTHESIA);
 				try {
 					if (active && renderer.currentEffect() == null) {
 						renderer.loadEffect(SYNESTHESIA);
@@ -179,7 +179,7 @@ public class ForgeClientEvents {
 	public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {
 		Player player = Minecraft.getInstance().player;
 		if (player == null || player.isCreative() || player.isSpectator()) return;
-		if (event.getOverlay() != VanillaGuiOverlay.PLAYER_HEALTH.type() || event.isCanceled() || !player.hasEffect(RatsEffectRegistry.PLAGUE.get()) || !RatConfig.plagueHearts) {
+		if (event.getOverlay() != VanillaGuiOverlay.PLAYER_HEALTH.type() || event.isCanceled() || !player.hasEffect(RatsEffectRegistry.PLAGUE) || !RatConfig.plagueHearts) {
 			return;
 		}
 		GuiGraphics graphics = event.getGuiGraphics();

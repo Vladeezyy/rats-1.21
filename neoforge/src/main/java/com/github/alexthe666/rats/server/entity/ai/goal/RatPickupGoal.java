@@ -23,7 +23,6 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.EnumSet;
 
@@ -197,7 +196,7 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 						this.rat.transportingFluid.setAmount(this.rat.transportingFluid.getAmount() + Math.max(drainedStack.getAmount(), 0));
 					}
 					if (!this.rat.level().isClientSide()) {
-						RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new UpdateRatFluidPacket(this.rat.getId(), this.rat.transportingFluid));
+						RatsNetworkHandler.toTracking(this.rat, new UpdateRatFluidPacket(this.rat.getId(), this.rat.transportingFluid));
 					}
 					SoundEvent sound = this.rat.transportingFluid.isEmpty() ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
 					this.rat.playSound(sound, 1, 1);

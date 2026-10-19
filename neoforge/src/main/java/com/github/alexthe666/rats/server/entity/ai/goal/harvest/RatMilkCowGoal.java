@@ -14,7 +14,6 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -61,7 +60,7 @@ public class RatMilkCowGoal extends BaseRatHarvestGoal {
 					if (this.rat.transportingFluid.isEmpty() || this.rat.transportingFluid.getAmount() < this.rat.getMBTransferRate()) {
 						this.rat.transportingFluid = milkFluid.copy();
 						if (!this.rat.level().isClientSide()) {
-							RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new UpdateRatFluidPacket(this.rat.getId(), this.rat.transportingFluid));
+							RatsNetworkHandler.toTracking(this.rat, new UpdateRatFluidPacket(this.rat.getId(), this.rat.transportingFluid));
 						}
 						this.rat.playSound(SoundEvents.COW_MILK, 1, 1);
 						this.rat.gameEvent(GameEvent.ENTITY_INTERACT);

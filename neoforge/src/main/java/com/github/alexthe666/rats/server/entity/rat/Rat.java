@@ -392,7 +392,7 @@ public class Rat extends DiggingRat {
 		if (flag && this.hasPlague()) {
 			this.doEnchantDamageEffects(this, entity);
 			if (entity instanceof LivingEntity living && this.rollForPlague(living)) {
-				living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 6000));
+				living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 			}
 		}
 		return flag;
@@ -404,7 +404,7 @@ public class Rat extends DiggingRat {
 			if (entity instanceof Rat rat && !rat.hasPlague()) {
 				rat.setPlagued(true);
 			} else if (entity instanceof LivingEntity living && this.rollForPlague(living)) {
-				living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 6000));
+				living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 			}
 		}
 		super.doPush(entity);

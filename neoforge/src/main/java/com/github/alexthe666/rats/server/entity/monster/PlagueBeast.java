@@ -98,7 +98,7 @@ public class PlagueBeast extends FeralRatlantean {
 
 	@Override
 	public void doExtraEffect(LivingEntity target) {
-		target.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.get(), 1200));
+		target.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 1200));
 	}
 
 	@Override

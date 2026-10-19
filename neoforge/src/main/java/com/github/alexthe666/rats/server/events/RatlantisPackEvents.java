@@ -10,7 +10,6 @@ import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.FORGE)
 public class RatlantisPackEvents {
@@ -20,7 +19,7 @@ public class RatlantisPackEvents {
 		if (event.getLevel() instanceof ServerLevel server && server.dimension().equals(Level.OVERWORLD) && event.getLevel().getServer() != null) {
 			boolean enabled = event.getLevel().getServer().getWorldData().getDataConfiguration().dataPacks().getEnabled().contains("ratlantis");
 			RatsMod.RATLANTIS_DATAPACK_ENABLED = enabled;
-			RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new ChangeRatlantisStatusPacket(enabled));
+			RatsNetworkHandler.toAll(new ChangeRatlantisStatusPacket(enabled));
 			RatsMod.LOGGER.debug("Overworld loaded! Ratlantis datapack is {} for this world.", enabled ? "enabled" : "disabled");
 		}
 	}
@@ -30,13 +29,13 @@ public class RatlantisPackEvents {
 		if (event.getPlayer() != null) {
 			boolean enabled = event.getPlayer().serverLevel().getServer().getWorldData().getDataConfiguration().dataPacks().getEnabled().contains("ratlantis");
 			RatsMod.RATLANTIS_DATAPACK_ENABLED = enabled;
-			RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(event::getPlayer), new ChangeRatlantisStatusPacket(enabled));
+			RatsNetworkHandler.toPlayer(event.getPlayer(), new ChangeRatlantisStatusPacket(enabled));
 			RatsMod.LOGGER.debug("Ratlantis datapack flag has been set to {} for {} ({})", enabled, event.getPlayer().getDisplayName().getString(), event.getPlayer().getStringUUID());
 		} else {
 			event.getPlayerList().getPlayers().forEach(player -> {
 				boolean enabled = player.serverLevel().getServer().getWorldData().getDataConfiguration().dataPacks().getEnabled().contains("ratlantis");
 				RatsMod.RATLANTIS_DATAPACK_ENABLED = enabled;
-				RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ChangeRatlantisStatusPacket(enabled));
+				RatsNetworkHandler.toPlayer(player, new ChangeRatlantisStatusPacket(enabled));
 				RatsMod.LOGGER.debug("Ratlantis datapack flag has been set to {} for {} ({})", enabled, player.getDisplayName().getString(), player.getStringUUID());
 			});
 		}

@@ -32,7 +32,7 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 
 	private final DeferredHolder<Block, Block> drop;
 
-	public CheeseCauldronBlock(BlockBehaviour.Properties properties, DeferredHolder<Block, Block> dropBlock, Map<Item, CauldronInteraction> interaction) {
+	public CheeseCauldronBlock(BlockBehaviour.Properties properties, DeferredHolder<Block, Block> dropBlock, CauldronInteraction.InteractionMap interaction) {
 		super(properties, interaction);
 		this.drop = dropBlock;
 	}

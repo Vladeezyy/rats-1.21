@@ -1,14 +1,27 @@
 package com.github.alexthe666.rats.server.message;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
 
-public record ChangeRatlantisStatusPacket(boolean enabled) {
+public record ChangeRatlantisStatusPacket(boolean enabled) implements CustomPacketPayload {
 
-	public static ChangeRatlantisStatusPacket decode(FriendlyByteBuf buf) {
+	public static final Type<ChangeRatlantisStatusPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "change_ratlantis_status"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ChangeRatlantisStatusPacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), ChangeRatlantisStatusPacket::decode);
+
+	@Override
+	public Type<ChangeRatlantisStatusPacket> type() {
+		return TYPE;
+	}
+
+
+	public static ChangeRatlantisStatusPacket decode(RegistryFriendlyByteBuf buf) {
 		return new ChangeRatlantisStatusPacket(buf.readBoolean());
 	}
 
@@ -17,9 +30,8 @@ public record ChangeRatlantisStatusPacket(boolean enabled) {
 	}
 
 	public static class Handler {
-		public static void handle(ChangeRatlantisStatusPacket message, Supplier<NetworkEvent.Context> context) {
-			context.get().enqueueWork(() -> RatsMod.RATLANTIS_DATAPACK_ENABLED = message.enabled());
-			context.get().setPacketHandled(true);
+		public static void handle(ChangeRatlantisStatusPacket message, IPayloadContext context) {
+			context.enqueueWork(() -> RatsMod.RATLANTIS_DATAPACK_ENABLED = message.enabled());
 		}
 	}
 

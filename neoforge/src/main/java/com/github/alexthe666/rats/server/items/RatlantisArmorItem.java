@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.hats.RatlantisArmorModel;
@@ -23,13 +25,13 @@ import java.util.function.Consumer;
 
 public class RatlantisArmorItem extends ArmorItem {
 
-	public RatlantisArmorItem(ArmorMaterial material, Type type, Item.Properties properties) {
-		super(material, type, properties);
+	public RatlantisArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties properties) {
+		super(material, type, HatItem.withDurability(properties, material, type));
 	}
 
 	@Override
-	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-		return "rats:textures/model/armor/" + (slot == EquipmentSlot.LEGS ? "ratlantis_armor_1" : "ratlantis_armor_0") + ".png";
+	public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
+		return ResourceLocation.fromNamespaceAndPath("rats", "textures/model/armor/" + (slot == EquipmentSlot.LEGS ? "ratlantis_armor_1" : "ratlantis_armor_0") + ".png");
 	}
 
 	@Override

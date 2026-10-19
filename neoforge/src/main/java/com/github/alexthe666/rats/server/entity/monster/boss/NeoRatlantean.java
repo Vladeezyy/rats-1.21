@@ -43,7 +43,6 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -221,7 +220,7 @@ public class NeoRatlantean extends Monster {
 					if (!this.level().isClientSide()) {
 						this.level().addFreshEntity(thrownBlock);
 					}
-					RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new SyncThrownBlockPacket(thrownBlock.getId(), pos.asLong()));
+					RatsNetworkHandler.toTracking(thrownBlock, new SyncThrownBlockPacket(thrownBlock.getId(), pos.asLong()));
 					this.level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					this.summonCooldown = RatConfig.neoratlanteanBlockAttackCooldown;
 				}

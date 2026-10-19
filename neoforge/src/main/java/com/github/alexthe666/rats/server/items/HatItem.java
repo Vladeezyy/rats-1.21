@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items;
 
+import com.github.alexthe666.rats.registry.RatsArmorMaterialRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
@@ -35,8 +37,8 @@ public class HatItem extends ArmorItem {
 
 	private final int loreLines;
 
-	public HatItem(Item.Properties properties, ArmorMaterial material, int loreLines) {
-		super(material, Type.HELMET, properties);
+	public HatItem(Item.Properties properties, Holder<ArmorMaterial> material, int loreLines) {
+		super(material, Type.HELMET, withDurability(properties, material, Type.HELMET));
 		this.loreLines = loreLines;
 	}
 
@@ -144,14 +146,15 @@ public class HatItem extends ArmorItem {
 		return 0.0F;
 	}
 
+	/** The durability the 1.20.1 armor material gave (hats without durability stay at stack size 1) */
+	public static Item.Properties withDurability(Item.Properties properties, Holder<ArmorMaterial> material, Type type) {
+		int durability = RatsArmorMaterialRegistry.durability(material, type);
+		return durability > 0 ? properties.durability(durability) : properties;
+	}
+
 	@Override
-	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-		String item = BuiltInRegistries.ITEM.getKey(this).getPath();
-		if (!item.equals("air")) {
-			return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/" + item + ".png").toString();
-		}
-		//hehe
-		return "textures/particle/flea_0.png";
+	public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
+		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/" + BuiltInRegistries.ITEM.getKey(this).getPath() + ".png");
 	}
 
 	@Override

@@ -23,7 +23,7 @@ public class PlagueLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
 	@Override
 	public void render(PoseStack stack, MultiBufferSource buffer, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-		if (!(entity instanceof AbstractRat) && entity.hasEffect(RatsEffectRegistry.PLAGUE.get())) {
+		if (!(entity instanceof AbstractRat) && entity.hasEffect(RatsEffectRegistry.PLAGUE)) {
 			this.getParentModel().renderToBuffer(stack, buffer.getBuffer(TEXTURE), light, OverlayTexture.NO_OVERLAY, -1);
 		}
 	}

@@ -34,7 +34,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -223,7 +222,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			}
 
 			sp.nextContainerCounter();
-			RatsNetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new OpenRatScreenPacket(sp.containerCounter, this.getId()));
+			RatsNetworkHandler.toPlayer(sp, new OpenRatScreenPacket(sp.containerCounter, this.getId()));
 			sp.containerMenu = new RatMenu(sp.containerCounter, this.getInventory(), sp.getInventory());
 			sp.initMenu(sp.containerMenu);
 			this.inventoryOpen = true;

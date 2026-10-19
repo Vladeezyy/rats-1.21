@@ -16,7 +16,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DJRatUpgradeItem extends BaseRatUpgradeItem implements HoldsItemUpgrade, TickRatUpgrade, EquipmentListenerUpgrade {
 
@@ -46,7 +45,7 @@ public class DJRatUpgradeItem extends BaseRatUpgradeItem implements HoldsItemUpg
 	public void onItemChanged(TamedRat rat, EquipmentSlot slot, ItemStack oldStack, ItemStack newStack) {
 		if (!rat.level().isClientSide() && slot == EquipmentSlot.MAINHAND) {
 			if (newStack.getItem() instanceof RecordItem record) {
-				RatsNetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> rat.level().getChunkAt(rat.blockPosition())), new UpdateRatMusicPacket(rat.getId(), record));
+				RatsNetworkHandler.toTracking(rat, new UpdateRatMusicPacket(rat.getId(), record));
 			}
 		}
 	}

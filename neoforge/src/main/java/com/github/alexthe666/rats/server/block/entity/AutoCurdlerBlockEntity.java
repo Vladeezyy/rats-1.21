@@ -43,7 +43,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -260,7 +259,7 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	public void setChanged() {
 		super.setChanged();
 		if (this.getLevel() != null && !this.getLevel().isClientSide()) {
-			RatsNetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new UpdateCurdlerFluidPacket(this.getBlockPos().asLong(), this.tank.getFluid()));
+			RatsNetworkHandler.toTrackingBlock(this.getLevel(), this.getBlockPos(), new UpdateCurdlerFluidPacket(this.getBlockPos().asLong(), this.tank.getFluid()));
 		}
 	}
 

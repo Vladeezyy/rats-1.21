@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.registry;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.resources.ResourceKey;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +38,9 @@ public class RatsSoundRegistry {
 	public static final DeferredHolder<SoundEvent, SoundEvent> LASER = createSoundEvent("entity.rats.laser.shoot");
 	public static final DeferredHolder<SoundEvent, SoundEvent> LIVING_MICE = createSoundEvent("music_disc.rats.living_mice");
 	public static final DeferredHolder<SoundEvent, SoundEvent> MICE_ON_VENUS = createSoundEvent("music_disc.rats.mice_on_venus");
+	// 1.21: the discs play jukebox songs (data/rats/jukebox_song), which point at the sound events above
+	public static final ResourceKey<JukeboxSong> LIVING_MICE_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "living_mice"));
+	public static final ResourceKey<JukeboxSong> MICE_ON_VENUS_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "mice_on_venus"));
 	public static final DeferredHolder<SoundEvent, SoundEvent> NEORATLANTEAN_DIE = createSoundEvent("entity.rats.neoratlantean.death");
 	public static final DeferredHolder<SoundEvent, SoundEvent> NEORATLANTEAN_HURT = createSoundEvent("entity.rats.neoratlantean.hurt");
 	public static final DeferredHolder<SoundEvent, SoundEvent> NEORATLANTEAN_IDLE = createSoundEvent("entity.rats.neoratlantean.ambient");
