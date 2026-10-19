@@ -1,8 +1,26 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "dev.vladeezyy.rats.mixin",
+  "package": "dev.vladeezyy.rats.fabric.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "FishingHookMixin",
+    "ItemEntityMixin",
+    "LivingEntityMixin",
+    "LootTableMixin",
+    "MobCategoryAccessor",
+    "MobMixin",
+    "NaturalSpawnerMixin",
+    "RaidMixin",
+    "RarityAccessor",
+    "ServerLevelMixin"
+  ],
+  "client": [
+    "client.AbstractClientPlayerMixin",
+    "client.FogRendererMixin",
+    "client.GameRendererMixin",
+    "client.LivingEntityRendererMixin",
+    "client.MinecraftMixin"
+  ],
   "injectors": {"defaultRequire": 1}
 }

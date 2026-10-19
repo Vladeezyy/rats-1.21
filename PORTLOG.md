@@ -82,3 +82,44 @@ What changed beyond renames, and why:
 - Projectiles fired from dispensers (cheese cannonball, rat capture net, vial of sentience) started at 0, 0, 0.
 - #847: a rat teleported to its owner kept its old fall distance ("fell from a great height").
 - `Animal.isFood` defaulted to wheat in 1.20.1; kept explicitly (1.21 made it abstract).
+
+## 2026-10-20 — NeoForge + Fabric 1.21.1: common code, both loaders
+
+The game code lives in `common/` (compiled against vanilla 1.21.1 / NeoForm) and calls the loader through
+`dev.vladeezyy.rats.platform` (`Platform`, `ClientPlatform`); `neoforge/` and `fabric/` wire it up.
+
+- **Registration**: `Registrar` / `RegistryEntry` keep `DeferredRegister` / `DeferredHolder`'s calls. NeoForge: deferred
+  registers. Fabric: entries are queued and registered in NeoForge's order (attributes, data components, armor materials,
+  then vanilla order, then modded registries), so suppliers see the same state on both. A `RegistryEntry` is not a
+  `Holder`: vanilla APIs get `entry.holder()`, the registry's own reference (vanilla compares holders by identity).
+- **Storages**: `ItemHandler` / `FluidHandler` / `EnergyHandler` (the methods of NeoForge 1.21.1's capabilities, own
+  code). NeoForge adapts them to capabilities both ways; Fabric uses the mod's own handlers, vanilla containers
+  (`InvWrapper` / `SidedInvWrapper`), the transfer API for other mods (fluids: 81 droplets per mB). Energy: NeoForge
+  only (Fabric has no common energy API). Milk: NeoForge's milk fluid; Fabric registers `rats:milk` (tank-only fluid,
+  milk bucket ⇄ bucket through the transfer API, the original's milk textures).
+- **Events**: the original's Forge subscribers are `RatsEvents` / `RatsClientEvents` (vanilla arguments). NeoForge:
+  `NeoForgeGameEvents`, `RatsNeoForgeClient`. Fabric: Fabric API callbacks plus mixins where Fabric has no event
+  (target change, game events, item expiry, effects, healing, natural-spawn finalize, fishing, raid waves, loot
+  modifiers; client: FOV, fog, living render, left click on air).
+- **Data of NeoForge read on Fabric**: biome modifiers (`data/rats/neoforge/biome_modifier`, from Natura's port), the
+  global loot modifiers, the hero gift data map (→ `GiveGiftToHero.GIFTS`), the built-in Ratlantis pack (the build copies
+  it to `resourcepacks/ratlantis`). Enum extensions on Fabric: `MobCategory` / `Rarity` values added by mixin accessors;
+  the Pied Piper joins raid waves by a mixin (0,0,1,0,0,1,1,2 per wave, as the NeoForge raider type).
+- **Config**: `ConfigSpec` with ModConfigSpec's builder calls; NeoForge builds a real ModConfigSpec (same files),
+  Fabric reads/writes the same TOML (from Natura's port).
+- NeoForge extension overrides with vanilla types stay in the common classes without `@Override` (NeoForge still
+  calls them); where vanilla has the same hook it is used instead (`getPickResult`, `onDestroyed(ItemEntity)`,
+  `processBlock`, `decreaseAirSupply` for water-breathing rats, `goDownInWater` for the pirat boat, `setLevel` for the
+  crafting table's `onLoad`).
+- Hats and the Ratlantis armor bake their armor model once (the original baked a new model every frame for every
+  entity wearing one).
+
+### Bugs of the port fixed (found while splitting)
+- **Global loot modifiers never ran**: the resource converter moved `data/forge/loot_modifiers/global_loot_modifiers.json`
+  to `data/c/...` (it treated every `forge:` path as a common tag) and the condition `forge:loot_table_id` became
+  `c:loot_table_id`. Cat morning gifts (raw rat / tiny coin), charged creeper chunks and the aristocrat's tiny coins
+  never dropped. Now `data/neoforge/loot_modifiers/...` and `neoforge:loot_table_id`; the converter is fixed.
+- **Ratlantis was always "disabled"**: the built-in pack was registered as `rats:ratlantis`, but the game checks the
+  world's enabled packs for `ratlantis` (the original's id), so `RATLANTIS_DATAPACK_ENABLED` stayed false (Ratlantis
+  items with the "disabled" tooltip, no Ratlantis fishing loot). The pack id is `ratlantis` again (1.20.1 worlds keep it
+  enabled); the check also accepts Fabric's `rats:ratlantis`.

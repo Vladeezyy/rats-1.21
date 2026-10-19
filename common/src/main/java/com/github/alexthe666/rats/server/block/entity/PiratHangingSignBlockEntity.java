@@ -15,4 +15,11 @@ public class PiratHangingSignBlockEntity extends HangingSignBlockEntity {
 	public BlockEntityType<?> getType() {
 		return RatlantisBlockEntityRegistry.PIRAT_HANGING_SIGN.get();
 	}
+
+	// vanilla checks the block against the type passed to the constructor (the vanilla sign's), NeoForge against
+	// getType(): the pirat signs are only valid for their own type, so check that one on both loaders
+	@Override
+	public boolean isValidBlockState(BlockState state) {
+		return this.getType().isValid(state);
+	}
 }

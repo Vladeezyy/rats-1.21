@@ -23,7 +23,7 @@ wait 2>/dev/null
 grep -E 'Rats selftest\] (PASS|FAILED|FAIL )|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED' build-selftest.log | sed -E 's/^\[[^]]*\] //'
 echo "--- errors / warnings (vanilla dev noise filtered)"
 grep -E '/(ERROR|FATAL|WARN)\]|Caused by|Exception' build-selftest.log \
-  | grep -vE 'Rats selftest|server.properties|uses unexpected schema|OFFLINE/INSECURE|online-mode|hackers to connect|no attempt to authenticate|LanServerPinger|UnixException|Ambiguity between arguments' \
+  | grep -vE 'Rats selftest|server.properties|uses unexpected schema|OFFLINE/INSECURE|online-mode|hackers to connect|no attempt to authenticate|LanServerPinger|UnixException|Ambiguity between arguments|No data fixer registered' \
   | sed -E 's/^\[[^]]*\] //' | cut -c1-300 | sort | uniq -c | sort -rn | head -40
 
 # result: 0 if all checks passed

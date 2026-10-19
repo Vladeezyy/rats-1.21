@@ -7,6 +7,7 @@ import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsCreativeTabRegistry;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
+import com.github.alexthe666.rats.server.events.RatlantisPack;
 import com.github.alexthe666.rats.server.events.RatsEntitySetup;
 import com.github.alexthe666.rats.server.loot.GenericAddItemLootModifier;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
@@ -161,7 +162,7 @@ public final class RatsNeoForge {
     private static void addRatlantisDatapack(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.SERVER_DATA) {
             var resourcePath = ModList.get().getModFileById(RatsMod.MODID).getFile().findResource("data", "minecraft", "datapacks", "ratlantis");
-            var info = new PackLocationInfo("rats:ratlantis", Component.literal("Ratlantis"), PackSource.FEATURE, Optional.empty());
+            var info = new PackLocationInfo(RatlantisPack.PACK_ID, Component.literal("Ratlantis"), PackSource.FEATURE, Optional.empty());
             var pack = Pack.readMetaAndCreate(info, new PathPackResources.PathResourcesSupplier(resourcePath), PackType.SERVER_DATA,
                 new PackSelectionConfig(RatConfig.ratlantisEnabledByDefault, Pack.Position.TOP, false));
             if (pack != null) {

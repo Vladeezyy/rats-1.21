@@ -13,12 +13,15 @@
   "environment": "*",
   "entrypoints": {
     "main": ["dev.vladeezyy.rats.fabric.RatsFabric"],
-    "client": ["dev.vladeezyy.rats.fabric.RatsFabricClient"]
+    "client": ["dev.vladeezyy.rats.fabric.RatsFabricClient"],
+    "jei_mod_plugin": ["com.github.alexthe666.rats.compat.jei.RatsJEIPlugin"]
   },
   "mixins": ["rats.fabric.mixins.json"],
+  "accessWidener": "rats.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
+    "rampart": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"
   }

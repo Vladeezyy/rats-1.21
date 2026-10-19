@@ -30,6 +30,7 @@ FORGE_TYPES = {  # loader object types, not tags
     'forge:mod_loaded': 'neoforge:mod_loaded', 'forge:not': 'neoforge:not', 'forge:and': 'neoforge:and',
     'forge:or': 'neoforge:or', 'forge:tag_empty': 'neoforge:tag_empty', 'forge:item_exists': 'neoforge:item_exists',
     'forge:true': 'neoforge:always', 'forge:false': 'neoforge:never',
+    'forge:loot_table_id': 'neoforge:loot_table_id', 'forge:can_tool_perform_action': 'neoforge:can_item_perform_ability',
 }
 
 
@@ -156,7 +157,8 @@ def target_path(tree, path):
     if parts[0] != 'data':
         return rel
     if parts[1] == 'forge':
-        parts[1] = 'c'
+        # forge's own data (the global loot modifier list) belongs to neoforge; only tags move to the common "c"
+        parts[1] = 'neoforge' if len(parts) > 2 and parts[2] == 'loot_modifiers' else 'c'
     if len(parts) > 2:
         if parts[2] in DIR_RENAMES:
             parts[2] = DIR_RENAMES[parts[2]]

@@ -130,7 +130,8 @@ public final class SelfTest {
       net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);
     check("banner patterns registered", () -> server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BANNER_PATTERN)
       .containsKey(com.github.alexthe666.rats.registry.RatsBannerPatternRegistry.RAT_PATTERN));
-    check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().contains("rats:ratlantis"));
+    check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().stream().anyMatch(id -> id.equals("ratlantis") || id.endsWith(":ratlantis") || id.endsWith("/ratlantis")));
+    check("Ratlantis pack on means Ratlantis on (1.20.1 pack id)", () -> com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server) == com.github.alexthe666.rats.RatsMod.RATLANTIS_DATAPACK_ENABLED);
     check("wild rat spawns", () -> {
       spawned = com.github.alexthe666.rats.registry.RatsEntityRegistry.RAT.get().spawn(level, at(1, 0, 1), net.minecraft.world.entity.MobSpawnType.COMMAND);
       return spawned != null && spawned.isAlive();
