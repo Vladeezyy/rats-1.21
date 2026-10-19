@@ -50,10 +50,10 @@ public class TamedRatOverlayLayer extends RenderLayer<TamedRat, AbstractRatModel
 					if (rat.getDyeColor() == 100) {
 						RenderType type = RatsRenderType.GlintType.getRenderTypeBasedOnKeyword(rat.getSpecialDye());
 						consumer = buffer.getBuffer(type != null ? type : RatsRenderType.getRainbowGlint());
-						this.getParentModel().renderToBuffer(stack, consumer, light, LivingEntityRenderer.getOverlayCoords(rat, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+						this.getParentModel().renderToBuffer(stack, consumer, light, LivingEntityRenderer.getOverlayCoords(rat, 0), -1);
 						if (!RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_UNDEAD.get())) {
 							VertexConsumer consumer1 = buffer.getBuffer(TEXTURE_DYED_NOT);
-							this.getParentModel().renderToBuffer(stack, consumer1, light, LivingEntityRenderer.getOverlayCoords(rat, 0), 1.0F, 1.0F, 1.0F, 1.0F);
+							this.getParentModel().renderToBuffer(stack, consumer1, light, LivingEntityRenderer.getOverlayCoords(rat, 0), -1);
 						}
 					} else {
 						consumer = buffer.getBuffer(TEXTURE_DYED);

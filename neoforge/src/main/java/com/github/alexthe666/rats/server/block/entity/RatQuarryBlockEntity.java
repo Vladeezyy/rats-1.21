@@ -28,7 +28,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,7 @@ import java.util.stream.IntStream;
 
 public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer {
 	private static final int[] STACKS = IntStream.range(0, 64).toArray();
-	private final LazyOptional<? extends IItemHandler>[] handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN);
+	private final IItemHandler[] handlers = {new SidedInvWrapper(this, Direction.UP), new SidedInvWrapper(this, Direction.DOWN)};
 	private NonNullList<ItemStack> inventory = NonNullList.withSize(64, ItemStack.EMPTY);
 	private int tick;
 
@@ -162,14 +161,7 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 
 	@NotNull
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (!this.remove && facing != null && capability == Capabilities.ITEM_HANDLER) {
-			return handlers[0].cast();
-		}
-		return super.getCapability(capability, facing);
-	}
-
-	@Override
+		@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
@@ -229,5 +221,11 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 			stairPos = stairPos.relative(buildDir);
 		}
 		return stairPos;
+	}
+
+	/** Hoppers and pipes per side, as in the original (registered as the block's item handler capability) */
+	@Nullable
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return side == null ? null : this.handlers[0];
 	}
 }

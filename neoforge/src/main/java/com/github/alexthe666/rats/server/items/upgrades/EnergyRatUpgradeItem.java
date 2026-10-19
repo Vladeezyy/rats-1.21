@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import java.util.Optional;
+import com.github.alexthe666.rats.server.misc.RatsCaps;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.ai.goal.RatDepositGoal;
@@ -66,9 +68,9 @@ public class EnergyRatUpgradeItem extends BaseRatUpgradeItem implements ChangesO
 	public void tick(TamedRat rat) {
 		if (RatConfig.ratsChargeHeldItems && rat.getHeldRF() > 0 && !rat.getMainHandItem().isEmpty()) {
 			ItemStack stack = rat.getMainHandItem();
-			LazyOptional<IEnergyStorage> optional = stack.getCapability(Capabilities.ENERGY);
-			if (optional.resolve().isPresent()) {
-				IEnergyStorage energyStorage = optional.resolve().get();
+			Optional<IEnergyStorage> optional = RatsCaps.energy(stack);
+			if (optional.isPresent()) {
+				IEnergyStorage energyStorage = optional.get();
 				if (energyStorage.getEnergyStored() < energyStorage.getMaxEnergyStored()) {
 					int energyToTransfer = Math.min(rat.getHeldRF(), this.chargeRate);
 					energyToTransfer = energyStorage.receiveEnergy(energyToTransfer, false);

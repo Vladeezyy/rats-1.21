@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.entity.BlackDeathModel;
@@ -24,7 +23,7 @@ public class BlackDeathRenderer extends MobRenderer<BlackDeath, BlackDeathModel<
 		this.addLayer(new ItemInHandLayer<>(this, context.getItemInHandRenderer()) {
 			public void render(PoseStack stack, MultiBufferSource buffer, int light, BlackDeath entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 				if (entity.isSummoning() || entity.isMeleeAttacking()) {
-					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, FastColor.ARGB32.colorFromFloat(headPitch, partialTicks, ageInTicks, netHeadYaw));
+					super.render(stack, buffer, light, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 				}
 			}
 		});

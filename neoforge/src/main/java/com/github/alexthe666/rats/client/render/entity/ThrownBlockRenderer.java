@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.CubeModel;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
@@ -51,7 +50,7 @@ public class ThrownBlockRenderer extends EntityRenderer<ThrownBlock> {
 		VertexConsumer consumer = buffer.getBuffer(RenderType.energySwirl(LIGHTNING_TEXTURE, f * 0.01F, f * 0.01F));
 		this.cube.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 		stack.popPose();
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 
 	}
 

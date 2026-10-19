@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.events.ModClientEvents;
 import com.github.alexthe666.rats.client.model.entity.AbstractRatModel;
@@ -77,7 +76,7 @@ public class TamedRatRenderer extends AbstractRatRenderer<TamedRat, AbstractRatM
 		} else {
 			this.model = RAT_MODEL;
 		}
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 		if (ModClientEvents.shouldRenderNameplates() && entity.crafting && RatUpgradeUtils.hasUpgrade(entity, RatsItemRegistry.RAT_UPGRADE_FISHERMAN.get())) {
 			boolean hasName = this.shouldShowName(entity);
 			stack.pushPose();

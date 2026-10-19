@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import java.util.Optional;
+import com.github.alexthe666.rats.server.misc.RatsCaps;
 import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
@@ -19,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,12 +34,10 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 	private TamedRat wheeler;
 	private int dismountCooldown = 0;
 	private final EnergyStorage energyStorage;
-	private final LazyOptional<EnergyStorage> energyCap;
 
 	public RatCageWheelBlockEntity(BlockPos pos, BlockState state) {
 		super(RatsBlockEntityRegistry.RAT_CAGE_WHEEL.get(), pos, state);
 		this.energyStorage = new EnergyStorage(1000, 10, 10, 0);
-		this.energyCap = LazyOptional.of(() -> this.energyStorage);
 	}
 
 	@Override
@@ -136,7 +135,7 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 			BlockEntity blockEntity = level.getBlockEntity(pos.relative(facing));
 			if (blockEntity == null)
 				continue;
-			blockEntity.getCapability(Capabilities.ENERGY, facing.getOpposite()).ifPresent(handler -> {
+			RatsCaps.energy(blockEntity, facing.getOpposite()).ifPresent(handler -> {
 				if (handler.canReceive()) {
 					int received = handler.receiveEnergy(Math.min(capacity.get(), 10), false);
 					capacity.addAndGet(-received);
@@ -150,12 +149,13 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 	@Override
 	public void setRemoved() {
 		super.setRemoved();
-		this.energyCap.invalidate();
 	}
 
 	@NotNull
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		return capability == Capabilities.ENERGY ? this.energyCap.cast() : super.getCapability(capability, facing);
+
+	/** The wheel's generator (registered as the block's energy capability) */
+	public EnergyStorage getEnergyStorage(@org.jetbrains.annotations.Nullable Direction side) {
+		return this.energyStorage;
 	}
 }

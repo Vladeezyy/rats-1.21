@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.ai.goal;
 
+import java.util.Optional;
+import com.github.alexthe666.rats.server.misc.RatsCaps;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -64,7 +66,7 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 				if (this.rat.getMainHandItem().getCount() < 64 && !this.getItemsOfTypeAround(this.rat.getMainHandItem()).isEmpty())
 					return false;
 			}
-			if (te.getCapability(Capabilities.ITEM_HANDLER, this.rat.depositFacing).resolve().isEmpty()) {
+			if (RatsCaps.items(te, this.rat.depositFacing).isEmpty()) {
 				return false;
 			}
 
@@ -72,14 +74,14 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 			if (this.rat.getRFTransferRate() <= 0 || this.rat.getHeldRF() <= 0) {
 				return false;
 			}
-			if (te.getCapability(Capabilities.ENERGY, this.rat.depositFacing).resolve().isEmpty()) {
+			if (RatsCaps.energy(te, this.rat.depositFacing).isEmpty()) {
 				return false;
 			}
 		} else if (this.type == DepositType.FLUID) {
 			if (this.rat.transportingFluid.isEmpty() || this.rat.transportingFluid.getAmount() == 0) {
 				return false;
 			}
-			if (te.getCapability(Capabilities.FLUID_HANDLER, this.rat.depositFacing).resolve().isEmpty()) {
+			if (RatsCaps.fluids(te, this.rat.depositFacing).isEmpty()) {
 				return false;
 			}
 		}
@@ -156,9 +158,9 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 
 	private void executeTask(BlockEntity entity) {
 		if (this.type == DepositType.INVENTORY) {
-			LazyOptional<IItemHandler> handler = entity.getCapability(Capabilities.ITEM_HANDLER, this.rat.depositFacing);
-			if (handler.resolve().isPresent()) {
-				IItemHandler resolvedHandler = handler.resolve().get();
+			Optional<IItemHandler> handler = RatsCaps.items(entity, this.rat.depositFacing);
+			if (handler.isPresent()) {
+				IItemHandler resolvedHandler = handler.get();
 				ItemStack duplicate = this.rat.getItemInHand(InteractionHand.MAIN_HAND).copy();
 				if (!ItemHandlerHelper.insertItem(resolvedHandler, duplicate, true).equals(duplicate)) {
 					ItemStack shrunkenStack = ItemHandlerHelper.insertItem(resolvedHandler, duplicate, false);
@@ -170,9 +172,9 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 				}
 			}
 		} else if (this.type == DepositType.ENERGY) {
-			LazyOptional<IEnergyStorage> handler = entity.getCapability(Capabilities.ENERGY, this.rat.depositFacing);
-			if (handler.resolve().isPresent()) {
-				IEnergyStorage storage = handler.resolve().get();
+			Optional<IEnergyStorage> handler = RatsCaps.energy(entity, this.rat.depositFacing);
+			if (handler.isPresent()) {
+				IEnergyStorage storage = handler.get();
 				int howMuchWeHave = this.rat.getHeldRF();
 				int inputtedEnergy = 0;
 				try {
@@ -188,9 +190,9 @@ public class RatDepositGoal extends Goal implements RatWorkGoal {
 			}
 		} else if (this.type == DepositType.FLUID) {
 			FluidStack copiedFluid = this.rat.transportingFluid.copy();
-			LazyOptional<IFluidHandler> handler = entity.getCapability(Capabilities.FLUID_HANDLER, this.rat.depositFacing);
-			if (handler.resolve().isPresent()) {
-				IFluidHandler fluidHandler = handler.resolve().get();
+			Optional<IFluidHandler> handler = RatsCaps.fluids(entity, this.rat.depositFacing);
+			if (handler.isPresent()) {
+				IFluidHandler fluidHandler = handler.get();
 				if (!this.rat.transportingFluid.isEmpty()) {
 					int minusAmount = 0;
 					try {

@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.LaserPortalModel;
 import com.github.alexthe666.rats.server.entity.misc.LaserPortal;
@@ -43,7 +42,7 @@ public class LaserPortalRenderer extends EntityRenderer<LaserPortal> {
 		MODEL_NEO_RATLANTEAN.renderToBuffer(stack, consumer, 240, OverlayTexture.NO_OVERLAY, -1);
 		stack.popPose();
 		stack.popPose();
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 	}
 
 	private float interpolateValue(float start, float end, float pct) {

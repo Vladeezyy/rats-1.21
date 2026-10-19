@@ -121,6 +121,7 @@ public class RatsMod {
 		bus.addListener(this::reloadConfigs);
 		bus.addListener(this::setup);
 		bus.addListener(RatsNetworkHandler::register);
+		bus.addListener(com.github.alexthe666.rats.server.events.RatsCapabilityEvents::register);
 		NeoForge.EVENT_BUS.addListener(this::addPetShops);
 		bus.addListener(this::addRatlantisDatapack);
 	}

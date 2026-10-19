@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.projectile.LaserBeam;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -49,20 +48,20 @@ public class LaserBeamRenderer extends EntityRenderer<LaserBeam> {
 		Matrix4f matrix4f = matrixstack$entry.pose();
 		Matrix3f matrix3f = matrixstack$entry.normal();
 		light = 240;
-		this.vertex(matrix4f, matrix3f, consumer, -7, -2, -2, 0.0F, 0.15625F, -1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, -2, 2, 0.15625F, 0.15625F, -1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, 2, 2, 0.15625F, 0.3125F, -1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, 2, -2, 0.0F, 0.3125F, -1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, 2, -2, 0.0F, 0.15625F, 1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, 2, 2, 0.15625F, 0.15625F, 1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, -2, 2, 0.15625F, 0.3125F, 1, 0, 0, light, r, g, b);
-		this.vertex(matrix4f, matrix3f, consumer, -7, -2, -2, 0.0F, 0.3125F, 1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, -2, -2, 0.0F, 0.15625F, -1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, -2, 2, 0.15625F, 0.15625F, -1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, 2, 2, 0.15625F, 0.3125F, -1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, 2, -2, 0.0F, 0.3125F, -1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, 2, -2, 0.0F, 0.15625F, 1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, 2, 2, 0.15625F, 0.15625F, 1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, -2, 2, 0.15625F, 0.3125F, 1, 0, 0, light, r, g, b);
+		this.vertex(matrix4f, matrixstack$entry, consumer, -7, -2, -2, 0.0F, 0.3125F, 1, 0, 0, light, r, g, b);
 		stack.popPose();
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 	}
 
-	public void vertex(Matrix4f m4f, Matrix3f m3f, VertexConsumer consumer, float x, float y, float z, float u, float v, int normX, int normZ, int normY, int light, int red, int green, int blue) {
-		consumer.addVertex(m4f, x, y, z).setColor(red, green, blue, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(m3f, (float) normX, (float) normY, (float) normZ);
+	public void vertex(Matrix4f m4f, PoseStack.Pose m3f, VertexConsumer consumer, float x, float y, float z, float u, float v, int normX, int normZ, int normY, int light, int red, int green, int blue) {
+		consumer.addVertex(m4f, x, y, z).setColor(red, green, blue, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrixstack$entry, (float) normX, (float) normY, (float) normZ);
 	}
 
 	@Override

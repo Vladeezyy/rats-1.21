@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.client.model.entity.PiratBoatModel;
 import com.github.alexthe666.rats.client.render.entity.layer.PiratBoatSailLayer;
 import com.github.alexthe666.rats.server.entity.misc.PiratBoat;
@@ -63,7 +62,7 @@ public class PiratBoatRenderer<T extends PiratBoat, M extends PiratBoatModel<T>>
 
 		if (!entity.isSpectator()) {
 			for (RenderLayer<T, M> renderlayer : this.layers) {
-				renderlayer.render(stack, buffer, light, entity, 0.0F, 0.0F, FastColor.ARGB32.colorFromFloat(0.0F, partialTicks, entity.tickCount + partialTicks, 0.0F));
+				renderlayer.render(stack, buffer, light, entity, 0.0F, 0.0F, partialTicks, entity.tickCount + partialTicks, 0.0F, 0.0F);
 			}
 		}
 		stack.popPose();

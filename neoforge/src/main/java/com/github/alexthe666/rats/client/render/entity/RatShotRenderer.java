@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.StaticRatModel;
 import com.github.alexthe666.rats.server.entity.projectile.RatShot;
@@ -49,15 +48,15 @@ public class RatShotRenderer extends EntityRenderer<RatShot> {
 		float f = (entity.tickCount + partialTicks) * 0.5F;
 		float f1 = 1;
 		MODEL_STATIC_RAT.setupAnim(entity, f, f1, entity.tickCount + partialTicks, 0, 0);
-		MODEL_STATIC_RAT.renderToBuffer(stack, consumer, light, OverlayTexture.pack(OverlayTexture.u(0), OverlayTexture.v(false)), 1.0F, 1.0F, 1.0F, 1.0F);
+		MODEL_STATIC_RAT.renderToBuffer(stack, consumer, light, OverlayTexture.pack(OverlayTexture.u(0), OverlayTexture.v(false)), -1);
 
 		if (brightness < 7) {
 			VertexConsumer iGlowBuffer = buffer.getBuffer(TEXTURE_EYES);
-			MODEL_STATIC_RAT.renderToBuffer(stack, iGlowBuffer, light, OverlayTexture.pack(OverlayTexture.u(0), OverlayTexture.v(false)), 1.0F, 1.0F, 1.0F, 1.0F);
+			MODEL_STATIC_RAT.renderToBuffer(stack, iGlowBuffer, light, OverlayTexture.pack(OverlayTexture.u(0), OverlayTexture.v(false)), -1);
 		}
 		stack.popPose();
 
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 	}
 
 	@Override

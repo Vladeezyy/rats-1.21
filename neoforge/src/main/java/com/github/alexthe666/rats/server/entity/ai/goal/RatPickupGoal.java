@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.ai.goal;
 
+import java.util.Optional;
+import com.github.alexthe666.rats.server.misc.RatsCaps;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.RatCommand;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -119,14 +121,14 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 
 	private void executeTask(BlockEntity entity) {
 		if (this.type == PickupType.INVENTORY) {
-			LazyOptional<IItemHandler> handler = entity.getCapability(Capabilities.ITEM_HANDLER, this.rat.pickupFacing);
-			if (handler.resolve().isPresent()) {
-				int slot = RatUtils.getItemSlotFromItemHandler(this.rat, handler.resolve().get(), this.rat.level().getRandom());
+			Optional<IItemHandler> handler = RatsCaps.items(entity, this.rat.pickupFacing);
+			if (handler.isPresent()) {
+				int slot = RatUtils.getItemSlotFromItemHandler(this.rat, handler.get(), this.rat.level().getRandom());
 				int extractSize = RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_PLATTER.get()) ? 64 : 1;
 				ItemStack stack = ItemStack.EMPTY;
 				try {
-					if (handler.resolve().get().getSlots() > 0 && handler.resolve().get().extractItem(slot, extractSize, true) != ItemStack.EMPTY) {
-						stack = handler.resolve().get().extractItem(slot, extractSize, false);
+					if (handler.get().getSlots() > 0 && handler.get().extractItem(slot, extractSize, true) != ItemStack.EMPTY) {
+						stack = handler.get().extractItem(slot, extractSize, false);
 					}
 				} catch (Exception e) {
 					//container is empty
@@ -140,9 +142,9 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 				}
 			}
 		} else if (this.type == PickupType.ENERGY) {
-			LazyOptional<IEnergyStorage> handler = entity.getCapability(Capabilities.ENERGY, this.rat.pickupFacing);
-			if (handler.resolve().isPresent()) {
-				IEnergyStorage storage = handler.resolve().get();
+			Optional<IEnergyStorage> handler = RatsCaps.energy(entity, this.rat.pickupFacing);
+			if (handler.isPresent()) {
+				IEnergyStorage storage = handler.get();
 				int howMuchWeWant = this.rat.getRFTransferRate() - this.rat.getHeldRF();
 				int recievedEnergy = 0;
 				try {
@@ -158,9 +160,9 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 				}
 			}
 		} else if (this.type == PickupType.FLUID) {
-			LazyOptional<IFluidHandler> handler = entity.getCapability(Capabilities.FLUID_HANDLER, this.rat.pickupFacing);
-			if (handler.resolve().isPresent()) {
-				IFluidHandler fluidHandler = handler.resolve().get();
+			Optional<IFluidHandler> handler = RatsCaps.fluids(entity, this.rat.pickupFacing);
+			if (handler.isPresent()) {
+				IFluidHandler fluidHandler = handler.get();
 				int currentAmount = 0;
 				if (!this.rat.transportingFluid.isEmpty()) {
 					currentAmount = this.rat.transportingFluid.getAmount();

@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatlanteanSpiritModel;
 import com.github.alexthe666.rats.server.entity.projectile.PlagueShot;
@@ -35,7 +34,7 @@ public class PlagueShotRenderer extends EntityRenderer<PlagueShot> {
 		MODEL_SPIRIT.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
 		stack.popPose();
 
-		super.render(entity, entityYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(entity, entityYaw, partialTicks, stack, buffer, light);
 	}
 
 	@Override

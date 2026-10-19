@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import com.github.alexthe666.rats.server.misc.RatsCaps;
 import net.minecraft.core.Holder;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
 import com.github.alexthe666.rats.server.misc.StoredItems;
@@ -798,10 +799,10 @@ public class TamedRat extends InventoryRat {
 		if (this.level().getBlockEntity(this.blockPosition()) != null) {
 			BlockEntity te = this.level().getBlockEntity(this.blockPosition());
 			if (te != null) {
-				LazyOptional<IItemHandler> handler = te.getCapability(Capabilities.ITEM_HANDLER, Direction.UP);
-				if (handler.resolve().isPresent()) {
-					if (ItemHandlerHelper.insertItem(handler.resolve().get(), burntItem, true).isEmpty()) {
-						ItemHandlerHelper.insertItem(handler.resolve().get(), burntItem, false);
+				Optional<IItemHandler> handler = RatsCaps.items(te, Direction.UP);
+				if (handler.isPresent()) {
+					if (ItemHandlerHelper.insertItem(handler.get(), burntItem, true).isEmpty()) {
+						ItemHandlerHelper.insertItem(handler.get(), burntItem, false);
 						return true;
 					}
 				}

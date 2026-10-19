@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
 
+import net.neoforged.neoforge.items.IItemHandler;
 import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -39,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import java.util.Optional;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
@@ -91,14 +92,12 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	};
 
 	private final static EmptyHandler EMPTYHANDLER = new EmptyHandler();
-	public final LazyOptional<IItemHandlerModifiable> bufferHandler = LazyOptional.of(() -> new TableItemHandlers.BufferHandler(this));
-	public final LazyOptional<IItemHandlerModifiable> matrixHandler = LazyOptional.of(() -> new TableItemHandlers.MatrixHandler(this));
-	public final LazyOptional<IItemHandlerModifiable> resultHandler = LazyOptional.of(() -> new TableItemHandlers.ResultHandler(this));
+	public final Optional<IItemHandlerModifiable> bufferHandler = Optional.of(new TableItemHandlers.BufferHandler(this));
+	public final Optional<IItemHandlerModifiable> matrixHandler = Optional.of(new TableItemHandlers.MatrixHandler(this));
+	public final Optional<IItemHandlerModifiable> resultHandler = Optional.of(new TableItemHandlers.ResultHandler(this));
 
-	protected final LazyOptional<IItemHandlerModifiable> combinedHandler = LazyOptional.of(() ->
-			new CombinedInvWrapper(this.matrixHandler.orElse(EMPTYHANDLER), this.bufferHandler.orElse(EMPTYHANDLER)));
-	public final LazyOptional<CraftingContainer> matrixWrapper = LazyOptional.of(() ->
-			new CraftingContainerWrapper(this.matrixHandler.orElse(EMPTYHANDLER)));
+	protected final Optional<IItemHandlerModifiable> combinedHandler = Optional.of(new CombinedInvWrapper(this.matrixHandler.orElse(EMPTYHANDLER), this.bufferHandler.orElse(EMPTYHANDLER)));
+	public final Optional<CraftingContainer> matrixWrapper = Optional.of(new CraftingContainerWrapper(this.matrixHandler.orElse(EMPTYHANDLER)));
 
 	public RatCraftingTableBlockEntity(BlockPos pos, BlockState state) {
 		super(RatsBlockEntityRegistry.RAT_CRAFTING_TABLE.get(), pos, state);
@@ -127,7 +126,7 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 			}
 			if (te.cookTime >= te.totalCookTime) {
 				te.cookTime = 0;
-				ItemStack addStack = te.recipeUsed.map(r -> r.assemble(te.matrixWrapper.resolve().orElseThrow(), level.registryAccess())).orElse(ItemStack.EMPTY);
+				ItemStack addStack = te.recipeUsed.map(r -> r.assemble(te.matrixWrapper.orElseThrow(), level.registryAccess())).orElse(ItemStack.EMPTY);
 				te.resultHandler.ifPresent(h -> h.setStackInSlot(0, addStack.copyWithCount(addStack.getCount() + h.getStackInSlot(0).getCount())));
 				te.consumeIngredients(null);
 				te.updateRecipe();
@@ -177,8 +176,8 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	}
 
 	private boolean checkIfResultFits(Level level, Optional<CraftingRecipe> recipe) {
-		if (recipe.isPresent() && this.resultHandler.resolve().isPresent()) {
-			ItemStack checkStack = this.resultHandler.resolve().get().getStackInSlot(0);
+		if (recipe.isPresent() && this.resultHandler.isPresent()) {
+			ItemStack checkStack = this.resultHandler.get().getStackInSlot(0);
 			ItemStack resultStack = recipe.get().getResultItem(level.registryAccess());
 			return (ItemStack.isSameItemSameComponents(checkStack, resultStack) && checkStack.getCount() + resultStack.getCount() <= checkStack.getMaxStackSize()) || checkStack.isEmpty();
 		}
@@ -284,16 +283,10 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 		return new RatCraftingTableMenu(id, inventory, this, this.dataAccess);
 	}
 
-	@Override
-	public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-		if (!this.remove && cap == Capabilities.ITEM_HANDLER) {
-			if (side == Direction.DOWN) {
-				return this.resultHandler.cast();
-			} else {
-				return this.bufferHandler.cast();
-			}
-		}
-		return super.getCapability(cap, side);
+
+	/** Hoppers: the result below, the buffer on the other sides (registered as the block's item handler capability) */
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		return side == Direction.DOWN ? this.resultHandler.get() : this.bufferHandler.get();
 	}
 
 	public void consumeIngredients(@Nullable Player player) {
@@ -334,7 +327,7 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	}
 
 	private void outputStack(ItemStack stack) {
-		ItemStack newStack = this.getCapability(Capabilities.ITEM_HANDLER)
+		ItemStack newStack = this.bufferHandler
 				.map(h -> ItemHandlerHelper.insertItemStacked(h, stack, false))
 				.orElse(stack);
 

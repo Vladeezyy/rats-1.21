@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.misc.PiratWoodBoat;
 import com.google.common.collect.ImmutableMap;
@@ -90,7 +89,7 @@ public class PiratWoodBoatRenderer extends EntityRenderer<PiratWoodBoat> {
 		}
 
 		stack.popPose();
-		super.render(boat, boatYaw, FastColor.ARGB32.colorFromFloat(light, partialTicks, stack, buffer));
+		super.render(boat, boatYaw, partialTicks, stack, buffer, light);
 	}
 
 	@Override

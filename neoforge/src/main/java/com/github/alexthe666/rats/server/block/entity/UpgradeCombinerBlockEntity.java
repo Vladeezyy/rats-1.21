@@ -34,7 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +52,7 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	public int burnDuration;
 	public int cookTime;
 	public int totalCookTime;
-	private final LazyOptional<? extends IItemHandler>[] handlers = SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
+	private final IItemHandler[] handlers = {new SidedInvWrapper(this, Direction.UP), new SidedInvWrapper(this, Direction.DOWN), new SidedInvWrapper(this, Direction.NORTH)};
 	private NonNullList<ItemStack> combinerStacks = NonNullList.withSize(4, ItemStack.EMPTY);
 	public final ContainerData data = new ContainerData() {
 		@Override
@@ -349,19 +348,7 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 
 	@NotNull
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-		if (!this.remove && facing != null && capability == Capabilities.ITEM_HANDLER) {
-			if (facing == Direction.UP)
-				return handlers[0].cast();
-			else if (facing == Direction.DOWN)
-				return handlers[1].cast();
-			else
-				return handlers[2].cast();
-		}
-		return super.getCapability(capability, facing);
-	}
-
-	@Override
+		@Override
 	protected Component getDefaultName() {
 		return Component.translatable(RatsLangConstants.UPGRADE_COMBINER);
 	}
@@ -369,5 +356,14 @@ public class UpgradeCombinerBlockEntity extends BaseContainerBlockEntity impleme
 	@Override
 	protected AbstractContainerMenu createMenu(int id, Inventory player) {
 		return new UpgradeCombinerMenu(id, this, player, this.data);
+	}
+
+	/** Hoppers and pipes per side, as in the original (registered as the block's item handler capability) */
+	@Nullable
+	public IItemHandler getItemHandler(@Nullable Direction side) {
+		if (side == null) {
+			return null;
+		}
+		return side == Direction.UP ? this.handlers[0] : side == Direction.DOWN ? this.handlers[1] : this.handlers[2];
 	}
 }
