@@ -43,7 +43,7 @@ public abstract class DiggingRat extends AbstractRat {
 	public void aiStep() {
 		super.aiStep();
 
-		if (this.canDigThroughBlocks() && EventHooks.getMobGriefingEvent(this.level(), this)) {
+		if (this.canDigThroughBlocks() && EventHooks.canEntityGrief(this.level(), this)) {
 			if (this.getOwner() == null && this.getNavigation().isDone() && this.digCooldown-- <= 0 && RatConfig.ratsDigBlocks) {
 				this.findDigTarget();
 				this.digTarget();

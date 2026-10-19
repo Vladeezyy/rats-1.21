@@ -79,7 +79,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			if (!itemstack.isEmpty()) {
 				CompoundTag compoundtag = new CompoundTag();
 				compoundtag.putByte("Slot", (byte) i);
-				itemstack.save(compoundtag);
+				itemstack.save(this.registryAccess(), compoundtag);
 				listtag.add(compoundtag);
 			}
 		}
@@ -107,7 +107,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			CompoundTag compoundtag = listtag.getCompound(i);
 			int j = compoundtag.getByte("Slot") & 255;
 			if (j < this.getInventory().getContainerSize()) {
-				this.getInventory().setItem(j, ItemStack.of(compoundtag));
+				this.getInventory().setItem(j, ItemStack.parseOptional(this.registryAccess(), compoundtag));
 			}
 		}
 
@@ -247,7 +247,7 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 	public void setCommandInteger(int command) {
 		if (!this.level().isClientSide() && command != this.getCommandInteger()) {
 			this.getNavigation().stop();
-			this.goalSelector.getRunningGoals().forEach(WrappedGoal::stop);
+			this.goalSelector.getAvailableGoals().stream().filter(WrappedGoal::isRunning).forEach(WrappedGoal::stop);
 			if (this instanceof TamedRat rat) rat.crafting = false;
 		}
 		this.getEntityData().set(COMMAND, command);

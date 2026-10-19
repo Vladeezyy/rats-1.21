@@ -77,7 +77,7 @@ public class RatUtils {
 	}
 
 	public static boolean isRatFood(ItemStack stack) {
-		return (stack.getItem().has(net.minecraft.core.component.DataComponents.FOOD) || stack.is(Tags.Items.SEEDS) || stack.is(Items.WHEAT)) && !stack.is(RatsItemRegistry.RAW_RAT.get()) && !stack.is(RatsItemRegistry.COOKED_RAT.get());
+		return (stack.has(net.minecraft.core.component.DataComponents.FOOD) || stack.is(Tags.Items.SEEDS) || stack.is(Items.WHEAT)) && !stack.is(RatsItemRegistry.RAW_RAT.get()) && !stack.is(RatsItemRegistry.COOKED_RAT.get());
 	}
 
 	public static boolean shouldRaidItem(ItemStack stack) {
@@ -181,11 +181,11 @@ public class RatUtils {
 	}
 
 	public static boolean canRatPlaceBlock(Level level, BlockPos pos, DiggingRat rat) {
-		return EventHooks.getMobGriefingEvent(level, rat) && !EventHooks.onBlockPlace(rat, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
+		return EventHooks.canEntityGrief(level, rat) && !EventHooks.onBlockPlace(rat, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP);
 	}
 
 	public static boolean isBlockProtected(Level level, BlockPos pos, DiggingRat rat) {
-		return !EventHooks.getMobGriefingEvent(level, rat) || !EventHooks.onEntityDestroyBlock(rat, pos, level.getBlockState(pos));
+		return !EventHooks.canEntityGrief(level, rat) || !EventHooks.onEntityDestroyBlock(rat, pos, level.getBlockState(pos));
 	}
 
 	public static boolean isOpenRatTube(BlockGetter getter, BlockPos pos) {
@@ -218,7 +218,7 @@ public class RatUtils {
 			for (BlockPos pos : allBlocks) {
 				BlockState block = level.getBlockState(pos);
 				if (block.getBlock() instanceof BonemealableBlock igrowable) {
-					if (igrowable.isValidBonemealTarget(level, pos, block, level.isClientSide()) && level.getRandom().nextInt(3) == 0) {
+					if (igrowable.isValidBonemealTarget(level, pos, block) && level.getRandom().nextInt(3) == 0) {
 						if (!level.isClientSide()) {
 							level.levelEvent(2005, pos, 0);
 							igrowable.performBonemeal((ServerLevel) level, level.getRandom(), pos, block);
@@ -231,7 +231,7 @@ public class RatUtils {
 
 	private static boolean canPlantBeBonemealed(Level level, BlockPos pos, BlockState BlockState) {
 		if (BlockState.getBlock() instanceof BonemealableBlock igrowable && !(BlockState.getBlock() instanceof TallGrassBlock) && !(BlockState.getBlock() instanceof GrassBlock)) {
-			if (igrowable.isValidBonemealTarget(level, pos, BlockState, level.isClientSide())) {
+			if (igrowable.isValidBonemealTarget(level, pos, BlockState)) {
 				if (!level.isClientSide()) {
 					//  igrowable.grow(level, level.rand, target, BlockState);
 					return igrowable.isBonemealSuccess(level, level.getRandom(), pos, BlockState);
@@ -246,8 +246,8 @@ public class RatUtils {
 		BlockState blockState = level.getBlockState(pos);
 		Block block = blockState.getBlock();
 		if (!level.isClientSide()) {
-			if (block.isRandomlyTicking(blockState) && randomTickInt == 0) {
-				block.randomTick(blockState, (ServerLevel) level, pos, level.getRandom());
+			if (blockState.isRandomlyTicking() && randomTickInt == 0) {
+				blockState.randomTick((ServerLevel) level, pos, level.getRandom());
 			}
 
 			if (beTickInt == 0) {

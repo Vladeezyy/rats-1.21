@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.SpawnEggItem;
@@ -97,7 +98,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -350,7 +350,9 @@ public class TamedRat extends InventoryRat {
 		}
 		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		if (flag) {
-			this.doEnchantDamageEffects(this, entity);
+			if (this.level() instanceof ServerLevel serverLevel) {
+				EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().mobAttack(this));
+			}
 			this.getMainHandItem().hurtAndBreak(1, this, EquipmentSlot.MAINHAND);
 			RatUpgradeUtils.forEachUpgrade(this, item -> item instanceof PostAttackUpgrade, (stack, slot) -> ((PostAttackUpgrade) stack.getItem()).afterHit(this, (LivingEntity) entity));
 		}
@@ -387,7 +389,7 @@ public class TamedRat extends InventoryRat {
 
 	@Override
 	public boolean canDrownInFluidType(FluidType type) {
-		return type == NeoForgeMod.WATER_TYPE.get() && (!RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()) || !RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDERWATER.get()));
+		return type == NeoForgeMod.WATER_TYPE.value() && (!RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()) || !RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDERWATER.get()));
 	}
 
 	@Override
@@ -1158,17 +1160,11 @@ public class TamedRat extends InventoryRat {
 		return blacklist.isEmpty() == listed;
 	}
 
+	// 1.21 has no mob types: the undead upgrade makes healing and harming potions work the other way round, as
+	// MobType.UNDEAD did (the aquatic upgrade's MobType.WATER only changed Impaling, now an entity type tag)
 	@Override
-	public MobType getMobType() {
-		if (this.getInventory() != null) {
-			if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDEAD.get())) {
-				return MobType.UNDEAD;
-			}
-			if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get())) {
-				return MobType.WATER;
-			}
-		}
-		return super.getMobType();
+	public boolean isInvertedHealAndHarm() {
+		return this.getInventory() != null && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_UNDEAD.get());
 	}
 
 	@Override
@@ -1457,11 +1453,5 @@ public class TamedRat extends InventoryRat {
 
 	public boolean hasFlightUpgrade() {
 		return RatUpgradeUtils.forEachUpgradeBool(this, (stack) -> stack.canFly(this), false);
-	}
-
-	// 1.21: FollowOwnerGoal asks the animal; the rat stays when sitting, riding a player or leashed (as in the original)
-	@Override
-	public boolean unableToMoveToOwner() {
-		return this.isOrderedToSit() || this.getVehicle() instanceof Player || this.isLeashed();
 	}
 }

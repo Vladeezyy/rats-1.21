@@ -37,7 +37,7 @@ public class RatRaidChestsGoal extends RatMoveToBlockGoal {
 		if (!this.rat.canMove() || this.rat.getOwner() != null || !RatConfig.ratsStealItems) {
 			return false;
 		}
-		return EventHooks.getMobGriefingEvent(this.rat.level(), this.rat) && super.canUse();
+		return EventHooks.canEntityGrief(this.rat.level(), this.rat) && super.canUse();
 	}
 
 	@Override

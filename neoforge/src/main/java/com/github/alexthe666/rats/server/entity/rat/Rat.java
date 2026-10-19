@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.*;
@@ -390,7 +391,9 @@ public class Rat extends DiggingRat {
 	public boolean doHurtTarget(Entity entity) {
 		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		if (flag && this.hasPlague()) {
-			this.doEnchantDamageEffects(this, entity);
+			if (this.level() instanceof ServerLevel serverLevel) {
+				EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().mobAttack(this));
+			}
 			if (entity instanceof LivingEntity living && this.rollForPlague(living)) {
 				living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 			}

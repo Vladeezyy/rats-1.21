@@ -37,7 +37,7 @@ public class RatRaidCropsGoal extends RatMoveToBlockGoal {
 			return false;
 		}
 
-		return EventHooks.getMobGriefingEvent(this.rat.level(), this.rat) && super.canUse();
+		return EventHooks.canEntityGrief(this.rat.level(), this.rat) && super.canUse();
 	}
 
 	@Override

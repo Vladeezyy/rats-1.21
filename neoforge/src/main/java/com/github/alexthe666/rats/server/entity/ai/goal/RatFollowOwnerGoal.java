@@ -19,18 +19,37 @@ import java.util.EnumSet;
 public class RatFollowOwnerGoal extends FollowOwnerGoal {
 	private final TamedRat rat;
 	private final double speedModifier;
+	private final float startDist;
+	private final float stopDist;
 	private int timeToRecalcPath;
 
 	public RatFollowOwnerGoal(TamedRat rat, double speedModifier, float startDist, float stopDist) {
 		super(rat, speedModifier, startDist, stopDist);
 		this.rat = rat;
 		this.speedModifier = speedModifier;
+		this.startDist = startDist;
+		this.stopDist = stopDist;
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+	}
+
+	// 1.21's TamableAnimal.unableToMoveToOwner is final and stops any passenger; the original let rats on their own
+	// mounts follow (only sitting, riding a player or a leash stop them), so the checks are done here
+	private boolean unableToMove() {
+		return this.rat.isOrderedToSit() || this.rat.getVehicle() instanceof Player || this.rat.isLeashed();
 	}
 
 	@Override
 	public boolean canUse() {
-		return this.rat.canMove() && this.rat.isFollowing() && super.canUse();
+		LivingEntity owner = this.rat.getOwner();
+		return this.rat.canMove() && this.rat.isFollowing() && owner != null && !owner.isSpectator() && !this.unableToMove()
+				&& this.rat.distanceToSqr(owner) >= (double) (this.startDist * this.startDist);
+	}
+
+	@Override
+	public boolean canContinueToUse() {
+		LivingEntity owner = this.rat.getOwner();
+		return owner != null && !this.rat.getNavigation().isDone() && !this.unableToMove()
+				&& this.rat.distanceToSqr(owner) > (double) (this.stopDist * this.stopDist);
 	}
 
 	@Override

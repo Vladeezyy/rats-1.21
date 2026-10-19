@@ -101,7 +101,7 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 		if (this.blockBreakCounter > 0) {
 			--this.blockBreakCounter;
 
-			if (this.blockBreakCounter == 0 && EventHooks.getMobGriefingEvent(this.level(), this)) {
+			if (this.blockBreakCounter == 0 && EventHooks.canEntityGrief(this.level(), this)) {
 				int i1 = Mth.floor(this.getY());
 				int l1 = Mth.floor(this.getX());
 				int i2 = Mth.floor(this.getZ());

@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.client.events;
 
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatConfig;
@@ -53,8 +55,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.bus.api.EventPriority;
@@ -117,11 +119,11 @@ public class ForgeClientEvents {
 	}
 
 	@SubscribeEvent
-	public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
+	public static void onLivingUpdate(EntityTickEvent.Pre event) {
 		if (RatConfig.synesthesiaShader) {
 			if (event.getEntity() == Minecraft.getInstance().player) {
 				GameRenderer renderer = Minecraft.getInstance().gameRenderer;
-				boolean active = event.getEntity().hasEffect(RatsEffectRegistry.SYNESTHESIA);
+				boolean active = Minecraft.getInstance().player.hasEffect(RatsEffectRegistry.SYNESTHESIA);
 				try {
 					if (active && renderer.currentEffect() == null) {
 						renderer.loadEffect(SYNESTHESIA);
@@ -176,10 +178,10 @@ public class ForgeClientEvents {
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {
+	public static void onRenderOverlay(RenderGuiLayerEvent.Post event) {
 		Player player = Minecraft.getInstance().player;
 		if (player == null || player.isCreative() || player.isSpectator()) return;
-		if (event.getOverlay() != VanillaGuiOverlay.PLAYER_HEALTH.type() || event.isCanceled() || !player.hasEffect(RatsEffectRegistry.PLAGUE) || !RatConfig.plagueHearts) {
+		if (!event.getName().equals(VanillaGuiLayers.PLAYER_HEALTH) || !player.hasEffect(RatsEffectRegistry.PLAGUE) || !RatConfig.plagueHearts) {
 			return;
 		}
 		GuiGraphics graphics = event.getGuiGraphics();
@@ -325,9 +327,8 @@ public class ForgeClientEvents {
 				if (rat == null) return;
 				ItemStack heldItem = Minecraft.getInstance().player.getItemInHand(InteractionHand.MAIN_HAND);
 				Tesselator tessellator = Tesselator.getInstance();
-				BufferBuilder buffer = tessellator.getBuilder();
 				PoseStack stack = event.getPoseStack();
-				float bob = 1.5F + 0.3F * (Mth.sin((event.getPartialTick() + Minecraft.getInstance().player.tickCount) * 0.1F) + 1F);
+				float bob = 1.5F + 0.3F * (Mth.sin((event.getPartialTick().getGameTimeDeltaPartialTick(false) + Minecraft.getInstance().player.tickCount) * 0.1F) + 1F);
 				final Vec3 viewPosition = Minecraft.getInstance().getEntityRenderDispatcher().camera.getPosition();
 				double px = viewPosition.x;
 				double py = viewPosition.y;
@@ -336,17 +337,17 @@ public class ForgeClientEvents {
 					float finalBob = bob;
 					rat.getDepositPos().ifPresent(pos -> {
 						if (Minecraft.getInstance().player.level().isLoaded(pos.pos()) && pos.dimension().equals(rat.level().dimension())) {
-							RatsIconRenderUtil.renderPOIIcon(RAT_DEPOSIT_TEXTURE, viewPosition, pos.pos(), finalBob, stack, buffer, tessellator);
+							RatsIconRenderUtil.renderPOIIcon(RAT_DEPOSIT_TEXTURE, viewPosition, pos.pos(), finalBob, stack, tessellator);
 						}
 					});
 					rat.getPickupPos().ifPresent(pos -> {
 						if (Minecraft.getInstance().player.level().isLoaded(pos.pos()) && pos.dimension().equals(rat.level().dimension())) {
-							RatsIconRenderUtil.renderPOIIcon(RAT_PICKUP_TEXTURE, viewPosition, pos.pos(), finalBob, stack, buffer, tessellator);
+							RatsIconRenderUtil.renderPOIIcon(RAT_PICKUP_TEXTURE, viewPosition, pos.pos(), finalBob, stack, tessellator);
 						}
 					});
 					rat.getHomePoint().ifPresent(pos -> {
 						if (Minecraft.getInstance().player.level().isLoaded(pos.pos()) && pos.dimension().equals(rat.level().dimension())) {
-							RatsIconRenderUtil.renderPOIIcon(HOME_TEXTURE, viewPosition, pos.pos(), finalBob, stack, buffer, tessellator);
+							RatsIconRenderUtil.renderPOIIcon(HOME_TEXTURE, viewPosition, pos.pos(), finalBob, stack, tessellator);
 						}
 					});
 					if (Minecraft.getInstance().hitResult != null && Minecraft.getInstance().hitResult.getType() == HitResult.Type.BLOCK) {
@@ -367,7 +368,7 @@ public class ForgeClientEvents {
 					AABB aabb = new AABB(-renderRadius, -renderRadius, -renderRadius, renderRadius, renderRadius, renderRadius);
 					RatsIconRenderUtil.renderBox(RADIUS_TEXTURE, viewPosition, renderCenter, aabb, stack);
 				} else if (heldItem.is(RatsItemRegistry.PATROL_STICK.get())) {
-					bob = 1.5F + 0.05F * (Mth.sin((event.getPartialTick() + (float) Minecraft.getInstance().player.tickCount) * 0.1F) + 1.0F);
+					bob = 1.5F + 0.05F * (Mth.sin((event.getPartialTick().getGameTimeDeltaPartialTick(false) + (float) Minecraft.getInstance().player.tickCount) * 0.1F) + 1.0F);
 
 					for (int i = 0; i < rat.getPatrolNodes().size(); ++i) {
 						GlobalPos node = rat.getPatrolNodes().get(i);
@@ -391,11 +392,11 @@ public class ForgeClientEvents {
 							float pdx = (float) (node.pos().getX() - prev.pos().getX());
 							float pdy = (float) (node.pos().getY() - prev.pos().getY());
 							float pdz = (float) (node.pos().getZ() - prev.pos().getZ());
-							buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+							BufferBuilder lines = tessellator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 							Matrix4f matrix4f = stack.last().pose();
-							buffer.addVertex(matrix4f, pdx, pdy, pdz).setColor(r, g, b, 1.0F);
-							buffer.addVertex(matrix4f, 0.0F, 0.0F, 0.0F).setColor(r, g, b, 1.0F);
-							tessellator.end();
+							lines.addVertex(matrix4f, pdx, pdy, pdz).setColor(r, g, b, 1.0F);
+							lines.addVertex(matrix4f, 0.0F, 0.0F, 0.0F).setColor(r, g, b, 1.0F);
+							BufferUploader.drawWithShader(lines.buildOrThrow());
 							stack.popPose();
 						}
 

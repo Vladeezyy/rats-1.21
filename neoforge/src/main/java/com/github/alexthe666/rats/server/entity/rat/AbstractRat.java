@@ -142,8 +142,8 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 					this.onItemEaten();
 				}
 				int healAmount = 1;
-				if (this.getMainHandItem().getItem().has(net.minecraft.core.component.DataComponents.FOOD)) {
-					healAmount = Objects.requireNonNull(this.getMainHandItem().getItem().getFoodProperties(this.getMainHandItem(), this)).getNutrition();
+				if (this.getMainHandItem().has(net.minecraft.core.component.DataComponents.FOOD)) {
+					healAmount = Objects.requireNonNull(this.getMainHandItem().getFoodProperties(this)).nutrition();
 				}
 				this.heal(healAmount);
 				this.eatingTicks = 0;
@@ -224,7 +224,7 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 		builder.define(IS_MALE, false);
 		builder.define(SITTING, false);
 		builder.define(SLEEPING, false);
-		builder.define(COLOR_VARIANT, RatVariantRegistry.RAT_VARIANT_REGISTRY.get().getKey(RatVariantRegistry.BLUE.get()).toString());
+		builder.define(COLOR_VARIANT, RatVariantRegistry.RAT_VARIANT_REGISTRY.getKey(RatVariantRegistry.BLUE.get()).toString());
 		builder.define(DEAD_IN_TRAP, false);
 		builder.define(FLEE_POS, Optional.empty());
 	}
@@ -432,7 +432,7 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 		this.setOrderedToSit(tag.getBoolean("Sitting"));
 		if (tag.contains("ColorVariant", Tag.TAG_INT)) {
 			this.setColorVariant(RatUtils.convertOldRatVariant(tag.getInt("ColorVariant")));
-			RatsMod.LOGGER.debug("Converted Rat variant for Rat {} from {} to {}.", this.getUUID(), tag.getInt("ColorVariant"), RatVariantRegistry.RAT_VARIANT_REGISTRY.get().getKey(RatUtils.convertOldRatVariant(tag.getInt("ColorVariant"))).toString());
+			RatsMod.LOGGER.debug("Converted Rat variant for Rat {} from {} to {}.", this.getUUID(), tag.getInt("ColorVariant"), RatVariantRegistry.RAT_VARIANT_REGISTRY.getKey(RatUtils.convertOldRatVariant(tag.getInt("ColorVariant"))).toString());
 		} else if (tag.contains("ColorVariant", Tag.TAG_STRING)) {
 			this.setColorVariant(RatVariant.getVariant(tag.getString("ColorVariant")));
 		}
@@ -464,9 +464,11 @@ public abstract class AbstractRat extends TamableAnimal implements IAnimatedEnti
 		return RatConfig.ratsSpawnLikeMonsters;
 	}
 
+	// 1.21: the eye height is part of the dimensions (the original overrode getStandingEyeHeight)
 	@Override
-	protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
-		return this.sitProgress > 0.0F && this.sleepProgress <= 0.0F ? super.getStandingEyeHeight(pose, dimensions) : dimensions.height * 0.5F;
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		EntityDimensions dimensions = super.getDefaultDimensions(pose);
+		return this.sitProgress > 0.0F && this.sleepProgress <= 0.0F ? dimensions : dimensions.withEyeHeight(dimensions.height() * 0.5F);
 	}
 
 	@Override
