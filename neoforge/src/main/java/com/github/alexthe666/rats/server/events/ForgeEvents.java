@@ -1,5 +1,10 @@
 package com.github.alexthe666.rats.server.events;
 
+import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import com.github.alexthe666.rats.server.capability.SelectedRats;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.github.alexthe666.rats.RatConfig;
@@ -84,7 +89,7 @@ import net.neoforged.fml.common.Mod;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = RatsMod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeEvents {
 
 	@SubscribeEvent
@@ -139,7 +144,7 @@ public class ForgeEvents {
 	@SubscribeEvent
 	public static void piglinsDontAttackGoldRatsEver(LivingChangeTargetEvent event) {
 		if (event.getEntity() instanceof Piglin) {
-			if (event.getNewTarget() instanceof TamedRat rat && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_IDOL.get())) {
+			if (event.getNewAboutToBeSetTarget() instanceof TamedRat rat && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_IDOL.get())) {
 				event.setCanceled(true);
 			}
 		}
@@ -174,7 +179,7 @@ public class ForgeEvents {
 
 	//complete hack workaround for rats not cooking food dropped by victims if they kill them in 1 shot
 	@SubscribeEvent
-	public static void hackySetFireFix(LivingAttackEvent event) {
+	public static void hackySetFireFix(LivingIncomingDamageEvent event) {
 		if (!event.getEntity().fireImmune()) {
 			if (event.getSource().getEntity() instanceof TamedRat rat && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_DEMON.get())) {
 				event.getEntity().igniteForSeconds(1);
@@ -185,12 +190,12 @@ public class ForgeEvents {
 	@SubscribeEvent
 	public static void checkIfPlagueCanApplyToMob(MobEffectEvent.Applicable event) {
 		if (event.getEffectInstance().getEffect() == RatsEffectRegistry.PLAGUE && (!RatConfig.plagueSpread || event.getEntity().getType().is(RatsEntityTags.PLAGUE_IMMUNE))) {
-			event.setResult(Event.Result.DENY);
+			event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
 		}
 	}
 
 	@SubscribeEvent
-	public static void onHitEntity(LivingAttackEvent event) {
+	public static void onHitEntity(LivingIncomingDamageEvent event) {
 		if (event.getSource().getDirectEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE)) {
 			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE, 6000));
 		}
@@ -256,7 +261,7 @@ public class ForgeEvents {
 	}
 
 	@SubscribeEvent
-	public static void spawnStriderJockeys(MobSpawnEvent.FinalizeSpawn event) {
+	public static void spawnStriderJockeys(FinalizeSpawnEvent event) {
 		//Carry On passes null into their difficulty when firing this event so we have to check this unfortunately. They shouldnt be doing this.
 		if (event.getDifficulty() == null) return;
 		if (event.getDifficulty().getDifficulty() != Difficulty.PEACEFUL && (event.getSpawnType() == MobSpawnType.CHUNK_GENERATION || event.getSpawnType() == MobSpawnType.NATURAL)) {
@@ -268,7 +273,7 @@ public class ForgeEvents {
 						demonRat.finalizeSpawn(event.getLevel(), event.getDifficulty(), MobSpawnType.JOCKEY, null);
 						demonRat.startRiding(strider, true);
 						demonRat.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
-						strider.equipSaddle(null);
+						strider.equipSaddle(new ItemStack(Items.SADDLE), null);
 					}
 				}
 			}
@@ -299,7 +304,7 @@ public class ForgeEvents {
 			LootParams.Builder builder = (new LootParams.Builder((ServerLevel) level))
 					.withParameter(LootContextParams.ORIGIN, hook.position())
 					.withParameter(LootContextParams.TOOL, checkHandsForRod(player))
-					.withParameter(LootContextParams.KILLER_ENTITY, player)
+					.withParameter(LootContextParams.ATTACKING_ENTITY, player)
 					.withParameter(LootContextParams.THIS_ENTITY, hook)
 					.withLuck((float) hook.luck + player.getLuck());
 			LootTable loottable = level.getServer().reloadableRegistries().getLootTable(RatsLootRegistry.RATLANTIS_FISH);
@@ -330,7 +335,7 @@ public class ForgeEvents {
 			event.getTrades().get(1).add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.CHEESE.get(), 1, 5, 1));
 
 			event.getTrades().get(2).add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.COOKED_RAT.get(), 1, 5, 5));
-			event.getTrades().get(2).add(new VillagerTrades.ItemsAndEmeraldsToItems(RatsBlockRegistry.GARBAGE_PILE.get(), 10, 3, RatsItemRegistry.PLASTIC_WASTE.get(), 10, 12, 5));
+			event.getTrades().get(2).add(new VillagerTrades.ItemsAndEmeraldsToItems(RatsBlockRegistry.GARBAGE_PILE.get(), 10, 3, RatsItemRegistry.PLASTIC_WASTE.get(), 10, 12, 5, 0.05F));
 			event.getTrades().get(2).add(new VillagerTrades.ItemsForEmeralds(RatsBlockRegistry.MARBLED_CHEESE_RAW.get().asItem(), 1, 8, 5));
 			event.getTrades().get(2).add(new VillagerTrades.ItemsForEmeralds(RatsBlockRegistry.GARBAGE_PILE.get().asItem(), 1, 6, 5));
 			event.getTrades().get(2).add(new VillagerTrades.EmeraldForItems(RatsItemRegistry.RAW_PLASTIC.get(), 5, 12, 5));
@@ -378,7 +383,7 @@ public class ForgeEvents {
 	}
 
 	@SubscribeEvent
-	public static void onLivingHurt(LivingHurtEvent event) {
+	public static void onLivingHurt(LivingIncomingDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
 			List<TamedRat> list = event.getEntity().level().getEntitiesOfClass(TamedRat.class, event.getEntity().getBoundingBox().inflate(RatConfig.ratVoodooDistance), rat -> rat.isTame() && rat.isOwnedBy(event.getEntity()) && !rat.isInvulnerable() && !rat.isInvulnerableTo(event.getSource()) && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_VOODOO.get()));
 			if (!list.isEmpty()) {
@@ -399,8 +404,8 @@ public class ForgeEvents {
 	}
 
 	@SubscribeEvent
-	public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
-		if (event.getEntity().level().isClientSide() && event.getEntity().hasEffect(RatsEffectRegistry.PLAGUE)) {
+	public static void onLivingUpdate(EntityTickEvent.Pre event) {
+		if (event.getEntity().level().isClientSide() && event.getEntity() instanceof LivingEntity living && living.hasEffect(RatsEffectRegistry.PLAGUE)) {
 			RandomSource rand = event.getEntity().getRandom();
 			if (rand.nextInt(4) == 0) {
 				int entitySize = 1;
@@ -425,7 +430,7 @@ public class ForgeEvents {
 	public static void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
 		ItemStack stack = event.getEntity().getItemInHand(event.getHand());
 		if (stack.getItem() instanceof RatStaffItem staff) {
-			event.setUseBlock(Event.Result.DENY);
+			event.setUseBlock(TriState.FALSE);
 			event.setCancellationResult(InteractionResult.FAIL);
 			event.setCanceled(true);
 			TamedRat rat = null;
@@ -446,13 +451,14 @@ public class ForgeEvents {
 	public static void handleArmSwing(ItemStack stack, Player player) {
 		if (stack.is(RatsItemRegistry.PLAGUE_SCYTHE.get())) {
 			if (player.swingTime == 0 && !player.isSpectator()) {
-				Multimap<Attribute, AttributeModifier> dmg = stack.getAttributeModifiers(EquipmentSlot.MAINHAND);
-				double totalDmg = 0;
-				for (AttributeModifier modifier : dmg.get(Attributes.ATTACK_DAMAGE)) {
-					totalDmg += modifier.getAmount();
-				}
+				double[] totalDmg = {0};
+				stack.getAttributeModifiers().forEach(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
+					if (attribute.is(Attributes.ATTACK_DAMAGE)) {
+						totalDmg[0] += modifier.amount();
+					}
+				});
 				player.playSound(RatsSoundRegistry.PLAGUE_CLOUD_SHOOT.get(), 1, 1);
-				PlagueShot shot = new PlagueShot(RatsEntityRegistry.PLAGUE_SHOT.get(), player.level(), player, totalDmg * 0.5F);
+				PlagueShot shot = new PlagueShot(RatsEntityRegistry.PLAGUE_SHOT.get(), player.level(), player, totalDmg[0] * 0.5F);
 				Vec3 vec3 = player.getViewVector(1.0F);
 
 				shot.shoot(vec3.x(), vec3.y(), vec3.z(), 1.0F, 0.5F);

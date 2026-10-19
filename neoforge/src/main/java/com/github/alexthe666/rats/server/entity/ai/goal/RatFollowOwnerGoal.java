@@ -1,5 +1,10 @@
 package com.github.alexthe666.rats.server.entity.ai.goal;
 
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
+import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.entity.LivingEntity;
 import com.github.alexthe666.rats.server.entity.RatMount;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.core.BlockPos;
@@ -17,7 +22,7 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 	private int timeToRecalcPath;
 
 	public RatFollowOwnerGoal(TamedRat rat, double speedModifier, float startDist, float stopDist) {
-		super(rat, speedModifier, startDist, stopDist, false);
+		super(rat, speedModifier, startDist, stopDist);
 		this.rat = rat;
 		this.speedModifier = speedModifier;
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE));
@@ -29,11 +34,6 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 	}
 
 	@Override
-	public boolean unableToMove() {
-		return this.rat.isOrderedToSit() || this.rat.getVehicle() instanceof Player || this.rat.isLeashed();
-	}
-
-	@Override
 	public void start() {
 		super.start();
 		this.rat.getNavigation().stop();
@@ -42,35 +42,41 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 
 	@Override
 	public void tick() {
-		this.rat.getLookControl().setLookAt(this.owner, 10.0F, (float) this.rat.getMaxHeadXRot());
+		LivingEntity owner = this.rat.getOwner();
+		if (owner == null) {
+			return;
+		}
+		this.rat.getLookControl().setLookAt(owner, 10.0F, (float) this.rat.getMaxHeadXRot());
 		if (this.rat.isFollowing()) {
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = this.adjustedTickDelay(10);
-				if (this.rat.distanceToSqr(this.owner) >= (this.rat.hasFlightUpgrade() ? 800.0D : 400.0D)) {
-					if (!this.maybeTeleportMount()) {
-						this.teleportToOwner();
+				if (this.rat.distanceToSqr(owner) >= (this.rat.hasFlightUpgrade() ? 800.0D : 400.0D)) {
+					if (!this.maybeTeleportMount(owner)) {
+						this.rat.tryToTeleportToOwner();
+						// the original kept the fall distance of the old position (#847: "fell from a great height")
+						this.rat.resetFallDistance();
 					}
 				} else {
 					if (this.rat.hasFlightUpgrade()) {
-						this.rat.getNavigation().moveTo(this.owner.getX(), this.owner.getY() + 2.5D, this.owner.getZ(), this.speedModifier);
+						this.rat.getNavigation().moveTo(owner.getX(), owner.getY() + 2.5D, owner.getZ(), this.speedModifier);
 						this.rat.setFlying(true);
 					} else {
-						this.rat.getNavigation().moveTo(this.owner, this.speedModifier);
+						this.rat.getNavigation().moveTo(owner, this.speedModifier);
 					}
 				}
 			}
 		}
 	}
 
-	private boolean maybeTeleportMount() {
+	private boolean maybeTeleportMount(LivingEntity owner) {
 		if (this.rat.getVehicle() instanceof RatMount mount && mount.shouldTeleportWhenFarAway()) {
-			BlockPos blockpos = this.owner.blockPosition();
+			BlockPos blockpos = owner.blockPosition();
 
 			for (int i = 0; i < 10; ++i) {
 				int j = this.randomIntInclusive(-3, 3);
 				int k = this.randomIntInclusive(-1, 1);
 				int l = this.randomIntInclusive(-3, 3);
-				boolean flag = this.attemptTeleportEntity(this.rat.getVehicle(), blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
+				boolean flag = this.attemptTeleportEntity(owner, this.rat.getVehicle(), blockpos.getX() + j, blockpos.getY() + k, blockpos.getZ() + l);
 				if (flag) {
 					return true;
 				}
@@ -79,13 +85,14 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 		return false;
 	}
 
-	private boolean attemptTeleportEntity(Entity mount, int x, int y, int z) {
-		if (Math.abs((double) x - this.owner.getX()) < 2.0D && Math.abs((double) z - this.owner.getZ()) < 2.0D) {
+	private boolean attemptTeleportEntity(LivingEntity owner, Entity mount, int x, int y, int z) {
+		if (Math.abs((double) x - owner.getX()) < 2.0D && Math.abs((double) z - owner.getZ()) < 2.0D) {
 			return false;
-		} else if (!this.canTeleportTo(new BlockPos(x, y, z))) {
+		} else if (!this.canTeleportTo(mount, new BlockPos(x, y, z))) {
 			return false;
 		} else {
 			mount.moveTo((double) x + 0.5D, y, (double) z + 0.5D, this.rat.getYRot(), this.rat.getXRot());
+			mount.resetFallDistance();
 			if (mount instanceof Mob mob) mob.getNavigation().stop();
 			this.rat.getNavigation().stop();
 			return true;
@@ -94,5 +101,19 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 
 	private int randomIntInclusive(int min, int max) {
 		return this.rat.getRandom().nextInt(max - min + 1) + min;
+	}
+
+	/** Vanilla's TamableAnimal.canTeleportTo (private in 1.21): solid floor, no leaves, room for the mount */
+	private boolean canTeleportTo(Entity mount, BlockPos pos) {
+		PathType type = WalkNodeEvaluator.getPathTypeStatic(this.rat, pos);
+		if (type != PathType.WALKABLE) {
+			return false;
+		}
+		BlockState below = this.rat.level().getBlockState(pos.below());
+		if (below.getBlock() instanceof LeavesBlock) {
+			return false;
+		}
+		BlockPos offset = pos.subtract(mount.blockPosition());
+		return this.rat.level().noCollision(mount, mount.getBoundingBox().move(offset));
 	}
 }

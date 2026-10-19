@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.rat;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.server.level.ServerLevel;
 import com.github.alexthe666.rats.server.misc.RatsCaps;
@@ -723,8 +725,7 @@ public class TamedRat extends InventoryRat {
 		ItemStack handCopy = this.getMainHandItem().copy();
 		if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_ORE_DOUBLING.get()) && OreDoublingRatUpgradeItem.isProcessable(this.level(), handCopy)) {
 			ItemStack attemptedSmelt = handCopy.copy();
-			Container container = new SimpleContainer(attemptedSmelt);
-			SmeltingRecipe recipe = this.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, this.level()).orElse(null);
+			SmeltingRecipe recipe = this.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(attemptedSmelt), this.level()).map(RecipeHolder::value).orElse(null);
 			if (recipe != null && !recipe.getResultItem(this.level().registryAccess()).isEmpty()) {
 				attemptedSmelt = recipe.getResultItem(this.level().registryAccess()).copy();
 			}
@@ -784,8 +785,8 @@ public class TamedRat extends InventoryRat {
 		return !(this.getVehicle() instanceof Player);
 	}
 
-	public ItemStack getResultForRecipe(RecipeType<? extends SingleItemRecipe> recipe, ItemStack stack) {
-		Optional<? extends SingleItemRecipe> optional = this.level().getRecipeManager().getRecipeFor(recipe, new SimpleContainer(stack), this.level());
+	public <R extends SingleItemRecipe> ItemStack getResultForRecipe(RecipeType<R> recipe, ItemStack stack) {
+		Optional<R> optional = this.level().getRecipeManager().getRecipeFor(recipe, new SingleRecipeInput(stack), this.level()).map(RecipeHolder::value);
 		if (optional.isPresent()) {
 			ItemStack itemstack = optional.get().getResultItem(this.level().registryAccess());
 			if (!itemstack.isEmpty()) {
@@ -1456,5 +1457,11 @@ public class TamedRat extends InventoryRat {
 
 	public boolean hasFlightUpgrade() {
 		return RatUpgradeUtils.forEachUpgradeBool(this, (stack) -> stack.canFly(this), false);
+	}
+
+	// 1.21: FollowOwnerGoal asks the animal; the rat stays when sitting, riding a player or leashed (as in the original)
+	@Override
+	public boolean unableToMoveToOwner() {
+		return this.isOrderedToSit() || this.getVehicle() instanceof Player || this.isLeashed();
 	}
 }

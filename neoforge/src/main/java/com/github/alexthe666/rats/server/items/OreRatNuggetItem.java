@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -58,8 +60,7 @@ public class OreRatNuggetItem extends Item {
 	}
 
 	public static ItemStack getIngot(Level level, ItemStack stack) {
-		Container container = new SimpleContainer(stack);
-		SmeltingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, level).orElse(null);
+		SmeltingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), level).map(RecipeHolder::value).orElse(null);
 		if (recipe != null && !recipe.getResultItem(level.registryAccess()).isEmpty()) {
 			return recipe.getResultItem(level.registryAccess()).copy();
 		}

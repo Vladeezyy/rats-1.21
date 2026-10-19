@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
 
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import com.github.alexthe666.rats.registry.RatsRecipeRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
@@ -64,7 +66,7 @@ public class ChefRatUpgradeItem extends BaseRatUpgradeItem implements TickRatUpg
 			return specialChefRecipe.copy();
 		}
 
-		Optional<SmeltingRecipe> optional = rat.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SimpleContainer(stack), rat.level());
+		Optional<SmeltingRecipe> optional = rat.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), rat.level()).map(RecipeHolder::value);
 		if (optional.isPresent()) {
 			ItemStack itemstack = optional.get().getResultItem(rat.level().registryAccess());
 			if (!itemstack.isEmpty()) {

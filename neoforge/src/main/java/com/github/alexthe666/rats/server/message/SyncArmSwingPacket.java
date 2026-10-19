@@ -24,17 +24,21 @@ public record SyncArmSwingPacket(ItemStack stack) implements CustomPacketPayload
 	}
 
 
+	// the stack is not sent: the server uses the item the player holds (the original trusted the client's stack,
+	// so a modified client could shoot plague shots with any damage)
 	public static SyncArmSwingPacket decode(RegistryFriendlyByteBuf buf) {
-		return new SyncArmSwingPacket(buf.readItem());
+		return new SyncArmSwingPacket(ItemStack.EMPTY);
 	}
 
 	public static void encode(SyncArmSwingPacket packet, RegistryFriendlyByteBuf buf) {
-		buf.writeItem(packet.stack());
 	}
 
 	public static class Handler {
 		public static void handle(SyncArmSwingPacket packet, IPayloadContext context) {
-			context.enqueueWork(() -> ForgeEvents.handleArmSwing(packet.stack(), Objects.requireNonNull(((ServerPlayer) context.player()))));
+			context.enqueueWork(() -> {
+				ServerPlayer player = (ServerPlayer) context.player();
+				ForgeEvents.handleArmSwing(player.getMainHandItem(), player);
+			});
 		}
 	}
 }
