@@ -196,6 +196,18 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
   nothing. Now `rats.common.mixins.json`, loaded by NeoForge (`neoforge.mods.toml`) and Fabric (`fabric.mod.json`);
   two checks in `SelfTest`. Both loaders: `tools/selftest.sh` 43/43.
 
+### The rat cage advancement accepted any item (found during the 26.3 port)
+- `rat_cage_decoration`: the hammock and igloo criteria checked the used item with the 1.20 item predicate key
+  `"tag"`, which 1.21 ignores, so any item used on a decorated cage counted. Now `"items": "#rats:hammocks"` /
+  `"#rats:igloos"`.
+
+### Pick block on five blocks did nothing on Fabric (found during the 26.3 port)
+- The milk and cheese cauldrons, the decorated rat cage, the rat tube and the rat hole defined NeoForge's
+  `getCloneItemStack(state, hit, level, pos, player)`, which Fabric never calls (and NeoForge 26.x has another
+  signature): middle click gave nothing or the wrong item. Now they override vanilla's
+  `getCloneItemStack(level, pos, state)`, which NeoForge's version calls too (`tools/port/fix_lost_overrides.py`,
+  found with `tools/port/OverrideCheck.java`). A check in `SelfTest`.
+
 ## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
 
 Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,
@@ -261,6 +273,11 @@ ms against +3.79 ms) (1.21.1: 3.9×, +2.24 ms against +0.57 ms). Rat phase profi
 vanilla mob tick (movement 24 %, goal selection 22 %) and dropped items (17 %).
 `sh tools/scenetest.sh -Pscene=perf` (1600x900, no frame limit): empty stage 171 FPS, 100 tamed rats wandering 140 FPS,
 100 wild wolves 145 FPS (rats −3.5 % against wolves; 1.21.1: −10 %).
+
+### Found during the 26.3 port (26.x)
+- Pick block: 26.x vanilla takes `getCloneItemStack(level, pos, state, includeData)` (the merged 1.21.1 fix uses it here).
+- Thrown blocks were no longer solid for other entities: `canBeCollidedWith` takes the other entity since 1.21.2.
+  Checks in `SelfTest`.
 
 ## 2026-10-20 — 26.2 (branch `mc/26.2`, on `mc/26.1.2`)
 
