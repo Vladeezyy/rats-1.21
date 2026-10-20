@@ -831,6 +831,88 @@ final class GameplayTest {
         return this.mobs.size() + " mobs spawned";
       }
     });
+    SCENARIOS.add(new Scenario("1.20.1 items stored in a combined upgrade keep their count and name", 40) {
+      net.minecraft.core.NonNullList<ItemStack> items;
+
+      @Override
+      boolean start(ServerLevel level) {
+        // an upgrade from a 1.20.1 world: its "Items" list stays in custom data as the old version wrote it
+        ItemStack upgrade = new ItemStack(RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
+        net.minecraft.nbt.CompoundTag tag;
+        try {
+          tag = net.minecraft.nbt.TagParser.parseTag("{Items:[{Slot:0b,id:\"rats:rat_upgrade_speed\",Count:1b},{Slot:1b,id:\"minecraft:diamond\",Count:5b,tag:{display:{Name:'{\"text\":\"Shiny\"}'}}}]}");
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+          throw new IllegalStateException(e);
+        }
+        upgrade.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+        this.items = com.github.alexthe666.rats.server.misc.StoredItems.view(upgrade, 2);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        ItemStack diamonds = this.items.get(1);
+        return this.items.get(0).is(RatsItemRegistry.RAT_UPGRADE_SPEED.get()) && diamonds.is(Items.DIAMOND) && diamonds.getCount() == 5 && "Shiny".equals(diamonds.getHoverName().getString());
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "stored: " + this.items;
+      }
+    });
+    SCENARIOS.add(new Scenario("a plague beast keeps its owner after a save and load", 40) {
+      java.util.UUID owner;
+      java.util.UUID loaded;
+
+      @Override
+      boolean start(ServerLevel level) {
+        com.github.alexthe666.rats.server.entity.monster.PlagueBeast beast = RatsEntityRegistry.PLAGUE_BEAST.get().create(level);
+        this.owner = java.util.UUID.randomUUID();
+        beast.setOwnerId(this.owner);
+        net.minecraft.nbt.CompoundTag saved = beast.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        com.github.alexthe666.rats.server.entity.monster.PlagueBeast copy = RatsEntityRegistry.PLAGUE_BEAST.get().create(level);
+        copy.load(saved);
+        this.loaded = copy.getOwnerId();
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return this.owner.equals(this.loaded);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "owner " + this.owner + ", after load " + this.loaded;
+      }
+    });
+    SCENARIOS.add(new Scenario("marbled cheese grass spreads onto marbled cheese dirt, not vanilla dirt", 40) {
+      @Override
+      boolean start(ServerLevel level) {
+        BlockState grass = RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get().defaultBlockState();
+        level.setBlock(this.base, grass, Block.UPDATE_ALL);
+        level.setBlock(this.base.east(), RatlantisBlockRegistry.MARBLED_CHEESE_DIRT.get().defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(this.base.west(), Blocks.DIRT.defaultBlockState(), Block.UPDATE_ALL);
+        // light for the spreading, whatever the time of day
+        level.setBlock(this.base.above(3), Blocks.GLOWSTONE.defaultBlockState(), Block.UPDATE_ALL);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        // ~200 random ticks: the east block is one of 45 picks, 4 picks a tick
+        for (int i = 0; i < 20; i++) {
+          BlockState state = level.getBlockState(this.base);
+          state.randomTick(level, this.base, level.getRandom());
+        }
+        return level.getBlockState(this.base.east()).is(RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get()) && level.getBlockState(this.base.west()).is(Blocks.DIRT);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "east " + level.getBlockState(this.base.east()) + ", west " + level.getBlockState(this.base.west());
+      }
+    });
     // -Drats.selftest.only=<part of a name>[,<part>...] runs only the matching scenarios (JAVA_TOOL_OPTIONS reaches the
     // dev run; it splits on spaces, so the parts have none)
     List<String> only = List.of(System.getProperty("rats.selftest.only", "").split(","));

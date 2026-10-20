@@ -148,9 +148,17 @@ and were rewritten: a bee rat that landed found a path; "came within reach once"
 - The Flying Dutchrat fled to the north-west after every sword throw (`nextInt(6) - 12`; 1.16: `nextInt(15) - 7`).
 - `RatMeleeAttackGoal.getAttackReachSqr` was dead since 1.20.2 (vanilla reach now counts the vehicle).
 - Tube climbing: 1.19+ only had `onClimbable`, which climbs while the rat pushes against a wall; 1.12's lift is back.
+- Plague beasts and clouds lost their owner (the Black Death) on reload: saved as "OwnerUUID", read as "Owner".
+- Marbled cheese grass never spread: it looked for vanilla dirt and turned it into a short grass plant; now it spreads
+  onto marbled cheese dirt like vanilla grass.
+
+### World upgrade from 1.20.1 fixed (found on the 26.x port)
+- Combined/list upgrades of 1.20.1 worlds keep their stored items in custom data as 1.20.1 wrote them ("Count",
+  "tag"); the move into the container component parsed them as 1.21 stacks, so every stack became 1 item without its
+  NBT. Now vanilla's item fixers (DFU, from data version 3465) bring each entry up first.
 
 ### Tests
-`tools/selftest.sh` (both loaders): 31 → 38 checks. `JAVA_TOOL_OPTIONS=-Drats.selftest.only=a,b` runs the scenarios
+`tools/selftest.sh` (both loaders): 31 → 41 checks. `JAVA_TOOL_OPTIONS=-Drats.selftest.only=a,b` runs the scenarios
 whose names contain one of the parts. `tools/stress.sh` (server load, below), `tools/scenetest.sh -Pscene=perf`
 (client FPS with 100 rats in view).
 

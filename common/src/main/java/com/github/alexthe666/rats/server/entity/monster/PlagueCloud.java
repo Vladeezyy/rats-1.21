@@ -161,12 +161,9 @@ public class PlagueCloud extends Monster {
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		UUID uuid;
-		if (compound.hasUUID("Owner")) {
-			uuid = compound.getUUID("Owner");
-		} else {
-			String s = compound.getString("Owner");
-			uuid = OldUsersConverter.convertMobOwnerIfNecessary(this.getServer(), s);
-		}
+		// saved as "OwnerUUID" (the original read "Owner" back, so the owner was lost on reload)
+		String s = compound.contains("OwnerUUID") ? compound.getString("OwnerUUID") : compound.getString("Owner");
+		uuid = s.isEmpty() ? null : OldUsersConverter.convertMobOwnerIfNecessary(this.getServer(), s);
 
 		if (uuid != null) {
 			try {

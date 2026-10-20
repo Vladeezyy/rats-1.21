@@ -31,8 +31,9 @@ public class MarbledCheeseGrassBlock extends GrassBlock implements BonemealableB
 							return;
 						}
 
-						if (level.getBlockState(blockpos).is(Blocks.DIRT) && level.getMaxLocalRawBrightness(blockpos.above()) >= 4 && level.getBlockState(blockpos.above()).getLightBlock(level, pos.above()) <= 2) {
-							level.setBlockAndUpdate(blockpos, Blocks.SHORT_GRASS.defaultBlockState());
+						// spreads onto marbled cheese dirt (the original turned vanilla dirt blocks into a grass plant)
+						if (level.getBlockState(blockpos).is(RatlantisBlockRegistry.MARBLED_CHEESE_DIRT.get()) && level.getMaxLocalRawBrightness(blockpos.above()) >= 4 && level.getBlockState(blockpos.above()).getLightBlock(level, pos.above()) <= 2) {
+							level.setBlockAndUpdate(blockpos, this.defaultBlockState());
 						}
 					}
 				}

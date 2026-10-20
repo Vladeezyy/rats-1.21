@@ -1,6 +1,11 @@
 package com.github.alexthe666.rats.server.misc;
 
+import com.mojang.serialization.Dynamic;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -18,6 +23,8 @@ import net.minecraft.world.item.component.ItemContainerContents;
  * into the component the first time the stack is read on the server.
  */
 public final class StoredItems {
+	/** Data version of 1.20.1, the original's version */
+	private static final int LEGACY_DATA_VERSION = 3465;
 
 	private StoredItems() {
 	}
@@ -60,7 +67,9 @@ public final class StoredItems {
 			CompoundTag entry = list.getCompound(i);
 			int slot = entry.getByte("Slot") & 255;
 			if (slot < items.size()) {
-				items.set(slot, ItemStack.parseOptional(registries, entry));
+				// the entry is a 1.20.1 stack ("Count", "tag"): vanilla's item fixers bring it to this version first
+				Dynamic<Tag> fixed = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, entry), LEGACY_DATA_VERSION, SharedConstants.getCurrentVersion().getDataVersion().getVersion());
+				items.set(slot, ItemStack.parseOptional(registries, (CompoundTag) fixed.getValue()));
 			}
 		}
 		set(holder, items);
