@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:filth"
+        "recipes": "rats:filth"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

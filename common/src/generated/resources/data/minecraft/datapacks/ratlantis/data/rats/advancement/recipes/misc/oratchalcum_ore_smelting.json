@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:oratchalcum_ore_smelting"
+        "recipes": "rats:oratchalcum_ore_smelting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

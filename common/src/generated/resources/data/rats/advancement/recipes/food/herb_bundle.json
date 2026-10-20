@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:herb_bundle"
+        "recipes": "rats:herb_bundle"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
-import com.github.alexthe666.rats.server.misc.Values;
+
+import net.minecraft.world.item.component.SwingAnimation;import com.github.alexthe666.rats.server.misc.Values;
 
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
@@ -43,7 +44,7 @@ public class RatArrowItem extends ArrowItem {
 		}
 		stack.shrink(1);
 		context.getPlayer().setItemInHand(context.getHand(), new ItemStack(Items.ARROW));
-		context.getPlayer().swing(context.getHand());
+		context.getPlayer().swing(context.getHand(), SwingAnimation.DEFAULT, false);
 		return InteractionResult.SUCCESS;
 	}
 

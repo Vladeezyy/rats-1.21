@@ -50,15 +50,15 @@ public class ThrownBlockRenderer extends EntityRenderer<ThrownBlock, ThrownBlock
 		if (state.block != null) {
 			stack.pushPose();
 			stack.translate(-0.5D, 0, 0.5D);
-			stack.mulPose(Axis.YP.rotationDegrees(90.0F));
+			stack.rotate(Axis.YP.rotationDegrees(90.0F));
 			this.blocks.block(state.block, stack, collector, state.lightCoords);
 			stack.popPose();
 		}
 		stack.pushPose();
 		stack.scale(1F, -1F, 1F);
 		stack.translate(0F, -0.5F, 0F);
-		stack.mulPose(Axis.YP.rotationDegrees(state.yRot - 180));
-		collector.submitModel(this.cube, Unit.INSTANCE, stack, RenderTypes.energySwirl(LIGHTNING_TEXTURE, f * 0.01F, f * 0.01F), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		stack.rotate(Axis.YP.rotationDegrees(state.yRot - 180));
+		collector.submitModel(this.cube, Unit.INSTANCE, stack, RenderTypes.energySwirl(LIGHTNING_TEXTURE, f * 0.01F, f * 0.01F), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		stack.popPose();
 		super.submit(state, stack, collector, camera);
 	}

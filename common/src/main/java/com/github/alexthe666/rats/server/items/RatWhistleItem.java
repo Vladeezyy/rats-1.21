@@ -48,7 +48,7 @@ public class RatWhistleItem extends LoreTagItem {
 				}
 			}
 		}
-		player.swing(hand);
+		player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 		player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COUNT, ratCount).withStyle(ChatFormatting.GRAY));
 		level.playSound(player, player.blockPosition(), RatsSoundRegistry.RAT_WHISTLE.get(), SoundSource.PLAYERS, 1, 1.25F);
 

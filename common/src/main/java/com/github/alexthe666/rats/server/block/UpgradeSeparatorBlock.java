@@ -30,12 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class UpgradeSeparatorBlock extends BaseEntityBlock implements BlockTooltip {
-    public static final MapCodec<UpgradeSeparatorBlock> CODEC = simpleCodec(UpgradeSeparatorBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends UpgradeSeparatorBlock> codec() {
-        return CODEC;
-    }
 
 	protected static final VoxelShape AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 

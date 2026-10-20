@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:raw_oratchalcum_blasting"
+        "recipes": "rats:raw_oratchalcum_blasting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -51,7 +51,7 @@ public class RatCaptureNet extends ThrowableItemProjectile {
 			this.discard();
 		}
 		ItemEntity itemEntity = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), sack);
-		itemEntity.setInvulnerable(true);
+		itemEntity.setPermanentlyInvulnerable(true);
 		if (!this.level().isClientSide()) {
 			this.level().addFreshEntity(itemEntity);
 		}

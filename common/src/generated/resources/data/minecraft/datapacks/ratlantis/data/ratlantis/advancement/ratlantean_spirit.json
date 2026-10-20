@@ -13,43 +13,37 @@
     },
     "hurt_ratlantean_spirit": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ratlantean_spirit"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ratlantean_spirit"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_hurt_entity"
     },
     "killed_by_ratlantean_spirit": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ratlantean_spirit"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ratlantean_spirit"
           }
-        ]
+        }
       },
       "trigger": "minecraft:entity_killed_player"
     },
     "killed_ratlantean_spirit": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ratlantean_spirit"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ratlantean_spirit"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

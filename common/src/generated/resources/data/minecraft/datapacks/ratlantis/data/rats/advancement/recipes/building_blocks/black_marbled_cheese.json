@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:black_marbled_cheese"
+        "recipes": "rats:black_marbled_cheese"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

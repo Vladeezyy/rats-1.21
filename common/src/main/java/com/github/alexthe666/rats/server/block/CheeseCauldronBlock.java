@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.block;
 
+import net.minecraft.util.Prediction;
 import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
@@ -31,13 +32,7 @@ import dev.vladeezyy.rats.platform.RegistryEntry;
 
 
 public class CheeseCauldronBlock extends AbstractCauldronBlock {
-	// 1.21 wants a codec per block class; these blocks are only made by the mod's registry, so it gives the same block
-	private final MapCodec<CheeseCauldronBlock> codec = simpleCodec(properties -> this);
 
-	@Override
-	protected MapCodec<? extends CheeseCauldronBlock> codec() {
-		return this.codec;
-	}
 
 
 	private final RegistryEntry<Block, Block> drop;
@@ -54,7 +49,7 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 			level.playSound(null, pos, RatsSoundRegistry.CHEESE_CAULDRON_EMPTY.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 			level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!player.getInventory().add(new ItemStack(this.drop.get()))) {
-				player.drop(new ItemStack(this.drop.get()), false);
+				player.drop(new ItemStack(this.drop.get()), false, Prediction.SERVER_ONLY);
 			}
 		}
 		return InteractionResult.SUCCESS;
@@ -81,7 +76,8 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	@Override
+	protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
 		return new ItemStack(Items.CAULDRON);
 	}
 }

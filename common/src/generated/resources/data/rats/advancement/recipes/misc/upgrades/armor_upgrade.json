@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/armor_upgrade"
+        "recipes": "rats:upgrades/armor_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

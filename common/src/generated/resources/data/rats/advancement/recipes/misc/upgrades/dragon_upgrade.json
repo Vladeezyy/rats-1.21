@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/dragon_upgrade"
+        "recipes": "rats:upgrades/dragon_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

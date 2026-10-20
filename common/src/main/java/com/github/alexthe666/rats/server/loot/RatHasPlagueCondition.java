@@ -9,18 +9,19 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 public class RatHasPlagueCondition implements LootItemCondition {
 
 	public static final MapCodec<RatHasPlagueCondition> CODEC = MapCodec.unit(RatHasPlagueCondition::new);
-	@Override
-	public MapCodec<? extends LootItemCondition> codec() {
-		return CODEC;
-	}
 
 	@Override
 	public boolean test(LootContext context) {
 		if (!context.hasParameter(LootContextParams.THIS_ENTITY)) return false;
-		return context.getParameter(LootContextParams.THIS_ENTITY) instanceof Rat rat && rat.hasPlague();
+		return context.getOptional(LootContextParams.THIS_ENTITY) instanceof Rat rat && rat.hasPlague();
 	}
 
 	public static LootItemCondition.Builder hasPlague() {
 		return RatHasPlagueCondition::new;
+	}
+
+	@Override
+	public MapCodec<RatHasPlagueCondition> codec() {
+		return CODEC;
 	}
 }

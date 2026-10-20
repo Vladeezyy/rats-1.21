@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:chef/confit_byaldi"
+        "recipes": "rats:chef/confit_byaldi"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

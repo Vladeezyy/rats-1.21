@@ -28,10 +28,10 @@ public final class PartyHats {
 			model = new PartyHatModel(Minecraft.getInstance().getEntityModels().bakeLayer(RatsModelLayers.PARTY_HAT));
 		}
 		int color = PartyHatItem.getColor(stack);
-		collector.submitModel(model, HatRendering.REST, poseStack, LAYER_1, light, OverlayTexture.NO_OVERLAY, ARGB.opaque(color), null, outlineColor, null);
-		collector.submitModel(model, HatRendering.REST, poseStack, LAYER_2, light, OverlayTexture.NO_OVERLAY, ARGB.opaque(invertColor(color)), null, outlineColor, null);
+		collector.submitModel(model, HatRendering.REST, poseStack, LAYER_1, light, OverlayTexture.NO_OVERLAY, ARGB.opaque(color), null, outlineColor);
+		collector.submitModel(model, HatRendering.REST, poseStack, LAYER_2, light, OverlayTexture.NO_OVERLAY, ARGB.opaque(invertColor(color)), null, outlineColor);
 		if (stack.hasFoil()) {
-			collector.submitModel(model, HatRendering.REST, poseStack, RenderTypes.armorEntityGlint(), light, OverlayTexture.NO_OVERLAY, -1, null, outlineColor, null);
+			collector.submitModel(model, HatRendering.REST, poseStack, RenderTypes.trimmedArmorGlint(), light, OverlayTexture.NO_OVERLAY, -1, null, outlineColor);
 		}
 	}
 

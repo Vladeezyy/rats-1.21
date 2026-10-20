@@ -73,7 +73,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.FishingRodItem;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -91,7 +90,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
@@ -455,17 +453,9 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
-    public boolean canTill(ItemStack stack) {
-        return stack.getItem() instanceof HoeItem;
-    }
-
-    @Override
-    @Nullable
-    public BlockState tilledState(BlockState state, UseOnContext context) {
-        if (!HoeItem.TILLABLES.containsKey(state.getBlock())) {
-            return null;
-        }
-        return state.is(Blocks.COARSE_DIRT) || state.is(Blocks.ROOTED_DIRT) ? Blocks.DIRT.defaultBlockState() : Blocks.FARMLAND.defaultBlockState();
+    public void registerStripping(net.minecraft.world.level.block.Block block, net.minecraft.world.level.block.Block stripped) {
+        // 26.3: axes strip by block transformers; Fabric adds to the minecraft:axe one (the properties are copied)
+        net.fabricmc.fabric.api.item.v1.BlockTransformerHelper.registerStripping(block, stripped);
     }
 
     @Override
@@ -494,10 +484,6 @@ public final class FabricPlatform implements Platform {
         return true;
     }
 
-    @Override
-    public boolean canSetDirtUnderTree(LevelSimulatedReader reader, BiConsumer<BlockPos, BlockState> placer, RandomSource random, BlockPos pos, TreeConfiguration config) {
-        return true;
-    }
 
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {

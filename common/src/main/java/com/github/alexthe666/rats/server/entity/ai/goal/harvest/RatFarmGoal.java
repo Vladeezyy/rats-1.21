@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.FarmlandBlock;
 
 import net.minecraft.world.item.BlockItem;
@@ -83,11 +84,11 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 						if (this.holdingBonemeal()) {
 							this.rat.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
 							if (block.getBlock() instanceof BonemealableBlock bonemealable) {
-								if (bonemealable.isValidBonemealTarget(this.rat.level(), this.getTargetBlock(), block)) {
+								if (bonemealable.isValidBonemealTarget(this.rat.level(), this.getTargetBlock(), block, BonemealSource.MOB)) {
 									if (!this.rat.level().isClientSide()) {
 										this.rat.level().levelEvent(2005, this.getTargetBlock(), 0);
 										this.rat.level().playSound(null, this.getTargetBlock(), SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS);
-										bonemealable.performBonemeal((ServerLevel) this.rat.level(), this.rat.level().getRandom(), this.getTargetBlock(), block);
+										bonemealable.performBonemeal((ServerLevel) this.rat.level(), this.rat.level().getRandom(), this.getTargetBlock(), block, BonemealSource.MOB);
 									}
 								}
 							}
@@ -123,8 +124,8 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 
 	private boolean canPlantBeBonemealed(BlockPos pos, BlockState state) {
 		if (state.getBlock() instanceof BonemealableBlock bonemealable && state.is(BlockTags.BEE_GROWABLES)) {
-			if (bonemealable.isValidBonemealTarget(this.rat.level(), pos, state)) {
-				return bonemealable.isBonemealSuccess(this.rat.level(), this.rat.level().getRandom(), pos, state);
+			if (bonemealable.isValidBonemealTarget(this.rat.level(), pos, state, BonemealSource.MOB)) {
+				return bonemealable.isBonemealSuccess(this.rat.level(), this.rat.level().getRandom(), pos, state, BonemealSource.MOB);
 			}
 		}
 		return false;

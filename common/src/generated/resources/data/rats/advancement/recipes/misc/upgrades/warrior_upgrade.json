@@ -63,7 +63,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/warrior_upgrade"
+        "recipes": "rats:upgrades/warrior_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

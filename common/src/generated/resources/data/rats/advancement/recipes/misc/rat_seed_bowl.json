@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_seed_bowl"
+        "recipes": "rats:rat_seed_bowl"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:raw_plastic_smelting"
+        "recipes": "rats:raw_plastic_smelting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

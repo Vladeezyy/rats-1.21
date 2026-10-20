@@ -59,4 +59,15 @@ public class EtherealRatNavigation extends FlyingPathNavigation {
 		this.rat.getMoveControl().setWantedPosition(x, y, z, speed);
 		return this.moveTo(this.createPath(BlockPos.containing(x, y, z), 0), speed);
 	}
+
+	// 26.3: goals call the overloads with a reach range (MeleeAttackGoal: moveTo(target, 0, speed))
+	@Override
+	public boolean moveTo(Entity entity, int reachRange, double speed) {
+		return this.moveTo(entity, speed);
+	}
+
+	@Override
+	public boolean moveTo(double x, double y, double z, int reachRange, double speed) {
+		return this.moveTo(x, y, z, speed);
+	}
 }

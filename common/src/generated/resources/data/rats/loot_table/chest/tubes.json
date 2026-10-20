@@ -2,7 +2,6 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:empty",
@@ -10,246 +9,198 @@
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_white",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_white"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_orange",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_orange"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_magenta",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_magenta"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_light_blue",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_light_blue"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_yellow",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_yellow"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_lime",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_lime"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_pink",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_pink"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_gray",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_gray"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_light_gray",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_light_gray"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_cyan",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_cyan"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_purple",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_purple"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_blue",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_blue"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_brown",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_brown"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_green",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_green"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_red",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_red"
+          }
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 16.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "name": "rats:rat_tube_black",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 16,
+              "min": 1
             }
-          ],
-          "name": "rats:rat_tube_black"
+          }
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "rats:chest/tubes"

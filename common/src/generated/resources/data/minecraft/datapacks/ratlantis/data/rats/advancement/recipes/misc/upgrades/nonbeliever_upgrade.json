@@ -53,7 +53,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/nonbeliever_upgrade"
+        "recipes": "rats:upgrades/nonbeliever_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -76,7 +76,8 @@ public final class RatsNeoForge {
         clientSpec = NeoForgeConfig.build(ConfigHolder.CLIENT_SPEC);
         serverSpec = NeoForgeConfig.build(ConfigHolder.SERVER_SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, clientSpec);
-        container.registerConfig(ModConfig.Type.COMMON, serverSpec);
+        // 26.3: COMMON is LOCAL (loaded on both sides, not synced); the file keeps its old name
+        container.registerConfig(ModConfig.Type.LOCAL, serverSpec, "rats-common.toml");
         //melk
         NeoForgeMod.enableMilkFluid();
 

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/gem_of_ratlantis"
+        "recipes": "rats:archeologist/gem_of_ratlantis"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

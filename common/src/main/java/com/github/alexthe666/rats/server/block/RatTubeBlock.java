@@ -52,12 +52,7 @@ import java.util.Objects;
 
 @SuppressWarnings("deprecation")
 public class RatTubeBlock extends BaseEntityBlock {
-    public static final MapCodec<RatTubeBlock> CODEC = simpleCodec(RatTubeBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatTubeBlock> codec() {
-        return CODEC;
-    }
 
 
 	public static final BooleanProperty NORTH = BooleanProperty.create("north");
@@ -349,7 +344,8 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader getter, BlockPos pos, Player player) {
+	@Override
+	protected ItemStack getCloneItemStack(LevelReader getter, BlockPos pos, BlockState state, boolean includeData) {
 		return getTubeItem(getter, pos);
 	}
 

@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:cheese_banner_pattern"
+        "recipes": "rats:cheese_banner_pattern"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

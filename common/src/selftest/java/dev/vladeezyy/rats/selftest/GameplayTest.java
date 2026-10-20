@@ -702,7 +702,7 @@ final class GameplayTest {
             return false;
           }
         }
-        return sets.get(byLevel.get(1)).get().value().getTrades().size() == 7 && sets.get(byLevel.get(5)).get().value().getTrades().size() == 5;
+        return sets.get(byLevel.get(1)).get().value().trades().size() == 7 && sets.get(byLevel.get(5)).get().value().trades().size() == 5;
       }
     });
     SCENARIOS.add(new Scenario("a rat sack that despawns lets its rats out", 40) {

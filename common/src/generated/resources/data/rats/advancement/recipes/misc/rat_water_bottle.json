@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_water_bottle"
+        "recipes": "rats:rat_water_bottle"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

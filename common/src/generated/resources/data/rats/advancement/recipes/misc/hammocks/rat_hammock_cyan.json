@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:hammocks/rat_hammock_cyan"
+        "recipes": "rats:hammocks/rat_hammock_cyan"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

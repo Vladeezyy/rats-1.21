@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:pied_garbage"
+        "recipes": "rats:pied_garbage"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

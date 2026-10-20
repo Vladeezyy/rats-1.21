@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/biplane_upgrade"
+        "recipes": "rats:upgrades/biplane_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

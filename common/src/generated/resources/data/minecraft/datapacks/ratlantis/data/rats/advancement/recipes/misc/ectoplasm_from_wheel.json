@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ectoplasm_from_wheel"
+        "recipes": "rats:ectoplasm_from_wheel"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/chef_upgrade"
+        "recipes": "rats:upgrades/chef_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

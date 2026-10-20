@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/aquatic_upgrade"
+        "recipes": "rats:upgrades/aquatic_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

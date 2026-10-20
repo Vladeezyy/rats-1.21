@@ -3,15 +3,13 @@
   "criteria": {
     "use_essence": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:tamed_rat"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:tamed_rat"
           }
-        ],
+        },
         "item": {
           "items": [
             "rats:ratbow_essence"

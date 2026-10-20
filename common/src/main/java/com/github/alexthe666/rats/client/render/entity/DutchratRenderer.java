@@ -71,8 +71,8 @@ public class DutchratRenderer extends RatsMobRenderer<Dutchrat, FlyingDutchratMo
 			if (!item.isEmpty()) {
 				stack.pushPose();
 				this.getParentModel().translateToHand(arm, stack);
-				stack.mulPose(Axis.XP.rotationDegrees(-90.0F));
-				stack.mulPose(Axis.YP.rotationDegrees(180.0F));
+				stack.rotate(Axis.XP.rotationDegrees(-90.0F));
+				stack.rotate(Axis.YP.rotationDegrees(180.0F));
 				boolean left = arm == HumanoidArm.LEFT;
 				stack.translate((float) (left ? -1 : 1) / 16.0F, 0.125F, -0.625F);
 				this.items.item(item, left ? ItemDisplayContext.THIRD_PERSON_LEFT_HAND : ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, entity, stack, collector, light);

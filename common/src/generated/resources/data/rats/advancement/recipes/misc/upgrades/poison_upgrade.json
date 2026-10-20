@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/poison_upgrade"
+        "recipes": "rats:upgrades/poison_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

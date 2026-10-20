@@ -2,7 +2,6 @@
   "type": "minecraft:fishing",
   "pools": [
     {
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:loot_table",
@@ -12,20 +11,18 @@
         },
         {
           "type": "minecraft:loot_table",
-          "conditions": [
-            {
-              "condition": "minecraft:entity_properties",
-              "entity": "this",
-              "predicate": {
-                "minecraft:type_specific/fishing_hook": {
-                  "in_open_water": true
-                }
-              }
-            }
-          ],
           "quality": 2,
           "weight": 5,
-          "value": "rats:gameplay/fishing/ratlantis_treasure"
+          "value": "rats:gameplay/fishing/ratlantis_treasure",
+          "condition": {
+            "type": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "minecraft:type_specific/fishing_hook": {
+                "in_open_water": true
+              }
+            }
+          }
         },
         {
           "type": "minecraft:loot_table",
@@ -34,7 +31,7 @@
           "value": "rats:gameplay/fishing/ratlantis_fish"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "rats:gameplay/fishing/ratlantis"

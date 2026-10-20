@@ -26,13 +26,13 @@ public record UpdateMobFilterPacket(InteractionHand hand, boolean whitelist, Lis
 
 
 	public static UpdateMobFilterPacket decode(RegistryFriendlyByteBuf buf) {
-		return new UpdateMobFilterPacket(buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, buf.readBoolean(), buf.readList(FriendlyByteBuf::readUtf));
+		return new UpdateMobFilterPacket(buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, buf.readBoolean(), SyncRatTagPacket.readList(buf, FriendlyByteBuf::readUtf));
 	}
 
 	public static void encode(UpdateMobFilterPacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeBoolean(packet.hand() == InteractionHand.MAIN_HAND);
 		buf.writeBoolean(packet.whitelist());
-		buf.writeCollection(packet.mobs(), FriendlyByteBuf::writeUtf);
+		SyncRatTagPacket.writeList(buf, packet.mobs(), FriendlyByteBuf::writeUtf);
 	}
 
 	public static class Handler {

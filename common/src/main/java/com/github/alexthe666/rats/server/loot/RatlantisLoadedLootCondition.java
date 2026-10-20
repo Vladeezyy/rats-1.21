@@ -9,13 +9,14 @@ public class RatlantisLoadedLootCondition implements LootItemCondition {
 
 	public static final MapCodec<RatlantisLoadedLootCondition> CODEC = MapCodec.unit(RatlantisLoadedLootCondition::new);
 
-	@Override
-	public MapCodec<? extends LootItemCondition> codec() {
-		return CODEC;
-	}
 
 	@Override
 	public boolean test(LootContext context) {
 		return RatsMod.RATLANTIS_DATAPACK_ENABLED;
+	}
+
+	@Override
+	public MapCodec<RatlantisLoadedLootCondition> codec() {
+		return CODEC;
 	}
 }

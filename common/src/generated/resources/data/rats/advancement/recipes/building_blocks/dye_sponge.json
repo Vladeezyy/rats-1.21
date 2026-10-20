@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:dye_sponge"
+        "recipes": "rats:dye_sponge"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

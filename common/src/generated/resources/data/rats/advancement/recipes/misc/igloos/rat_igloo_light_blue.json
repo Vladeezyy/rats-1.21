@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:igloos/rat_igloo_light_blue"
+        "recipes": "rats:igloos/rat_igloo_light_blue"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

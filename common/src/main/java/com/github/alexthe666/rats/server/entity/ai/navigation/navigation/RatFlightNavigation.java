@@ -27,4 +27,16 @@ public class RatFlightNavigation extends GroundPathNavigation {
 		this.rat.getMoveControl().setWantedPosition(entity.getX(), entity.getY(), entity.getZ(), speed);
 		return true;
 	}
+
+	// 26.3: goals call the overloads with a reach range (MeleeAttackGoal: moveTo(target, 0, speed)); flying, a rat
+	// goes straight to the spot, as through the overloads above
+	@Override
+	public boolean moveTo(Entity entity, int reachRange, double speed) {
+		return this.moveTo(entity, speed);
+	}
+
+	@Override
+	public boolean moveTo(double x, double y, double z, int reachRange, double speed) {
+		return this.moveTo(x, y, z, speed);
+	}
 }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/ratlantean_flame"
+        "recipes": "rats:archeologist/ratlantean_flame"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

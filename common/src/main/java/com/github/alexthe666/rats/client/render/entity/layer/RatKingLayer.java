@@ -54,13 +54,13 @@ public class RatKingLayer extends EntityLayer<RatKing, RatsMobRenderState, Empty
 		for (int i = 0; i < RatKing.RAT_COUNT; i++) {
 			int deathTime = Math.min(Math.max(0, king.deathTime - i * 5), 5);
 			stack.pushPose();
-			stack.mulPose(Axis.YP.rotationDegrees(i * RatKing.RAT_ANGLE));
+			stack.rotate(Axis.YP.rotationDegrees(i * RatKing.RAT_ANGLE));
 			stack.translate(0, 0.6F + (deathTime * 0.01F), -0.8);
 			stack.scale(0.6F, 0.6F, 0.6F);
 			RatKingModel<RatKing> model = RAT_MODELS[i];
-			collector.submitModel(model, state, stack, getRatTexture(king.getRatColors(i)), light, overlay, -1, null, state.outlineColor, null);
+			collector.submitModel(model, state, stack, getRatTexture(king.getRatColors(i)), light, overlay, -1, null, state.outlineColor);
 			if (brightness < 7) {
-				collector.order(1).submitModel(model, state, stack, TEXTURE_EYES, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+				collector.order(1).submitModel(model, state, stack, TEXTURE_EYES, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 			}
 			stack.popPose();
 		}

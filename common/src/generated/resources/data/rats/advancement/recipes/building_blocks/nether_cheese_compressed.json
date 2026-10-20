@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:nether_cheese_compressed"
+        "recipes": "rats:nether_cheese_compressed"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

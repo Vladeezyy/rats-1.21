@@ -53,7 +53,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/aristocrat_upgrade"
+        "recipes": "rats:upgrades/aristocrat_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

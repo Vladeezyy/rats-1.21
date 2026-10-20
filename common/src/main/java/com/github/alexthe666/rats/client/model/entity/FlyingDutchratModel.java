@@ -371,7 +371,7 @@ public class FlyingDutchratModel<T extends Dutchrat> extends AdvancedEntityModel
 		this.rightArm1.translateRotate(stack);
 		this.rightArm2.translateRotate(stack);
 		this.paw.translateRotate(stack);
-		stack.mulPose(Axis.ZP.rotationDegrees(90));
+		stack.rotate(Axis.ZP.rotationDegrees(90));
 		stack.translate(0.1F, -0.45F, 0);
 	}
 }

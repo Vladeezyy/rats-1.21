@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:marble_cheese_smelting"
+        "recipes": "rats:marble_cheese_smelting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

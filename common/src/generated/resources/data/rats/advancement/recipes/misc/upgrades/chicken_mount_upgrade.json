@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/chicken_mount_upgrade"
+        "recipes": "rats:upgrades/chicken_mount_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

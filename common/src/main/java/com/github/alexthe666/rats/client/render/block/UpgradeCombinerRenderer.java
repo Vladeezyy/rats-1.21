@@ -31,10 +31,10 @@ public class UpgradeCombinerRenderer extends StateBlockEntityRenderer<UpgradeCom
 		stack.translate(0.0F, 3.25F + Mth.sin(f * 0.1F) * 0.1F, 0.0F);
 		float f1 = Mth.wrapDegrees((entity.ratRotation - entity.ratRotationPrev) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD;
 		float f2 = entity.ratRotationPrev + f1 * partialTicks;
-		stack.mulPose(Axis.YP.rotationDegrees(-f2 * (180F / (float) Math.PI) - 90F));
-		stack.mulPose(Axis.ZP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(-f2 * (180F / (float) Math.PI) - 90F));
+		stack.rotate(Axis.ZP.rotationDegrees(180));
 		stack.scale(1.5F, 1.5F, 1.5F);
-		collector.submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, TEXTURE, 244, overlay, ARGB.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F), null, 0, null);
+		collector.submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, TEXTURE, 244, overlay, ARGB.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F), null, 0);
 		stack.popPose();
 	}
 

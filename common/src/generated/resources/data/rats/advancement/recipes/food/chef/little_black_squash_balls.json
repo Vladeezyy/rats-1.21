@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:chef/little_black_squash_balls"
+        "recipes": "rats:chef/little_black_squash_balls"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

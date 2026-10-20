@@ -71,10 +71,9 @@ final class FabricLootModifiers {
                 throw new IllegalStateException("Unsupported loot modifier " + id + ": " + json.get("type"));
             }
             List<Identifier> tables = new ArrayList<>();
-            for (JsonElement condition : json.getAsJsonArray("conditions")) {
-                JsonObject object = condition.getAsJsonObject();
-                if (object.get("condition").getAsString().equals("neoforge:loot_table_id")) {
-                    tables.add(Identifier.parse(object.get("loot_table_id").getAsString()));
+            for (JsonObject condition : terms(json)) {
+                if (condition.get("type").getAsString().equals("neoforge:loot_table_id")) {
+                    tables.add(Identifier.parse(condition.get("loot_table_id").getAsString()));
                 }
             }
             MODIFIERS.add(new Modifier(id, json, tables));
@@ -120,8 +119,8 @@ final class FabricLootModifiers {
         return PARSED.computeIfAbsent(modifier.id(), id -> {
             var ops = registries.createSerializationContext(JsonOps.INSTANCE);
             List<LootItemCondition> conditions = new ArrayList<>();
-            for (JsonElement condition : modifier.json().getAsJsonArray("conditions")) {
-                if (!condition.getAsJsonObject().get("condition").getAsString().equals("neoforge:loot_table_id")) {
+            for (JsonObject condition : terms(modifier.json())) {
+                if (!condition.get("type").getAsString().equals("neoforge:loot_table_id")) {
                     conditions.add(LootItemCondition.DIRECT_CODEC.parse(ops, condition).getOrThrow(error -> new IllegalStateException(id + ": " + error)));
                 }
             }
@@ -130,6 +129,20 @@ final class FabricLootModifiers {
             boolean replacePool = modifier.json().has("replacePool") && modifier.json().get("replacePool").getAsBoolean();
             return new Parsed(conditions, items, replacePool);
         });
+    }
+
+    /** 26.3: one "condition" (an all_of of several) instead of a "conditions" list */
+    private static List<JsonObject> terms(JsonObject json) {
+        if (!json.has("condition")) {
+            return List.of();
+        }
+        JsonObject condition = json.getAsJsonObject("condition");
+        if (!condition.get("type").getAsString().equals("minecraft:all_of")) {
+            return List.of(condition);
+        }
+        List<JsonObject> terms = new ArrayList<>();
+        condition.getAsJsonArray("terms").forEach(term -> terms.add(term.getAsJsonObject()));
+        return terms;
     }
 
     private static JsonObject read(Path file) {

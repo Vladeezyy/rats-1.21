@@ -1,5 +1,6 @@
 package dev.vladeezyy.rats.platform.transfer;
 
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -57,7 +58,7 @@ public final class ItemHandlers {
             return;
         }
         if (!player.getInventory().add(stack) || !stack.isEmpty()) {
-            ItemEntity drop = player.drop(stack, false);
+            ItemEntity drop = player.drop(stack, false, Prediction.SERVER_ONLY);
             if (drop != null) {
                 drop.setNoPickUpDelay();
                 drop.setTarget(player.getUUID());

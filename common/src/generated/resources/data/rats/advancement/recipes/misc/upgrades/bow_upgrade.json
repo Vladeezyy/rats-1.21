@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/bow_upgrade"
+        "recipes": "rats:upgrades/bow_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -49,12 +49,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("deprecation")
 public class RatlanteanAutomatonHeadBlock extends BaseEntityBlock implements WearableOnHead, CustomItemRarity {
-    public static final MapCodec<RatlanteanAutomatonHeadBlock> CODEC = simpleCodec(RatlanteanAutomatonHeadBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatlanteanAutomatonHeadBlock> codec() {
-        return CODEC;
-    }
 
 
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;

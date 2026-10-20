@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.items;
-import net.minecraft.world.InteractionResult;
+
+import net.minecraft.util.Prediction;import net.minecraft.world.InteractionResult;
 import java.util.function.Consumer;
 import net.minecraft.world.item.component.TooltipDisplay;
 
@@ -39,7 +40,7 @@ public class OreRatNuggetItem extends Item {
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), RatsSoundRegistry.RAT_NUGGET_ORE.get(), SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 		ItemStack poopStack = getStoredItem(itemstack, new ItemStack(Items.IRON_INGOT));
 		if (!player.getInventory().add(poopStack)) {
-			player.drop(poopStack, false);
+			player.drop(poopStack, false, Prediction.SERVER_ONLY);
 		}
 		if (!player.isCreative()) {
 			itemstack.shrink(1);

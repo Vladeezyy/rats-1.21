@@ -32,9 +32,9 @@ public class UpgradeSeparatorRenderer extends StateBlockEntityRenderer<UpgradeSe
 		stack.translate(0.0F, 1F + Mth.sin(f * 0.1F) * 0.1F, 0.0F);
 		float f1 = Mth.wrapDegrees((entity.ratRotation - entity.ratRotationPrev) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD;
 		float f2 = entity.ratRotationPrev + f1 * partialTicks;
-		stack.mulPose(Axis.YP.rotationDegrees(-f2 * 0.1F * (180F / (float) Math.PI)));
-		stack.mulPose(Axis.ZP.rotationDegrees(180));
-		stack.mulPose(Axis.XP.rotationDegrees(90));
+		stack.rotate(Axis.YP.rotationDegrees(-f2 * 0.1F * (180F / (float) Math.PI)));
+		stack.rotate(Axis.ZP.rotationDegrees(180));
+		stack.rotate(Axis.XP.rotationDegrees(90));
 		this.items.item(this.sawblade, ItemDisplayContext.FIXED, null, stack, collector, light, overlay);
 		stack.popPose();
 	}

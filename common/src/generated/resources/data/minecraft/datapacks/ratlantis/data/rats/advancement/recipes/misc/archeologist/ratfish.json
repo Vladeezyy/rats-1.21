@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/ratfish"
+        "recipes": "rats:archeologist/ratfish"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

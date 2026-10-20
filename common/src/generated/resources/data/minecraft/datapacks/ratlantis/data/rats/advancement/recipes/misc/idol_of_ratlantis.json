@@ -83,7 +83,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:idol_of_ratlantis"
+        "recipes": "rats:idol_of_ratlantis"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

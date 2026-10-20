@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:dragon_wing"
+        "recipes": "rats:dragon_wing"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

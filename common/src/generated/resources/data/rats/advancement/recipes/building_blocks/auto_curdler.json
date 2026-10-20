@@ -43,7 +43,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:auto_curdler"
+        "recipes": "rats:auto_curdler"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

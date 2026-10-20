@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.events;
-import net.minecraft.world.entity.EquipmentSlot;
+
+import net.minecraft.util.Prediction;import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.EntitySpawnReason;
 
@@ -105,7 +106,7 @@ public final class RatsEvents {
 				PlagueDoctor doctor = villager.convertTo(RatsEntityRegistry.PLAGUE_DOCTOR.get(), ConversionParams.single(villager, true, false), converted -> {});
 				if (doctor != null) {
 					doctor.setWillDespawn(false);
-					player.swing(hand);
+					player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 					level.playSound(null, doctor.blockPosition(), RatsSoundRegistry.PLAGUE_DOCTOR_SUMMON.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
 					if (!player.isCreative()) {
 						heldItem.shrink(1);
@@ -289,9 +290,9 @@ public final class RatsEvents {
 			held.shrink(1);
 			ItemStack centipede = new ItemStack(RatsItemRegistry.CENTIPEDE.get());
 			if (!player.addItem(centipede.copy())) {
-				player.drop(centipede, false);
+				player.drop(centipede, false, Prediction.SERVER_ONLY);
 			}
-			player.swing(hand);
+			player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 			level.setBlockAndUpdate(hit.getBlockPos(), Blocks.DIRT.defaultBlockState());
 			level.playSound(null, hit.getBlockPos(), SoundEvents.ROOTED_DIRT_BREAK, SoundSource.BLOCKS, 2.0F, 1.0F);
 		}
@@ -302,7 +303,7 @@ public final class RatsEvents {
 				rat = SelectedRats.of(player).get().getSelectedRat();
 			}
 			if (rat != null) {
-				player.swing(hand);
+				player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 				if (!level.isClientSide()) {
 					RatsNetworkHandler.toPlayer((ServerPlayer) player, new ManageRatStaffPacket(rat.getId(), hit.getBlockPos(), hit.getDirection().ordinal(), false, true, staff.getStaff(stack)));
 				}
@@ -390,7 +391,7 @@ public final class RatsEvents {
 
 	public static void handleArmSwing(ItemStack stack, Player player) {
 		if (stack.is(RatsItemRegistry.PLAGUE_SCYTHE.get())) {
-			if (player.swingTime == 0 && !player.isSpectator()) {
+			if (!player.isSwinging() && !player.isSpectator()) {
 				double[] totalDmg = {0};
 				stack.getOrDefault(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS, net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY).forEach(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
 					if (attribute.is(Attributes.ATTACK_DAMAGE)) {

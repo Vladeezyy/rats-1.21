@@ -30,7 +30,7 @@ public class GlowingOverlayLayer<S extends LivingEntityRenderState, M extends En
 
 	@Override
 	public void submit(PoseStack stack, SubmitNodeCollector collector, int light, S state, float yRot, float xRot) {
-		collector.order(1).submitModel(this.getParentModel(), state, stack, this.renderType, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		collector.order(1).submitModel(this.getParentModel(), state, stack, this.renderType, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		if (this.getParentModel() instanceof RatlanteanAutomatonModel<?> automaton) {
 			if (this.items == null) {
 				this.items = SubmitHelper.fromGame();
@@ -42,7 +42,7 @@ public class GlowingOverlayLayer<S extends LivingEntityRenderState, M extends En
 			automaton.drillArm2.translateAndRotate(stack);
 			automaton.drilArm3.translateAndRotate(stack);
 			automaton.blade.translateAndRotate(stack);
-			stack.mulPose(Axis.YP.rotationDegrees(90));
+			stack.rotate(Axis.YP.rotationDegrees(90));
 			this.items.item(this.sawblade, ItemDisplayContext.FIXED, null, stack, collector, light);
 			stack.popPose();
 		}

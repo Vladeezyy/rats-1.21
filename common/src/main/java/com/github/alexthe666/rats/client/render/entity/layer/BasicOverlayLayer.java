@@ -22,6 +22,6 @@ public class BasicOverlayLayer<S extends LivingEntityRenderState, M extends Enti
 
 	@Override
 	public void submit(PoseStack stack, SubmitNodeCollector collector, int light, S state, float yRot, float xRot) {
-		collector.order(1).submitModel(this.getParentModel(), state, stack, this.renderType, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		collector.order(1).submitModel(this.getParentModel(), state, stack, this.renderType, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 	}
 }

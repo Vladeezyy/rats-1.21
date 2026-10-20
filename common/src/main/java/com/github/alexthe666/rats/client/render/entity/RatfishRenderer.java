@@ -31,11 +31,11 @@ public class RatfishRenderer extends RatsMobRenderer<Ratfish, RatFishModel<Ratfi
 			f1 = 1.7F;
 		}
 		float f2 = f * 4.3F * Mth.sin(f1 * 0.6F * state.ageInTicks);
-		stack.mulPose(Axis.YP.rotationDegrees(f2));
+		stack.rotate(Axis.YP.rotationDegrees(f2));
 		stack.translate(0.0D, 0.0D, -0.4F);
 		if (!state.isInWater) {
 			stack.translate(0.2F, 0.1F, 0.0D);
-			stack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+			stack.rotate(Axis.ZP.rotationDegrees(90.0F));
 		}
 	}
 }

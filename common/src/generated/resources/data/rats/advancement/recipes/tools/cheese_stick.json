@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:cheese_stick"
+        "recipes": "rats:cheese_stick"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

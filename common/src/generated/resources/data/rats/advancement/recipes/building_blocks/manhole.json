@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:manhole"
+        "recipes": "rats:manhole"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

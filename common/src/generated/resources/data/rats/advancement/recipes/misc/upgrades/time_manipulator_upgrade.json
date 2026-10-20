@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/time_manipulator_upgrade"
+        "recipes": "rats:upgrades/time_manipulator_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -31,7 +31,7 @@ public class StriderMountRatUpgradeItem<T extends Mob & RatMount> extends MountR
 	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
-		stack.mulPose(Axis.ZP.rotationDegrees(180F));
+		stack.rotate(Axis.ZP.rotationDegrees(180F));
 		stack.translate(0.0F, 0.0F, -0.15F);
 		stack.scale(0.65F, 0.65F, 0.65F);
 		context.item(new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);

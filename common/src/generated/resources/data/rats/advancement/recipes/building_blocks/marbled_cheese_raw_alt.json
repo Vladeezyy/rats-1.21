@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:marbled_cheese_raw_alt"
+        "recipes": "rats:marbled_cheese_raw_alt"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

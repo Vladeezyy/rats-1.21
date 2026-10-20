@@ -24,9 +24,9 @@ public class PiratBoatSailLayer extends RenderLayer<PiratBoatRenderer.State, Pir
 
 	/** The cannon on a buccaneer rat's back (called from the upgrade item: the model types stay out of server classes) */
 	public static void submitRatCannon(PoseStack stack, SubmitNodeCollector collector, int light, boolean firing) {
-		collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON), light, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON), light, OverlayTexture.NO_OVERLAY, -1, null, 0);
 		if (firing) {
-			collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.eyes(TEXTURE_PIRATE_CANNON_FIRE), light, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+			collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.eyes(TEXTURE_PIRATE_CANNON_FIRE), light, OverlayTexture.NO_OVERLAY, -1, null, 0);
 		}
 	}
 	private final SubmitHelper items;
@@ -40,19 +40,19 @@ public class PiratBoatSailLayer extends RenderLayer<PiratBoatRenderer.State, Pir
 	public void submit(PoseStack stack, SubmitNodeCollector collector, int light, PiratBoatRenderer.State state, float yRot, float xRot) {
 		int overlay = PiratBoatRenderer.overlay(state);
 		stack.pushPose();
-		stack.mulPose(Axis.XP.rotationDegrees(180));
-		stack.mulPose(Axis.YP.rotationDegrees(90));
+		stack.rotate(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(90));
 		stack.translate(0F, -0.8F, -0.9F);
 		stack.scale(4F, 4F, 4F);
 		this.items.item(state.banner, ItemDisplayContext.GROUND, null, stack, collector, light, overlay);
 		stack.popPose();
 		stack.pushPose();
-		stack.mulPose(Axis.YN.rotationDegrees(90));
+		stack.rotate(Axis.YN.rotationDegrees(90));
 		stack.translate(0, 0.1F, -0.6F);
 		stack.scale(0.75F, 0.75F, 0.75F);
-		collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON), light, overlay, -1, null, state.outlineColor, null);
+		collector.submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON), light, overlay, -1, null, state.outlineColor);
 		if (state.firing) {
-			collector.order(1).submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON_FIRE), 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			collector.order(1).submitModel(MODEL_PIRAT_CANNON, SubmitHelper.NO_STATE, stack, RenderTypes.entityCutout(TEXTURE_PIRATE_CANNON_FIRE), 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		}
 		stack.popPose();
 	}

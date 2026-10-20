@@ -1,13 +1,13 @@
 package com.github.alexthe666.rats.client.render;
 
 import net.minecraft.client.renderer.BindGroupLayouts;
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.render.block.RatlantisPortalRenderer;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -31,7 +31,8 @@ public final class RatsRenderType {
 
 	/** The Ratlantis portal: two projected layers, assets/rats/shaders/core/rendertype_ratlantis_portal.* */
 	private static final RenderPipeline RATLANTIS_PORTAL_PIPELINE = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
-		.withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+		.withBindGroupLayout(BindGroupLayouts.PROJECTION)
+		.withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
 		.withLocation(id("pipeline/ratlantis_portal"))
 		.withVertexShader(id("core/rendertype_ratlantis_portal"))
 		.withFragmentShader(id("core/rendertype_ratlantis_portal"))

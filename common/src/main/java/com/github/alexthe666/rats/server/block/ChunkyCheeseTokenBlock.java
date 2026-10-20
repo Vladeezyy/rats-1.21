@@ -31,12 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomItemRarity, BlockTooltip {
-    public static final MapCodec<ChunkyCheeseTokenBlock> CODEC = simpleCodec(ChunkyCheeseTokenBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends ChunkyCheeseTokenBlock> codec() {
-        return CODEC;
-    }
 
 
 	private static final VoxelShape AABB = Block.box(4, 4, 4, 12, 12, 12);

@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/flute_upgrade"
+        "recipes": "rats:upgrades/flute_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

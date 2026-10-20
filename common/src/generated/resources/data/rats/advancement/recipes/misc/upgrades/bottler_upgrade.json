@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/bottler_upgrade"
+        "recipes": "rats:upgrades/bottler_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/pirat_hat"
+        "recipes": "rats:archeologist/pirat_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

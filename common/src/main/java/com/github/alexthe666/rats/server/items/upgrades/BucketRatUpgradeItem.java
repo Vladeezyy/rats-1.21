@@ -47,13 +47,13 @@ public class BucketRatUpgradeItem extends BaseRatUpgradeItem implements HoldsIte
 		stack.pushPose();
 		if (rat.isBaby()) {
 			stack.translate(0.0F, 0.625F, 0.0F);
-			stack.mulPose(Axis.XP.rotationDegrees(20));
+			stack.rotate(Axis.XP.rotationDegrees(20));
 			stack.scale(0.5F, 0.5F, 0.5F);
 		}
 		this.translateToHand(model, true, stack);
-		stack.mulPose(Axis.ZP.rotationDegrees(190));
-		stack.mulPose(Axis.YP.rotationDegrees(180));
-		stack.mulPose(Axis.XN.rotationDegrees(40));
+		stack.rotate(Axis.ZP.rotationDegrees(190));
+		stack.rotate(Axis.YP.rotationDegrees(180));
+		stack.rotate(Axis.XN.rotationDegrees(40));
 
 		stack.translate(-0.155F, -0.25F, 0.0F);
 		stack.scale(1.25F, 1.25F, 1.25F);

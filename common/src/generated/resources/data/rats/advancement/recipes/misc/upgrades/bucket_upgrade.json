@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/bucket_upgrade"
+        "recipes": "rats:upgrades/bucket_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -40,11 +40,11 @@ public class PlagueShotRenderer extends EntityRenderer<PlagueShot, DutchratSword
 	public void submit(DutchratSwordRenderer.State state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
 		stack.pushPose();
 		stack.scale(1.5F, -1.5F, 1.5F);
-		stack.mulPose(Axis.YP.rotationDegrees(state.yRot + 180.0F));
-		stack.mulPose(Axis.XP.rotationDegrees(-state.xRot));
+		stack.rotate(Axis.YP.rotationDegrees(state.yRot + 180.0F));
+		stack.rotate(Axis.XP.rotationDegrees(-state.xRot));
 		stack.translate(0F, -1.5F, 0F);
-		collector.submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, TEXTURE, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
-		collector.order(1).submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, RenderTypes.entityGlint(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		collector.submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, TEXTURE, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
+		collector.order(1).submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, RenderTypes.patternedShieldGlint(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		stack.popPose();
 		super.submit(state, stack, collector, camera);
 	}

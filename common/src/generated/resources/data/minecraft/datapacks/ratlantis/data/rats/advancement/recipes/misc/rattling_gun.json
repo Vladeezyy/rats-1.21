@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rattling_gun"
+        "recipes": "rats:rattling_gun"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

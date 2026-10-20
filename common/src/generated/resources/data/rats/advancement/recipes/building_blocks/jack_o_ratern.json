@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:jack_o_ratern"
+        "recipes": "rats:jack_o_ratern"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

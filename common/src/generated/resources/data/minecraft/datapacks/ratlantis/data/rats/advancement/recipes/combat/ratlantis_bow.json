@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantis_bow"
+        "recipes": "rats:ratlantis_bow"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/dj_upgrade"
+        "recipes": "rats:upgrades/dj_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

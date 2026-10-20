@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/ghost_pirat_ectoplasm"
+        "recipes": "rats:archeologist/ghost_pirat_ectoplasm"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

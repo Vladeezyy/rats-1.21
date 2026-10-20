@@ -20,12 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class CompressedRatBlock extends HorizontalDirectionalBlock implements BlockTooltip {
-    public static final MapCodec<CompressedRatBlock> CODEC = simpleCodec(CompressedRatBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends CompressedRatBlock> codec() {
-        return CODEC;
-    }
 
 
 	public CompressedRatBlock(BlockBehaviour.Properties properties) {

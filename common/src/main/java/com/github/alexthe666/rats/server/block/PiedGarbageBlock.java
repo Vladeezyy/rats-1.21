@@ -11,12 +11,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class PiedGarbageBlock extends AbstractGarbageBlock {
-    public static final MapCodec<PiedGarbageBlock> CODEC = simpleCodec(PiedGarbageBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends PiedGarbageBlock> codec() {
-        return CODEC;
-    }
 
 
 	public PiedGarbageBlock(BlockBehaviour.Properties properties) {

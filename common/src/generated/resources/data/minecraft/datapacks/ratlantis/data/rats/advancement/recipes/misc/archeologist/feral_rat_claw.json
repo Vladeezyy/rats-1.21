@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/feral_rat_claw"
+        "recipes": "rats:archeologist/feral_rat_claw"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

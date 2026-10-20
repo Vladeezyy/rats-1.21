@@ -49,12 +49,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class TrashCanBlock extends BaseEntityBlock implements WorldlyContainerHolder, BlockTooltip {
-    public static final MapCodec<TrashCanBlock> CODEC = simpleCodec(TrashCanBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends TrashCanBlock> codec() {
-        return CODEC;
-    }
 
 
 	public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);

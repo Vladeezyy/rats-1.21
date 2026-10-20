@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:stripped_pirat_wood"
+        "recipes": "rats:stripped_pirat_wood"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

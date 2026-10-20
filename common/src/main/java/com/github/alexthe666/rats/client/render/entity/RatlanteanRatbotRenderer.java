@@ -30,7 +30,7 @@ public class RatlanteanRatbotRenderer extends RatsMobRenderer<RatlanteanRatbot, 
 			// the state's walk position is already the partial tick's (1.21.1: position - speed * (1 - partialTick))
 			float f1 = state.walkAnimationPos + 6.0F;
 			float f2 = (Math.abs(f1 % 13.0F - 6.5F) - 3.25F) / 3.25F;
-			stack.mulPose(Axis.ZP.rotationDegrees(6.5F * f2));
+			stack.rotate(Axis.ZP.rotationDegrees(6.5F * f2));
 		}
 	}
 }

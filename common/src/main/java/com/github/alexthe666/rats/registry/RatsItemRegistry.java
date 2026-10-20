@@ -77,7 +77,7 @@ public class RatsItemRegistry {
 	public static final RegistryEntry<Item, Item> DRAGON_WING = ITEMS.register("dragon_wing", () -> new Item(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> PLASTIC_WASTE = ITEMS.register("plastic_waste", () -> new Item(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> RAW_PLASTIC = ITEMS.register("raw_plastic", () -> new Item(Registrar.itemProps()));
-	public static final RegistryEntry<Item, Item> CONTAMINATED_FOOD = ITEMS.register("contaminated_food", () -> new Item(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.5F)
+	public static final RegistryEntry<Item, Item> CONTAMINATED_FOOD = ITEMS.register("contaminated_food", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_LOW_MEDIUM).food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.5F)
 			.build(), Consumables.defaultFood()
 			.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 2400), 0.3F))
 			.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.POISON, 2400), 0.3F))
@@ -91,7 +91,7 @@ public class RatsItemRegistry {
 	public static final RegistryEntry<Item, Item> CRIMSON_FLUID = ITEMS.register("crimson_liquid", () -> new PurifyingLiquidItem(Registrar.itemProps().stacksTo(1), true));
 	public static final RegistryEntry<Item, Item> PLAGUE_ESSENCE = ITEMS.register("plague_essence", () -> new LoreTagItem(Registrar.itemProps().rarity(Rarity.UNCOMMON), 1));
 	public static final RegistryEntry<Item, Item> PLAGUE_DOCTORATE = ITEMS.register("plague_doctorate", () -> new LoreTagItem(Registrar.itemProps().stacksTo(1).rarity(Rarity.UNCOMMON), 1));
-	public static final RegistryEntry<Item, Item> HERB_BUNDLE = ITEMS.register("herb_bundle", () -> new PlagueHealerItem(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.1F).build()), 0.1F));
+	public static final RegistryEntry<Item, Item> HERB_BUNDLE = ITEMS.register("herb_bundle", () -> new PlagueHealerItem(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_MEDIUM_HIGH).food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.1F).build()), 0.1F));
 	public static final RegistryEntry<Item, Item> TREACLE = ITEMS.register("treacle", () -> new PlagueHealerItem(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.6F).build()), 0.25F));
 	public static final RegistryEntry<Item, Item> PLAGUE_LEECH = ITEMS.register("plague_leech", () -> new PlagueLeechItem(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> PLAGUE_STEW = ITEMS.register("plague_stew", () -> new PlagueHealerItem(Registrar.itemProps().stacksTo(1).craftRemainder(Items.BOWL).food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.3F).build()), 1.0F));
@@ -123,13 +123,13 @@ public class RatsItemRegistry {
 	public static final RegistryEntry<Item, Item> RAT_SEED_BOWL = ITEMS.register("rat_seed_bowl", () -> new RatDecorationItem(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> RAT_BREEDING_LANTERN = ITEMS.register("rat_breeding_lantern", () -> new RatDecorationItem(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> RAT_WHEEL = ITEMS.register("rat_wheel", () -> new RatDecorationItem(Registrar.itemProps()));
-	public static final RegistryEntry<Item, Item> CONFIT_BYALDI = ITEMS.register("confit_byaldi", () -> new Item(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(50).saturationModifier(1.0F).alwaysEdible().build(), Consumables.defaultFood()
+	public static final RegistryEntry<Item, Item> CONFIT_BYALDI = ITEMS.register("confit_byaldi", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_ALWAYS_ADD_ONE).food(new FoodProperties.Builder().nutrition(50).saturationModifier(1.0F).alwaysEdible().build(), Consumables.defaultFood()
 			.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(RatsEffectRegistry.SYNESTHESIA.holder(), 2400), 1.0F)).build())));
-	public static final RegistryEntry<Item, Item> POTATO_PANCAKE = ITEMS.register("potato_pancake", () -> new Item(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.5F).alwaysEdible().build())));
+	public static final RegistryEntry<Item, Item> POTATO_PANCAKE = ITEMS.register("potato_pancake", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_MEDIUM_HIGH).food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.5F).alwaysEdible().build())));
 	public static final RegistryEntry<Item, Item> LITTLE_BLACK_SQUASH_BALLS = ITEMS.register("little_black_squash_balls", () -> new Item(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> LITTLE_BLACK_WORM = ITEMS.register("little_black_worm", () -> new LoreTagItem(Registrar.itemProps(), 1));
 	public static final RegistryEntry<Item, Item> CENTIPEDE = ITEMS.register("centipede", () -> new Item(Registrar.itemProps()));
-	public static final RegistryEntry<Item, Item> POTATO_KNISHES = ITEMS.register("potato_knishes", () -> new Item(Registrar.itemProps().food(new FoodProperties.Builder().nutrition(50).saturationModifier(1.0F).alwaysEdible().build(), Consumables.defaultFood()
+	public static final RegistryEntry<Item, Item> POTATO_KNISHES = ITEMS.register("potato_knishes", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_ALWAYS_ADD_ONE).food(new FoodProperties.Builder().nutrition(50).saturationModifier(1.0F).alwaysEdible().build(), Consumables.defaultFood()
 			.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(RatsEffectRegistry.SYNESTHESIA.holder(), 2400), 1.0F)).build())));
 	public static final RegistryEntry<Item, Item> TINY_COIN = ITEMS.register("tiny_coin", () -> new Item(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> TOKEN_FRAGMENT = ITEMS.register("token_fragment", () -> new Item(Registrar.itemProps().rarity(Rarity.UNCOMMON)));
@@ -229,7 +229,7 @@ public class RatsItemRegistry {
 	public static final RegistryEntry<Item, Item> RAT_UPGRADE_COMBINED = ITEMS.register("rat_upgrade_combined", () -> new CombinedRatUpgradeItem(Registrar.itemProps().stacksTo(1)));
 	public static final RegistryEntry<Item, Item> RAT_UPGRADE_COMBINED_CREATIVE = ITEMS.register("rat_upgrade_combined_creative", () -> new CombinedRatUpgradeItem(Registrar.itemProps().stacksTo(1).fireResistant()));
 
-	public static final RegistryEntry<Item, Item> RAT_NUGGET = ITEMS.register("rat_nugget", () -> new Item(Registrar.itemProps()));
+	public static final RegistryEntry<Item, Item> RAT_NUGGET = ITEMS.register("rat_nugget", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_LOW)));
 	public static final RegistryEntry<Item, Item> RAT_NUGGET_ORE = ITEMS.register("rat_nugget_ore", () -> new OreRatNuggetItem(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> RAT_BANNER_PATTERN = ITEMS.register("rat_banner_pattern", () -> new Item(Registrar.itemProps().stacksTo(1).delayedComponent(DataComponents.PROVIDES_BANNER_PATTERNS, context -> context.getOrThrow(RatsBannerPatternTags.RAT_BANNER_PATTERN))));
 	public static final RegistryEntry<Item, Item> CHEESE_BANNER_PATTERN = ITEMS.register("cheese_banner_pattern", () -> new Item(Registrar.itemProps().stacksTo(1).delayedComponent(DataComponents.PROVIDES_BANNER_PATTERNS, context -> context.getOrThrow(RatsBannerPatternTags.CHEESE_BANNER_PATTERN))));

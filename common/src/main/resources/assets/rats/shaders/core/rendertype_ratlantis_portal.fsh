@@ -1,12 +1,13 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
 
-in vec4 texProj0;
-in vec4 vertexColor;
+layout(location = 0) in vec4 texProj0;
+layout(location = 1) in vec4 vertexColor;
 
 const mat4 SCALE_TRANSLATE = mat4(
     0.5, 0.0, 0.0, 0.5,
@@ -26,7 +27,7 @@ mat4 portal_layer(float layer) {
     return mat4(mat2((4.5 - layer / 4.0))) * translate * SCALE_TRANSLATE;
 }
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 color = textureProj(Sampler0, texProj0) * vec4(vertexColor[0], vertexColor[1], vertexColor[2], 0.5);

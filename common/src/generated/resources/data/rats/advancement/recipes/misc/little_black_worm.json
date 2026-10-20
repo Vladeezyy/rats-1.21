@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:little_black_worm"
+        "recipes": "rats:little_black_worm"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

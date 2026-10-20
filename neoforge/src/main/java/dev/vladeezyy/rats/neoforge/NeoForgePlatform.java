@@ -58,7 +58,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.IEventBus;
@@ -339,14 +338,8 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public boolean canTill(ItemStack stack) {
-        return stack.canPerformAction(ItemAbilities.HOE_TILL);
-    }
-
-    @Override
-    @Nullable
-    public BlockState tilledState(BlockState state, UseOnContext context) {
-        return state.getToolModifiedState(context, ItemAbilities.HOE_TILL, false);
+    public Iterable<net.minecraft.core.component.BlockTransformer.BlockTransformData> blockTransforms(net.minecraft.core.Holder<net.minecraft.core.component.BlockTransformer> transformer) {
+        return net.neoforged.neoforge.common.DataMapHooks.getAllTransformers(transformer);
     }
 
     @Override
@@ -364,10 +357,6 @@ public final class NeoForgePlatform implements Platform {
         return state.canEntityDestroy(level, pos, entity);
     }
 
-    @Override
-    public boolean canSetDirtUnderTree(LevelSimulatedReader reader, BiConsumer<BlockPos, BlockState> placer, RandomSource random, BlockPos pos, TreeConfiguration config) {
-        return !(reader instanceof WorldGenLevel level) || !level.getBlockState(pos).onTreeGrow(level, placer, random, pos, config);
-    }
 
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {

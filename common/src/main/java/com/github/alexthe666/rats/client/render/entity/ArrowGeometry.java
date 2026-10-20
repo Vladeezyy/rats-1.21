@@ -20,12 +20,12 @@ public final class ArrowGeometry {
 	 */
 	public static void submit(PoseStack stack, SubmitNodeCollector collector, RenderType type, float yRot, float xRot, float shake, float scale, int light, int color, boolean shaft) {
 		stack.pushPose();
-		stack.mulPose(Axis.YP.rotationDegrees(yRot - 90.0F));
-		stack.mulPose(Axis.ZP.rotationDegrees(xRot));
+		stack.rotate(Axis.YP.rotationDegrees(yRot - 90.0F));
+		stack.rotate(Axis.ZP.rotationDegrees(xRot));
 		if (shake > 0.0F) {
-			stack.mulPose(Axis.ZP.rotationDegrees(-Mth.sin(shake * 3.0F) * shake));
+			stack.rotate(Axis.ZP.rotationDegrees(-Mth.sin(shake * 3.0F) * shake));
 		}
-		stack.mulPose(Axis.XP.rotationDegrees(45.0F));
+		stack.rotate(Axis.XP.rotationDegrees(45.0F));
 		stack.scale(scale * 0.05625F, scale * 0.05625F, scale * 0.05625F);
 		stack.translate(-4.0F, 0.0F, 0.0F);
 		collector.submitCustomGeometry(stack, type, (pose, consumer) -> draw(pose, consumer, light, color, shaft));

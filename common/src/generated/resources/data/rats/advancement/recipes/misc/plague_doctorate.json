@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:plague_doctorate"
+        "recipes": "rats:plague_doctorate"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

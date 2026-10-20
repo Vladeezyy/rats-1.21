@@ -19,7 +19,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -54,7 +54,7 @@ public class HatItem extends Item {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public boolean isEnderMask(ItemStack stack, Player player, EnderMan enderMan) {
+	public boolean isEnderMask(ItemStack stack, Player player, Enderman enderMan) {
 		return stack.is(RatsItemRegistry.BLACK_DEATH_MASK.get()) || stack.is(RatsItemRegistry.PLAGUE_DOCTOR_MASK.get());
 	}
 
@@ -66,37 +66,37 @@ public class HatItem extends Item {
 	 */
 	public void transformOnHead(AbstractRat rat, PoseStack stack) {
 		if (this == RatsItemRegistry.CHEF_TOQUE.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(25.0F));
+			stack.rotate(Axis.XN.rotationDegrees(25.0F));
 			stack.translate(0.0F, 0.1F, 0.3F);
 		}
 		if (this == RatsItemRegistry.PIPER_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(10.0F));
+			stack.rotate(Axis.XN.rotationDegrees(10.0F));
 			stack.translate(0.0F, 0.0F, 0.1F);
 		}
 		if (this == RatsItemRegistry.PIRAT_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.125F, 0.0F);
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatlantisItemRegistry.GHOST_PIRAT_HAT.get()) {
 			float piratScale = rat instanceof GhostPirat ? 1.1F : 1.425F;
 			float piratTranslate = rat instanceof GhostPirat ? 0.05F : -0.125F;
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, piratTranslate, 0.0F);
 			stack.scale(piratScale, piratScale, piratScale);
 		}
 		if (this == RatsItemRegistry.ARCHEOLOGIST_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.1F, 0.0F);
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatsItemRegistry.FARMER_HAT.get() || this == RatsItemRegistry.FISHERMAN_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.1F, 0.0F);
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatsItemRegistry.PLAGUE_DOCTOR_MASK.get() || this == RatsItemRegistry.BLACK_DEATH_MASK.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(15.0F));
+			stack.rotate(Axis.XN.rotationDegrees(15.0F));
 			stack.translate(0.0F, -0.1F, 0.0F);
 			stack.scale(1.5F, 1.2F, 1.5F);
 		}
@@ -105,22 +105,22 @@ public class HatItem extends Item {
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatsItemRegistry.TOP_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.125F, 0.0F);
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatsItemRegistry.SANTA_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, 0.0F, 0.1F);
 			stack.scale(1.25F, 1.25F, 1.25F);
 		}
 		if (this == RatlantisItemRegistry.MILITARY_HAT.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.1F, 0.0F);
 			stack.scale(1.425F, 1.425F, 1.425F);
 		}
 		if (this == RatsItemRegistry.RAT_KING_CROWN.get()) {
-			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
+			stack.rotate(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, -0.05F, 0.0F);
 			stack.scale(1.25F, 1.25F, 1.25F);
 		}

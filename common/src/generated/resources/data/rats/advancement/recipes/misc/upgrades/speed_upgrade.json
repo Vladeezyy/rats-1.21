@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/speed_upgrade"
+        "recipes": "rats:upgrades/speed_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

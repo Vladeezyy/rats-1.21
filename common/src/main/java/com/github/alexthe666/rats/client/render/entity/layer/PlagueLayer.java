@@ -27,7 +27,7 @@ public class PlagueLayer<S extends LivingEntityRenderState, M extends EntityMode
 	@Override
 	public void submit(PoseStack stack, SubmitNodeCollector collector, int light, S state, float yRot, float xRot) {
 		if (ClientPlatform.INSTANCE.isPlagued(state) && !(state instanceof RampartState rampart && rampart.rampart$pose().entity instanceof AbstractRat)) {
-			collector.order(1).submitModel(this.getParentModel(), state, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			collector.order(1).submitModel(this.getParentModel(), state, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		}
 	}
 }

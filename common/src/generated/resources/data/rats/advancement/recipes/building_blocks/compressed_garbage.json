@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:compressed_garbage"
+        "recipes": "rats:compressed_garbage"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

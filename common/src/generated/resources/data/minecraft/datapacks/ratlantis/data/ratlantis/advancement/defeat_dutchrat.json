@@ -3,15 +3,13 @@
   "criteria": {
     "kill_dutchrat": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:dutchrat"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:dutchrat"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.inventory;
-import net.minecraft.world.inventory.RecipeBookType;
+
+import net.minecraft.util.Prediction;import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import java.util.Optional;
 import java.util.List;
@@ -171,7 +172,7 @@ public class RatCraftingTableMenu extends RecipeBookMenu {
 			slot.onTake(player, itemstack1);
 
 			if (slotIndex == 0) {
-				player.drop(itemstack1, false);
+				player.drop(itemstack1, false, Prediction.SERVER_ONLY);
 			}
 		}
 

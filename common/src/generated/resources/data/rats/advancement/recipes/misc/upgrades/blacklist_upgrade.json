@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/blacklist_upgrade"
+        "recipes": "rats:upgrades/blacklist_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

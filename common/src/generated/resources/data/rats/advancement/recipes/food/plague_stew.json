@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:plague_stew"
+        "recipes": "rats:plague_stew"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

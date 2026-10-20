@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/marbled_cheese_rat_head"
+        "recipes": "rats:archeologist/marbled_cheese_rat_head"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

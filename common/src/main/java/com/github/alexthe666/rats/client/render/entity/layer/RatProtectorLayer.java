@@ -55,7 +55,7 @@ public class RatProtectorLayer<S extends HumanoidRenderState, M extends Humanoid
 		stack.translate(0.0F, 1.501F, 0.0F);
 		stack.scale(1.0F / 0.9375F, 1.0F / 0.9375F, 1.0F / 0.9375F);
 		stack.scale(-1.0F, -1.0F, 1.0F);
-		stack.mulPose(Axis.YP.rotationDegrees(-(180.0F - state.bodyRot)));
+		stack.rotate(Axis.YP.rotationDegrees(-(180.0F - state.bodyRot)));
 		float tick = state.ageInTicks - 1.0F;
 		float age = state.ageInTicks;
 		for (int i = 0; i < protectorCount; i++) {
@@ -64,12 +64,12 @@ public class RatProtectorLayer<S extends HumanoidRenderState, M extends Humanoid
 			float scale = 0.4F;
 			float rotation = Mth.wrapDegrees((tick * 8) % 360.0F + offsetRot);
 			stack.pushPose();
-			stack.mulPose(Axis.YP.rotationDegrees(rotation));
+			stack.rotate(Axis.YP.rotationDegrees(rotation));
 			stack.translate(0.0D, state.boundingBoxHeight + 0.5D + bob, state.boundingBoxWidth + 0.5F);
-			stack.mulPose(Axis.YP.rotationDegrees(90));
-			stack.mulPose(Axis.XP.rotationDegrees(75.0F));
+			stack.rotate(Axis.YP.rotationDegrees(90));
+			stack.rotate(Axis.XP.rotationDegrees(75.0F));
 			stack.scale(scale, scale, scale);
-			stack.mulPose(Axis.XP.rotationDegrees(90.0F));
+			stack.rotate(Axis.XP.rotationDegrees(90.0F));
 			PosedModels.submit(collector, stack, RatsRenderType.getGlowingTranslucent(RatProtectorRenderer.BASE_TEXTURE), RAT_MODEL, () -> RAT_MODEL.setupAnim(null, age * 0.5F, 1.0F, age, 0.0F, 0.0F), light, OverlayTexture.NO_OVERLAY, -1);
 			stack.popPose();
 		}

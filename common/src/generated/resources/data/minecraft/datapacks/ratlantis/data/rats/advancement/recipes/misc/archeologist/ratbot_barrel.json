@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/ratbot_barrel"
+        "recipes": "rats:archeologist/ratbot_barrel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

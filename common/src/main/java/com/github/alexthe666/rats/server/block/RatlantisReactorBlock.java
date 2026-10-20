@@ -12,12 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class RatlantisReactorBlock extends BaseEntityBlock {
-    public static final MapCodec<RatlantisReactorBlock> CODEC = simpleCodec(RatlantisReactorBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatlantisReactorBlock> codec() {
-        return CODEC;
-    }
 
 
 	public RatlantisReactorBlock(BlockBehaviour.Properties properties) {

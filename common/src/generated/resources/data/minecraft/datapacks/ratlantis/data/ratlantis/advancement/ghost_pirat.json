@@ -13,43 +13,37 @@
     },
     "hurt_ghost_pirat": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ghost_pirat"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ghost_pirat"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_hurt_entity"
     },
     "killed_by_ghost_pirat": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ghost_pirat"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ghost_pirat"
           }
-        ]
+        }
       },
       "trigger": "minecraft:entity_killed_player"
     },
     "killed_ghost_pirat": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ghost_pirat"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ghost_pirat"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

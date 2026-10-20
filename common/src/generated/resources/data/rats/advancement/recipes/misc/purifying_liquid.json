@@ -43,7 +43,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:purifying_liquid"
+        "recipes": "rats:purifying_liquid"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantis_pickaxe"
+        "recipes": "rats:ratlantis_pickaxe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

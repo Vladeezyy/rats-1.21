@@ -92,9 +92,10 @@ final class FabricBiomeModifiers {
     }
 
     private static void addSpawn(BiomeModificationContext context, JsonObject spawner) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
-        context.getMobSpawnSettings().addSpawn(type.getCategory(), new MobSpawnSettings.SpawnerData(type,
-                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
+        // 26.3: {"type", "count" (an int provider), "weight"}, NeoForge's codec
+        MobSpawnSettings.SpawnerData data = MobSpawnSettings.SpawnerData.CODEC.codec().parse(com.mojang.serialization.JsonOps.INSTANCE, spawner)
+                .getOrThrow(error -> new IllegalStateException("Bad spawner " + spawner + ": " + error));
+        context.getMobSpawnSettings().addSpawn(data.type().getCategory(), data, spawner.get("weight").getAsInt());
     }
 
     private static Predicate<BiomeSelectionContext> biomes(JsonElement biomes) {

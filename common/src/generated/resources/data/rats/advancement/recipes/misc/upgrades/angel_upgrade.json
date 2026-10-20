@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/angel_upgrade"
+        "recipes": "rats:upgrades/angel_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

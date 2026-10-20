@@ -41,12 +41,12 @@ public class DutchratSwordRenderer extends EntityRenderer<DutchratSword, Dutchra
 			this.sword = new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_CUTLASS.get());
 		}
 		stack.pushPose();
-		stack.mulPose(Axis.YP.rotationDegrees(state.yRot - 180.0F));
-		stack.mulPose(Axis.ZP.rotationDegrees(state.xRot));
+		stack.rotate(Axis.YP.rotationDegrees(state.yRot - 180.0F));
+		stack.rotate(Axis.ZP.rotationDegrees(state.xRot));
 		stack.translate(0.0F, 0.5F, 0.0F);
 		stack.scale(3.0F, 3.0F, 3.0F);
-		stack.mulPose(Axis.YP.rotationDegrees(90.0F));
-		stack.mulPose(Axis.ZP.rotationDegrees(state.ageInTicks * 20.0F));
+		stack.rotate(Axis.YP.rotationDegrees(90.0F));
+		stack.rotate(Axis.ZP.rotationDegrees(state.ageInTicks * 20.0F));
 		stack.translate(0.0F, -0.15F, 0.0F);
 		this.items.item(this.sword, ItemDisplayContext.GROUND, null, stack, collector, state.lightCoords);
 		stack.popPose();

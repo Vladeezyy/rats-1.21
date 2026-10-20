@@ -26,12 +26,29 @@ public record SyncRatTagPacket(int ratId, List<GlobalPos> nodes) implements Cust
 
 
 	public static SyncRatTagPacket decode(RegistryFriendlyByteBuf buf) {
-		return new SyncRatTagPacket(buf.readInt(), buf.readList(FriendlyByteBuf::readGlobalPos));
+		return new SyncRatTagPacket(buf.readInt(), readList(buf, FriendlyByteBuf::readGlobalPos));
+	}
+
+	/** 26.3 has no FriendlyByteBuf.readList / writeCollection: the same VarInt size and elements */
+	public static <T> java.util.List<T> readList(FriendlyByteBuf buf, java.util.function.Function<FriendlyByteBuf, T> reader) {
+		int size = buf.readVarInt();
+		java.util.List<T> list = new java.util.ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			list.add(reader.apply(buf));
+		}
+		return list;
+	}
+
+	public static <T> void writeList(FriendlyByteBuf buf, java.util.Collection<T> values, java.util.function.BiConsumer<FriendlyByteBuf, T> writer) {
+		buf.writeVarInt(values.size());
+		for (T value : values) {
+			writer.accept(buf, value);
+		}
 	}
 
 	public static void encode(SyncRatTagPacket packet, RegistryFriendlyByteBuf buf) {
 		buf.writeInt(packet.ratId());
-		buf.writeCollection(packet.nodes(), FriendlyByteBuf::writeGlobalPos);
+		writeList(buf, packet.nodes(), FriendlyByteBuf::writeGlobalPos);
 	}
 
 	public static class Handler {

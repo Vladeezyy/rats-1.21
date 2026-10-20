@@ -37,9 +37,9 @@ public class ShearsRatUpgradeItem extends BaseRatUpgradeItem implements HoldsIte
 	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
-		stack.mulPose(Axis.ZN.rotationDegrees(90.0F));
-		stack.mulPose(Axis.YP.rotationDegrees(15.0F));
-		stack.mulPose(Axis.XN.rotationDegrees(90.0F));
+		stack.rotate(Axis.ZN.rotationDegrees(90.0F));
+		stack.rotate(Axis.YP.rotationDegrees(15.0F));
+		stack.rotate(Axis.XN.rotationDegrees(90.0F));
 		stack.translate(0.1F, 0.0F, -0.075F);
 		context.item(new ItemStack(Items.SHEARS), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);
 		stack.popPose();

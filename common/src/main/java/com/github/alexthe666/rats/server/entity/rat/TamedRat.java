@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.server.entity.rat;
-import net.minecraft.core.component.DataComponents;
+
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Prediction;import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -679,7 +681,7 @@ public class TamedRat extends InventoryRat {
 
 			if (flag && this.getVehicle() != null && this.isRidingSpecialMount()) {
 				this.getVehicle().hurt(source, amount);
-				this.invulnerableTime = 20;
+				this.setInvulnerableTime(20);
 				return false;
 			}
 
@@ -1038,12 +1040,12 @@ public class TamedRat extends InventoryRat {
 					RatSackItem.packRatIntoSack(itemstack, this, RatSackItem.getRatsInSack(itemstack) + 1);
 					this.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1, 1);
 					this.discard();
-					player.swing(hand);
+					player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 					return InteractionResult.SUCCESS;
 				}
 			} else if (itemstack.getItem() instanceof RatStaffItem) {
 				SelectedRats.of(player).ifPresent(cap -> cap.setSelectedRat(this));
-				player.swing(hand);
+				player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 				if (!this.level().isClientSide() && player instanceof ServerPlayer sp) {
 					RatsNetworkHandler.toPlayer(sp, new ManageRatStaffPacket(this.getId(), BlockPos.ZERO, Direction.NORTH.ordinal(), false, false));
 				}
@@ -1060,10 +1062,10 @@ public class TamedRat extends InventoryRat {
 				if (itemstack.isEmpty()) {
 					player.setItemInHand(hand, arrow);
 				} else if (!player.getInventory().add(arrow)) {
-					player.drop(arrow, false);
+					player.drop(arrow, false, Prediction.SERVER_ONLY);
 				}
 				this.playSound(RatsSoundRegistry.RAT_HURT.get(), 1, 1);
-				player.swing(hand);
+				player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 				this.discard();
 				return InteractionResult.SUCCESS;
 			} else {
@@ -1279,7 +1281,7 @@ public class TamedRat extends InventoryRat {
 				BlockPos blockpos1 = blockpos.below();
 				BlockState state = this.level().getBlockState(blockpos1);
 
-				if (state.blocksMotion()) {
+				if (state.is(BlockTags.BLOCKS_MOTION)) {
 					flag1 = true;
 				} else {
 					this.setPos(this.getX(), this.getY() - 1, this.getZ());

@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class GenericAddItemLootModifier extends LootModifier {
 
@@ -28,14 +30,14 @@ public class GenericAddItemLootModifier extends LootModifier {
 	private final Map<Item, Integer> items;
 	private final boolean makeNewPool;
 
-	private GenericAddItemLootModifier(LootItemCondition[] conditions, int priority, Map<Item, Integer> items, boolean makeNewPool) {
-		super(conditions, priority);
+	private GenericAddItemLootModifier(Optional<Holder<LootItemCondition>> condition, int priority, Map<Item, Integer> items, boolean makeNewPool) {
+		super(condition, priority);
 		this.items = items;
 		this.makeNewPool = makeNewPool;
 	}
 
-	public GenericAddItemLootModifier(LootItemCondition[] conditions, boolean makeNewPool, ItemStack... stacks) {
-		super(conditions, IGlobalLootModifier.DEFAULT_PRIORITY);
+	public GenericAddItemLootModifier(Optional<Holder<LootItemCondition>> condition, boolean makeNewPool, ItemStack... stacks) {
+		super(condition, IGlobalLootModifier.DEFAULT_PRIORITY);
 		this.items = new HashMap<>();
 		for (ItemStack stack : stacks) {
 			this.items.put(stack.getItem(), stack.getCount());

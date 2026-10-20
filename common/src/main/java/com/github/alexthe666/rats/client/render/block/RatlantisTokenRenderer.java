@@ -51,7 +51,7 @@ public class RatlantisTokenRenderer extends StateBlockEntityRenderer<RatlantisTo
 		float rotateSpeed = progress / 3F * progress / 3F;
 		float masterRot = rotateSpeed - f2 * (180F / (float) Math.PI) - 90F;
 		stack.scale(tokenScale, tokenScale, tokenScale);
-		stack.mulPose(Axis.YP.rotationDegrees(masterRot));
+		stack.rotate(Axis.YP.rotationDegrees(masterRot));
 		this.items.item(this.token, ItemDisplayContext.FIXED, null, stack, collector, light, overlay);
 		stack.popPose();
 		if (progress > 150) {
@@ -87,12 +87,12 @@ public class RatlantisTokenRenderer extends StateBlockEntityRenderer<RatlantisTo
 		PoseStack stack = new PoseStack();
 		stack.last().set(start);
 		for (int i = 0; (float) i < (elapsedTime + elapsedTime * elapsedTime) / 2.0F * 10.0F; ++i) {
-			stack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
-			stack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
-			stack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F));
-			stack.mulPose(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
-			stack.mulPose(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
-			stack.mulPose(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + elapsedTime * 90.0F));
+			stack.rotate(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
+			stack.rotate(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
+			stack.rotate(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F));
+			stack.rotate(Axis.XP.rotationDegrees(random.nextFloat() * 360.0F));
+			stack.rotate(Axis.YP.rotationDegrees(random.nextFloat() * 360.0F));
+			stack.rotate(Axis.ZP.rotationDegrees(random.nextFloat() * 360.0F + elapsedTime * 90.0F));
 			float yAngle = random.nextFloat() * 20.0F + 5.0F + amplifier * 2.0F;
 			float xAngle = random.nextFloat() * 2.0F + 1.0F + amplifier * 2.0F;
 			PoseStack.Pose matrix = stack.last();

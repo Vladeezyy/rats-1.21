@@ -43,7 +43,7 @@ public class TamedRatOverlayLayer<S extends RampartLivingRenderState> extends En
 			int overlay = LivingEntityRenderer.getOverlayCoords(state, 0.0F);
 			if (RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_GOD.get()) && RatConfig.ratGodGlint) {
 				// the original drew the rat again with the foil buffer: the body is drawn, the glint goes on top
-				this.submitParent(stack, collector, state, RenderTypes.entityGlint(), light, OverlayTexture.NO_OVERLAY, -1, order++);
+				this.submitParent(stack, collector, state, RenderTypes.patternedShieldGlint(), light, OverlayTexture.NO_OVERLAY, -1, order++);
 			}
 			if (rat.isDyed()) {
 				if (rat.getDyeColor() == 100) {

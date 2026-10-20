@@ -1,7 +1,7 @@
 {
-  "asset_name": "oratchalcum",
   "description": {
     "color": "#AB9058",
     "translate": "trim_material.rats.oratchalcum"
-  }
+  },
+  "palette_id": "rats:trim/oratchalcum"
 }

@@ -28,13 +28,13 @@ public class PlatterRatUpgradeItem extends BaseRatUpgradeItem implements HoldsIt
 	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		if (rat.isBaby()) {
 			stack.translate(0.0F, 0.625F, 0.0F);
-			stack.mulPose(Axis.XP.rotationDegrees(20));
+			stack.rotate(Axis.XP.rotationDegrees(20));
 			stack.scale(0.5F, 0.5F, 0.5F);
 		}
 		this.translateToHand(model, true, stack);
-		stack.mulPose(Axis.ZP.rotationDegrees(190.0F));
-		stack.mulPose(Axis.YP.rotationDegrees(180.0F));
-		stack.mulPose(Axis.XN.rotationDegrees(70.0F));
+		stack.rotate(Axis.ZP.rotationDegrees(190.0F));
+		stack.rotate(Axis.YP.rotationDegrees(180.0F));
+		stack.rotate(Axis.XN.rotationDegrees(70.0F));
 
 		stack.translate(-0.155F, -0.225F, 0.2F);
 		stack.scale(2F, 2F, 2F);

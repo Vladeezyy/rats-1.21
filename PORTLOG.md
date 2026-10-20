@@ -290,3 +290,59 @@ none in Fabric.
 - Stress, NeoForge 26.2 dev server, `RATS=300 sh tools/stress.sh`: empty stage 2.87 ms, 300 wild wolves 7.95 ms, 300
   working rats 9.61 ms mean tick (9494 items carried); the rats add 1.33× what the wolves add (+6.74 ms against +5.08
   ms; 26.1.2: 1.36×).
+
+## 2026-10-20 — 26.3 (branch `mc/26.3`, on `mc/26.2`)
+
+NeoForge 26.3.0.94, Fabric API 0.164.0, JEI 31.16, Rampart `1.0.0+26.3`. 131 compile errors in common after the renames, 9 in
+NeoForge, 3 in Fabric. The big part is data: worldgen, loot and advancements have new formats.
+
+### Data: `tools/port/convert_263.py`
+- One converter for everything that changed, run after `convert_26.py`, safe to run again. Each converter is checked
+  on vanilla: `--check` converts the 26.2 client jar's data and compares it with the 26.3 jar's (loot 1349/1355,
+  advancements 1683/1688, processor lists 40/40, dimension types 4/4; what differs is Mojang's own content edits).
+- Ratlantis worldgen: configured features → `worldgen/feature` (config inline, block states `{id, properties}`,
+  providers renamed), the carver is a vanilla `minecraft:cave` (26.3 cave fields; Rats' own carver only turned the
+  water check off, which 26.3 does not have), density functions renamed (`input`, `left/right`, `gradient`, `noise`,
+  `cache`, `minecraft:end/islands`, cell sizes on `interpolated`), the surface rule is a material rule
+  (`worldgen/material_rule/ratlantis_noise_gen.json`), aquifers an object of their own, `chunk_surface_level`, the
+  beardifier is part of `final_density` now (the baron runway and the Dutchrat ship still blend into the terrain).
+- Biome spawns are the `natural_mob_spawns` attribute, spawner counts int providers (also in structure overrides and
+  the NeoForge biome modifiers, which Fabric reads too).
+- Loot: typed conditions and functions, one `condition`, `modifier`; the global loot modifiers have one `condition`
+  (Fabric's reader too). Advancements: one condition per entity/location, `blocks`, `recipes`.
+- Cooking: `cookingtime` is required; blasting and smoking take 200 ticks like vanilla's 26.3 recipes (the blast
+  furnace's speed comes from the fuel now), Rats' 100 tick ones would have been four times as fast as smelting.
+- Trims: `palette_id` (`rats:trim/oratchalcum`, `rats:trim/gem_of_ratlantis`), palettes in `textures/palettes/trim`, the
+  items atlas on `minecraft:trim_base`, no `armor_trims` atlas. The Ratlantis dimension type got vanilla's straw bed
+  rule.
+
+### Code
+- Features are records with their own codec registered as feature types (`MarblePileFeature`, `RatlantisRuinFeature`
+  with its configuration inside), keys are `ResourceKey<Feature>`; the pirat tree grower takes weighted lists; the trunk
+  placer gets the tree feature; `RatsCaveCarver` and the unused surface rule constants went.
+- Tools without tool classes: the Ratlantis axe, shovel and hoe are items with `Properties.axe/shovel/hoe` (block
+  transformer components). The hoe still tills 3x3 for one damage, through the transformer's data (NeoForge adds its
+  data map ones). Pirat logs are stripped through `neoforge:transformables` / Fabric's `BlockTransformerHelper`.
+- Composting and furnace fuel are item components: the Rats items keep their compost chances; the pirat wood items,
+  signs, boats, sapling and pied wool burn like vanilla's oak items and wool (26.2 got that from the wood tags; the
+  original's pirat logs never burned, they do now like every log).
+- `ModConfig.Type.COMMON` is `LOCAL`; the file is still `rats-common.toml`. NeoForge loot modifiers take one optional
+  condition. Advancement triggers take a loot condition holder.
+- Rendering: glint passes are `trimmedArmorGlint` / `patternedShieldGlint`, the portal pipeline binds `PROJECTION` and
+  `DYNAMIC_TRANSFORMS`, the portal shader uses `#include` and explicit locations; the synesthesia post effect goes into
+  the local player's post effect list (no `setPostEffect`); no GLFW (SDL key codes from `InputConstants`).
+- Smaller: `drop(..., Prediction)`, `setInvulnerableTime`, `setPermanentlyInvulnerable`, `isSwinging()`,
+  `swing(hand, SwingAnimation, ...)`, `BonemealSource.MOB`, push reactions renamed, `BLOCKS_MOTION` tag, `SignItem` →
+  `StandingAndWallBlockItem` with sign text, leaves with an ambient sound player, list packets written by hand.
+
+### Bugs found and fixed
+- **Flying rats stood still in the air when attacking** (#822 test): 26.3's melee goal moves with
+  `moveTo(target, reach, speed)`, the flight and ethereal navigations only overrode `moveTo(target, speed)`. Both
+  overloads now.
+- `tools/port/OverrideCheck.java` (new) lists methods that no longer override anything after an update. It found:
+  - **pick block** on the milk and cheese cauldrons, decorated cage, rat tube and rat hole used NeoForge 1.21.1's
+    `getCloneItemStack(state, hit, level, pos, player)`, which nothing calls on Fabric (any version) or NeoForge 26.x:
+    vanilla's override now (`tools/port/fix_lost_overrides.py`, also on `main`);
+  - thrown blocks were no longer solid for other entities in 26.x (`canBeCollidedWith(Entity)`).
+- The rat cage advancement accepted any item for the hammock and igloo criteria (1.20's `"tag"` key in item
+  predicates, ignored since 1.21): fixed on `main`, the converter turns such keys into `"items": "#tag"`.

@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantis_rat_skull"
+        "recipes": "rats:ratlantis_rat_skull"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

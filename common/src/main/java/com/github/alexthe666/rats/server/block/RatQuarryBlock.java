@@ -32,12 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatQuarryBlock extends BaseEntityBlock implements BlockTooltip {
-    public static final MapCodec<RatQuarryBlock> CODEC = simpleCodec(RatQuarryBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatQuarryBlock> codec() {
-        return CODEC;
-    }
 
 
 	public RatQuarryBlock(BlockBehaviour.Properties properties) {

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/ratglove_flower"
+        "recipes": "rats:archeologist/ratglove_flower"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

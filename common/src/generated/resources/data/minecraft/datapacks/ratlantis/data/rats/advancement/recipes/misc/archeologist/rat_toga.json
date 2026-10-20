@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/rat_toga"
+        "recipes": "rats:archeologist/rat_toga"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -15,12 +15,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 @SuppressWarnings("deprecation")
 public class RatUpgradeBlock extends DirectionalBlock {
-    public static final MapCodec<RatUpgradeBlock> CODEC = simpleCodec(RatUpgradeBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatUpgradeBlock> codec() {
-        return CODEC;
-    }
 
 	public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
 

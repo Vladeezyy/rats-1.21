@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/basic_ratlantean_upgrade"
+        "recipes": "rats:upgrades/basic_ratlantean_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

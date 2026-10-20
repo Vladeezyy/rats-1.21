@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:pirat_stairs"
+        "recipes": "rats:pirat_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

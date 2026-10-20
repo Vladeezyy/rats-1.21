@@ -32,7 +32,7 @@ public class AutoCurdlerRenderer extends StateBlockEntityRenderer<AutoCurdlerBlo
 	/** The milk: a box of the fluid's still sprite, as high as the tank is full */
 	public static void submitMilk(SubmitNodeCollector collector, PoseStack stack, FluidStack fluidStack, int combinedLight, int overlay) {
 		stack.pushPose();
-		stack.mulPose(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.XP.rotationDegrees(180));
 		stack.translate(-0.5F, -1.6F, -0.5F);
 		collector.submitCustomGeometry(stack, TEXTURE_BLOCKS, (pose, vertexbuffer) -> drawMilk(pose, vertexbuffer, fluidStack, combinedLight, overlay));
 		stack.popPose();
@@ -87,8 +87,8 @@ public class AutoCurdlerRenderer extends StateBlockEntityRenderer<AutoCurdlerBlo
 	public static void submitItem(PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5D, 1.5D, 0.5D);
-		stack.mulPose(Axis.ZP.rotationDegrees(180));
-		collector.submitModel(MODEL_AUTO_CURDLER, SubmitHelper.NO_STATE, stack, TEXTURE, light, overlay, -1, null, 0, null);
+		stack.rotate(Axis.ZP.rotationDegrees(180));
+		collector.submitModel(MODEL_AUTO_CURDLER, SubmitHelper.NO_STATE, stack, TEXTURE, light, overlay, -1, null, 0);
 		stack.popPose();
 	}
 
@@ -101,12 +101,12 @@ public class AutoCurdlerRenderer extends StateBlockEntityRenderer<AutoCurdlerBlo
 		}
 		stack.pushPose();
 		stack.translate(0.5D, 1.5D, 0.5D);
-		stack.mulPose(Axis.YP.rotationDegrees(-f));
-		stack.mulPose(Axis.ZP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(-f));
+		stack.rotate(Axis.ZP.rotationDegrees(180));
 		if (!entity.getTank().getFluid().isEmpty()) {
 			submitMilk(collector, stack, entity.getTank().getFluid().copy(), light, overlay);
 		}
-		collector.submitModel(MODEL_AUTO_CURDLER, SubmitHelper.NO_STATE, stack, TEXTURE, light, overlay, -1, null, 0, null);
+		collector.submitModel(MODEL_AUTO_CURDLER, SubmitHelper.NO_STATE, stack, TEXTURE, light, overlay, -1, null, 0);
 		stack.popPose();
 	}
 }

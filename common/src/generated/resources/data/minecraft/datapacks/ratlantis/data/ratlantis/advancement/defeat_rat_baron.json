@@ -3,29 +3,25 @@
   "criteria": {
     "killed_baron": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:rat_baron"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:rat_baron"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     },
     "killed_plane": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:rat_baron_plane"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:rat_baron_plane"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

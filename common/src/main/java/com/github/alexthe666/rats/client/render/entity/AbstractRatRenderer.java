@@ -46,13 +46,13 @@ public abstract class AbstractRatRenderer<T extends AbstractRat, M extends Abstr
 	}
 
 	@Override
-	public boolean shouldRender(T rat, Frustum camera, double camX, double camY, double camZ) {
+	public boolean shouldRender(T rat, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
 		if (rat.isPassenger() && rat.getVehicle() != null && !rat.getVehicle().getPassengers().isEmpty() && rat.getVehicle().getPassengers().get(0) == rat && rat.getVehicle() instanceof LivingEntity living) {
 			if (living.getItemBySlot(EquipmentSlot.HEAD).is(RatsItemRegistry.CHEF_TOQUE.get())) {
 				return false;
 			}
 		}
-		return super.shouldRender(rat, camera, camX, camY, camZ);
+		return super.shouldRender(rat, camera, camX, camY, camZ, partialTicks);
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public abstract class AbstractRatRenderer<T extends AbstractRat, M extends Abstr
 			float headYaw = Mth.wrapDegrees(Mth.rotLerp(partialTicks, player.yHeadRotO, player.yHeadRot) - Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot));
 			float headPitch = player.getXRot(partialTicks);
 			pose.translate(0.0F, player.getPose() == Pose.CROUCHING ? 4.2F / 16.0F : 0.0F, 0.0F);
-			pose.mulPose(new Quaternionf().rotationZYX(0.0F, headYaw * Mth.DEG_TO_RAD, headPitch * Mth.DEG_TO_RAD));
+			pose.rotate(new Quaternionf().rotationZYX(0.0F, headYaw * Mth.DEG_TO_RAD, headPitch * Mth.DEG_TO_RAD));
 			pose.translate(0.0F, -0.7F, 0.25F);
 			if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof HatItem hatItem) {
 				pose.translate(0.0F, hatItem.getRatOffsetOnHead(), 0.0F);

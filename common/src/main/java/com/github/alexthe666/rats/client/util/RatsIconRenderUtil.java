@@ -23,7 +23,7 @@ public class RatsIconRenderUtil {
 			stack.pushPose();
 			stack.translate(-viewVec.x(), -viewVec.y(), -viewVec.z());
 			stack.translate(renderPos.getX() + 0.5F, renderPos.getY() + bob, renderPos.getZ() + 0.5F);
-			stack.mulPose(cameraOrientation);
+			stack.rotate(cameraOrientation);
 			collector.submitCustomGeometry(stack, RenderTypes.entityTranslucent(icon), (pose, buffer) -> {
 				iconVertex(buffer, pose, -0.5F, -0.5F, 1.0F, 1.0F);
 				iconVertex(buffer, pose, -0.5F, 0.5F, 1.0F, 0.0F);

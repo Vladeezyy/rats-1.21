@@ -1,20 +1,23 @@
 {
   "type": "rats:add_item",
-  "conditions": [
-    {
-      "condition": "minecraft:entity_properties",
-      "entity": "this",
-      "predicate": {
-        "minecraft:nbt": "{powered:1b}"
-      }
-    },
-    {
-      "condition": "neoforge:loot_table_id",
-      "loot_table_id": "minecraft:entities/creeper"
-    }
-  ],
   "items": {
     "rats:charged_creeper_chunk": 1
   },
-  "replacePool": false
+  "replacePool": false,
+  "condition": {
+    "type": "minecraft:all_of",
+    "terms": [
+      {
+        "type": "minecraft:entity_properties",
+        "entity": "this",
+        "predicate": {
+          "minecraft:nbt": "{powered:1b}"
+        }
+      },
+      {
+        "type": "neoforge:loot_table_id",
+        "loot_table_id": "minecraft:entities/creeper"
+      }
+    ]
+  }
 }

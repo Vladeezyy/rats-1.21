@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_pelt_to_leather"
+        "recipes": "rats:rat_pelt_to_leather"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

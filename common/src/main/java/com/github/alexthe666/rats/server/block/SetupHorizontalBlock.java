@@ -12,12 +12,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 
 public class SetupHorizontalBlock extends HorizontalDirectionalBlock {
-    public static final MapCodec<SetupHorizontalBlock> CODEC = simpleCodec(SetupHorizontalBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends SetupHorizontalBlock> codec() {
-        return CODEC;
-    }
 
 
 	public SetupHorizontalBlock(BlockBehaviour.Properties properties) {

@@ -44,17 +44,17 @@ public class LaserPortalRenderer extends EntityRenderer<LaserPortal, LaserPortal
 	public void submit(State state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
 		float d1 = state.scale;
 		stack.pushPose();
-		stack.mulPose(Axis.ZP.rotationDegrees(state.xRot));
+		stack.rotate(Axis.ZP.rotationDegrees(state.xRot));
 		stack.pushPose();
 		stack.scale(1.5F * d1, 1.5F * d1, 1.5F * d1);
 		stack.translate(0, 0.5F, 0);
 		stack.translate(0, 1 - d1, 0);
-		stack.mulPose(Axis.YP.rotationDegrees(90));
-		stack.mulPose(Axis.XP.rotationDegrees(90));
-		stack.mulPose(Axis.ZP.rotationDegrees(state.yRot - 90.0F));
-		stack.mulPose(Axis.YP.rotationDegrees(state.ageInTicks * 10));
-		collector.submitModel(MODEL_NEO_RATLANTEAN, SubmitHelper.NO_STATE, stack, PORTAL, 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
-		collector.order(1).submitModel(MODEL_NEO_RATLANTEAN, SubmitHelper.NO_STATE, stack, RenderTypes.entityGlint(), 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		stack.rotate(Axis.YP.rotationDegrees(90));
+		stack.rotate(Axis.XP.rotationDegrees(90));
+		stack.rotate(Axis.ZP.rotationDegrees(state.yRot - 90.0F));
+		stack.rotate(Axis.YP.rotationDegrees(state.ageInTicks * 10));
+		collector.submitModel(MODEL_NEO_RATLANTEAN, SubmitHelper.NO_STATE, stack, PORTAL, 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
+		collector.order(1).submitModel(MODEL_NEO_RATLANTEAN, SubmitHelper.NO_STATE, stack, RenderTypes.patternedShieldGlint(), 240, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		stack.popPose();
 		stack.popPose();
 		super.submit(state, stack, collector, camera);

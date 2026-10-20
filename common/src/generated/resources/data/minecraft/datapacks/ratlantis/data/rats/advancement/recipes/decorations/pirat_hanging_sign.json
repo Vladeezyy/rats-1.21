@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:pirat_hanging_sign"
+        "recipes": "rats:pirat_hanging_sign"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

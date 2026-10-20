@@ -208,9 +208,9 @@ public final class RatsFabricClient implements ClientModInitializer {
         ArmorRenderer.register((poseStack, collector, stack, state, slot, light, contextModel) -> {
             AbstractHatModel model = RatsArmorModels.ratlantisArmorModel(slot);
             Identifier texture = slot == EquipmentSlot.LEGS ? RATLANTIS_LEGGINGS : RATLANTIS_ARMOR;
-            collector.submitModel(model, state, poseStack, model.renderType(texture), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+            collector.submitModel(model, state, poseStack, model.renderType(texture), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
             if (stack.hasFoil()) {
-                collector.order(1).submitModel(model, state, poseStack, RenderTypes.armorEntityGlint(), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+                collector.order(1).submitModel(model, state, poseStack, RenderTypes.trimmedArmorGlint(), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
             }
         }, armor.toArray(Item[]::new));
     }

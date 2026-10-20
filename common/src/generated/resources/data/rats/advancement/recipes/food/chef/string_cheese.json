@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:chef/string_cheese"
+        "recipes": "rats:chef/string_cheese"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:assorted_vegetables"
+        "recipes": "rats:assorted_vegetables"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

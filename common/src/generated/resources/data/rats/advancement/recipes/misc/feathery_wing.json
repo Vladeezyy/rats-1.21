@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:feathery_wing"
+        "recipes": "rats:feathery_wing"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

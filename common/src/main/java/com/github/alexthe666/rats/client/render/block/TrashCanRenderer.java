@@ -25,7 +25,7 @@ public class TrashCanRenderer extends StateBlockEntityRenderer<TrashCanBlockEnti
 	public static void submitItem(PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5D, 1.501D, 0.5D);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.XP.rotationDegrees(180));
 		PosedModels.submit(collector, stack, TEXTURE, MODEL_TRASH_CAN, MODEL_TRASH_CAN::resetToDefaultPose, light, overlay, -1);
 		stack.popPose();
 	}
@@ -39,8 +39,8 @@ public class TrashCanRenderer extends StateBlockEntityRenderer<TrashCanBlockEnti
 		}
 		stack.pushPose();
 		stack.translate(0.5D, 1.501D, 0.5D);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
-		stack.mulPose(Axis.YP.rotationDegrees(rotation));
+		stack.rotate(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(rotation));
 		PosedModels.submit(collector, stack, TEXTURE, MODEL_TRASH_CAN, () -> MODEL_TRASH_CAN.animate(entity), light, overlay, -1);
 		stack.popPose();
 	}

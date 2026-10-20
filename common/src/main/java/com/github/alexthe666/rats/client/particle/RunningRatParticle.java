@@ -138,11 +138,11 @@ public class RunningRatParticle extends Particle {
 		stack.translate(f, f1, f2);
 		stack.translate(0.0D, 0.95D, 0.0D);
 		stack.scale(0.6F, -0.6F, -0.6F);
-		this.getYRotD().ifPresent(aFloat -> stack.mulPose(Axis.YP.rotationDegrees(aFloat)));
+		this.getYRotD().ifPresent(aFloat -> stack.rotate(Axis.YP.rotationDegrees(aFloat)));
 		// the particle's own model: posed now, drawn later in the frame with this pose
 		float age = Mth.lerp(partialTicks, this.oldAge, this.age);
 		this.model.setupAnim(null, age * 0.35F, 1, age, partialTicks, 0);
-		collector.submitModel(this.model, SubmitHelper.NO_STATE, stack, this.renderType, this.getLightCoords(partialTicks), OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		collector.submitModel(this.model, SubmitHelper.NO_STATE, stack, this.renderType, this.getLightCoords(partialTicks), OverlayTexture.NO_OVERLAY, -1, null, 0);
 		stack.popPose();
 	}
 

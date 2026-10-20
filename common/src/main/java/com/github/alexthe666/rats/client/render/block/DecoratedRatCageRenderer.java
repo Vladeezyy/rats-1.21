@@ -51,16 +51,16 @@ public class DecoratedRatCageRenderer extends StateBlockEntityRenderer<Decorated
 	}
 
 	private static void submit(SubmitNodeCollector collector, PoseStack stack, Model<Unit> model, RenderType type, int light, int overlay, int color) {
-		collector.submitModel(model, Unit.INSTANCE, stack, type, light, overlay, color, null, 0, null);
+		collector.submitModel(model, Unit.INSTANCE, stack, type, light, overlay, color, null, 0);
 	}
 
 	@Override
 	protected void submit(DecoratedRatCageBlockEntity entity, float partialTicks, PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5D, 1.5D, 0.5D);
-		stack.mulPose(Axis.ZP.rotationDegrees(180));
+		stack.rotate(Axis.ZP.rotationDegrees(180));
 		float f = entity.getBlockState().getValue(RatCageDecoratedBlock.FACING).getOpposite().toYRot();
-		stack.mulPose(Axis.YP.rotationDegrees(f));
+		stack.rotate(Axis.YP.rotationDegrees(f));
 		ItemStack containedItem = entity.getLevel() != null ? entity.getContainedItem() : ItemStack.EMPTY;
 		if (containedItem.getItem() instanceof RatIglooItem iglooItem) {
 			submit(collector, stack, this.igloo, TEXTURE_RAT_IGLOO, light, overlay, iglooItem.color.getTextureDiffuseColor());

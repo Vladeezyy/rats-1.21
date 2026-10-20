@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/crossbow_upgrade"
+        "recipes": "rats:upgrades/crossbow_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

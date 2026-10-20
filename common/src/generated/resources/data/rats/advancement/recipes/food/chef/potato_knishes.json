@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:chef/potato_knishes"
+        "recipes": "rats:chef/potato_knishes"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

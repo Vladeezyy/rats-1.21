@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:skull_to_bonemeal"
+        "recipes": "rats:skull_to_bonemeal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

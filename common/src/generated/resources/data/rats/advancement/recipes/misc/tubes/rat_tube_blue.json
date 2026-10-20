@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:tubes/rat_tube_blue"
+        "recipes": "rats:tubes/rat_tube_blue"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

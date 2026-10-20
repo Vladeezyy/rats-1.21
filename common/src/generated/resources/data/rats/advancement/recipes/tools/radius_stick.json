@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:radius_stick"
+        "recipes": "rats:radius_stick"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

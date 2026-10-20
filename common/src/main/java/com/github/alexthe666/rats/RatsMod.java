@@ -31,12 +31,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -102,7 +100,7 @@ public final class RatsMod {
 			RatsEntityRegistry.ENTITIES, RatlantisEntityRegistry.ENTITIES, RatsItemRegistry.ITEMS, RatlantisItemRegistry.ITEMS,
 			RatsLootRegistry.CONDITIONS, RatsMenuRegistry.MENUS, RatsVillagerRegistry.POIS, RatsVillagerRegistry.PROFESSIONS,
 			RatsRecipeRegistry.RECIPES, RatsRecipeRegistry.SERIALIZERS, RatsCreativeTabRegistry.TABS,
-			RatlantisFeatureRegistry.CARVERS, RatlantisFeatureRegistry.FEATURES, RatlantisFeatureRegistry.PROCESSORS, RatlantisFeatureRegistry.TRUNK_PLACERS);
+			RatlantisFeatureRegistry.FEATURES, RatlantisFeatureRegistry.PROCESSORS, RatlantisFeatureRegistry.TRUNK_PLACERS);
 		RatsDataSerializerRegistry.register();
 	}
 
@@ -125,20 +123,11 @@ public final class RatsMod {
 			FlowerPotBlock pot = (FlowerPotBlock) Blocks.FLOWER_POT;
 			// the potted plants: vanilla FlowerPotBlock(content, properties) adds them to the empty pot
 
-			ComposterBlock.add(0.3F, RatsItemRegistry.RAT_NUGGET.get());
-			ComposterBlock.add(0.3F, RatlantisBlockRegistry.PIRAT_SAPLING.get());
-			ComposterBlock.add(0.3F, RatlantisBlockRegistry.PIRAT_LEAVES.get());
-			ComposterBlock.add(0.5F, RatsItemRegistry.CONTAMINATED_FOOD.get());
-			ComposterBlock.add(0.65F, RatlantisBlockRegistry.RATGLOVE_FLOWER.get());
-			ComposterBlock.add(0.65F, RatlantisItemRegistry.RATGLOVE_PETALS.get());
-			ComposterBlock.add(0.85F, RatsItemRegistry.POTATO_PANCAKE.get());
-			ComposterBlock.add(0.85F, RatsItemRegistry.HERB_BUNDLE.get());
-			ComposterBlock.add(1.0F, RatsItemRegistry.CONFIT_BYALDI.get());
-			ComposterBlock.add(1.0F, RatsItemRegistry.POTATO_KNISHES.get());
 
-			AxeItem.STRIPPABLES = Maps.newHashMap(AxeItem.STRIPPABLES);
-			AxeItem.STRIPPABLES.put(RatlantisBlockRegistry.PIRAT_LOG.get(), RatlantisBlockRegistry.STRIPPED_PIRAT_LOG.get());
-			AxeItem.STRIPPABLES.put(RatlantisBlockRegistry.PIRAT_WOOD.get(), RatlantisBlockRegistry.STRIPPED_PIRAT_WOOD.get());
+			// 26.3: stripping is data (the axe's block transformer); the loaders add ours (NeoForge: the transformables
+			// data map, data/neoforge/data_maps/block/transformables.json; Fabric: BlockTransformerHelper)
+			Platform.INSTANCE.registerStripping(RatlantisBlockRegistry.PIRAT_LOG.get(), RatlantisBlockRegistry.STRIPPED_PIRAT_LOG.get());
+			Platform.INSTANCE.registerStripping(RatlantisBlockRegistry.PIRAT_WOOD.get(), RatlantisBlockRegistry.STRIPPED_PIRAT_WOOD.get());
 		}
 		//wooooo caches ftw
 		if (RATLANTIS_ITEMS.isEmpty()) {

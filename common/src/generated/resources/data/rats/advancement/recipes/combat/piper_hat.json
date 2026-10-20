@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:piper_hat"
+        "recipes": "rats:piper_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

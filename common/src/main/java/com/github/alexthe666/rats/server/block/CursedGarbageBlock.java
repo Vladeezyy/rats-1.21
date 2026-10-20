@@ -16,12 +16,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CursedGarbageBlock extends AbstractGarbageBlock {
-    public static final MapCodec<CursedGarbageBlock> CODEC = simpleCodec(CursedGarbageBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends CursedGarbageBlock> codec() {
-        return CODEC;
-    }
 
 
 	public CursedGarbageBlock(BlockBehaviour.Properties properties) {

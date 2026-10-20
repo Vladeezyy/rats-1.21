@@ -49,22 +49,22 @@ public class RattlingGunRenderer extends EntityRenderer<RattlingGun, RattlingGun
 		stack.pushPose();
 		stack.pushPose();
 		stack.translate(0, 1.5F, 0);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
-		collector.submitModel(GUN_BASE_MODEL, SubmitHelper.NO_STATE, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
-		stack.mulPose(Axis.YP.rotationDegrees(state.yRot));
+		stack.rotate(Axis.XP.rotationDegrees(180));
+		collector.submitModel(GUN_BASE_MODEL, SubmitHelper.NO_STATE, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
+		stack.rotate(Axis.YP.rotationDegrees(state.yRot));
 		if (state.firing) {
-			collector.submitModel(GUN_MODEL, state, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			collector.submitModel(GUN_MODEL, state, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		} else {
-			collector.submitModel(IDLE_GUN_MODEL, SubmitHelper.NO_STATE, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			collector.submitModel(IDLE_GUN_MODEL, SubmitHelper.NO_STATE, stack, TEXTURE, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		}
 		stack.popPose();
 
 		if (state.firing) {
 			stack.pushPose();
 			stack.translate(0, 1.6F, 0);
-			stack.mulPose(Axis.XP.rotationDegrees(180));
-			stack.mulPose(Axis.YP.rotationDegrees(state.yRot));
-			collector.order(1).submitModel(GUN_MODEL, state, stack, TEXTURE_FIRING, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			stack.rotate(Axis.XP.rotationDegrees(180));
+			stack.rotate(Axis.YP.rotationDegrees(state.yRot));
+			collector.order(1).submitModel(GUN_MODEL, state, stack, TEXTURE_FIRING, light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 			stack.popPose();
 		}
 		stack.popPose();

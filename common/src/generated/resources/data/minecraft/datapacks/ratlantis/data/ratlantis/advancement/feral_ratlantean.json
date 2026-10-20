@@ -13,43 +13,37 @@
     },
     "hurt_feral_ratlantean": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:feral_ratlantean"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:feral_ratlantean"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_hurt_entity"
     },
     "killed_by_feral_ratlantean": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:feral_ratlantean"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:feral_ratlantean"
           }
-        ]
+        }
       },
       "trigger": "minecraft:entity_killed_player"
     },
     "killed_feral_ratlantean": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:feral_ratlantean"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:feral_ratlantean"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

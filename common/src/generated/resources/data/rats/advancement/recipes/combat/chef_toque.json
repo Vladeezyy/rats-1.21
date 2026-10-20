@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:chef_toque"
+        "recipes": "rats:chef_toque"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

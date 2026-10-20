@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:stonecutting/cracked_marbled_cheese_brick_to_slab"
+        "recipes": "rats:stonecutting/cracked_marbled_cheese_brick_to_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

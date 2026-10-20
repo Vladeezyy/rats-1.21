@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantean_gem_blasting"
+        "recipes": "rats:ratlantean_gem_blasting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

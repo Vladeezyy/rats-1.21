@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:cursed_garbage"
+        "recipes": "rats:cursed_garbage"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

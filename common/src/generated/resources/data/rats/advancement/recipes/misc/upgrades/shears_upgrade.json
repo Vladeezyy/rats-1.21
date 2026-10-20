@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/shears_upgrade"
+        "recipes": "rats:upgrades/shears_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

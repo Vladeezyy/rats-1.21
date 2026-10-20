@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_whistle"
+        "recipes": "rats:rat_whistle"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

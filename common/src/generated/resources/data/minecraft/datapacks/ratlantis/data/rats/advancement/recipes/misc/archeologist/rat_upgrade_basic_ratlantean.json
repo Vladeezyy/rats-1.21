@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/rat_upgrade_basic_ratlantean"
+        "recipes": "rats:archeologist/rat_upgrade_basic_ratlantean"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

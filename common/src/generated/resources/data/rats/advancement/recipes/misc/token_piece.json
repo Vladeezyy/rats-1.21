@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:token_piece"
+        "recipes": "rats:token_piece"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

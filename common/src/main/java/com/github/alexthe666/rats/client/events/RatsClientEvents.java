@@ -123,17 +123,14 @@ public final class RatsClientEvents {
 	public static void onClientEntityTick(Entity entity) {
 		if (RatConfig.synesthesiaShader) {
 			if (entity == Minecraft.getInstance().player) {
-				GameRenderer renderer = Minecraft.getInstance().gameRenderer;
 				boolean active = Minecraft.getInstance().player.hasEffect(RatsEffectRegistry.SYNESTHESIA.holder());
-				try {
-					if (active && renderer.currentPostEffect() == null) {
-						renderer.setPostEffect(SYNESTHESIA);
-					}
-					if (!active && SYNESTHESIA.equals(renderer.currentPostEffect())) {
-						renderer.clearPostEffect();
-					}
-				} catch (Exception e) {
-					RatsMod.LOGGER.warn("Game tried to crash when applying shader");
+				// 26.3: the game renderer applies the player's list of post effects every frame (a missing one is skipped)
+				java.util.List<Identifier> effects = Minecraft.getInstance().player.getActivePostEffects();
+				if (active && !effects.contains(SYNESTHESIA)) {
+					effects.add(SYNESTHESIA);
+				}
+				if (!active) {
+					effects.remove(SYNESTHESIA);
 				}
 
 				if (prevSynesthesiaProgress == 2 && active) {
@@ -201,10 +198,10 @@ public final class RatsClientEvents {
 		boolean highlight = gui.healthBlinkTime > (long) gui.getGuiTicks() && (gui.healthBlinkTime - (long) gui.getGuiTicks()) / 3L % 2L == 1L;
 
 		long j = Util.getMillis();
-		if (health < gui.lastHealth && player.invulnerableTime > 0) {
+		if (health < gui.lastHealth && player.getInvulnerableTime() > 0) {
 			gui.lastHealthTime = j;
 			gui.healthBlinkTime = gui.getGuiTicks() + 20;
-		} else if (health > gui.lastHealth && player.invulnerableTime > 0) {
+		} else if (health > gui.lastHealth && player.getInvulnerableTime() > 0) {
 			gui.lastHealthTime = j;
 			gui.healthBlinkTime = gui.getGuiTicks() + 10;
 		}

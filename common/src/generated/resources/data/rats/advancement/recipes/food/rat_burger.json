@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_burger"
+        "recipes": "rats:rat_burger"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

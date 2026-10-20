@@ -31,12 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemRarity {
-    public static final MapCodec<RatlantisPortalBlock> CODEC = simpleCodec(RatlantisPortalBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatlantisPortalBlock> codec() {
-        return CODEC;
-    }
 
 
 	public RatlantisPortalBlock(BlockBehaviour.Properties properties) {

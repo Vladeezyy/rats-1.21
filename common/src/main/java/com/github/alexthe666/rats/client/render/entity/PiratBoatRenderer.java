@@ -54,21 +54,21 @@ public class PiratBoatRenderer extends MobRenderer<PiratBoat, PiratBoatRenderer.
 	@Override
 	public void submit(State state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
 		stack.pushPose();
-		stack.mulPose(Axis.YP.rotationDegrees(180.0F - state.boatYaw));
+		stack.rotate(Axis.YP.rotationDegrees(180.0F - state.boatYaw));
 		stack.scale(-1.0F, -1.0F, 1.0F);
 		stack.scale(1.2F, 1.2F, 1.2F);
 		stack.translate(0.0D, -1.501F, 0.0D);
-		stack.mulPose(Axis.YP.rotationDegrees(90.0F));
+		stack.rotate(Axis.YP.rotationDegrees(90.0F));
 		if (state.hurt > 0.0F) {
-			stack.mulPose(Axis.YP.rotationDegrees(Mth.sin(state.hurt) * state.hurt * state.damage / 10.0F));
+			stack.rotate(Axis.YP.rotationDegrees(Mth.sin(state.hurt) * state.hurt * state.damage / 10.0F));
 		}
 		boolean visible = this.isBodyVisible(state);
 		boolean translucent = !visible && !state.isInvisibleToPlayer;
 		RenderType rendertype = this.getRenderType(state, visible, translucent, state.appearsGlowing());
 		if (rendertype != null) {
-			collector.submitModel(this.model, state, stack, rendertype, state.lightCoords, overlay(state), ARGB.colorFromFloat(translucent ? 0.15F : 1.0F, 1.0F, 1.0F, 1.0F), null, state.outlineColor, null);
+			collector.submitModel(this.model, state, stack, rendertype, state.lightCoords, overlay(state), ARGB.colorFromFloat(translucent ? 0.15F : 1.0F, 1.0F, 1.0F, 1.0F), null, state.outlineColor);
 		}
-		collector.submitModel(this.waterPatch, Unit.INSTANCE, stack, RenderTypes.waterMask(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		collector.submitModel(this.waterPatch, Unit.INSTANCE, stack, RenderTypes.waterMask(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0);
 		if (!state.spectator) {
 			for (RenderLayer<State, PiratBoatModel> layer : this.layers) {
 				layer.submit(stack, collector, state.lightCoords, state, 0.0F, 0.0F);

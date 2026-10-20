@@ -40,7 +40,7 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 	/** Vanilla's chest model (the christmas upgrade's gift); baked on first use */
 	/** The closed chest a Christmas rat carries (called from the upgrade item: the model types stay out of server classes) */
 	public static void submitChristmasChest(PoseStack stack, SubmitNodeCollector collector, int light) {
-		collector.submitModel(christmasChestModel(), 0.0F, stack, RenderTypes.entityCutout(Identifier.parse("textures/entity/chest/christmas.png")), light, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		collector.submitModel(christmasChestModel(), 0.0F, stack, RenderTypes.entityCutout(Identifier.parse("textures/entity/chest/christmas.png")), light, OverlayTexture.NO_OVERLAY, -1, null, 0);
 	}
 
 	public static ChestModel christmasChestModel() {
@@ -58,9 +58,9 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 				stack.pushPose();
 				if (!entity.isHoldingItemInHands()) {
 					this.getParentModel().translateToHead(stack);
-					stack.mulPose(Axis.ZP.rotationDegrees(180));
-					stack.mulPose(Axis.YP.rotationDegrees(180));
-					stack.mulPose(Axis.XP.rotationDegrees(90));
+					stack.rotate(Axis.ZP.rotationDegrees(180));
+					stack.rotate(Axis.YP.rotationDegrees(180));
+					stack.rotate(Axis.XP.rotationDegrees(90));
 					stack.translate(0F, 0.35F, 0.05F);
 					stack.scale(0.5F, 0.5F, 0.5F);
 					this.items.item(itemstack, ItemDisplayContext.FIXED, entity, stack, collector, light);
@@ -73,22 +73,22 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 						this.translateToHand(model, true, stack);
 						stack.translate(-0.125F, -0.15F, -0.2F);
 						if (model3d) {
-							stack.mulPose(Axis.XP.rotationDegrees(110));
-							stack.mulPose(Axis.YP.rotationDegrees(10));
-							stack.mulPose(Axis.ZN.rotationDegrees(3));
+							stack.rotate(Axis.XP.rotationDegrees(110));
+							stack.rotate(Axis.YP.rotationDegrees(10));
+							stack.rotate(Axis.ZN.rotationDegrees(3));
 							stack.translate(0.0F, 0.2F, 0.025F);
 						} else {
-							stack.mulPose(Axis.XP.rotationDegrees(20));
-							stack.mulPose(Axis.YP.rotationDegrees(3));
-							stack.mulPose(Axis.ZP.rotationDegrees(10));
+							stack.rotate(Axis.XP.rotationDegrees(20));
+							stack.rotate(Axis.YP.rotationDegrees(3));
+							stack.rotate(Axis.ZP.rotationDegrees(10));
 							stack.translate(0.0F, -0.025F, 0.09F);
 							stack.scale(0.75F, 0.75F, 0.75F);
 						}
 						stack.scale(0.5F, 0.5F, 0.5F);
 					} else {
 						this.translateToHand(model, true, stack);
-						stack.mulPose(Axis.ZP.rotationDegrees(180));
-						stack.mulPose(Axis.XP.rotationDegrees(20));
+						stack.rotate(Axis.ZP.rotationDegrees(180));
+						stack.rotate(Axis.XP.rotationDegrees(20));
 						stack.scale(0.65F, 0.65F, 0.65F);
 						stack.translate(0.0F, -0.075F, -0.2F);
 					}
@@ -98,7 +98,7 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 						RandomSource random = RandomSource.create(itemstack.getItem().hashCode());
 						for (int i = 0; i < itemstack.getCount() / 5; i++) {
 							stack.translate(0.0D, 0.025D, 0.0D);
-							stack.mulPose(Axis.ZP.rotationDegrees(random.nextIntBetweenInclusive(-90, 90)));
+							stack.rotate(Axis.ZP.rotationDegrees(random.nextIntBetweenInclusive(-90, 90)));
 							stack.translate(0.0D, -0.025D, 0.05D);
 							this.items.submitResolved(stack, collector, light, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
 						}
@@ -117,17 +117,17 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 					float wingFold = -45.0F;
 					this.getParentModel().translateToBody(stack);
 					stack.pushPose();
-					stack.mulPose(Axis.ZN.rotationDegrees(wingAngle));
-					stack.mulPose(Axis.YP.rotationDegrees(wingFold));
-					stack.mulPose(Axis.XN.rotationDegrees(90));
+					stack.rotate(Axis.ZN.rotationDegrees(wingAngle));
+					stack.rotate(Axis.YP.rotationDegrees(wingFold));
+					stack.rotate(Axis.XN.rotationDegrees(90));
 					stack.translate(0.2F, 0.0F, -0.15F);
 					this.items.item(this.featheryWing, ItemDisplayContext.GROUND, rat, stack, collector, light);
 					stack.popPose();
 					stack.pushPose();
-					stack.mulPose(Axis.ZP.rotationDegrees(wingAngle));
-					stack.mulPose(Axis.YN.rotationDegrees(wingFold));
-					stack.mulPose(Axis.XN.rotationDegrees(90));
-					stack.mulPose(Axis.YP.rotationDegrees(180));
+					stack.rotate(Axis.ZP.rotationDegrees(wingAngle));
+					stack.rotate(Axis.YN.rotationDegrees(wingFold));
+					stack.rotate(Axis.XN.rotationDegrees(90));
+					stack.rotate(Axis.YP.rotationDegrees(180));
 					stack.translate(0.2F, -0.0F, 0.15F);
 					this.items.item(this.featheryWing, ItemDisplayContext.GROUND, rat, stack, collector, light);
 					stack.popPose();

@@ -3,15 +3,13 @@
   "criteria": {
     "meet_doctor": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:plague_doctor"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:plague_doctor"
           }
-        ],
+        },
         "item": {}
       },
       "trigger": "minecraft:player_interacted_with_entity"

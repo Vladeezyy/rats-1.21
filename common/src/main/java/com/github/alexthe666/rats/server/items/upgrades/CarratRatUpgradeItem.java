@@ -42,7 +42,7 @@ public class CarratRatUpgradeItem extends BaseRatUpgradeItem implements ChangesT
 		model.body1.translateRotate(stack);
 		stack.pushPose();
 		stack.translate(0F, -0.05F, 0.5F);
-		stack.mulPose(Axis.XP.rotationDegrees(90.0F));
+		stack.rotate(Axis.XP.rotationDegrees(90.0F));
 		stack.scale(2, 2, 2);
 		context.item(new ItemStack(Blocks.FERN), ItemDisplayContext.GROUND, rat, stack, buffer, light);
 		stack.popPose();

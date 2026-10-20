@@ -1,6 +1,12 @@
 package com.github.alexthe666.rats.server.world;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.Identifier;
@@ -10,7 +16,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -19,21 +24,28 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-public class RatlantisRuinFeature extends Feature<RatlantisRuinConfiguration> {
-	public RatlantisRuinFeature(Codec<RatlantisRuinConfiguration> codec) {
-		super(codec);
+/** 26.3: features are records with their own codec, the configuration (was RatlantisRuinConfiguration) is the record */
+public record RatlantisRuinFeature(Map<Identifier, Float> ruins, Identifier defaultRuin, Holder<StructureProcessorList> processor) implements Feature {
+	public static final MapCodec<RatlantisRuinFeature> CODEC = RecordCodecBuilder.mapCodec(instance ->
+			instance.group(
+							Codec.unboundedMap(Identifier.CODEC, Codec.FLOAT).fieldOf("ruins").forGetter(RatlantisRuinFeature::ruins),
+							Identifier.CODEC.fieldOf("fallback_ruin").forGetter(RatlantisRuinFeature::defaultRuin),
+							StructureProcessorType.LIST_CODEC.fieldOf("processor").forGetter(RatlantisRuinFeature::processor))
+					.apply(instance, RatlantisRuinFeature::new));
+
+	@Override
+	public MapCodec<RatlantisRuinFeature> codec() {
+		return CODEC;
 	}
 
 	@Override
-	public boolean place(FeaturePlaceContext<RatlantisRuinConfiguration> context) {
-		RandomSource random = context.random();
-		WorldGenLevel level = context.level();
-		BlockPos blockpos = context.origin();
+	public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos blockpos) {
 		Rotation rotation = Rotation.getRandom(random);
-		RatlantisRuinConfiguration config = context.config();
+		RatlantisRuinFeature config = this;
 
-		StructureTemplateManager structuretemplatemanager = level.getLevel().getServer().getStructureManager();
+		StructureTemplateManager structuretemplatemanager = level.getLevel().getServer().getStructureTemplateManager();
 		StructureTemplate structuretemplate = null;
 
 		//shuffle the map. This makes it so the last entries are actually used more often

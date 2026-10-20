@@ -48,12 +48,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class AutoCurdlerBlock extends BaseEntityBlock implements BlockTooltip {
-    public static final MapCodec<AutoCurdlerBlock> CODEC = simpleCodec(AutoCurdlerBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends AutoCurdlerBlock> codec() {
-        return CODEC;
-    }
 
 
 	public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);

@@ -36,7 +36,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.*;
 
@@ -274,7 +274,7 @@ public class MobFilterScreen extends Screen {
 	public boolean charTyped(CharacterEvent event) {
 		int character = event.codepoint();
 		String s = this.searchBar.getValue();
-		if (character == GLFW.GLFW_KEY_GRAVE_ACCENT) {
+		if (character == '`') {
 			RatsMod.LOGGER.debug(this.filteredMobs);
 			return true;
 		}
@@ -302,7 +302,7 @@ public class MobFilterScreen extends Screen {
 
 			return true;
 		} else {
-			return event.key() != GLFW.GLFW_KEY_ESCAPE || super.keyPressed(event);
+			return event.key() != InputConstants.KEY_ESCAPE || super.keyPressed(event);
 		}
 	}
 

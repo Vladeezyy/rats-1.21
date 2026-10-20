@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_flute"
+        "recipes": "rats:rat_flute"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

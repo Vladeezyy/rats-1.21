@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/pirat_cutlass"
+        "recipes": "rats:archeologist/pirat_cutlass"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

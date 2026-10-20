@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:oratchalcum_nugget"
+        "recipes": "rats:oratchalcum_nugget"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

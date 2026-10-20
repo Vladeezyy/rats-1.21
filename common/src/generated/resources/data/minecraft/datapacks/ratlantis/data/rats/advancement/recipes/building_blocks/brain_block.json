@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:brain_block"
+        "recipes": "rats:brain_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

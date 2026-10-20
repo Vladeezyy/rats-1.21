@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:potato_pancake"
+        "recipes": "rats:potato_pancake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

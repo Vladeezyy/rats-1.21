@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantis_helmet"
+        "recipes": "rats:ratlantis_helmet"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

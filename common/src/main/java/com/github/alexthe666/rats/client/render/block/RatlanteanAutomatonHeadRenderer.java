@@ -34,8 +34,8 @@ public class RatlanteanAutomatonHeadRenderer extends StateBlockEntityRenderer<Ra
 	public static void submitHead(float rotation, float tickCount, PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5F, -0.5F, 0.5F);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
-		stack.mulPose(Axis.YP.rotationDegrees(rotation));
+		stack.rotate(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(rotation));
 		for (RenderType type : new RenderType[] {GOLEM_TEXTURE, GLOW_TEXTURE}) {
 			collector.submitCustomGeometry(stack, type, (pose, consumer) -> {
 				AUTOMATON_MODEL.setTERotationAngles(tickCount);

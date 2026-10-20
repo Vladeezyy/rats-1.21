@@ -56,7 +56,10 @@ public class RatsBlockRegistry {
 
 	public static RegistryEntry<Block, Block> register(String name, Supplier<Block> blockSupplier) {
 		RegistryEntry<Block, Block> ret = BLOCKS.register(name, blockSupplier);
-		RatsItemRegistry.ITEMS.register(name, () -> new RatsBlockItem(ret.get(), Registrar.itemProps().useBlockDescriptionPrefix()));
+		// 26.3: furnace fuel is an item component (26.2: the minecraft:wool tag)
+		RatsItemRegistry.ITEMS.register(name, () -> new RatsBlockItem(ret.get(), name.equals("pied_wool")
+				? Registrar.itemProps().useBlockDescriptionPrefix().cookingFuel(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COOKING_TIME_WOOL)
+				: Registrar.itemProps().useBlockDescriptionPrefix()));
 		return ret;
 	}
 }

@@ -174,12 +174,14 @@ public interface Platform {
     /** Swords: what NeoForge's item ability SWORD_SWEEP says */
     boolean canSweep(ItemStack stack);
 
-    /** Hoes: what NeoForge's item ability HOE_TILL says */
-    boolean canTill(ItemStack stack);
+    /** Lets axes strip this block (26.3: block transformers are data; NeoForge reads the transformables data map) */
+    default void registerStripping(net.minecraft.world.level.block.Block block, net.minecraft.world.level.block.Block stripped) {
+    }
 
-    /** The state a hoe turns this block into (farmland, dirt), or null */
-    @Nullable
-    BlockState tilledState(BlockState state, net.minecraft.world.item.context.UseOnContext context);
+    /** A tool's block transforms (26.3, the hoe's tilling and the like; NeoForge adds its data map ones) */
+    default Iterable<net.minecraft.core.component.BlockTransformer.BlockTransformData> blockTransforms(net.minecraft.core.Holder<net.minecraft.core.component.BlockTransformer> transformer) {
+        return transformer.value().transforms();
+    }
 
     /** Whether the entity can be sheared now (NeoForge: IShearable, Fabric: vanilla Shearable) */
     boolean isShearable(Entity entity, ItemStack shears);
@@ -190,8 +192,6 @@ public interface Platform {
     /** Whether the block lets the entity break it (NeoForge: Block.canEntityDestroy; vanilla: dragon / wither immunity) */
     boolean blockAllowsDestroy(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, Entity entity);
 
-    /** False if the block under a growing tree handles itself (NeoForge: BlockState.onTreeGrow); vanilla: true */
-    boolean canSetDirtUnderTree(net.minecraft.world.level.LevelSimulatedReader reader, java.util.function.BiConsumer<BlockPos, BlockState> placer, net.minecraft.util.RandomSource random, BlockPos pos, net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration config);
 
     /** Whether the item may go into the slot (NeoForge: Item.canEquip; vanilla: the item's own equipment slot) */
     boolean canEquip(ItemStack stack, net.minecraft.world.entity.EquipmentSlot slot, LivingEntity entity);

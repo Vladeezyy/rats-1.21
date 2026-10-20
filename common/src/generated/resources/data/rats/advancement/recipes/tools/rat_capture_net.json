@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_capture_net"
+        "recipes": "rats:rat_capture_net"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -12,13 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class GarbageBlock extends AbstractGarbageBlock {
-	// 1.21 wants a codec per block class; this block is only made by the mod's registry, so it gives the same block
-	private final MapCodec<GarbageBlock> codec = simpleCodec(properties -> this);
 
-	@Override
-	protected MapCodec<? extends GarbageBlock> codec() {
-		return this.codec;
-	}
 
 	public GarbageBlock(Properties properties, double spawnRateModifier) {
 		super(properties, spawnRateModifier);

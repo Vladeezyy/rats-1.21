@@ -42,8 +42,8 @@ public class PsychicRatUpgradeItem extends StatBoostingRatUpgradeItem implements
 			stack.pushPose();
 			this.translateToHead(model, stack);
 			stack.translate(0F, 0.1F, 0.035F);
-			stack.mulPose(Axis.XP.rotationDegrees(180F));
-			stack.mulPose(Axis.YP.rotationDegrees(180F));
+			stack.rotate(Axis.XP.rotationDegrees(180F));
+			stack.rotate(Axis.YP.rotationDegrees(180F));
 			stack.scale(0.9F, 0.9F, 0.9F);
 			context.item(new ItemStack(RatlantisBlockRegistry.BRAIN_BLOCK.get()), ItemDisplayContext.GROUND, rat, stack, buffer, light);
 			stack.popPose();

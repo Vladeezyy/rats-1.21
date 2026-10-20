@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:stonecutting/marbled_cheese_to_pillar"
+        "recipes": "rats:stonecutting/marbled_cheese_to_pillar"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

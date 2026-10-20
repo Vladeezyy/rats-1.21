@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:feral_bagh_nakhs"
+        "recipes": "rats:feral_bagh_nakhs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

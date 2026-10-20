@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_sack"
+        "recipes": "rats:rat_sack"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

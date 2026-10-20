@@ -91,16 +91,16 @@ public class TamedRatRenderer extends AbstractRatRenderer<TamedRat, AbstractRatM
 			}
 			stack.pushPose();
 			stack.translate(0.0F, hasName ? 1.3F : 1.05F, 0.0F);
-			stack.mulPose(camera.orientation);
+			stack.rotate(camera.orientation);
 			stack.scale(0.25F, 0.25F, 0.25F);
-			stack.mulPose(Axis.YP.rotationDegrees(180));
-			stack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(state.ageInTicks / 5) * 20));
+			stack.rotate(Axis.YP.rotationDegrees(180));
+			stack.rotate(Axis.ZP.rotationDegrees(Mth.sin(state.ageInTicks / 5) * 20));
 			this.items.item(this.fishingRod, ItemDisplayContext.GUI, state.pose.entity, stack, collector, state.lightCoords);
 			stack.popPose();
 
 			stack.pushPose();
 			stack.translate(0.0F, state.boundingBoxHeight + 0.5F, 0.0F);
-			stack.mulPose(camera.orientation);
+			stack.rotate(camera.orientation);
 			stack.scale(0.025F, -0.025F, 0.025F);
 			String dots = FISHING_PROGRESS[(int) (Util.getMillis() / 300L % (long) FISHING_PROGRESS.length)];
 			collector.submitText(stack, -this.getFont().width(dots) / 2.0F, hasName ? -10 : 0, Component.literal(dots).getVisualOrderText(), false, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, 0xFFFFFFFF, 0, 0);

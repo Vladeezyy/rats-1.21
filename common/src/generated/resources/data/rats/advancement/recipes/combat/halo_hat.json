@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:halo_hat"
+        "recipes": "rats:halo_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

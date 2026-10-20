@@ -33,9 +33,9 @@ public final class HatRendering {
 		}
 		// the ghost pirat hat glows (its model's render type is the glowing translucent one)
 		int hatLight = stack.is(RatlantisItemRegistry.GHOST_PIRAT_HAT.get()) ? LightCoordsUtil.FULL_BRIGHT : light;
-		collector.submitModel(model, state, poseStack, model.renderType(hat.getHatTexture()), hatLight, OverlayTexture.NO_OVERLAY, -1, null, outlineColor, null);
+		collector.submitModel(model, state, poseStack, model.renderType(hat.getHatTexture()), hatLight, OverlayTexture.NO_OVERLAY, -1, null, outlineColor);
 		if (stack.hasFoil()) {
-			collector.submitModel(model, state, poseStack, RenderTypes.armorEntityGlint(), hatLight, OverlayTexture.NO_OVERLAY, -1, null, outlineColor, null);
+			collector.submitModel(model, state, poseStack, RenderTypes.trimmedArmorGlint(), hatLight, OverlayTexture.NO_OVERLAY, -1, null, outlineColor);
 		}
 		return true;
 	}

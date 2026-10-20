@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_quarry"
+        "recipes": "rats:rat_quarry"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

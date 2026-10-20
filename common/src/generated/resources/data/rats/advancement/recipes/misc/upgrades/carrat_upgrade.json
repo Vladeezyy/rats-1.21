@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/carrat_upgrade"
+        "recipes": "rats:upgrades/carrat_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

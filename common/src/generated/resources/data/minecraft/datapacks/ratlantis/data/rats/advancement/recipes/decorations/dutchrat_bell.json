@@ -43,7 +43,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:dutchrat_bell"
+        "recipes": "rats:dutchrat_bell"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

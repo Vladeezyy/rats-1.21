@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratbow_essence"
+        "recipes": "rats:ratbow_essence"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

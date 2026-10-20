@@ -1,6 +1,7 @@
 package com.github.alexthe666.rats.registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.ColorParticleOption;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.minecraft.world.level.block.UntintedParticleLeavesBlock;
 
 import com.github.alexthe666.rats.RatsMod;
@@ -34,7 +35,7 @@ public class RatlantisBlockRegistry {
 	public static final Registrar<Block> BLOCKS = Registrar.create(BuiltInRegistries.BLOCK, RatsMod.MODID);
 
 	public static final RegistryEntry<Block, Block> RATLANTIS_REACTOR = register("ratlantis_reactor", () -> new RatlantisReactorBlock(Registrar.blockProps().requiresCorrectToolForDrops().sound(SoundType.STONE).strength(100.0F).lightLevel(value -> 15)));
-	public static final RegistryEntry<Block, Block> RATGLOVE_FLOWER = register("ratglove_flower", () -> new FlowerBlock(RatsEffectRegistry.SYNESTHESIA.holder(), 6, Registrar.blockProps().pushReaction(PushReaction.DESTROY).mapColor(MapColor.PLANT).noCollision().randomTicks().sound(SoundType.CROP).offsetType(BlockBehaviour.OffsetType.XZ)) {
+	public static final RegistryEntry<Block, Block> RATGLOVE_FLOWER = register("ratglove_flower", () -> new FlowerBlock(RatsEffectRegistry.SYNESTHESIA.holder(), 6, Registrar.blockProps().pushReaction(PushReaction.POPPED).mapColor(MapColor.PLANT).noCollision().randomTicks().sound(SoundType.CROP).offsetType(BlockBehaviour.OffsetType.XZ)) {
 		@Override
 		public VoxelShape getShape(BlockState state, BlockGetter getter, BlockPos pos, CollisionContext context) {
 			Vec3 vec3 = state.getOffset(pos);
@@ -68,12 +69,12 @@ public class RatlantisBlockRegistry {
 	public static final RegistryEntry<Block, Block> MARBLED_CHEESE_GRASS = register("marbled_cheese_grass", () -> new MarbledCheeseGrassBlock(Registrar.blockProps().mapColor(MapColor.GRASS).strength(0.6F, 0.0F).sound(SoundType.GRASS)));
 	public static final RegistryEntry<Block, Block> MARBLED_CHEESE_RAT_HEAD = register("marbled_cheese_rat_head", () -> new RatlanteanAutomatonHeadBlock(Registrar.blockProps().mapColor(MapColor.WOOL).sound(SoundType.STONE).lightLevel(value -> 5).noCollision().dynamicShape().strength(1.0F, 0)));
 	public static final RegistryEntry<Block, Block> MARBLED_CHEESE_GOLEM_CORE = register("marbled_cheese_golem_core", () -> new Block(Registrar.blockProps().mapColor(MapColor.WOOL).requiresCorrectToolForDrops().strength(5.0F, 30.0F).sound(SoundType.STONE).lightLevel(value -> 6)));
-	public static final RegistryEntry<Block, Block> RATLANTIS_PORTAL = register("ratlantis_portal", () -> new RatlantisPortalBlock(Registrar.blockProps().pushReaction(PushReaction.BLOCK).sound(SoundType.BONE_BLOCK).strength(-1.0F).lightLevel(value -> 15).noCollision()));
+	public static final RegistryEntry<Block, Block> RATLANTIS_PORTAL = register("ratlantis_portal", () -> new RatlantisPortalBlock(Registrar.blockProps().pushReaction(PushReaction.IMMOVEABLE).sound(SoundType.BONE_BLOCK).strength(-1.0F).lightLevel(value -> 15).noCollision()));
 	public static final RegistryEntry<Block, Block> COMPRESSED_RAT = register("compressed_rat", () -> new CompressedRatBlock(Registrar.blockProps().mapColor(MapColor.WOOL).sound(SoundType.WOOL).strength(0.6F, 0.0F)));
 	public static final RegistryEntry<Block, Block> BRAIN_BLOCK = register("brain_block", () -> new SetupHorizontalBlock(Registrar.blockProps().mapColor(MapColor.WOOL).sound(SoundType.SLIME_BLOCK).strength(0.6F, 0.0F)));
-	public static final RegistryEntry<Block, Block> PIRAT_SAPLING = register("pirat_sapling", () -> new SaplingBlock(PiratTreeGrower.PIRAT, Registrar.blockProps().pushReaction(PushReaction.DESTROY).ignitedByLava().mapColor(MapColor.TERRACOTTA_GREEN).randomTicks().instabreak().lightLevel(value -> 3).noCollision().noOcclusion().sound(SoundType.GRASS)));
+	public static final RegistryEntry<Block, Block> PIRAT_SAPLING = register("pirat_sapling", () -> new SaplingBlock(PiratTreeGrower.PIRAT, Registrar.blockProps().pushReaction(PushReaction.POPPED).ignitedByLava().mapColor(MapColor.TERRACOTTA_GREEN).randomTicks().instabreak().lightLevel(value -> 3).noCollision().noOcclusion().sound(SoundType.GRASS)));
 	public static final RegistryEntry<Block, Block> POTTED_PIRAT_SAPLING = BLOCKS.register("potted_pirat_sapling", () -> new FlowerPotBlock(PIRAT_SAPLING.get(), Registrar.blockCopy(Blocks.FLOWER_POT).lightLevel(value -> 3)));
-	public static final RegistryEntry<Block, Block> PIRAT_LEAVES = register("pirat_leaves", () -> new UntintedParticleLeavesBlock(0.01F, ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, 0xFF4C522A), Registrar.blockCopy(Blocks.OAK_LEAVES).mapColor(MapColor.TERRACOTTA_GREEN).lightLevel(value -> 3).sound(SoundType.AZALEA_LEAVES)));
+	public static final RegistryEntry<Block, Block> PIRAT_LEAVES = register("pirat_leaves", () -> new UntintedParticleLeavesBlock(0.01F, ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, 0xFF4C522A), net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer.noAmbientSound(), Registrar.blockCopy(Blocks.OAK_LEAVES).mapColor(MapColor.TERRACOTTA_GREEN).lightLevel(value -> 3).sound(SoundType.AZALEA_LEAVES)));
 	public static final RegistryEntry<Block, Block> PIRAT_LOG = register("pirat_log", () -> new RotatedPillarBlock(Registrar.blockProps().ignitedByLava().mapColor(MapColor.COLOR_BROWN).lightLevel(value -> 3).noOcclusion().strength(2.0F).sound(SoundType.WOOD)) {
 		public boolean skipRendering(BlockState state, BlockState sideState, Direction direction) {
 			return sideState.is(RatlantisBlockTags.PIRAT_LOGS) || super.skipRendering(state, sideState, direction);
@@ -136,9 +137,35 @@ public class RatlantisBlockRegistry {
 	public static final RegistryEntry<Block, Block> AIR_RAID_SIREN = register("air_raid_siren", () -> new AirRaidSirenBlock(Registrar.blockProps().mapColor(MapColor.WOOD).sound(SoundType.METAL).strength(5.0F, 1000.0F)));
 	public static final RegistryEntry<Block, Block> RATLANTIS_UPGRADE_BLOCK = register("ratlantis_upgrade_block", () -> new RatUpgradeBlock(Registrar.blockProps().mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.SLIME_BLOCK).strength(0.6F, 0.0F)));
 
+	private static final java.util.Map<String, net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider>> COMPOSTABLE = java.util.Map.of(
+		"pirat_sapling", net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_LOW, "pirat_leaves", net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_LOW,
+		"ratglove_flower", net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_MEDIUM);
+
+	// 26.3: furnace fuel is an item component (26.2: the vanilla wood tags), the burn times of vanilla's oak items
+	private static final java.util.Map<String, net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider>> FUEL = java.util.Map.ofEntries(
+		java.util.Map.entry("pirat_log", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS), java.util.Map.entry("stripped_pirat_log", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS),
+		java.util.Map.entry("pirat_wood", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS), java.util.Map.entry("stripped_pirat_wood", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS),
+		java.util.Map.entry("pirat_planks", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS), java.util.Map.entry("pirat_stairs", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS),
+		java.util.Map.entry("pirat_slab", ContextIntProviders.COOKING_TIME_WOOD_SLABS), java.util.Map.entry("pirat_fence", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS),
+		java.util.Map.entry("pirat_fence_gate", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS), java.util.Map.entry("pirat_trapdoor", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS),
+		java.util.Map.entry("pirat_pressure_plate", ContextIntProviders.COOKING_TIME_WOOD_BLOCKS), java.util.Map.entry("pirat_door", ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE),
+		java.util.Map.entry("pirat_button", ContextIntProviders.COOKING_TIME_WOOD_ITEMS_EXTRA_SMALL), java.util.Map.entry("pirat_sapling", ContextIntProviders.COOKING_TIME_DRY_PLANTS));
+
 	public static RegistryEntry<Block, Block> register(String name, Supplier<Block> blockSupplier) {
 		RegistryEntry<Block, Block> ret = BLOCKS.register(name, blockSupplier);
-		RatlantisItemRegistry.ITEMS.register(name, () -> new RatsBlockItem(ret.get(), Registrar.itemProps().useBlockDescriptionPrefix()));
+		RatlantisItemRegistry.ITEMS.register(name, () -> {
+			net.minecraft.world.item.Item.Properties properties = Registrar.itemProps().useBlockDescriptionPrefix();
+			// 26.3: composting is an item component (1.21.1: ComposterBlock.add in setup)
+			var compostable = COMPOSTABLE.get(name);
+			if (compostable != null) {
+				properties.compostable(compostable);
+			}
+			var fuel = FUEL.get(name);
+			if (fuel != null) {
+				properties.cookingFuel(fuel);
+			}
+			return new RatsBlockItem(ret.get(), properties);
+		});
 		return ret;
 	}
 }

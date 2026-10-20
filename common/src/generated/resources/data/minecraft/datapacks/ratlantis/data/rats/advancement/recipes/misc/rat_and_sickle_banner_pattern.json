@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_and_sickle_banner_pattern"
+        "recipes": "rats:rat_and_sickle_banner_pattern"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

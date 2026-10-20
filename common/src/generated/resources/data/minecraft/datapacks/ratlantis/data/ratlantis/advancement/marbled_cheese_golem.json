@@ -3,15 +3,13 @@
   "criteria": {
     "killed_automaton": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:ratlantean_automaton"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:ratlantean_automaton"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     }

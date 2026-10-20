@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/demon_upgrade"
+        "recipes": "rats:upgrades/demon_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

@@ -24,7 +24,7 @@ public class RatlantisSwordItem extends Item {
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
 	public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-		if (entity instanceof LivingEntity living && living.isAlive() && !(living instanceof RatProtector) && player.swingTime == 0) {
+		if (entity instanceof LivingEntity living && living.isAlive() && !(living instanceof RatProtector) && !player.isSwinging()) {
 			RatProtector protector = new RatProtector(RatlantisEntityRegistry.RAT_PROTECTOR.get(), entity.level());
 			protector.snapTo(player.getX(), player.getY() + 1.0D, player.getZ(), player.getYRot(), player.getXRot());
 			protector.setTarget(living);

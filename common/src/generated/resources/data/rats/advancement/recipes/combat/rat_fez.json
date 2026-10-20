@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_fez"
+        "recipes": "rats:rat_fez"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

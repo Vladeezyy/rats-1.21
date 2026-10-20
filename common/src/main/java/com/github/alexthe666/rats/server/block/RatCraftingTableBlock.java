@@ -29,12 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatCraftingTableBlock extends BaseEntityBlock {
-    public static final MapCodec<RatCraftingTableBlock> CODEC = simpleCodec(RatCraftingTableBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatCraftingTableBlock> codec() {
-        return CODEC;
-    }
 
 
 	public RatCraftingTableBlock(BlockBehaviour.Properties properties) {

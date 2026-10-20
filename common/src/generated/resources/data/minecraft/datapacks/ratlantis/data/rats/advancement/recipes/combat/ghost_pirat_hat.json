@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ghost_pirat_hat"
+        "recipes": "rats:ghost_pirat_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

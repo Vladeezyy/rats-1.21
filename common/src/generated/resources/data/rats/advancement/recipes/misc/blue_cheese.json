@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:blue_cheese"
+        "recipes": "rats:blue_cheese"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

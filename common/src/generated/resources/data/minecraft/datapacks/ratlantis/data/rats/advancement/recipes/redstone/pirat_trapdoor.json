@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:pirat_trapdoor"
+        "recipes": "rats:pirat_trapdoor"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

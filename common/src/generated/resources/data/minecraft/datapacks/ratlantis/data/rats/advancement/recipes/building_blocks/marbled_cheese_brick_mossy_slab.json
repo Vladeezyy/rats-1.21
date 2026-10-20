@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:marbled_cheese_brick_mossy_slab"
+        "recipes": "rats:marbled_cheese_brick_mossy_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

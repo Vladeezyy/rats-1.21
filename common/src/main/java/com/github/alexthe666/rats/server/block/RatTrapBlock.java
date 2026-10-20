@@ -41,12 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatTrapBlock extends BaseEntityBlock {
-    public static final MapCodec<RatTrapBlock> CODEC = simpleCodec(RatTrapBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatTrapBlock> codec() {
-        return CODEC;
-    }
 
 	public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
 	public static final BooleanProperty SHUT = BooleanProperty.create("shut");

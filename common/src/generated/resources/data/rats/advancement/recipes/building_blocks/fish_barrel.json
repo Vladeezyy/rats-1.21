@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:fish_barrel"
+        "recipes": "rats:fish_barrel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -29,7 +29,7 @@ public class RatKingRenderer extends RatsMobRenderer<RatKing, EmptyModel<RatKing
 		// the rats are placed around the king, which does not turn (only Dinnerbone and Grumm flip it)
 		if (state.isUpsideDown) {
 			stack.translate(0.0D, state.boundingBoxHeight + 0.1F, 0.0D);
-			stack.mulPose(Axis.ZP.rotationDegrees(180.0F));
+			stack.rotate(Axis.ZP.rotationDegrees(180.0F));
 		}
 	}
 

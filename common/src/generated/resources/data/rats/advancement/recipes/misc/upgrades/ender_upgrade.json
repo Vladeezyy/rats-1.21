@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/ender_upgrade"
+        "recipes": "rats:upgrades/ender_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

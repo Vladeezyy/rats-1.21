@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:fisherman_hat"
+        "recipes": "rats:fisherman_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

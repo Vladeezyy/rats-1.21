@@ -1,5 +1,8 @@
 package com.github.alexthe666.rats.registry;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
+import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.item.equipment.ArmorType;
 
 import com.github.alexthe666.rats.RatsMod;
@@ -22,7 +25,7 @@ public class RatlantisItemRegistry {
 	public static final RegistryEntry<Item, Item> RATLANTIS_RAT_SKULL = ITEMS.register("ratlantis_rat_skull", () -> new Item(Registrar.itemProps().rarity(RatsMod.RATLANTIS_SPECIAL).fireResistant()));
 	public static final RegistryEntry<Item, Item> AVIATOR_HAT = ITEMS.register("aviator_hat", () -> new HatItem(Registrar.itemProps(), RatsArmorMaterialRegistry.GENERIC_HAT, 0));
 	public static final RegistryEntry<Item, Item> RAT_TOGA = ITEMS.register("rat_toga", () -> new LoreTagItem(Registrar.itemProps(), 2));
-	public static final RegistryEntry<Item, Item> RATGLOVE_PETALS = ITEMS.register("ratglove_petals", () -> new Item(Registrar.itemProps()));
+	public static final RegistryEntry<Item, Item> RATGLOVE_PETALS = ITEMS.register("ratglove_petals", () -> new Item(Registrar.itemProps().compostable(net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.COMPOSTABLE_MEDIUM)));
 	public static final RegistryEntry<Item, Item> FERAL_RAT_CLAW = ITEMS.register("feral_rat_claw", () -> new Item(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> FERAL_BAGH_NAKHS = ITEMS.register("feral_bagh_nakhs", () -> new BaghNakhsItem(Registrar.itemProps().stacksTo(1)));
 	public static final RegistryEntry<Item, Item> GEM_OF_RATLANTIS = ITEMS.register("gem_of_ratlantis", () -> new Item(Registrar.itemProps().rarity(RatsMod.RATLANTIS_SPECIAL).trimMaterial(RatlantisTrimRegistry.GEM_OF_RATLANTIS)));
@@ -59,10 +62,10 @@ public class RatlantisItemRegistry {
 	public static final RegistryEntry<Item, Item> RATTLING_GUN = ITEMS.register("rattling_gun", () -> new RattlingGunItem(Registrar.itemProps().stacksTo(1)));
 	public static final RegistryEntry<Item, Item> IDOL_OF_RATLANTIS = ITEMS.register("idol_of_ratlantis", () -> new LoreTagItem(Registrar.itemProps().rarity(RatsMod.RATLANTIS_SPECIAL).fireResistant(), 1));
 
-	public static final RegistryEntry<Item, Item> PIRAT_SIGN = ITEMS.register("pirat_sign", () -> new SignItem(RatlantisBlockRegistry.PIRAT_SIGN.get(), RatlantisBlockRegistry.PIRAT_WALL_SIGN.get(), Registrar.itemProps().stacksTo(16).useBlockDescriptionPrefix()));
-	public static final RegistryEntry<Item, Item> PIRAT_HANGING_SIGN = ITEMS.register("pirat_hanging_sign", () -> new HangingSignItem(RatlantisBlockRegistry.PIRAT_HANGING_SIGN.get(), RatlantisBlockRegistry.PIRAT_WALL_HANGING_SIGN.get(), Registrar.itemProps().stacksTo(16).useBlockDescriptionPrefix()));
-	public static final RegistryEntry<Item, Item> PIRAT_BOAT = ITEMS.register("pirat_boat", () -> new BoatItem(RatlantisEntityRegistry.BOAT.get(), Registrar.itemProps().stacksTo(1)));
-	public static final RegistryEntry<Item, Item> PIRAT_CHEST_BOAT = ITEMS.register("pirat_chest_boat", () -> new BoatItem(RatlantisEntityRegistry.CHEST_BOAT.get(), Registrar.itemProps().stacksTo(1)));
+	public static final RegistryEntry<Item, Item> PIRAT_SIGN = ITEMS.register("pirat_sign", () -> new StandingAndWallBlockItem(RatlantisBlockRegistry.PIRAT_SIGN.get(), RatlantisBlockRegistry.PIRAT_WALL_SIGN.get(), Direction.DOWN, Registrar.itemProps().cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE).stacksTo(16).signText().useBlockDescriptionPrefix()));
+	public static final RegistryEntry<Item, Item> PIRAT_HANGING_SIGN = ITEMS.register("pirat_hanging_sign", () -> new HangingSignItem(RatlantisBlockRegistry.PIRAT_HANGING_SIGN.get(), RatlantisBlockRegistry.PIRAT_WALL_HANGING_SIGN.get(), Registrar.itemProps().cookingFuel(ContextIntProviders.COOKING_TIME_HANGING_SIGNS).stacksTo(16).signText().useBlockDescriptionPrefix()));
+	public static final RegistryEntry<Item, Item> PIRAT_BOAT = ITEMS.register("pirat_boat", () -> new BoatItem(RatlantisEntityRegistry.BOAT.get(), Registrar.itemProps().cookingFuel(ContextIntProviders.COOKING_TIME_BOATS).stacksTo(1)));
+	public static final RegistryEntry<Item, Item> PIRAT_CHEST_BOAT = ITEMS.register("pirat_chest_boat", () -> new BoatItem(RatlantisEntityRegistry.CHEST_BOAT.get(), Registrar.itemProps().cookingFuel(ContextIntProviders.COOKING_TIME_BOATS).stacksTo(1)));
 
 	public static final RegistryEntry<Item, Item> RAT_UPGRADE_ARCHEOLOGIST = ITEMS.register("rat_upgrade_archeologist", () -> new ArcheologistRatUpgradeItem(Registrar.itemProps()));
 	public static final RegistryEntry<Item, Item> RAT_UPGRADE_AUTOMATON_MOUNT = ITEMS.register("rat_upgrade_automaton_mount", () -> new MountRatUpgradeItem<>(Registrar.itemProps(), 2, 2, RatlantisEntityRegistry.RAT_MOUNT_AUTOMATON));

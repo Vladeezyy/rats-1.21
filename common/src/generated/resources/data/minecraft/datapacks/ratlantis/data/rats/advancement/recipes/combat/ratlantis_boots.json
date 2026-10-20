@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantis_boots"
+        "recipes": "rats:ratlantis_boots"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

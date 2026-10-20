@@ -25,7 +25,7 @@ public class RatbotEyesLayer extends RenderLayer<RatsMobRenderState, RatlanteanR
 
 	@Override
 	public void submit(PoseStack stack, SubmitNodeCollector collector, int light, RatsMobRenderState state, float yRot, float xRot) {
-		collector.order(1).submitModel(this.getParentModel(), state, stack, this.getTextureForTick((int) state.ageInTicks * 3), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		collector.order(1).submitModel(this.getParentModel(), state, stack, this.getTextureForTick((int) state.ageInTicks * 3), light, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 	}
 
 	private RenderType getTextureForTick(int tickCount) {

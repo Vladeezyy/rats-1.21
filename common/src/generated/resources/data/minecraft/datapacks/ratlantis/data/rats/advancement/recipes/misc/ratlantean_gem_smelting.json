@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ratlantean_gem_smelting"
+        "recipes": "rats:ratlantean_gem_smelting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

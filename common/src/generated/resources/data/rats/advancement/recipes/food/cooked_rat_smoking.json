@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:cooked_rat_smoking"
+        "recipes": "rats:cooked_rat_smoking"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -30,7 +30,7 @@ public class RatTrapRenderer extends StateBlockEntityRenderer<RatTrapBlockEntity
 	public static void submitItem(PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5D, 1.5D, 0.5D);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.XP.rotationDegrees(180));
 		PosedModels.submit(collector, stack, TEXTURE, MODEL_RAT_TRAP, () -> MODEL_RAT_TRAP.animateHinge(0), light, overlay, -1);
 		stack.popPose();
 	}
@@ -49,14 +49,14 @@ public class RatTrapRenderer extends StateBlockEntityRenderer<RatTrapBlockEntity
 		float shut = shutProgress;
 		stack.pushPose();
 		stack.translate(0.5D, 1.5D, 0.5D);
-		stack.mulPose(Axis.XP.rotationDegrees(180));
-		stack.mulPose(Axis.YP.rotationDegrees(rotation));
+		stack.rotate(Axis.XP.rotationDegrees(180));
+		stack.rotate(Axis.YP.rotationDegrees(rotation));
 		PosedModels.submit(collector, stack, TEXTURE, MODEL_RAT_TRAP, () -> MODEL_RAT_TRAP.animateHinge(shut), light, overlay, -1);
 		if (!bait.isEmpty()) {
 			stack.scale(0.4F, 0.4F, 0.4F);
 			stack.translate(0, 3.4F, -0.5F);
-			stack.mulPose(Axis.XP.rotationDegrees(90));
-			stack.mulPose(Axis.YP.rotationDegrees(180));
+			stack.rotate(Axis.XP.rotationDegrees(90));
+			stack.rotate(Axis.YP.rotationDegrees(180));
 			this.items.item(bait, ItemDisplayContext.FIXED, null, stack, collector, light, overlay);
 		}
 		stack.popPose();

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:archeologist/oratchalcum_ingot"
+        "recipes": "rats:archeologist/oratchalcum_ingot"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

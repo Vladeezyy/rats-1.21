@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:charged_ratbot_barrel"
+        "recipes": "rats:charged_ratbot_barrel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

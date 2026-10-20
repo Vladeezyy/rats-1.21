@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:rat_wheel"
+        "recipes": "rats:rat_wheel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

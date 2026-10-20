@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:corrupt_rat_skull"
+        "recipes": "rats:corrupt_rat_skull"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:cooked_rat_smelting"
+        "recipes": "rats:cooked_rat_smelting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

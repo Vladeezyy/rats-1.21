@@ -38,7 +38,7 @@ public class GildedRatFluteItem extends LoreTagItem {
 			ratShot.shoot(vector3d.x(), vector3d.y(), vector3d.z(), 1.0F, 1.5F);
 			level.addFreshEntity(ratShot);
 			stack.hurtAndBreak(1, player, hand);
-			player.swing(hand);
+			player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, false);
 			player.getCooldowns().addCooldown(stack, 10);
 			level.playSound(player, player.blockPosition(), RatsSoundRegistry.getFluteSound(), SoundSource.PLAYERS, 0.5F, 0.75F);
 		}

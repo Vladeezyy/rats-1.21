@@ -36,7 +36,7 @@ public class MinerRatUpgradeItem extends RatListUpgradeItem implements HoldsItem
 	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
-		stack.mulPose(Axis.ZP.rotationDegrees(180F));
+		stack.rotate(Axis.ZP.rotationDegrees(180F));
 		stack.translate(0.0F, -0.075F, -0.1F);
 		stack.scale(0.65F, 0.65F, 0.65F);
 		context.item(new ItemStack(Items.DIAMOND_PICKAXE), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);

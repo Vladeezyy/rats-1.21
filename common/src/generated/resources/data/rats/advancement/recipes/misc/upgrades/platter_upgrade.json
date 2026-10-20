@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/platter_upgrade"
+        "recipes": "rats:upgrades/platter_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

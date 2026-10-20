@@ -53,11 +53,11 @@ public class RatShotRenderer extends EntityRenderer<RatShot, RatShotRenderer.Sta
 		stack.pushPose();
 		stack.scale(0.6F, -0.6F, 0.6F);
 		stack.translate(0F, -1.5F, 0F);
-		stack.mulPose(Axis.YP.rotationDegrees(state.yRot - 180));
-		stack.mulPose(Axis.XN.rotationDegrees(state.xRot));
-		collector.submitModel(MODEL_STATIC_RAT, state, stack, state.texture, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+		stack.rotate(Axis.YP.rotationDegrees(state.yRot - 180));
+		stack.rotate(Axis.XN.rotationDegrees(state.xRot));
+		collector.submitModel(MODEL_STATIC_RAT, state, stack, state.texture, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		if (state.glowingEyes) {
-			collector.order(1).submitModel(MODEL_STATIC_RAT, state, stack, TEXTURE_EYES, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor, null);
+			collector.order(1).submitModel(MODEL_STATIC_RAT, state, stack, TEXTURE_EYES, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
 		}
 		stack.popPose();
 		super.submit(state, stack, collector, camera);

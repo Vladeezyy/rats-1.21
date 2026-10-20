@@ -3,29 +3,25 @@
   "criteria": {
     "hurt_death": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:black_death"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:black_death"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_hurt_entity"
     },
     "killed_death": {
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "minecraft:entity_type": "rats:black_death"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "rats:black_death"
           }
-        ]
+        }
       },
       "trigger": "minecraft:player_killed_entity"
     },

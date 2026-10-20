@@ -43,7 +43,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:crimson_liquid"
+        "recipes": "rats:crimson_liquid"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

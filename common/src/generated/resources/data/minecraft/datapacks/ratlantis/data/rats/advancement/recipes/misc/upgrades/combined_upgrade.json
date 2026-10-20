@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/combined_upgrade"
+        "recipes": "rats:upgrades/combined_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

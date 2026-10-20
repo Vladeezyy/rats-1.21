@@ -1,5 +1,6 @@
 package com.github.alexthe666.rats.server.misc;
-import net.minecraft.util.ProblemReporter;
+
+import net.minecraft.world.level.block.BonemealSource;import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -225,10 +226,10 @@ public class RatUtils {
 			for (BlockPos pos : allBlocks) {
 				BlockState block = level.getBlockState(pos);
 				if (block.getBlock() instanceof BonemealableBlock igrowable) {
-					if (igrowable.isValidBonemealTarget(level, pos, block) && level.getRandom().nextInt(3) == 0) {
+					if (igrowable.isValidBonemealTarget(level, pos, block, BonemealSource.MOB) && level.getRandom().nextInt(3) == 0) {
 						if (!level.isClientSide()) {
 							level.levelEvent(2005, pos, 0);
-							igrowable.performBonemeal((ServerLevel) level, level.getRandom(), pos, block);
+							igrowable.performBonemeal((ServerLevel) level, level.getRandom(), pos, block, BonemealSource.MOB);
 						}
 					}
 				}
@@ -238,10 +239,10 @@ public class RatUtils {
 
 	private static boolean canPlantBeBonemealed(Level level, BlockPos pos, BlockState BlockState) {
 		if (BlockState.getBlock() instanceof BonemealableBlock igrowable && !(BlockState.getBlock() instanceof TallGrassBlock) && !(BlockState.getBlock() instanceof GrassBlock)) {
-			if (igrowable.isValidBonemealTarget(level, pos, BlockState)) {
+			if (igrowable.isValidBonemealTarget(level, pos, BlockState, BonemealSource.MOB)) {
 				if (!level.isClientSide()) {
 					//  igrowable.grow(level, level.rand, target, BlockState);
-					return igrowable.isBonemealSuccess(level, level.getRandom(), pos, BlockState);
+					return igrowable.isBonemealSuccess(level, level.getRandom(), pos, BlockState, BonemealSource.MOB);
 				}
 			}
 		}

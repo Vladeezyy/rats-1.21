@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:vial_of_sentience"
+        "recipes": "rats:vial_of_sentience"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

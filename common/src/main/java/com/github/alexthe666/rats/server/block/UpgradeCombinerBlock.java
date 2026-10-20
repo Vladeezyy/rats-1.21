@@ -28,12 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class UpgradeCombinerBlock extends BaseEntityBlock {
-    public static final MapCodec<UpgradeCombinerBlock> CODEC = simpleCodec(UpgradeCombinerBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends UpgradeCombinerBlock> codec() {
-        return CODEC;
-    }
 
 	protected static final VoxelShape AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 

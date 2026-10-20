@@ -36,12 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class RatAttractorBlock extends BaseEntityBlock implements BlockTooltip {
-    public static final MapCodec<RatAttractorBlock> CODEC = simpleCodec(RatAttractorBlock::new);
 
-    @Override
-    protected @NotNull MapCodec<? extends RatAttractorBlock> codec() {
-        return CODEC;
-    }
 
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 	public static final BooleanProperty CONNECTED_UP = BooleanProperty.create("up");

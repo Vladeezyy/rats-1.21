@@ -8,10 +8,10 @@
         "minecraft:trims/items/leggings_trim",
         "minecraft:trims/items/boots_trim"
       ],
-      "palette_key": "minecraft:trims/color_palettes/trim_palette",
+      "palette_key": "minecraft:trim_base",
       "permutations": {
-        "gem_of_ratlantis": "rats:trims/color_palettes/gem_of_ratlantis",
-        "oratchalcum": "rats:trims/color_palettes/oratchalcum"
+        "gem_of_ratlantis": "rats:trim/gem_of_ratlantis",
+        "oratchalcum": "rats:trim/oratchalcum"
       }
     }
   ]

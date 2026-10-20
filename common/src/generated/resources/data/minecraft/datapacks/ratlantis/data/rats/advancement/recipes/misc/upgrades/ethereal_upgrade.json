@@ -43,7 +43,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:upgrades/ethereal_upgrade"
+        "recipes": "rats:upgrades/ethereal_upgrade"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

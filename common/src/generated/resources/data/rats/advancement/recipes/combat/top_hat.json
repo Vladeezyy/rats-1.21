@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:top_hat"
+        "recipes": "rats:top_hat"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

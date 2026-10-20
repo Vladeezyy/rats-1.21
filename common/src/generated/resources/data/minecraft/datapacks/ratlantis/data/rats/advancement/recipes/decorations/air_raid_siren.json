@@ -33,7 +33,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:air_raid_siren"
+        "recipes": "rats:air_raid_siren"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

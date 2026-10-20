@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rats:ectoplasm_from_cutlass"
+        "recipes": "rats:ectoplasm_from_cutlass"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
