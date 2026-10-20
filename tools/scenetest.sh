@@ -17,7 +17,8 @@ rm -f $LOADER/run/config/rats-*.toml
 perl -e 'alarm 900; exec @ARGV' ./gradlew :$LOADER:runScene --console=plain "$@" > build-scene.log 2>&1 &
 gradle_pid=$!
 while kill -0 $gradle_pid 2>/dev/null; do
-	if grep -q -- '---- Minecraft Crash Report ----' build-scene.log 2>/dev/null; then
+	# a crash, or no display (macOS display asleep: run 'caffeinate -d -u -t 900 &' first)
+	if grep -qE -- '---- Minecraft Crash Report ----|Failed to locate a primary monitor' build-scene.log 2>/dev/null; then
 		sleep 3
 		pkill -f "$PROC" 2>/dev/null
 	fi

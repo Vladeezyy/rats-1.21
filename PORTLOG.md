@@ -178,5 +178,6 @@ counts per call (another static map), tube shapes keyed by state (a string per c
 throttled like vanilla's target goals.
 
 Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a glass pen in view): empty stage
-230 FPS, 100 tamed rats wandering 207 FPS (0.48 ms a frame, ~5 µs a rat), 100 wild wolves 232 FPS.
+230 FPS, 100 tamed rats wandering 207 FPS (0.48 ms a frame, ~5 µs a rat), 100 wild wolves 232 FPS; a second run
+204 / 178 / 207 FPS (rats −13 %). Wolves cost nothing visible on this GPU; rats' Rampart models with their layers do.
 
