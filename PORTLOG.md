@@ -195,3 +195,8 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
   (wardens do not target rats with the sculked upgrade) sat in `common` but in no mixin config, so both upgrades did
   nothing. Now `rats.common.mixins.json`, loaded by NeoForge (`neoforge.mods.toml`) and Fabric (`fabric.mod.json`);
   two checks in `SelfTest`. Both loaders: `tools/selftest.sh` 43/43.
+
+### The rat cage advancement accepted any item (found during the 26.3 port)
+- `rat_cage_decoration`: the hammock and igloo criteria checked the used item with the 1.20 item predicate key
+  `"tag"`, which 1.21 ignores, so any item used on a decorated cage counted. Now `"items": "#rats:hammocks"` /
+  `"#rats:igloos"`.

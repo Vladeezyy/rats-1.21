@@ -67,7 +67,7 @@
           {
             "condition": "minecraft:match_tool",
             "predicate": {
-              "tag": "rats:hammocks"
+              "items": "#rats:hammocks"
             }
           }
         ]
@@ -90,7 +90,7 @@
           {
             "condition": "minecraft:match_tool",
             "predicate": {
-              "tag": "rats:igloos"
+              "items": "#rats:igloos"
             }
           }
         ]
