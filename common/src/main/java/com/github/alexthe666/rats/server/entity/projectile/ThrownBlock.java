@@ -218,7 +218,8 @@ public class ThrownBlock extends Entity {
 	/**
 	 * Returns true if other Entities should be prevented from moving through this Entity.
 	 */
-	public boolean canBeCollidedWith() {
+	@Override
+	public boolean canBeCollidedWith(@org.jetbrains.annotations.Nullable Entity other) {
 		return true;
 	}
 
