@@ -172,6 +172,35 @@ public final class SelfTest {
       tamed.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, combined);
       return tamed.isTame() && com.github.alexthe666.rats.server.misc.RatUpgradeUtils.hasUpgrade(tamed, com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get());
     });
+    check("piglins see a mob carrying a rat with the idol upgrade as wearing gold (common mixin)", () -> {
+      net.minecraft.world.entity.monster.Zombie carrier = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
+      com.github.alexthe666.rats.server.entity.rat.TamedRat rider = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level);
+      carrier.setPos(at(-3, 0, 3).getCenter());
+      rider.setPos(at(-3, 0, 3).getCenter());
+      level.addFreshEntity(carrier);
+      level.addFreshEntity(rider);
+      boolean before = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingGold(carrier);
+      rider.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_IDOL.get()));
+      rider.startRiding(carrier, true);
+      boolean after = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingGold(carrier);
+      rider.discard();
+      carrier.discard();
+      return !before && after;
+    });
+    check("wardens ignore rats with the sculked upgrade (common mixin)", () -> {
+      net.minecraft.world.entity.monster.warden.Warden warden = net.minecraft.world.entity.EntityType.WARDEN.create(level);
+      com.github.alexthe666.rats.server.entity.rat.TamedRat rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level);
+      warden.setPos(at(-5, 0, 3).getCenter());
+      rat.setPos(at(-6, 0, 3).getCenter());
+      level.addFreshEntity(warden);
+      level.addFreshEntity(rat);
+      boolean before = warden.canTargetEntity(rat);
+      rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SCULKED.get()));
+      boolean after = warden.canTargetEntity(rat);
+      rat.discard();
+      warden.discard();
+      return before && !after;
+    });
     check("1.20.1 combined upgrade data (Items list in custom data) is read", () -> {
       ItemStack old = new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
       com.github.alexthe666.rats.server.misc.RegistryAccessHolder.setServer(server);

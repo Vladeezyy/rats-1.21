@@ -16,6 +16,9 @@ ${mod_description}
 
 [[mixins]]
 config="${mod_id}.mixins.json"
+# the original's own mixins (piglins and the idol upgrade, wardens and the sculked upgrade), shared with Fabric
+[[mixins]]
+config="${mod_id}.common.mixins.json"
 
 [[dependencies.${mod_id}]]
     modId="neoforge"

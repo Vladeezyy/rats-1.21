@@ -16,7 +16,7 @@
     "client": ["dev.vladeezyy.rats.fabric.RatsFabricClient"],
     "jei_mod_plugin": ["com.github.alexthe666.rats.compat.jei.RatsJEIPlugin"]
   },
-  "mixins": ["rats.fabric.mixins.json"],
+  "mixins": ["rats.fabric.mixins.json", "rats.common.mixins.json"],
   "accessWidener": "rats.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",

@@ -189,3 +189,9 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
 230 FPS, 100 tamed rats wandering 207 FPS (0.48 ms a frame, ~5 µs a rat), 100 wild wolves 232 FPS; a second run
 204 / 178 / 207 FPS (rats −13 %). Wolves cost nothing visible on this GPU; rats' Rampart models with their layers do.
 
+
+### The original's own mixins were not registered (found during the 26.1.2 port)
+- `PiglinAiMixin` (a mob carrying a rat with the idol upgrade counts as wearing gold for piglins) and `WardenMixin`
+  (wardens do not target rats with the sculked upgrade) sat in `common` but in no mixin config, so both upgrades did
+  nothing. Now `rats.common.mixins.json`, loaded by NeoForge (`neoforge.mods.toml`) and Fabric (`fabric.mod.json`);
+  two checks in `SelfTest`. Both loaders: `tools/selftest.sh` 43/43.
