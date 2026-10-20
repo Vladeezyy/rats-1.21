@@ -1,12 +1,11 @@
 package com.github.alexthe666.rats.server.inventory.container;
+import net.minecraft.world.entity.ContainerUser;
 
 import com.github.alexthe666.rats.server.misc.StoredItems;
-import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.items.RatListUpgradeItem;
 import com.github.alexthe666.rats.server.items.upgrades.CombinedRatUpgradeItem;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
@@ -81,7 +80,7 @@ public class RatUpgradeContainer implements WorldlyContainer {
 	}
 
 	@Override
-	public void stopOpen(Player player) {
+	public void stopOpen(ContainerUser user) {
 		this.save();
 	}
 

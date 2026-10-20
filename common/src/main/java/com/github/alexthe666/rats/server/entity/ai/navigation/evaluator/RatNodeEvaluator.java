@@ -105,7 +105,7 @@ public class RatNodeEvaluator extends WalkNodeEvaluator {
 			return false;
 		}
 		// out of an open end the rat may drop down; in and along tubes it stays level
-		Direction direction = Direction.fromDelta(dx, 0, dz);
+		Direction direction = dx > 0 ? Direction.EAST : dx < 0 ? Direction.WEST : dz > 0 ? Direction.SOUTH : Direction.NORTH;
 		return (!fromTube || passes(fromState, direction)) && (!toTube || passes(toState, direction.getOpposite()));
 	}
 

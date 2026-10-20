@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:glass_bottle"
-    },
-    "G": {
-      "item": "minecraft:glistering_melon_slice"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    },
-    "W": {
-      "item": "minecraft:nether_wart"
-    }
+    "B": "minecraft:glass_bottle",
+    "G": "minecraft:glistering_melon_slice",
+    "U": "rats:rat_upgrade_basic",
+    "W": "minecraft:nether_wart"
   },
   "pattern": [
     "WGW",

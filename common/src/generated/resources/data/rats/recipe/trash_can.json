@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "item": "minecraft:cauldron"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "N": {
-      "tag": "c:nuggets/iron"
-    }
+    "C": "minecraft:cauldron",
+    "I": "#c:ingots/iron",
+    "N": "#c:nuggets/iron"
   },
   "pattern": [
     " N ",

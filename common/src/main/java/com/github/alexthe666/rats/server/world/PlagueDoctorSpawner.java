@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.server.world;
+import net.minecraft.world.entity.EntityReference;
 
 import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.entity.SpawnPlacementType;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.misc.PlagueDoctor;
@@ -11,15 +11,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.NaturalSpawner;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +43,8 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 	}
 
 	@Override
-	public int tick(ServerLevel level, boolean spawnEnemies, boolean spawnFriendlies) {
-		if (level.getGameRules().getBoolean(RatsMod.SPAWN_PLAGUE_DOCTORS) && this.tickDelay-- <= 0) {
+	public void tick(ServerLevel level, boolean spawnEnemies) {
+		if (RatsMod.spawnRule(level, RatsMod.SPAWN_PLAGUE_DOCTORS) && this.tickDelay-- <= 0) {
 			this.tickDelay = 1200;
 			PlagueDoctorWorldData data = PlagueDoctorWorldData.get(level);
 			if (data != null) {
@@ -54,20 +52,19 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 				data.setDoctorSpawnDelay(this.spawnDelay);
 				if (this.spawnDelay <= 0) {
 					this.spawnDelay = 24000;
-					if (level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+					if (level.getGameRules().get(GameRules.SPAWN_MOBS)) {
 						int i = this.spawnChance;
 						this.spawnChance = Mth.clamp(this.spawnChance + 25, 25, 75);
 						data.setDoctorSpawnChance(this.spawnChance);
 						if (level.getRandom().nextInt(100) <= i && this.canSpawnDoctor(level)) {
 							this.spawnChance = 25;
 							data.setDirty();
-							return 1;
+							return;
 						}
 					}
 				}
 			}
 		}
-		return 0;
 	}
 
 	private boolean canSpawnDoctor(ServerLevel level) {
@@ -87,7 +84,7 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 					return false;
 				}
 
-				PlagueDoctor plagueDoctor = RatsEntityRegistry.PLAGUE_DOCTOR.get().spawn(level, blockpos2, MobSpawnType.EVENT);
+				PlagueDoctor plagueDoctor = RatsEntityRegistry.PLAGUE_DOCTOR.get().spawn(level, blockpos2, EntitySpawnReason.EVENT);
 				if (plagueDoctor != null) {
 					for (int j = 0; j < 2; ++j) {
 						this.spawnARat(level, plagueDoctor);
@@ -98,7 +95,7 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 						plagueDoctor.setWillDespawn(true);
 						plagueDoctor.setDespawnDelay(24000);
 						plagueDoctor.setWanderTarget(blockpos1);
-						plagueDoctor.restrictTo(blockpos1, 32);
+						plagueDoctor.setHomeTo(blockpos1, 32);
 
 						return true;
 					}
@@ -112,11 +109,11 @@ public class PlagueDoctorSpawner implements CustomSpawner {
 	private void spawnARat(ServerLevel level, PlagueDoctor doctor) {
 		BlockPos blockpos = this.findNearbySpawnPos(level, doctor.blockPosition(), 4);
 		if (blockpos != null) {
-			Rat rat = RatsEntityRegistry.RAT.get().spawn(level, blockpos, MobSpawnType.EVENT);
+			Rat rat = RatsEntityRegistry.RAT.get().spawn(level, blockpos, EntitySpawnReason.EVENT);
 			if (rat != null) {
 				rat.setLeashedTo(doctor, true);
 				rat.setPlagued(false);
-				rat.setOwnerUUID(doctor.getUUID());
+				rat.setOwnerReference(EntityReference.of(doctor.getUUID()));
 			}
 		}
 	}

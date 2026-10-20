@@ -2,33 +2,15 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    },
-    {
-      "item": "rats:tiny_coin"
-    }
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin",
+    "rats:tiny_coin"
   ],
   "result": {
     "id": "rats:token_fragment"

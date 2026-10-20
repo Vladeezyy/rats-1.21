@@ -2,33 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "item": "rats:feral_rat_claw"
-    },
-    "F": {
-      "item": "rats:ratlantean_flame"
-    },
-    "G": {
-      "tag": "c:ingots/ratlantis_gem"
-    },
-    "H": {
-      "item": "rats:pirat_hat"
-    },
-    "O": {
-      "item": "rats:oratchalcum_block"
-    },
-    "P": {
-      "item": "rats:ratglove_petals"
-    },
-    "R": {
-      "item": "rats:ratfish"
-    },
-    "S": {
-      "item": "rats:ratlantis_rat_skull"
-    },
-    "T": {
-      "item": "rats:rat_toga"
-    }
+    "C": "rats:feral_rat_claw",
+    "F": "rats:ratlantean_flame",
+    "G": "#c:ingots/ratlantis_gem",
+    "H": "rats:pirat_hat",
+    "O": "rats:oratchalcum_block",
+    "P": "rats:ratglove_petals",
+    "R": "rats:ratfish",
+    "S": "rats:ratlantis_rat_skull",
+    "T": "rats:rat_toga"
   },
   "pattern": [
     "CHF",

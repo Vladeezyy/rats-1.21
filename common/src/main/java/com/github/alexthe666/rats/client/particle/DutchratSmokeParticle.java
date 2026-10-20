@@ -2,14 +2,15 @@ package com.github.alexthe666.rats.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.particles.SimpleParticleType;
 
-public class DutchratSmokeParticle extends TextureSheetParticle {
+public class DutchratSmokeParticle extends SingleQuadParticle {
 
 	protected final SpriteSet sprites;
 
 	public DutchratSmokeParticle(ClientLevel level, double x, double y, double z, double life, SpriteSet set) {
-		super(level, x, y, z, 0.0D, 0.0D, 0.0D);
+		super(level, x, y, z, 0.0D, 0.0D, 0.0D, set.first());
 		this.sprites = set;
 		this.lifetime = (int) life;
 		this.setColor(0.0F, 0.75F, 0.0F);
@@ -18,7 +19,7 @@ public class DutchratSmokeParticle extends TextureSheetParticle {
 	}
 
 	@Override
-	protected int getLightColor(float color) {
+	protected int getLightCoords(float color) {
 		return 240;
 	}
 
@@ -37,13 +38,13 @@ public class DutchratSmokeParticle extends TextureSheetParticle {
 	}
 
 	@Override
-	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	protected SingleQuadParticle.Layer getLayer() {
+		return SingleQuadParticle.Layer.TRANSLUCENT;
 	}
 
 	public record Provider(SpriteSet sprite) implements ParticleProvider<SimpleParticleType> {
 
-		public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+		public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
 			return new DutchratSmokeParticle(level, x, y, z, xSpeed, this.sprite());
 		}
 	}

@@ -1,10 +1,8 @@
 {
   "type": "minecraft:stonecutting",
-  "count": 2,
-  "ingredient": {
-    "item": "rats:marbled_cheese_brick_mossy"
-  },
+  "ingredient": "rats:marbled_cheese_brick_mossy",
   "result": {
-    "id": "rats:marbled_cheese_brick_mossy_slab"
+    "id": "rats:marbled_cheese_brick_mossy_slab",
+    "count": 2
   }
 }

@@ -15,7 +15,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -29,10 +29,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,8 +40,13 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
@@ -62,7 +67,6 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.NeoForge;
@@ -73,8 +77,10 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -121,7 +127,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean isClient() {
-        return FMLEnvironment.dist.isClient();
+        return FMLEnvironment.getDist().isClient();
     }
 
     // --- registration ---
@@ -132,7 +138,7 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, ResourceLocation id, Supplier<? extends T> factory) {
+    public <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, Identifier id, Supplier<? extends T> factory) {
         registerFor(registry).register(id.getPath(), factory);
     }
 
@@ -144,13 +150,14 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public void registerDataSerializer(ResourceLocation id, EntityDataSerializer<?> serializer) {
+    public void registerDataSerializer(Identifier id, EntityDataSerializer<?> serializer) {
         registerFor(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS).register(id.getPath(), () -> serializer);
     }
 
     @Override
     public Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties) {
-        return new DeferredSpawnEggItem(type, background, highlight, properties);
+        // 26.x: eggs have their own textures, entity types are registered before items
+        return new SpawnEggItem(properties.spawnEgg(type.get()));
     }
 
     @Override
@@ -160,7 +167,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public <T extends BlockEntity> BlockEntityType<T> blockEntityType(BiFunction<BlockPos, BlockState, T> factory, Block... blocks) {
-        return BlockEntityType.Builder.of(factory::apply, blocks).build(null);
+        return new BlockEntityType<>(factory::apply, blocks);
     }
 
     @Override
@@ -187,7 +194,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
-        PacketDistributor.sendToServer(payload);
+        ClientPacketDistributor.sendToServer(payload);
     }
 
     @Override
@@ -207,7 +214,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public void sendToTrackingChunk(ServerLevel level, BlockPos pos, CustomPacketPayload payload) {
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos), payload);
+        PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos), payload);
     }
 
     @Override
@@ -220,40 +227,52 @@ public final class NeoForgePlatform implements Platform {
     @Override
     public Optional<ItemHandler> itemHandler(Level level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
         BlockState state = blockEntity != null ? blockEntity.getBlockState() : level.getBlockState(pos);
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.ItemHandler.BLOCK, pos, state, blockEntity, side)));
+        return Optional.ofNullable(NeoForgeTransfer.fromNeoItems(level.getCapability(Capabilities.Item.BLOCK, pos, state, blockEntity, side)));
     }
 
     @Override
     public Optional<ItemHandler> itemHandler(Entity entity) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(entity.getCapability(Capabilities.ItemHandler.ENTITY, null)));
+        return Optional.ofNullable(NeoForgeTransfer.fromNeoItems(entity.getCapability(Capabilities.Item.ENTITY, null)));
     }
 
     @Override
     public Optional<FluidHandler> fluidHandler(Level level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
         BlockState state = blockEntity != null ? blockEntity.getBlockState() : level.getBlockState(pos);
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.FluidHandler.BLOCK, pos, state, blockEntity, side)));
+        return Optional.ofNullable(NeoForgeTransfer.fromNeoFluids(level.getCapability(Capabilities.Fluid.BLOCK, pos, state, blockEntity, side)));
     }
 
     @Override
     public Optional<EnergyHandler> energyHandler(Level level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
         BlockState state = blockEntity != null ? blockEntity.getBlockState() : level.getBlockState(pos);
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.EnergyStorage.BLOCK, pos, state, blockEntity, side)));
+        return Optional.ofNullable(NeoForgeTransfer.fromNeo(level.getCapability(Capabilities.Energy.BLOCK, pos, state, blockEntity, side)));
     }
 
     @Override
     public Optional<EnergyHandler> energyHandler(ItemStack stack) {
-        return Optional.ofNullable(NeoForgeTransfer.fromNeo(stack.getCapability(Capabilities.EnergyStorage.ITEM)));
+        return Optional.ofNullable(NeoForgeTransfer.fromNeo(ItemAccess.forStack(stack).getCapability(Capabilities.Energy.ITEM)));
     }
 
     @Override
     public Optional<ItemFluidHandler> fluidHandler(ItemStack stack) {
-        Optional<IFluidHandlerItem> handler = FluidUtil.getFluidHandler(stack);
-        return handler.map(h -> (ItemFluidHandler) NeoForgeTransfer.fromNeo(h));
+        if (stack.isEmpty()) {
+            return Optional.empty();
+        }
+        // a one-slot inventory: filling or draining swaps the item there, read back with getContainer()
+        ItemStacksResourceHandler slot = new ItemStacksResourceHandler(1);
+        slot.set(0, ItemResource.of(stack), stack.getCount());
+        return Optional.ofNullable(NeoForgeTransfer.fromNeo(ItemAccess.forHandlerIndex(slot, 0).getCapability(Capabilities.Fluid.ITEM), slot));
     }
 
     @Override
     public ItemStack filledBucket(FluidStack fluid) {
-        return FluidUtil.getFilledBucket(NeoForgeTransfer.toNeo(fluid));
+        if (fluid.isEmpty()) {
+            return ItemStack.EMPTY;
+        } else if (fluid.is(Fluids.WATER)) {
+            return new ItemStack(Items.WATER_BUCKET);
+        } else if (fluid.is(Fluids.LAVA)) {
+            return new ItemStack(Items.LAVA_BUCKET);
+        }
+        return fluid.getFluid().getFluidType().getBucket(new net.neoforged.neoforge.fluids.FluidStack(fluid.getFluid(), fluid.getAmount()));
     }
 
     @Override
@@ -265,13 +284,13 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     @Nullable
-    public SpawnGroupData finalizeMobSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData) {
+    public SpawnGroupData finalizeMobSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnData) {
         return EventHooks.finalizeMobSpawn(mob, level, difficulty, spawnType, spawnData);
     }
 
     @Override
     public boolean canEntityGrief(Level level, @Nullable Entity entity) {
-        return EventHooks.canEntityGrief(level, entity);
+        return level instanceof ServerLevel server && EventHooks.canEntityGrief(server, entity);
     }
 
     @Override
@@ -281,7 +300,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean canEntityDestroy(Level level, BlockPos pos, LivingEntity entity) {
-        return CommonHooks.canEntityDestroy(level, pos, entity);
+        return level instanceof ServerLevel server && CommonHooks.canEntityDestroy(server, pos, entity);
     }
 
     @Override
@@ -347,7 +366,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean canSetDirtUnderTree(LevelSimulatedReader reader, BiConsumer<BlockPos, BlockState> placer, RandomSource random, BlockPos pos, TreeConfiguration config) {
-        return !((LevelReader) reader).getBlockState(pos).onTreeGrow((LevelReader) reader, placer, random, pos, config);
+        return !(reader instanceof WorldGenLevel level) || !level.getBlockState(pos).onTreeGrow(level, placer, random, pos, config);
     }
 
     @Override
@@ -367,7 +386,8 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public ItemStack craftingRemainder(ItemStack stack) {
-        return stack.getCraftingRemainingItem();
+        ItemStackTemplate remainder = stack.getCraftingRemainder();
+        return remainder == null ? ItemStack.EMPTY : remainder.create();
     }
 
     @Override

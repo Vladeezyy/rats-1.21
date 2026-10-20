@@ -65,7 +65,7 @@ public final class NetScene {
       return;
     }
     mc.options.pauseOnLostFocus = false;
-    mc.getToasts().clear();
+    mc.getToastManager().clear();
     tick++;
     try {
       step(mc);
@@ -107,10 +107,7 @@ public final class NetScene {
 
   private static void done(Minecraft mc) {
     RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
-    if (mc.level != null) {
-      mc.level.disconnect();
-    }
-    mc.disconnect(new TitleScreen());
+    mc.disconnectWithSavingScreen();
     mc.stop();
   }
 }

@@ -3,18 +3,17 @@ package com.github.alexthe666.rats.server.message;
 import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.PacketContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import com.github.alexthe666.rats.server.inventory.RatCraftingTableMenu;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 
 
 public record CycleRatRecipePacket(long blockPos, boolean increase) implements CustomPacketPayload {
 
-	public static final Type<CycleRatRecipePacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "cycle_rat_recipe"));
+	public static final Type<CycleRatRecipePacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "cycle_rat_recipe"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, CycleRatRecipePacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), CycleRatRecipePacket::decode);
 
 	@Override

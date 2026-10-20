@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "rats:item/trash_can",
+    "model": {
+      "type": "rats:block_entity",
+      "block": "trash_can"
+    }
+  }
+}

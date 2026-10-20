@@ -1,0 +1,33 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "rats:rat_count",
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "rats:item/rat_sack"
+    },
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/rat_sack_1"
+        },
+        "threshold": 1.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/rat_sack_2"
+        },
+        "threshold": 2.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/rat_sack_3"
+        },
+        "threshold": 3.0
+      }
+    ]
+  }
+}

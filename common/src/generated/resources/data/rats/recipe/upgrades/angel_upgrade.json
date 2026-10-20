@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "G": {
-      "tag": "c:ingots/gold"
-    },
-    "H": {
-      "item": "rats:halo_hat"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    },
-    "W": {
-      "item": "rats:feathery_wing"
-    }
+    "G": "#c:ingots/gold",
+    "H": "rats:halo_hat",
+    "T": "minecraft:totem_of_undying",
+    "U": "rats:rat_upgrade_basic",
+    "W": "rats:feathery_wing"
   },
   "pattern": [
     "GHG",

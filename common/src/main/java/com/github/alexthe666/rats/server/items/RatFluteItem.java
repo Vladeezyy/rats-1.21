@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatConfig;
@@ -12,13 +15,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -33,14 +35,14 @@ public class RatFluteItem extends Item {
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack stack) {
-		return UseAnim.TOOT_HORN;
+	public ItemUseAnimation getUseAnimation(ItemStack stack) {
+		return ItemUseAnimation.TOOT_HORN;
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 
-		int commandInt = ItemNbt.view(stack).getInt("Command");
+		int commandInt = ItemNbt.view(stack).getIntOr("Command", 0);
 		RatCommand ratCommand = RatCommand.values()[Mth.clamp(commandInt, 0, RatCommand.values().length - 1)];
 		if (player.isShiftKeyDown()) {
 			commandInt++;
@@ -51,9 +53,9 @@ public class RatFluteItem extends Item {
 			ItemNbt.update(stack, tag -> tag.putInt("Command", newCommand));
 			ratCommand = RatCommand.values()[Mth.clamp(commandInt, 0, RatCommand.values().length - 1)];
 			level.playSound(player, player.blockPosition(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.NEUTRAL, 1.0F, 1.25F);
-			player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COMMAND, Component.translatable(ratCommand.getTranslateName())), true);
+			player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COMMAND, Component.translatable(ratCommand.getTranslateName())));
 		} else {
-			player.getCooldowns().addCooldown(this, 60);
+			player.getCooldowns().addCooldown(stack, 60);
 			float chunksize = 16 * RatConfig.ratFluteDistance;
 			List<Entity> list = level.getEntities(player, (new AABB(player.getX(), player.getY(), player.getZ(), player.getX() + 1.0D, player.getY() + 1.0D, player.getZ() + 1.0D)).inflate(chunksize, level.getHeight(), chunksize));
 			Iterator<Entity> itr = list.iterator();
@@ -67,20 +69,20 @@ public class RatFluteItem extends Item {
 				}
 			}
 			player.swing(hand);
-			player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COUNT, ratCount).withStyle(ChatFormatting.GRAY), true);
+			player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COUNT, ratCount).withStyle(ChatFormatting.GRAY));
 			level.playSound(player, player.blockPosition(), RatsSoundRegistry.getFluteSound(), SoundSource.NEUTRAL, 1, 1.25F);
 		}
 
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("item.rats.rat_flute.desc0").withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable("item.rats.rat_flute.desc1").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("item.rats.rat_flute.desc0").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("item.rats.rat_flute.desc1").withStyle(ChatFormatting.GRAY));
 		if (ItemNbt.hasTag(stack)) {
-			RatCommand ratCommand = RatCommand.values()[Mth.clamp(ItemNbt.view(stack).getInt("Command"), 0, RatCommand.values().length - 1)];
-			tooltip.add(Component.translatable(RatsLangConstants.RAT_CURRENT_COMMAND, Component.translatable(ratCommand.getTranslateName())).withStyle(ChatFormatting.GRAY));
+			RatCommand ratCommand = RatCommand.values()[Mth.clamp(ItemNbt.view(stack).getIntOr("Command", 0), 0, RatCommand.values().length - 1)];
+			tooltip.accept(Component.translatable(RatsLangConstants.RAT_CURRENT_COMMAND, Component.translatable(ratCommand.getTranslateName())).withStyle(ChatFormatting.GRAY));
 		}
 	}
 }

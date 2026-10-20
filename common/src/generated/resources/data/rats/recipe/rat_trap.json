@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "S": {
-      "tag": "minecraft:wooden_slabs"
-    },
-    "T": {
-      "item": "minecraft:iron_trapdoor"
-    }
+    "I": "#c:ingots/iron",
+    "S": "#minecraft:wooden_slabs",
+    "T": "minecraft:iron_trapdoor"
   },
   "pattern": [
     "IT ",

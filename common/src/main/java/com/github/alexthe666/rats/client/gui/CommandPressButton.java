@@ -1,6 +1,7 @@
 package com.github.alexthe666.rats.client.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
@@ -11,7 +12,7 @@ public class CommandPressButton extends Button {
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+	protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
 		if (this.visible) {
 			boolean flag = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 			int i = 0;
@@ -20,7 +21,7 @@ public class CommandPressButton extends Button {
 				j += 16;
 			}
 
-			graphics.blit(RatScreen.TEXTURE, this.getX(), this.getY(), i, j, this.width, this.height);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, RatScreen.TEXTURE, this.getX(), this.getY(), i, j, this.width, this.height, 256, 256);
 
 		}
 	}

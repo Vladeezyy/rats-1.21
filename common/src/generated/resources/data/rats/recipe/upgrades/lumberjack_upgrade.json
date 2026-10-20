@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:iron_axe"
-    },
-    "B": {
-      "item": "minecraft:black_wool"
-    },
-    "R": {
-      "item": "minecraft:red_wool"
-    },
-    "S": {
-      "tag": "minecraft:saplings"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "A": "minecraft:iron_axe",
+    "B": "minecraft:black_wool",
+    "R": "minecraft:red_wool",
+    "S": "#minecraft:saplings",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "RAR",

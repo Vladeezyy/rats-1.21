@@ -13,6 +13,13 @@ esac
 pkill -f "$PROC" 2>/dev/null
 rm -rf $LOADER/run/world build-selftest.log
 mkdir -p $LOADER/run/config && echo "eula=true" > $LOADER/run/eula.txt
+# 26.x servers stop ticking after 60 s without players: the scenarios need the ticks
+PROPS=$LOADER/run/server.properties
+if [ -f $PROPS ] && grep -q '^pause-when-empty-seconds=' $PROPS; then
+	perl -pi -e 's/^pause-when-empty-seconds=.*/pause-when-empty-seconds=0/' $PROPS
+else
+	echo "pause-when-empty-seconds=0" >> $PROPS
+fi
 # the test world has the Ratlantis datapack on (the gameplay checks go through its portal)
 CFG=$LOADER/run/config/rats-common.toml
 if [ -f $CFG ]; then

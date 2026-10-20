@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.core.particles.ColorParticleOption;
 import com.github.alexthe666.rats.RatConfig;
@@ -7,7 +10,6 @@ import com.github.alexthe666.rats.registry.RatsEffectRegistry;
 import com.github.alexthe666.rats.server.entity.monster.boss.BlackDeath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,6 +17,7 @@ import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -33,7 +36,7 @@ import java.util.UUID;
 
 public class PlagueBeast extends FeralRatlantean {
 
-	protected static final EntityDataAccessor<Optional<UUID>> OWNER_UNIQUE_ID = SynchedEntityData.defineId(PlagueBeast.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> OWNER_UNIQUE_ID = SynchedEntityData.defineId(PlagueBeast.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
 	public PlagueBeast(EntityType<? extends Monster> type, Level level) {
 		super(type, level);
@@ -78,7 +81,7 @@ public class PlagueBeast extends FeralRatlantean {
 				double extraZ = (double) (radius * Mth.cos(angle)) + death.getZ();
 				BlockPos runToPos = BlockPos.containing(extraX, death.getY(), extraZ);
 				int steps = 0;
-				while (this.level().getBlockState(runToPos).isSolidRender(this.level(), runToPos) && steps < 10) {
+				while (this.level().getBlockState(runToPos).isSolidRender() && steps < 10) {
 					runToPos = runToPos.above();
 					steps++;
 				}
@@ -114,7 +117,7 @@ public class PlagueBeast extends FeralRatlantean {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		if (this.getOwnerId() == null) {
 			compound.putString("OwnerUUID", "");
@@ -124,12 +127,12 @@ public class PlagueBeast extends FeralRatlantean {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
 		UUID uuid;
 		// saved as "OwnerUUID" (the original read "Owner" back, so the owner was lost on reload)
-		String s = compound.contains("OwnerUUID") ? compound.getString("OwnerUUID") : compound.getString("Owner");
-		uuid = s.isEmpty() ? null : OldUsersConverter.convertMobOwnerIfNecessary(this.getServer(), s);
+		String s = compound.getStringOr("OwnerUUID", compound.getStringOr("Owner", ""));
+		uuid = s.isEmpty() ? null : OldUsersConverter.convertMobOwnerIfNecessary(this.level().getServer(), s);
 
 		if (uuid != null) {
 			try {
@@ -141,11 +144,11 @@ public class PlagueBeast extends FeralRatlantean {
 
 	@Nullable
 	public UUID getOwnerId() {
-		return this.getEntityData().get(OWNER_UNIQUE_ID).orElse(null);
+		return this.getEntityData().get(OWNER_UNIQUE_ID).map(EntityReference::getUUID).orElse(null);
 	}
 
 	public void setOwnerId(@Nullable UUID uuid) {
-		this.getEntityData().set(OWNER_UNIQUE_ID, Optional.ofNullable(uuid));
+		this.getEntityData().set(OWNER_UNIQUE_ID, Optional.ofNullable(uuid).map(EntityReference::<LivingEntity>of));
 	}
 
 	@Nullable
@@ -170,7 +173,7 @@ public class PlagueBeast extends FeralRatlantean {
 	}
 
 	@Override
-	public boolean isAlliedTo(Entity entity) {
-		return super.isAlliedTo(entity) || entity.getType().is(RatsEntityTags.PLAGUE_LEGION);
+	protected boolean considersEntityAsAlly(Entity entity) {
+		return super.considersEntityAsAlly(entity) || entity.is(RatsEntityTags.PLAGUE_LEGION);
 	}
 }

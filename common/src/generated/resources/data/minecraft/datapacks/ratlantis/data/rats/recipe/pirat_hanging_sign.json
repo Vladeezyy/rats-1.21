@@ -3,12 +3,8 @@
   "category": "misc",
   "group": "hanging_sign",
   "key": {
-    "C": {
-      "item": "minecraft:chain"
-    },
-    "P": {
-      "item": "rats:stripped_pirat_wood"
-    }
+    "C": "minecraft:iron_chain",
+    "P": "rats:stripped_pirat_wood"
   },
   "pattern": [
     "C C",

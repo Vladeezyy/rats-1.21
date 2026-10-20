@@ -1,13 +1,14 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesTextureUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.GlowingEyesUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -17,8 +18,8 @@ public class EnderRatUpgradeItem extends BaseRatUpgradeItem implements ChangesTe
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
-		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/ender.png");
+	public Identifier getTexture() {
+		return Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/ender.png");
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class EnderRatUpgradeItem extends BaseRatUpgradeItem implements ChangesTe
 
 	@Override
 	public RenderType getEyeTexture(ItemStack stack) {
-		return RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/ender.png"));
+		return RenderTypes.eyes(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/ender.png"));
 	}
 
 	@Override

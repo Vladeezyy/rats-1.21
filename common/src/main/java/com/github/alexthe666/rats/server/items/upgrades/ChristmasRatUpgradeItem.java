@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.util.context.ContextKeySet;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.client.render.entity.layer.RatHeldItemLayer;
@@ -11,15 +15,15 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 
 import java.util.List;
 
@@ -50,7 +54,7 @@ public class ChristmasRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 		if (!rat.level().isClientSide()) {
 			LootParams.Builder builder = new LootParams.Builder((ServerLevel) rat.level());
 			builder.withLuck(1.0F);
-			LootContextParamSet.Builder lootparameterset$builder = new LootContextParamSet.Builder();
+			ContextKeySet.Builder lootparameterset$builder = new ContextKeySet.Builder();
 			List<ItemStack> result = rat.level().getServer().reloadableRegistries().getLootTable(RatsLootRegistry.CHRISTMAS_GIFTS).getRandomItems(builder.create(lootparameterset$builder.build()));
 			if (RatsDateFetcher.isChristmasDay()) {
 				for (int i = 0; i < 5; i++) {
@@ -64,7 +68,7 @@ public class ChristmasRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 					} else {
 						if (!rat.tryDepositItemInContainers(stack.copy())) {
 							if (!rat.level().isClientSide()) {
-								rat.spawnAtLocation(stack.copy(), 0.25F);
+								rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), stack.copy(), 0.25F);
 							}
 						}
 					}
@@ -75,7 +79,7 @@ public class ChristmasRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
 		stack.mulPose(Axis.ZP.rotationDegrees(-10.0F));
@@ -84,8 +88,8 @@ public class ChristmasRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 		stack.pushPose();
 		stack.translate(-0.025F, -0.2F, -0.05F);
 		stack.scale(0.35F, 0.35F, 0.35F);
-		VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.parse("textures/entity/chest/christmas.png")));
-		RatHeldItemLayer.CHRISTMAS_CHEST_MODEL.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+		// vanilla's chest model, closed (in the layer: the model types would make the dedicated server load them)
+		RatHeldItemLayer.submitChristmasChest(stack, buffer, light);
 		stack.popPose();
 		stack.popPose();
 	}

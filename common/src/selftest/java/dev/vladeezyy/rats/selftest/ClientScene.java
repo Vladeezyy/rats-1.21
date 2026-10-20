@@ -18,10 +18,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
@@ -77,14 +77,14 @@ public final class ClientScene {
   }
 
   static void shot(Minecraft mc, String name) {
-    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), c -> RatsMod.LOGGER.info("[scene] " + c.getString()));
+    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, c -> RatsMod.LOGGER.info("[scene] " + c.getString()));
   }
 
   static void lookAt(ServerPlayer player, double x, double y, double z, double tx, double ty, double tz) {
     double dx = tx - x, dy = ty - (y + player.getEyeHeight()), dz = tz - z;
     float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
     float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
-    player.teleportTo(player.serverLevel(), stage.getX() + x, stage.getY() + y, stage.getZ() + z, yaw, pitch);
+    player.teleportTo(player.level(), stage.getX() + x, stage.getY() + y, stage.getZ() + z, java.util.Set.of(), yaw, pitch, true);
   }
 
   static {
@@ -116,12 +116,12 @@ public final class ClientScene {
   }
 
   private static void perfMobs(ServerPlayer player, boolean rats) {
-    ServerLevel level = player.serverLevel();
+    ServerLevel level = player.level();
     perfMobs.forEach(net.minecraft.world.entity.Entity::discard);
     perfMobs.clear();
     for (int i = 0; i < PERF_MOBS; i++) {
-      Mob mob = rats ? com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level) : EntityType.WOLF.create(level);
-      mob.moveTo(stage.getX() - 4 + (i % 10) * 1.5, stage.getY(), stage.getZ() - 4 + (i / 10) * 1.5, i * 37, 0);
+      Mob mob = rats ? com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND) : EntityType.WOLF.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      mob.snapTo(stage.getX() - 4 + (i % 10) * 1.5, stage.getY(), stage.getZ() - 4 + (i / 10) * 1.5, i * 37, 0);
       mob.setPersistenceRequired();
       if (mob instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat) {
         rat.tame(player);
@@ -140,7 +140,7 @@ public final class ClientScene {
       server(mc, ClientScene::build);
     });
     at(t += 40, mc -> server(mc, p -> {
-      ServerLevel level = p.serverLevel();
+      ServerLevel level = p.level();
       // a glass pen over the stage, so the mobs stay in view; the blocks of the main scene are cleared
       for (BlockPos pos : BlockPos.betweenClosed(stage.offset(-6, 0, -6), stage.offset(12, 6, 12))) {
         boolean edge = pos.getX() == stage.getX() - 6 || pos.getX() == stage.getX() + 12 || pos.getZ() == stage.getZ() - 6 || pos.getZ() == stage.getZ() + 12;
@@ -159,8 +159,7 @@ public final class ClientScene {
       shot(mc, "perf");
       RatsMod.LOGGER.info("[scene] PERF DONE " + String.join(" | ", perf));
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
-      mc.level.disconnect();
-      mc.disconnect(new TitleScreen());
+      mc.disconnectWithSavingScreen();
       mc.stop();
     });
   }
@@ -199,8 +198,7 @@ public final class ClientScene {
     at(t += 5, ClientScene::checkTranslations);
     at(t += 10, mc -> {
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
-      mc.level.disconnect();
-      mc.disconnect(new TitleScreen());
+      mc.disconnectWithSavingScreen();
       mc.stop();
     });
   }
@@ -229,12 +227,12 @@ public final class ClientScene {
         return;
       }
       opened = true;
-      GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 1600, 900);
+      GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
       mc.options.guiScale().set(3);
       mc.options.cloudStatus().set(CloudStatus.OFF);
       mc.options.pauseOnLostFocus = false;
-      mc.resizeDisplay();
-      LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.NORMAL, true, new GameRules(), WorldDataConfiguration.DEFAULT);
+      mc.resizeGui();
+      LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
       mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(20261016L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
       return;
     }
@@ -243,7 +241,7 @@ public final class ClientScene {
     }
     mc.options.pauseOnLostFocus = false;
     mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
-    mc.getToasts().clear();
+    mc.getToastManager().clear();
     if (mc.screen instanceof PauseScreen) {
       mc.setScreen(null);
     }
@@ -261,19 +259,19 @@ public final class ClientScene {
   }
 
   private static void spawnMobs(ServerPlayer player) {
-    ServerLevel level = player.serverLevel();
+    ServerLevel level = player.level();
     int i = 0;
     for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
       if (!BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(RatsMod.MODID)) {
         continue;
       }
-      var entity = type.create(level);
+      var entity = type.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       if (!(entity instanceof Mob mob)) {
         continue;
       }
       mob.setNoAi(true);
       mob.setPersistenceRequired();
-      mob.moveTo(stage.getX() + (i % 6) * 2.5, stage.getY(), stage.getZ() - 3 - (i / 6) * 3.0, 180, 0);
+      mob.snapTo(stage.getX() + (i % 6) * 2.5, stage.getY(), stage.getZ() - 3 - (i / 6) * 3.0, 180, 0);
       level.addFreshEntity(mob);
       i++;
     }
@@ -281,13 +279,14 @@ public final class ClientScene {
   }
 
   private static void build(ServerPlayer player) {
-    ServerLevel level = player.serverLevel();
-    BlockPos spawn = level.getSharedSpawnPos();
+    ServerLevel level = player.level();
+    BlockPos spawn = level.getRespawnData().pos();
     stage = new BlockPos(spawn.getX(), 140, spawn.getZ());
-    level.setDayTime(6000);
-    level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, level.getServer());
-    level.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, level.getServer());
-    level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, level.getServer());
+    level.getGameRules().set(GameRules.ADVANCE_TIME, false, level.getServer());
+    level.getGameRules().set(GameRules.ADVANCE_WEATHER, false, level.getServer());
+    level.getGameRules().set(GameRules.SPAWN_MOBS, false, level.getServer());
+    // the day time moved to clocks in 26.1, the command works on every version
+    level.getServer().getCommands().performPrefixedCommand(level.getServer().createCommandSourceStack().withSuppressedOutput(), "time set noon");
     for (BlockPos pos : BlockPos.betweenClosed(stage.offset(-6, -1, -6), stage.offset(12, 6, 12))) {
       level.setBlock(pos, pos.getY() == stage.getY() - 1 ? Blocks.GRASS_BLOCK.defaultBlockState() : Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
     }
@@ -337,15 +336,18 @@ public final class ClientScene {
   }
 
   private static void checkNoMissingTexture(Minecraft mc, String name) {
-    int magenta = 0;
-    try (NativeImage image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
-      for (int pixel : image.getPixelsRGBA()) {
-        int r = pixel & 0xFF, g = pixel >> 8 & 0xFF, b = pixel >> 16 & 0xFF;
-        if (r > 200 && b > 200 && g < 40) {
-          magenta++;
+    // the screenshot is read back from the GPU asynchronously in 26.x
+    Screenshot.takeScreenshot(mc.getMainRenderTarget(), image -> {
+      int magenta = 0;
+      try (image) {
+        for (int pixel : image.getPixelsABGR()) {
+          int r = pixel & 0xFF, g = pixel >> 8 & 0xFF, b = pixel >> 16 & 0xFF;
+          if (r > 200 && b > 200 && g < 40) {
+            magenta++;
+          }
         }
       }
-    }
-    check(name + ": no missing texture on screen", magenta < 50, magenta + " magenta pixels");
+      check(name + ": no missing texture on screen", magenta < 50, magenta + " magenta pixels");
+    });
   }
 }

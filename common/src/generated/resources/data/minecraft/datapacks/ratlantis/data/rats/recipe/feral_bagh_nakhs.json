@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "item": "rats:feral_rat_claw"
-    },
-    "F": {
-      "item": "minecraft:rotten_flesh"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "C": "rats:feral_rat_claw",
+    "F": "minecraft:rotten_flesh",
+    "S": "#c:strings"
   },
   "pattern": [
     " FC",

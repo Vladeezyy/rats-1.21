@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.Difficulty;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.RatConfig;
@@ -11,7 +16,6 @@ import com.github.alexthe666.rats.server.entity.projectile.RattlingGunBullet;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import com.github.alexthe666.rats.server.misc.PlaneRotationUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -75,8 +79,8 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 		this.getEntityData().set(PLANE_PITCH, this.getPlanePitch() - pitch);
 	}
 
-	public boolean isAlliedTo(Entity entity) {
-		return super.isAlliedTo(entity) || entity instanceof RatBaron;
+	protected boolean considersEntityAsAlly(Entity entity) {
+		return super.considersEntityAsAlly(entity) || entity instanceof RatBaron;
 	}
 
 	public void setTarget(@Nullable LivingEntity living) {
@@ -116,9 +120,9 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 			float distX = (float) (this.startPreyVec.x() - this.startAttackVec.x());
 			float distY = 1.5F;
 			float distZ = (float) (this.startPreyVec.z() - this.startAttackVec.z());
-			this.setFlightTarget(new Vec3(this.getTarget().getX() + distX, this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getRestrictCenter()).getY() + 5 + this.getRandom().nextInt(16) + distY, this.getTarget().getZ() + distZ));
+			this.setFlightTarget(new Vec3(this.getTarget().getX() + distX, this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getHomePosition()).getY() + 5 + this.getRandom().nextInt(16) + distY, this.getTarget().getZ() + distZ));
 			if (this.distanceToSqr(this.getFlightTarget().x(), this.getFlightTarget().y(), this.getFlightTarget().z()) < 100) {
-				this.setFlightTarget(new Vec3(this.getTarget().getX() - distX, this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getRestrictCenter()).getY() + 5 + this.getRandom().nextInt(16) + distY, this.getTarget().getZ() - distZ));
+				this.setFlightTarget(new Vec3(this.getTarget().getX() - distX, this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getHomePosition()).getY() + 5 + this.getRandom().nextInt(16) + distY, this.getTarget().getZ() - distZ));
 			}
 		}
 		if (this.getTarget() != null && this.hasLineOfSight(this.getTarget())) {
@@ -150,7 +154,7 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 		}
 		if (this.getTarget() == null || this.getFlightTarget() == null || this.distanceToSqr(this.getFlightTarget().x(), this.getFlightTarget().y(), this.getFlightTarget().z()) < 9 || !this.level().isEmptyBlock(BlockPos.containing(this.getFlightTarget()))) {
 			if (this.escortPosition == null) {
-				this.escortPosition = this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getRestrictCenter()).above(RatConfig.ratBaronYFlight + this.getRandom().nextInt(10));
+				this.escortPosition = this.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.getHomePosition()).above(RatConfig.ratBaronYFlight + this.getRandom().nextInt(10));
 			}
 			this.setFlightTarget(this.getBlockInViewEscort());
 		}
@@ -187,23 +191,23 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
-		if (this.getRestrictCenter() != BlockPos.ZERO) {
-			BlockPos home = this.getRestrictCenter();
-			tag.put("Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
+		if (this.getHomePosition() != BlockPos.ZERO) {
+			BlockPos home = this.getHomePosition();
+			Values.put(tag, "Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
 		}
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		if (tag.contains("Home", 9)) {
-			ListTag nbttaglist = tag.getList("Home", 6);
-			int hx = (int) nbttaglist.getDouble(0);
-			int hy = (int) nbttaglist.getDouble(1);
-			int hz = (int) nbttaglist.getDouble(2);
-			this.restrictTo(new BlockPos(hx, hy, hz), 16);
+		if (Values.contains(tag, "Home")) {
+			ListTag nbttaglist = Values.list(tag, "Home");
+			int hx = (int) nbttaglist.getDoubleOr(0, 0.0D);
+			int hy = (int) nbttaglist.getDoubleOr(1, 0.0D);
+			int hz = (int) nbttaglist.getDoubleOr(2, 0.0D);
+			this.setHomeTo(new BlockPos(hx, hy, hz), 16);
 		}
 	}
 
@@ -216,7 +220,7 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 		return listtag;
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return true;
 	}
@@ -226,11 +230,11 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 		return false;
 	}
 
-	public boolean hurt(DamageSource source, float amount) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		if (this.getControllingPassenger() != null) {
-			return this.getControllingPassenger().hurt(source, amount);
+			return this.getControllingPassenger().hurtOrSimulate(source, amount);
 		} else {
-			return super.hurt(source, amount);
+			return super.hurtServer(level, source, amount);
 		}
 	}
 
@@ -322,7 +326,7 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 
@@ -335,5 +339,14 @@ public class RatBaronPlane extends Mob implements Plane, AdjustsRatTail {
 	public void adjustRatTailRotation(AbstractRat rat, AdvancedModelBox upperTail, AdvancedModelBox lowerTail) {
 		this.progressRotation(upperTail, rat.sitProgress, 1.3F, 0.0F, 0.0F, 20.0F);
 		this.progressRotation(lowerTail, rat.sitProgress, -0.2F, 0.0F, 0.0F, 20.0F);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+			this.discard();
+		} else {
+			super.checkDespawn();
+		}
 	}
 }

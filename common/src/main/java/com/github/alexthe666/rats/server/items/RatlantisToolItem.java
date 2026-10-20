@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import dev.vladeezyy.rats.platform.Platform;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsToolMaterialRegistry;
 import com.mojang.datafixers.util.Pair;
@@ -21,26 +21,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class RatlantisToolItem {
 
-	public static class Pickaxe extends PickaxeItem {
+	public static class Pickaxe extends Item {
 
 		public Pickaxe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 1, -2.8F)));
+			super(properties.pickaxe(RatsToolMaterialRegistry.RATLANTIS, 1, -2.8F));
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 
 		@Override
@@ -60,21 +57,21 @@ public class RatlantisToolItem {
 
 	public static class Axe extends AxeItem {
 		public Axe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 5.0F, -3.0F)));
+			super(RatsToolMaterialRegistry.RATLANTIS, 5.0F, -3.0F, properties);
 		}
 
 		@Override
 		public float getDestroySpeed(ItemStack stack, BlockState state) {
 			if (state.is(BlockTags.LEAVES)) {
-				return this.getTier().getSpeed() * 1.5F;
+				return RatsToolMaterialRegistry.RATLANTIS.speed() * 1.5F;
 			}
 			return super.getDestroySpeed(stack, state);
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 
 		@Override
@@ -92,7 +89,7 @@ public class RatlantisToolItem {
 
 	public static class Shovel extends ShovelItem {
 		public Shovel(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, 1.5F, -3.0F)));
+			super(RatsToolMaterialRegistry.RATLANTIS, 1.5F, -3.0F, properties);
 		}
 
 		@Override
@@ -108,15 +105,15 @@ public class RatlantisToolItem {
 		}
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 	}
 
 	public static class Hoe extends HoeItem {
 		public Hoe(Item.Properties properties) {
-			super(RatsToolMaterialRegistry.RATLANTIS, properties.attributes(DiggerItem.createAttributes(RatsToolMaterialRegistry.RATLANTIS, -7, 0.0F)));
+			super(RatsToolMaterialRegistry.RATLANTIS, -7.0F, 0.0F, properties);
 		}
 
 		@Override
@@ -145,7 +142,7 @@ public class RatlantisToolItem {
 			}
 
 			if (tilledAny && context.getPlayer() != null) {
-				context.getItemInHand().hurtAndBreak(1, context.getPlayer(), LivingEntity.getSlotForHand(context.getHand()));
+				context.getItemInHand().hurtAndBreak(1, context.getPlayer(), context.getHand());
 				return InteractionResult.SUCCESS;
 			}
 			return InteractionResult.PASS;
@@ -153,10 +150,10 @@ public class RatlantisToolItem {
 
 
 		@Override
-		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-			super.appendHoverText(stack, level, tooltip, flag);
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
-			tooltip.add(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
+		public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+			super.appendHoverText(stack, level, display, tooltip, flag);
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc0").withStyle(ChatFormatting.YELLOW));
+			tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc1").withStyle(ChatFormatting.GRAY));
 		}
 	}
 }

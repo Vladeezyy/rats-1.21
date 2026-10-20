@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "rats:item/rat_tube_green",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -12889830
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -12889830
+      }
+    ]
+  }
+}

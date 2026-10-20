@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "C": "#c:cheese",
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     " C",

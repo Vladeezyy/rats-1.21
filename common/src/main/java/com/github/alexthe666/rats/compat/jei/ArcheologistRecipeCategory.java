@@ -10,16 +10,16 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ArcheologistRecipeCategory implements IRecipeCategory<ArcheologistRecipe> {
 
-	protected static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/jei/archeologist_rat_jei.png");
+	protected static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/jei/archeologist_rat_jei.png");
 	private final IDrawable background;
 	private final IDrawable icon;
 	private final IDrawable arrow;
@@ -32,7 +32,7 @@ public class ArcheologistRecipeCategory implements IRecipeCategory<ArcheologistR
 	}
 
 	@Override
-	public RecipeType<ArcheologistRecipe> getRecipeType() {
+	public IRecipeType<ArcheologistRecipe> getRecipeType() {
 		return RatsRecipeTypes.ARCHEOLOGIST;
 	}
 
@@ -42,8 +42,13 @@ public class ArcheologistRecipeCategory implements IRecipeCategory<ArcheologistR
 	}
 
 	@Override
-	public IDrawable getBackground() {
-		return this.background;
+	public int getWidth() {
+		return 170;
+	}
+
+	@Override
+	public int getHeight() {
+		return 79;
 	}
 
 	@Override
@@ -53,12 +58,13 @@ public class ArcheologistRecipeCategory implements IRecipeCategory<ArcheologistR
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, ArcheologistRecipe recipe, IFocusGroup ingredients) {
-		builder.addSlot(RecipeIngredientRole.INPUT, 43, 49).addIngredients(recipe.getIngredients().get(0));
-		builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 49).addItemStack(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+		builder.addSlot(RecipeIngredientRole.INPUT, 43, 49).add(recipe.input());
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 114, 49).add(recipe.resultTemplate());
 	}
 
 	@Override
-	public void draw(ArcheologistRecipe recipe, IRecipeSlotsView view, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ArcheologistRecipe recipe, IRecipeSlotsView view, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+		this.background.draw(graphics);
 		this.arrow.draw(graphics, 71, 49);
 	}
 }

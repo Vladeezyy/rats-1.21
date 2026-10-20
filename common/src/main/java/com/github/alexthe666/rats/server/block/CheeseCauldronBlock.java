@@ -3,7 +3,7 @@ package com.github.alexthe666.rats.server.block;
 import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -12,7 +12,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -30,7 +29,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import dev.vladeezyy.rats.platform.RegistryEntry;
 
-import java.util.Map;
 
 public class CheeseCauldronBlock extends AbstractCauldronBlock {
 	// 1.21 wants a codec per block class; these blocks are only made by the mod's registry, so it gives the same block
@@ -44,14 +42,14 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 
 	private final RegistryEntry<Block, Block> drop;
 
-	public CheeseCauldronBlock(BlockBehaviour.Properties properties, RegistryEntry<Block, Block> dropBlock, CauldronInteraction.InteractionMap interaction) {
+	public CheeseCauldronBlock(BlockBehaviour.Properties properties, RegistryEntry<Block, Block> dropBlock, CauldronInteraction.Dispatcher interaction) {
 		super(properties, interaction);
 		this.drop = dropBlock;
 	}
 
 	@Override
-	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (super.useItemOn(heldStack, state, level, pos, player, hand, hit) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+	protected @NotNull InteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (super.useItemOn(heldStack, state, level, pos, player, hand, hit) == InteractionResult.TRY_WITH_EMPTY_HAND) {
 			level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
 			level.playSound(null, pos, RatsSoundRegistry.CHEESE_CAULDRON_EMPTY.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 			level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -59,7 +57,7 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 				player.drop(new ItemStack(this.drop.get()), false);
 			}
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

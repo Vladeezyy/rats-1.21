@@ -22,7 +22,9 @@ public class CheeseCannonball extends ThrowableProjectile implements ItemSupplie
 	}
 
 	public CheeseCannonball(EntityType<? extends ThrowableProjectile> type, Level level, LivingEntity thrower) {
-		super(type, thrower, level);
+		// 26.x: no owner constructor; 1.21.1's did this
+		super(type, thrower.getX(), thrower.getEyeY() - 0.1F, thrower.getZ(), level);
+		this.setOwner(thrower);
 	}
 
 	@Override
@@ -33,7 +35,7 @@ public class CheeseCannonball extends ThrowableProjectile implements ItemSupplie
 	public void handleEntityEvent(byte id) {
 		if (id == 3) {
 			for (int i = 0; i < 18; ++i) {
-				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(RatsItemRegistry.CHEESE.get())), this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
+				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, RatsItemRegistry.CHEESE.get()), this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
 			}
 		}
 	}
@@ -44,9 +46,8 @@ public class CheeseCannonball extends ThrowableProjectile implements ItemSupplie
 		}
 		super.onHit(result);
 		if (!this.level().isClientSide()) {
-			Explosion explosion = new Explosion(this.level(), this.getOwner() == null ? this : this.getOwner(), this.getX(), this.getY(), this.getZ(), 1.0F, false, Explosion.BlockInteraction.KEEP);
-			explosion.explode();
-			explosion.finalizeExplosion(true);
+			// 1.21.1: an explosion that keeps the blocks, with particles
+			this.level().explode(this.getOwner() == null ? this : this.getOwner(), this.getX(), this.getY(), this.getZ(), 1.0F, false, Level.ExplosionInteraction.NONE);
 			this.discard();
 		}
 	}

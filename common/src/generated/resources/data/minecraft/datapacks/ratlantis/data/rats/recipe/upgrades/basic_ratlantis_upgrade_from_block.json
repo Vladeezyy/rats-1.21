@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:ratlantis_upgrade_block"
-    }
+    "rats:ratlantis_upgrade_block"
   ],
   "result": {
     "count": 4,

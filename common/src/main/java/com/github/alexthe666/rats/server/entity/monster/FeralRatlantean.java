@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -6,7 +11,6 @@ import dev.vladeezyy.rampart.animation.IAnimatedEntity;
 import com.github.alexthe666.rats.data.ratlantis.tags.RatlantisBlockTags;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -62,7 +66,7 @@ public class FeralRatlantean extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getAnimation() == NO_ANIMATION) {
 			this.setAnimation(this.getRandom().nextBoolean() ? ANIMATION_SLASH : ANIMATION_BITE);
 		}
@@ -82,13 +86,15 @@ public class FeralRatlantean extends Monster implements IAnimatedEntity {
 		AnimationHandler.INSTANCE.updateAnimations(this);
 		if (!this.level().isClientSide()) {
 			if (this.getTarget() != null && this.distanceToSqr(this.getTarget()) < 3.0D && this.hasLineOfSight(this.getTarget())) {
-				if (this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE))) {
+				// the hit can kill the target and clear it (26.x), so the rest goes to the one that was hit
+				LivingEntity target = this.getTarget();
+				if (target.hurtOrSimulate(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE))) {
 					if (this.getAnimation() == NO_ANIMATION) {
 						this.setAnimation(this.getRandom().nextBoolean() ? ANIMATION_BITE : ANIMATION_SLASH);
 					}
-					this.lookAt(this.getTarget(), 360, 80);
-					this.doExtraEffect(this.getTarget());
-					this.getTarget().knockback(0.25F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+					this.lookAt(target, 360, 80);
+					this.doExtraEffect(target);
+					target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
 				}
 			}
 			if (!this.isNoAi()) {
@@ -128,21 +134,21 @@ public class FeralRatlantean extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putInt("ColorVariant", this.getColorVariant());
 		compound.putBoolean("Toga", this.hasToga());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setToga(compound.getBoolean("Toga"));
-		this.setColorVariant(compound.getInt("ColorVariant"));
+		this.setToga(compound.getBooleanOr("Toga", false));
+		this.setColorVariant(compound.getIntOr("ColorVariant", 0));
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.setColorVariant(this.getRandom().nextInt(4));
 		this.setToga(true);
@@ -195,7 +201,7 @@ public class FeralRatlantean extends Monster implements IAnimatedEntity {
 		return super.getVoicePitch() * 0.4F;
 	}
 
-	public static boolean checkRatlanteanSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor world, MobSpawnType reason, BlockPos pos, RandomSource rand) {
+	public static boolean checkRatlanteanSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor world, EntitySpawnReason reason, BlockPos pos, RandomSource rand) {
 		return rand.nextInt(8) == 0 && canSpawnAtPos(world, pos) && Mob.checkMobSpawnRules(entityType, world, reason, pos, rand);
 	}
 

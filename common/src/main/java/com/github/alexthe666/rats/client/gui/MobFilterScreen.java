@@ -1,5 +1,11 @@
 package com.github.alexthe666.rats.client.gui;
 
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.ARGB;
+import net.minecraft.client.renderer.RenderPipelines;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.util.EntityRenderingUtil;
 import com.github.alexthe666.rats.server.items.upgrades.MobFilterUpgradeItem;
@@ -9,9 +15,9 @@ import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -20,7 +26,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.FormattedCharSequence;
@@ -36,8 +42,8 @@ import java.util.*;
 
 public class MobFilterScreen extends Screen {
 
-	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter.png");
-	private static final ResourceLocation TEXTURE_BACKDROP = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter_backdrop.png");
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter.png");
+	private static final Identifier TEXTURE_BACKDROP = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/mob_filter_backdrop.png");
 
 	private static final int SCROLL_X_START = 218;
 	private static final int SCROLL_Y_START = 21;
@@ -56,7 +62,7 @@ public class MobFilterScreen extends Screen {
 
 	//screen fields
 	@Nullable
-	private ResourceLocation hoveredEntityName;
+	private Identifier hoveredEntityName;
 	private int startIndex;
 	private final List<Pair<String, Component>> allMobs;
 	private final List<Pair<String, Component>> filteredMobs = new ArrayList<>();
@@ -102,11 +108,11 @@ public class MobFilterScreen extends Screen {
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		// 1.21: Screen.render draws the background first, so the backdrop, the entity and the panel go here
-		super.renderBackground(graphics, mouseX, mouseY, partialTicks);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		// the screen draws the background first, so the backdrop, the entity and the panel go here
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 		//render background behind entity
-		graphics.blit(TEXTURE_BACKDROP, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_BACKDROP, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 		//render entity, scissor out everything around the backdrop
 		graphics.enableScissor(this.leftPos + 28, this.topPos + 23, this.leftPos + 28 + 90, this.topPos + 23 + 92);
 		LivingEntity entity = EntityRenderingUtil.fetchEntity(this.hoveredEntityName, Minecraft.getInstance().level);
@@ -116,57 +122,57 @@ public class MobFilterScreen extends Screen {
 		}
 		graphics.disableScissor();
 		//render normal GUI
-		graphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(graphics, mouseX, mouseY, partialTicks);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 		//draw title
-		graphics.drawString(this.font, this.title, this.leftPos + 7, this.topPos + 7, 4210752, false);
+		graphics.text(this.font, this.title, this.leftPos + 7, this.topPos + 7, 0xFF404040, false);
 		//draw whitelist/blacklist icon under checkbox
-		graphics.blit(TEXTURE, this.leftPos + 8, this.topPos + 35, this.isWhitelist ? 44 : 30, 125, 12, 14);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 8, this.topPos + 35, this.isWhitelist ? 44 : 30, 125, 12, 14, 256, 256);
 		//draw selected mob icon
-		graphics.blit(TEXTURE, this.leftPos + 8, this.topPos + 75, 58, 125, 12, 12);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 8, this.topPos + 75, 58, 125, 12, 12, 256, 256);
 		//search bar!
-		this.searchBar.render(graphics, mouseX, mouseY, partialTicks);
+		this.searchBar.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 		//scrollbar!
 		int k = (int) (81.0F * this.scrollOffs);
-		graphics.blit(TEXTURE, this.leftPos + SCROLL_X_START, this.topPos + SCROLL_Y_START + k, this.scrolling ? 12 : 0, 153, 12, 15);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + SCROLL_X_START, this.topPos + SCROLL_Y_START + k, this.scrolling ? 12 : 0, 153, 12, 15, 256, 256);
 		//render entity names for selecting. Mob names that are too big will scroll across the area.
 		this.renderEntityNames(graphics, this.leftPos + 123, this.topPos + 26, this.startIndex + MAX_MOB_BUTTONS);
 
 		//show a tooltip with the entity's id and any selected tags if hovering over its name
 		if (this.isHovering(121, 24, 90, 90, mouseX, mouseY) && !this.filteredMobs.isEmpty()) {
 			int y = (mouseY - this.topPos - 26) / 18;
-			this.hoveredEntityName = ResourceLocation.tryParse(this.filteredMobs.get(Mth.clamp(this.startIndex + y, 0, Math.max(0, this.filteredMobs.size() - 1))).getFirst());
+			this.hoveredEntityName = Identifier.tryParse(this.filteredMobs.get(Mth.clamp(this.startIndex + y, 0, Math.max(0, this.filteredMobs.size() - 1))).getFirst());
 			if (hoveredEntityName != null && this.startIndex + y < this.filteredMobs.size()) {
-				graphics.blit(TEXTURE, this.leftPos + 121, this.topPos + 26 + (y * 18), 0, 168, 90, 15);
+				graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 121, this.topPos + 26 + (y * 18), 0, 168, 90, 15, 256, 256);
 				List<FormattedCharSequence> tooltipParts = new ArrayList<>();
 				tooltipParts.add(Component.literal(this.hoveredEntityName.toString()).getVisualOrderText());
 				this.visibleTags.forEach(key -> {
-					if (BuiltInRegistries.ENTITY_TYPE.get(this.hoveredEntityName).is(key)) {
+					if (isInTag(this.hoveredEntityName, key)) {
 						tooltipParts.add(Component.literal("#" + key.location()).withStyle(ChatFormatting.DARK_PURPLE).getVisualOrderText());
 					}
 
 				});
-				graphics.renderTooltip(this.font, tooltipParts, mouseX, mouseY);
+				graphics.setTooltipForNextFrame(this.font, tooltipParts, mouseX, mouseY);
 
 			}
 		}
 
 		//render a tooltip for rendering over the whitelist checkbox
 		if (this.whitelistSelected.isHovered()) {
-			graphics.renderTooltip(this.font, Component.translatable(RatsLangConstants.FILTER_WHITELIST), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(this.font, Component.translatable(RatsLangConstants.FILTER_WHITELIST), mouseX, mouseY);
 		}
 
 		//render a tooltip for rendering over the selected mob filter checkbox
 		if (this.selectedMobsShown.isHovered()) {
-			graphics.renderTooltip(this.font, Component.translatable(RatsLangConstants.FILTER_SELECTED_MOBS), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(this.font, Component.translatable(RatsLangConstants.FILTER_SELECTED_MOBS), mouseX, mouseY);
 		}
 	}
 
-	private void renderEntityNames(GuiGraphics graphics, int startX, int startY, int startIndex) {
+	private void renderEntityNames(GuiGraphicsExtractor graphics, int startX, int startY, int startIndex) {
 		for (int i = this.startIndex; i < startIndex && i < this.filteredMobs.size(); ++i) {
 			int j = i - this.startIndex;
 			int y = startY + j * 18;
@@ -174,7 +180,7 @@ public class MobFilterScreen extends Screen {
 		}
 	}
 
-	protected void renderScrollingString(GuiGraphics graphics, Component text, int startX, int startY, int width, int height, int color) {
+	protected void renderScrollingString(GuiGraphicsExtractor graphics, Component text, int startX, int startY, int width, int height, int color) {
 		int i = this.font.width(text);
 		int j = (startY + height - 9) / 2 + 1;
 		int k = width - startX;
@@ -185,10 +191,10 @@ public class MobFilterScreen extends Screen {
 			double d2 = Math.sin((Math.PI / 2D) * Math.cos((Math.PI) * d0 / d1)) / 2.0D + 0.5D;
 			double d3 = Mth.lerp(d2, 0.0D, l);
 			graphics.enableScissor(startX - 1, startY, width - 1, height);
-			graphics.drawString(this.font, text, startX - (int) d3, j, color, false);
+			graphics.text(this.font, text, startX - (int) d3, j, ARGB.opaque(color), false);
 			graphics.disableScissor();
 		} else {
-			graphics.drawString(this.font, text, startX, j, color, false);
+			graphics.text(this.font, text, startX, j, ARGB.opaque(color), false);
 		}
 
 	}
@@ -202,7 +208,8 @@ public class MobFilterScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragSizeX, double dragSizeY) {
+	public boolean mouseDragged(MouseButtonEvent event, double dragSizeX, double dragSizeY) {
+		double mouseY = event.y();
 		if (this.scrolling && this.filteredMobs.size() > MAX_MOB_BUTTONS) {
 			int i = this.topPos + SCROLL_Y_START;
 			int j = i + 96;
@@ -211,7 +218,7 @@ public class MobFilterScreen extends Screen {
 			this.startIndex = (int) ((double) (this.scrollOffs * (float) this.getOffscreenRows()) + 0.5D);
 			return true;
 		} else {
-			return super.mouseDragged(mouseX, mouseY, button, dragSizeX, dragSizeY);
+			return super.mouseDragged(event, dragSizeX, dragSizeY);
 		}
 	}
 
@@ -228,15 +235,18 @@ public class MobFilterScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		if (button == 0) {
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (event.button() == 0) {
 			this.scrolling = false;
 		}
-		return super.mouseReleased(mouseX, mouseY, button);
+		return super.mouseReleased(event);
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+		int button = event.button();
 		int index = this.startIndex + MAX_MOB_BUTTONS;
 
 		this.searchBar.setFocused(this.isHovering(119, 6, 96, 12, mouseX, mouseY));
@@ -257,17 +267,18 @@ public class MobFilterScreen extends Screen {
 				return true;
 			}
 		}
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
-	public boolean charTyped(char character, int amount) {
+	public boolean charTyped(CharacterEvent event) {
+		int character = event.codepoint();
 		String s = this.searchBar.getValue();
 		if (character == GLFW.GLFW_KEY_GRAVE_ACCENT) {
 			RatsMod.LOGGER.debug(this.filteredMobs);
 			return true;
 		}
-		if (this.isValidCharacter(character) && this.searchBar.charTyped(character, amount)) {
+		if (this.isValidCharacter(character) && this.searchBar.charTyped(event)) {
 			if (!Objects.equals(s, this.searchBar.getValue())) {
 				this.refreshSearchResults();
 			}
@@ -277,21 +288,21 @@ public class MobFilterScreen extends Screen {
 		return false;
 	}
 
-	private boolean isValidCharacter(char character) {
+	private boolean isValidCharacter(int character) {
 		return Character.isAlphabetic(character) || Character.isDigit(character) || character == '#' || character == ':';
 	}
 
 	@Override
-	public boolean keyPressed(int key, int value, int modifier) {
+	public boolean keyPressed(KeyEvent event) {
 		String s = this.searchBar.getValue();
-		if (this.searchBar.keyPressed(key, value, modifier)) {
+		if (this.searchBar.keyPressed(event)) {
 			if (!Objects.equals(s, this.searchBar.getValue())) {
 				this.refreshSearchResults();
 			}
 
 			return true;
 		} else {
-			return key != GLFW.GLFW_KEY_ESCAPE || super.keyPressed(key, value, modifier);
+			return event.key() != GLFW.GLFW_KEY_ESCAPE || super.keyPressed(event);
 		}
 	}
 
@@ -301,14 +312,14 @@ public class MobFilterScreen extends Screen {
 		this.filteredMobs.clear();
 		this.visibleTags.clear();
 		if (this.selectedMobsShown.selected) {
-			this.selectedMobs.forEach(s -> this.filteredMobs.add(Pair.of(s, BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(s)).getDescription())));
+			this.selectedMobs.forEach(s -> this.filteredMobs.add(Pair.of(s, BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.tryParse(s)).getDescription())));
 		} else {
 			if (this.searchBar.getValue().startsWith("#")) {
 				String tagName = this.searchBar.getValue().substring(1).trim();
-				List<TagKey<EntityType<?>>> tags = BuiltInRegistries.ENTITY_TYPE.getTagNames().filter(key -> key.location().toString().contains(tagName)).toList();
+				List<TagKey<EntityType<?>>> tags = BuiltInRegistries.ENTITY_TYPE.listTagIds().filter(key -> key.location().toString().contains(tagName)).toList();
 				if (!tags.isEmpty()) {
 					tags.forEach(key -> {
-						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(pair.getFirst())).is(key)).toList());
+						this.filteredMobs.addAll(this.allMobs.stream().filter(pair -> isInTag(Identifier.tryParse(pair.getFirst()), key)).toList());
 						this.visibleTags.add(key);
 					});
 				}
@@ -316,6 +327,10 @@ public class MobFilterScreen extends Screen {
 				this.filteredMobs.addAll(this.allMobs.stream().filter(s -> s.getFirst().toLowerCase(Locale.ROOT).contains(this.searchBar.getValue()) || s.getSecond().getString().toLowerCase(Locale.ROOT).contains(this.searchBar.getValue())).toList());
 			}
 		}
+	}
+
+	private static boolean isInTag(Identifier id, TagKey<EntityType<?>> key) {
+		return id != null && BuiltInRegistries.ENTITY_TYPE.getOptional(id).map(type -> type.builtInRegistryHolder().is(key)).orElse(false);
 	}
 
 	protected boolean isHovering(int startX, int startY, int xSize, int ySize, double mouseX, double mouseY) {
@@ -346,7 +361,7 @@ public class MobFilterScreen extends Screen {
 		}
 
 		@Override
-		public void onPress() {
+		public void onPress(InputWithModifiers input) {
 			this.selected = !this.selected;
 			this.press.onPress(this);
 		}
@@ -364,12 +379,8 @@ public class MobFilterScreen extends Screen {
 		}
 
 		@Override
-		public void renderWidget(GuiGraphics graphics, int x, int y, float partialTicks) {
-			RenderSystem.enableDepthTest();
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-			RenderSystem.enableBlend();
-			graphics.blit(TEXTURE, this.getX(), this.getY(), this.isHovered() ? 14 : 0, this.selected ? 138 : 124, 14, 14);
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		protected void extractContents(GuiGraphicsExtractor graphics, int x, int y, float partialTicks) {
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.getX(), this.getY(), this.isHovered() ? 14 : 0, this.selected ? 138 : 124, 14, 14, 256, 256, ARGB.white(this.alpha));
 		}
 
 		public interface OnPress {

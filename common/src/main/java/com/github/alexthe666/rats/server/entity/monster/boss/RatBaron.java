@@ -1,4 +1,10 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -8,7 +14,6 @@ import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
@@ -32,15 +37,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class RatBaron extends AbstractRat implements Enemy {
 
-	private final ServerBossEvent bossInfo = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
+	private final ServerBossEvent bossInfo = new ServerBossEvent(java.util.UUID.randomUUID(), this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
 	public RatBaron(EntityType<? extends AbstractRat> type, Level level) {
 		super(type, level);
 	}
 
 	@Override
-	protected void customServerAiStep() {
-		super.customServerAiStep();
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
 		this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 	}
 
@@ -70,26 +75,26 @@ public class RatBaron extends AbstractRat implements Enemy {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
-		if (this.getRestrictCenter() != BlockPos.ZERO) {
-			BlockPos home = this.getRestrictCenter();
-			tag.put("Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
+		if (this.getHomePosition() != BlockPos.ZERO) {
+			BlockPos home = this.getHomePosition();
+			Values.put(tag, "Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
 		}
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
 		if (this.hasCustomName()) {
 			this.bossInfo.setName(this.getDisplayName());
 		}
-		if (tag.contains("Home", 9)) {
-			ListTag nbttaglist = tag.getList("Home", 6);
-			int hx = (int) nbttaglist.getDouble(0);
-			int hy = (int) nbttaglist.getDouble(1);
-			int hz = (int) nbttaglist.getDouble(2);
-			this.restrictTo(new BlockPos(hx, hy, hz), 16);
+		if (Values.contains(tag, "Home")) {
+			ListTag nbttaglist = Values.list(tag, "Home");
+			int hx = (int) nbttaglist.getDoubleOr(0, 0.0D);
+			int hy = (int) nbttaglist.getDoubleOr(1, 0.0D);
+			int hz = (int) nbttaglist.getDoubleOr(2, 0.0D);
+			this.setHomeTo(new BlockPos(hx, hy, hz), 16);
 		}
 	}
 
@@ -98,7 +103,7 @@ public class RatBaron extends AbstractRat implements Enemy {
 		return RatsSoundRegistry.RAT_HURT.get();
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return true;
 	}
@@ -111,8 +116,8 @@ public class RatBaron extends AbstractRat implements Enemy {
 	@Override
 	public void checkDespawn() {
 		if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
-			if (this.hasRestriction()) {
-				this.level().setBlockAndUpdate(this.getRestrictCenter(), RatlantisBlockRegistry.AIR_RAID_SIREN.get().defaultBlockState());
+			if (this.hasHome()) {
+				this.level().setBlockAndUpdate(this.getHomePosition(), RatlantisBlockRegistry.AIR_RAID_SIREN.get().defaultBlockState());
 			}
 			this.discard();
 		} else {
@@ -140,27 +145,27 @@ public class RatBaron extends AbstractRat implements Enemy {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(RatlantisItemRegistry.AVIATOR_HAT.get()));
 		this.setGuaranteedDrop(EquipmentSlot.HEAD);
-		if (type != MobSpawnType.MOB_SUMMONED) {
-			this.restrictTo(this.blockPosition(), 16);
+		if (type != EntitySpawnReason.MOB_SUMMONED) {
+			this.setHomeTo(this.blockPosition(), 16);
 		}
 		if (!this.isPassenger()) {
 			RatBaronPlane plane = new RatBaronPlane(RatlantisEntityRegistry.RAT_BARON_PLANE.get(), this.level());
 			plane.copyPosition(this);
-			plane.restrictTo(this.blockPosition(), 16);
+			plane.setHomeTo(this.blockPosition(), 16);
 			if (!this.level().isClientSide()) {
 				this.level().addFreshEntity(plane);
 			}
-			this.startRiding(plane, true);
+			this.startRiding(plane, true, true);
 		}
 		return data;
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 

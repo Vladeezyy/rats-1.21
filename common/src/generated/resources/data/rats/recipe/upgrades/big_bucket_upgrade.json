@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:bucket"
-    },
-    "D": {
-      "tag": "c:gems/diamond"
-    },
-    "S": {
-      "tag": "c:slime_balls"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_bucket"
-    }
+    "B": "minecraft:bucket",
+    "D": "#c:gems/diamond",
+    "S": "#c:slime_balls",
+    "U": "rats:rat_upgrade_bucket"
   },
   "pattern": [
     "BDB",

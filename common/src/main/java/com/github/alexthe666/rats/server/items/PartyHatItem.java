@@ -1,21 +1,18 @@
 package com.github.alexthe666.rats.server.items;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.DyedItemColor;
-import com.github.alexthe666.rats.server.misc.ItemNbt;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class PartyHatItem extends Item {
 	public PartyHatItem(Properties properties) {
@@ -28,9 +25,9 @@ public class PartyHatItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		if (!stack.has(DataComponents.DYED_COLOR)) {
-			tooltip.add(Component.translatable("item.rats.party_hat.desc").withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("item.rats.party_hat.desc").withStyle(ChatFormatting.GRAY));
 		}
 	}
 

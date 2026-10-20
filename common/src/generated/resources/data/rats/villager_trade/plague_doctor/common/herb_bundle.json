@@ -1,0 +1,17 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 1
+  },
+  "additional_wants": {
+    "id": "minecraft:poppy",
+    "count": 5
+  },
+  "gives": {
+    "id": "rats:herb_bundle",
+    "count": 3
+  },
+  "max_uses": 12,
+  "xp": 2,
+  "reputation_discount": 0.05
+}

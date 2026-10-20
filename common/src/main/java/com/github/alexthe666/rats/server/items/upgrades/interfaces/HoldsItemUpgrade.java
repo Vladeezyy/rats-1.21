@@ -1,8 +1,9 @@
 package com.github.alexthe666.rats.server.items.upgrades.interfaces;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
-import com.github.alexthe666.rats.server.items.upgrades.BaseFlightRatUpgradeItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -20,7 +21,7 @@ public interface HoldsItemUpgrade {
 	 * @param light      the brightness the item should render at
 	 * @param ageInTicks the rat's current age, in ticks. You can use this to move your item on a timer. To see this used in action, check out {@link BaseFlightRatUpgradeItem}
 	 */
-	void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks);
+	void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks);
 
 	/**
 	 * a helper method that moves the item to render on the rat's hand.

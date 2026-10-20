@@ -110,7 +110,7 @@ public class RatFollowOwnerGoal extends FollowOwnerGoal {
 		} else if (!this.canTeleportTo(mount, new BlockPos(x, y, z))) {
 			return false;
 		} else {
-			mount.moveTo((double) x + 0.5D, y, (double) z + 0.5D, this.rat.getYRot(), this.rat.getXRot());
+			mount.snapTo((double) x + 0.5D, y, (double) z + 0.5D, this.rat.getYRot(), this.rat.getXRot());
 			mount.resetFallDistance();
 			if (mount instanceof Mob mob) mob.getNavigation().stop();
 			this.rat.getNavigation().stop();

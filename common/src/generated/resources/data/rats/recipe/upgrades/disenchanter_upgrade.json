@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:book"
-    },
-    "F": {
-      "tag": "c:stones"
-    },
-    "G": {
-      "item": "minecraft:grindstone"
-    },
-    "S": {
-      "item": "minecraft:stone_slab"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "minecraft:book",
+    "F": "#c:stones",
+    "G": "minecraft:grindstone",
+    "S": "minecraft:stone_slab",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "SBS",

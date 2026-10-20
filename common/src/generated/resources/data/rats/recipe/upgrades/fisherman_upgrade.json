@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "rats:fish_barrel"
-    },
-    "F": {
-      "tag": "minecraft:fishes"
-    },
-    "H": {
-      "item": "rats:fisherman_hat"
-    },
-    "R": {
-      "item": "minecraft:fishing_rod"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "rats:fish_barrel",
+    "F": "#minecraft:fishes",
+    "H": "rats:fisherman_hat",
+    "R": "minecraft:fishing_rod",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "BHB",

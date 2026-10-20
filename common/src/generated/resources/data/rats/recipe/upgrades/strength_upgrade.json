@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "tag": "c:bones"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "S": {
-      "item": "minecraft:iron_sword"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "#c:bones",
+    "I": "#c:ingots/iron",
+    "S": "minecraft:iron_sword",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "BSB",

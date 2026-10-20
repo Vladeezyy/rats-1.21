@@ -3,9 +3,7 @@
   "category": "blocks",
   "cookingtime": 200,
   "experience": 0.1,
-  "ingredient": {
-    "item": "rats:marbled_cheese"
-  },
+  "ingredient": "rats:marbled_cheese",
   "result": {
     "id": "rats:marbled_cheese_brick_cracked"
   }

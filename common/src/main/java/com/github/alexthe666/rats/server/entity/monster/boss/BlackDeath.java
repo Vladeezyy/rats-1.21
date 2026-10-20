@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +16,6 @@ import com.github.alexthe666.rats.server.entity.ai.goal.BlackDeathSummonCloudGoa
 import com.github.alexthe666.rats.server.entity.ai.goal.BlackDeathSummonRatGoal;
 import com.github.alexthe666.rats.server.entity.ai.goal.BlackDeathSummoningGoal;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -47,13 +50,13 @@ import java.util.function.Predicate;
 
 public class BlackDeath extends Monster implements RatSummoner {
 
-	private static final Predicate<LivingEntity> NOT_PLAGUE = entity -> entity.isAlive() && !entity.getType().is(RatsEntityTags.PLAGUE_LEGION);
+	private static final Predicate<LivingEntity> NOT_PLAGUE = entity -> entity.isAlive() && !entity.is(RatsEntityTags.PLAGUE_LEGION);
 	private static final EntityDataAccessor<Boolean> IS_SUMMONING = SynchedEntityData.defineId(BlackDeath.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Boolean> MELEE_ATTACKING = SynchedEntityData.defineId(BlackDeath.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Integer> RAT_COUNT = SynchedEntityData.defineId(BlackDeath.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> CLOUD_COUNT = SynchedEntityData.defineId(BlackDeath.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> BEAST_COUNT = SynchedEntityData.defineId(BlackDeath.class, EntityDataSerializers.INT);
-	private final ServerBossEvent bossInfo = (new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS));
+	private final ServerBossEvent bossInfo = (new ServerBossEvent(java.util.UUID.randomUUID(), this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS));
 	private int summonTicks = 0;
 
 	public BlackDeath(EntityType<? extends Monster> type, Level level) {
@@ -99,10 +102,10 @@ public class BlackDeath extends Monster implements RatSummoner {
 		this.targetSelector.addGoal(1, new HurtByTargetGoal(this) {
 			@Override
 			public boolean canUse() {
-				return this.mob.getLastHurtByMob() != null && !this.mob.getLastHurtByMob().getType().is(RatsEntityTags.PLAGUE_LEGION) && super.canUse();
+				return this.mob.getLastHurtByMob() != null && !this.mob.getLastHurtByMob().is(RatsEntityTags.PLAGUE_LEGION) && super.canUse();
 			}
 		});
-		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, true, entity -> NOT_PLAGUE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR).and(living -> !living.getType().is(EntityTypeTags.UNDEAD)).test(entity)));
+		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, LivingEntity.class, true, (entity, level) -> NOT_PLAGUE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR).and(living -> !living.is(EntityTypeTags.UNDEAD)).test(entity)));
 	}
 
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -151,7 +154,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 			for (Rat rat : this.level().getEntitiesOfClass(Rat.class, new AABB(this.getX() - dist, this.getY() - dist, this.getZ() - dist, this.getX() + dist, this.getY() + dist, this.getZ() + dist))) {
 				if (rat.isOwnedBy(this)) {
 					rat.setTame(false, true);
-					rat.setOwnerUUID(null);
+					rat.setOwnerReference(null);
 					rat.setFleePos(rat.blockPosition());
 					rat.setTarget(null);
 					rat.setLastHurtByMob(null);
@@ -171,8 +174,8 @@ public class BlackDeath extends Monster implements RatSummoner {
 	}
 
 	@Override
-	protected void customServerAiStep() {
-		super.customServerAiStep();
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
 		this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 
 		if (this.summonTicks > 0 && this.getTarget() != null) {
@@ -181,7 +184,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 
@@ -249,7 +252,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putInt("SummoningTicks", this.summonTicks);
 		compound.putInt("RatsSummoned", this.getRatsSummoned());
@@ -258,15 +261,15 @@ public class BlackDeath extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
 		if (this.hasCustomName()) {
 			this.bossInfo.setName(this.getDisplayName());
 		}
-		this.summonTicks = compound.getInt("SummoningTicks");
-		this.setRatsSummoned(compound.getInt("RatsSummoned"));
-		this.setCloudsSummoned(compound.getInt("CloudsSummoned"));
-		this.setBeastsSummoned(compound.getInt("BeastsSummoned"));
+		this.summonTicks = compound.getIntOr("SummoningTicks", 0);
+		this.setRatsSummoned(compound.getIntOr("RatsSummoned", 0));
+		this.setCloudsSummoned(compound.getIntOr("CloudsSummoned", 0));
+		this.setBeastsSummoned(compound.getIntOr("BeastsSummoned", 0));
 
 	}
 
@@ -320,7 +323,7 @@ public class BlackDeath extends Monster implements RatSummoner {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		SpawnGroupData finalData = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.populateDefaultEquipmentSlots(accessor.getRandom(), difficulty);
 		this.populateDefaultEquipmentEnchantments(accessor, accessor.getRandom(), difficulty);

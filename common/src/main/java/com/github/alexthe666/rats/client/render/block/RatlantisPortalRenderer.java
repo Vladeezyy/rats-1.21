@@ -5,44 +5,55 @@ import com.github.alexthe666.rats.client.render.RatsRenderType;
 import com.github.alexthe666.rats.server.block.entity.RatlantisPortalBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import org.joml.Matrix4f;
+import net.minecraft.resources.Identifier;
 
-public class RatlantisPortalRenderer implements BlockEntityRenderer<RatlantisPortalBlockEntity> {
-	public static final ResourceLocation PORTAL_BG = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/environment/ratlantis_sky_portal.png");
-	public static final ResourceLocation PORTAL_FG = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/environment/ratlantis_portal.png");
+/** The Ratlantis portal: a cube of the portal shader, the faces not hidden by neighbors */
+public class RatlantisPortalRenderer extends StateBlockEntityRenderer<RatlantisPortalBlockEntity> {
+	public static final Identifier PORTAL_BG = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/environment/ratlantis_sky_portal.png");
+	public static final Identifier PORTAL_FG = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/environment/ratlantis_portal.png");
+	private static final Direction[] FACES = {Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST, Direction.DOWN, Direction.UP};
 
 	public RatlantisPortalRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
-	public void render(RatlantisPortalBlockEntity entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light, int overlay) {
-		Matrix4f matrix4f = stack.last().pose();
-		this.renderCube(entity, matrix4f, buffer.getBuffer(RatsRenderType.getRatlantisPortal()));
-	}
-
-	private void renderCube(RatlantisPortalBlockEntity entity, Matrix4f matrix, VertexConsumer consumer) {
-		float f = 1.0F;
-		float f1 = 1.0F;
-		float f2 = 1.0F;
-		this.renderFace(entity, matrix, consumer, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, f, f1, f2, Direction.SOUTH);
-		this.renderFace(entity, matrix, consumer, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, f, f1, f2, Direction.NORTH);
-		this.renderFace(entity, matrix, consumer, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F, f, f1, f2, Direction.EAST);
-		this.renderFace(entity, matrix, consumer, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, f, f1, f2, Direction.WEST);
-		this.renderFace(entity, matrix, consumer, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, f, f1, f2, Direction.DOWN);
-		this.renderFace(entity, matrix, consumer, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, f, f1, f2, Direction.UP);
-	}
-
-	private void renderFace(RatlantisPortalBlockEntity entity, Matrix4f matrix, VertexConsumer consumer, float xMin, float xMax, float yMin, float yMax, float p_228884_8_, float p_228884_9_, float p_228884_10_, float p_228884_11_, float red, float green, float blue, Direction direction) {
-		if (entity.shouldRenderFace(direction)) {
-			consumer.addVertex(matrix, xMin, yMin, p_228884_8_).setColor(red, green, blue, 1.0F);
-			consumer.addVertex(matrix, xMax, yMin, p_228884_9_).setColor(red, green, blue, 1.0F);
-			consumer.addVertex(matrix, xMax, yMax, p_228884_10_).setColor(red, green, blue, 1.0F);
-			consumer.addVertex(matrix, xMin, yMax, p_228884_11_).setColor(red, green, blue, 1.0F);
+	@Override
+	protected void submit(RatlantisPortalBlockEntity entity, float partialTicks, PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
+		// the faces to draw, from the neighbors now (the drawing happens later in the frame)
+		int faces = 0;
+		for (int i = 0; i < FACES.length; i++) {
+			if (entity.shouldRenderFace(FACES[i])) {
+				faces |= 1 << i;
+			}
 		}
+		if (faces != 0) {
+			int shown = faces;
+			collector.submitCustomGeometry(stack, RatsRenderType.getRatlantisPortal(), (pose, consumer) -> renderCube(pose, consumer, shown));
+		}
+	}
 
+	/** The item: every face */
+	public static void submitItem(PoseStack stack, SubmitNodeCollector collector) {
+		collector.submitCustomGeometry(stack, RatsRenderType.getRatlantisPortal(), (pose, consumer) -> renderCube(pose, consumer, 0b111111));
+	}
+
+	private static void renderCube(PoseStack.Pose pose, VertexConsumer consumer, int faces) {
+		renderFace(pose, consumer, faces, 0, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F);
+		renderFace(pose, consumer, faces, 1, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+		renderFace(pose, consumer, faces, 2, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F);
+		renderFace(pose, consumer, faces, 3, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F);
+		renderFace(pose, consumer, faces, 4, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F);
+		renderFace(pose, consumer, faces, 5, 0.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F);
+	}
+
+	private static void renderFace(PoseStack.Pose pose, VertexConsumer consumer, int faces, int face, float xMin, float xMax, float yMin, float yMax, float z1, float z2, float z3, float z4) {
+		if ((faces & (1 << face)) != 0) {
+			consumer.addVertex(pose, xMin, yMin, z1).setColor(1.0F, 1.0F, 1.0F, 1.0F);
+			consumer.addVertex(pose, xMax, yMin, z2).setColor(1.0F, 1.0F, 1.0F, 1.0F);
+			consumer.addVertex(pose, xMax, yMax, z3).setColor(1.0F, 1.0F, 1.0F, 1.0F);
+			consumer.addVertex(pose, xMin, yMax, z4).setColor(1.0F, 1.0F, 1.0F, 1.0F);
+		}
 	}
 }

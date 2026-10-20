@@ -2,27 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "tag": "c:bones"
-    },
-    "H": {
-      "item": "rats:archeologist_hat"
-    },
-    "M": {
-      "tag": "rats:marbled_cheese"
-    },
-    "P": {
-      "item": "minecraft:iron_pickaxe"
-    },
-    "S": {
-      "item": "minecraft:iron_shovel"
-    },
-    "T": {
-      "item": "rats:chunky_cheese_token"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "#c:bones",
+    "H": "rats:archeologist_hat",
+    "M": "#rats:marbled_cheese",
+    "P": "minecraft:iron_pickaxe",
+    "S": "minecraft:iron_shovel",
+    "T": "rats:chunky_cheese_token",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "MHM",

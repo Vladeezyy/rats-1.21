@@ -1,5 +1,6 @@
 package dev.vladeezyy.rats.fabric;
 
+import com.github.alexthe666.rats.registry.RatsRecipeRegistry;
 import com.github.alexthe666.rats.ConfigHolder;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
@@ -16,23 +17,24 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -61,12 +63,12 @@ public final class RatsFabric implements ModInitializer {
         RatsNetworkHandler.register(new RatsNetworkHandler.PacketRegistrar() {
             @Override
             public <T extends CustomPacketPayload> void toClient(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-                PayloadTypeRegistry.playS2C().register(type, codec);
+                PayloadTypeRegistry.clientboundPlay().register(type, codec);
             }
 
             @Override
             public <T extends CustomPacketPayload> void toServer(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PacketContext> handler) {
-                PayloadTypeRegistry.playC2S().register(type, codec);
+                PayloadTypeRegistry.serverboundPlay().register(type, codec);
                 ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.accept(payload, new PacketContext() {
                     @Override
                     public Player player() {
@@ -91,18 +93,18 @@ public final class RatsFabric implements ModInitializer {
         FabricBiomeModifiers.register();
         FabricLootModifiers.register();
         // NeoForge: data/neoforge/data_maps/villager_profession/raid_hero_gifts.json
-        GiveGiftToHero.GIFTS.put(RatsVillagerRegistry.PET_SHOP_OWNER.get(), RatsLootRegistry.PET_SHOP_HOTV);
-        for (int level = 1; level <= 5; level++) {
-            int tradeLevel = level;
-            TradeOfferHelper.registerVillagerOffers(RatsVillagerRegistry.PET_SHOP_OWNER.get(), level, trades -> RatsEvents.addPetShopTrades(tradeLevel, trades));
-        }
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.OP_BLOCKS).register(entries ->
-            RatsCreativeTabRegistry.addToVanillaTabs(CreativeModeTabs.OP_BLOCKS, entries.shouldShowOpRestrictedItems(), entries::accept));
+        GiveGiftToHero.GIFTS.put(BuiltInRegistries.VILLAGER_PROFESSION.getResourceKey(RatsVillagerRegistry.PET_SHOP_OWNER.get()).orElseThrow(), RatsLootRegistry.PET_SHOP_HOTV);
+        // the pet shop trades are data in 26.x (data/rats/trade_set/pet_shop_owner)
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.OP_BLOCKS).register(output ->
+            RatsCreativeTabRegistry.addToVanillaTabs(CreativeModeTabs.OP_BLOCKS, output.shouldShowOpRestrictedItems(), output::accept));
+        // 26.x clients have no recipes: the cauldron and JEI read these (ClientRecipes)
+        RecipeSynchronization.synchronizeRecipeSerializer(RatsRecipeRegistry.CHEF_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(RatsRecipeRegistry.ARCHEOLOGIST_SERIALIZER.get());
         // the built-in Ratlantis datapack (resourcepacks/ratlantis in the jar, copied there by the build)
-        ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis"),
+        ResourceLoader.registerBuiltinPack(Identifier.fromNamespaceAndPath(RatsMod.MODID, "ratlantis"),
             FabricLoader.getInstance().getModContainer(RatsMod.MODID).orElseThrow(), Component.literal("Ratlantis"),
             // NeoForge (and 1.20.1) make the pack required when the option is on: always enabled
-            RatConfig.ratlantisEnabledByDefault ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
+            RatConfig.ratlantisEnabledByDefault ? PackActivationType.ALWAYS_ENABLED : PackActivationType.NORMAL);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             RegistryAccessHolder.setServer(server);
@@ -124,11 +126,11 @@ public final class RatsFabric implements ModInitializer {
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> RatsEvents.onRightClickBlock(player, level, hand, hit) == InteractionResult.FAIL ? InteractionResult.FAIL : InteractionResult.PASS);
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> !RatsEvents.onLivingDeath(entity));
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> !RatsEvents.onIncomingDamage(entity, source, amount));
-        ServerWorldEvents.LOAD.register((server, level) -> {
+        ServerLevelEvents.LOAD.register((server, level) -> {
             RatsEvents.onLevelLoad(level);
             RatlantisPack.onLevelLoad(level);
         });
-        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> RatlantisPack.onDatapackSync(player, player.server.getPlayerList()));
+        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> RatlantisPack.onDatapackSync(player, player.level().getServer().getPlayerList()));
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> RatsEvents.onPlayerLoggedIn(handler.player));
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> RatsEvents.onEntityJoin(entity));
     }

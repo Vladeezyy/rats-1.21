@@ -16,7 +16,6 @@ public class MilitaryHatModel extends AbstractHatModel {
 		PartDefinition partdefinition = mesh.getRoot();
 
 		partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		PartDefinition hat = partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 						.texOffs(0, 0)
@@ -35,6 +34,8 @@ public class MilitaryHatModel extends AbstractHatModel {
 				PartPose.offsetAndRotation(0.0F, -3.0F, 0.0F, -0.2618F, 0.0F, 0.0F));
 
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

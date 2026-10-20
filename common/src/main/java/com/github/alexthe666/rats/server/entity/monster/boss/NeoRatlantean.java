@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.world.entity.EntityDimensions;
 import com.github.alexthe666.rats.RatConfig;
@@ -12,7 +17,6 @@ import com.github.alexthe666.rats.server.entity.projectile.ThrownBlock;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
 import com.github.alexthe666.rats.server.message.SyncThrownBlockPacket;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -53,9 +57,9 @@ import java.util.function.Predicate;
 
 public class NeoRatlantean extends Monster {
 
-	private static final Predicate<LivingEntity> NOT_RATLANTEAN = entity -> entity.isAlive() && !entity.getType().is(RatlantisEntityTags.RATLANTEAN);
+	private static final TargetingConditions.Selector NOT_RATLANTEAN = (entity, level) -> entity.isAlive() && !entity.is(RatlantisEntityTags.RATLANTEAN);
 	private static final EntityDataAccessor<Integer> COLOR_VARIANT = SynchedEntityData.defineId(NeoRatlantean.class, EntityDataSerializers.INT);
-	private final ServerBossEvent bossInfo = (new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS));
+	private final ServerBossEvent bossInfo = (new ServerBossEvent(java.util.UUID.randomUUID(), this.getDisplayName(), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS));
 	private int attackSelection = 0;
 	private int summonCooldown = 0;
 	private int humTicks = 0;
@@ -69,8 +73,8 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Override
-	protected void customServerAiStep() {
-		super.customServerAiStep();
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
 		if (this.tickCount % 100 == 0) {
 			this.heal(1);
 		}
@@ -78,7 +82,7 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 
@@ -112,17 +116,17 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putInt("ColorVariant", this.getColorVariant());
 		compound.putInt("AttackSelection", attackSelection);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setColorVariant(compound.getInt("ColorVariant"));
-		attackSelection = compound.getInt("AttackSelection");
+		this.setColorVariant(compound.getIntOr("ColorVariant", 0));
+		attackSelection = compound.getIntOr("AttackSelection", 0);
 		if (this.hasCustomName()) {
 			this.bossInfo.setName(this.getDisplayName());
 		}
@@ -147,7 +151,7 @@ public class NeoRatlantean extends Monster {
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.setColorVariant(this.getRandom().nextInt(4));
 		return data;
@@ -189,13 +193,13 @@ public class NeoRatlantean extends Monster {
 			if (RatConfig.neoratlanteanSummonFakeLightning && this.attackSelection == 1 && this.summonCooldown == 0) {
 				int bounds = 20;
 				if (!this.level().isClientSide()) {
-					LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(this.level());
-					bolt.moveTo(entity.position());
+					LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
+					bolt.snapTo(entity.position());
 					bolt.setVisualOnly(true);
 					this.level().addFreshEntity(bolt);
 					for (int i = 0; i < this.getRandom().nextInt(3) + 2; i++) {
-						LightningBolt boltAgain = EntityType.LIGHTNING_BOLT.create(this.level());
-						boltAgain.moveTo(new Vec3(entity.getX() + this.getRandom().nextInt(bounds * 2) - bounds, entity.getY(), entity.getZ() + this.getRandom().nextInt(bounds * 2) - bounds));
+						LightningBolt boltAgain = EntityType.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
+						boltAgain.snapTo(new Vec3(entity.getX() + this.getRandom().nextInt(bounds * 2) - bounds, entity.getY(), entity.getZ() + this.getRandom().nextInt(bounds * 2) - bounds));
 						boltAgain.setVisualOnly(true);
 						this.level().addFreshEntity(boltAgain);
 					}
@@ -242,7 +246,7 @@ public class NeoRatlantean extends Monster {
 	}
 
 	public boolean canPickupBlock(Level level, BlockState state, BlockPos pos) {
-		return !state.is(BlockTags.WITHER_IMMUNE) && state.isSolidRender(level, pos) && state.getDestroySpeed(level, pos) >= 0.0F && state.getDestroySpeed(level, pos) < 100.0F;
+		return !state.is(BlockTags.WITHER_IMMUNE) && state.isSolidRender() && state.getDestroySpeed(level, pos) >= 0.0F && state.getDestroySpeed(level, pos) < 100.0F;
 	}
 
 	@Override

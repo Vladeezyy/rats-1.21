@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
@@ -25,10 +27,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class UpgradeSeparatorBlock extends BaseEntityBlock {
+public class UpgradeSeparatorBlock extends BaseEntityBlock implements BlockTooltip {
     public static final MapCodec<UpgradeSeparatorBlock> CODEC = simpleCodec(UpgradeSeparatorBlock::new);
 
     @Override
@@ -52,9 +53,8 @@ public class UpgradeSeparatorBlock extends BaseEntityBlock {
 		return RenderShape.MODEL;
 	}
 
-	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("block.rats.upgrade_separator.desc").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("block.rats.upgrade_separator.desc").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Nullable

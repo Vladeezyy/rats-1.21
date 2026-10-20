@@ -1,9 +1,6 @@
 {
   "type": "minecraft:stonecutting",
-  "count": 1,
-  "ingredient": {
-    "item": "rats:marbled_cheese_brick_cracked"
-  },
+  "ingredient": "rats:marbled_cheese_brick_cracked",
   "result": {
     "id": "rats:marbled_cheese_brick_cracked_stairs"
   }

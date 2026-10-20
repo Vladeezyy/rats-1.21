@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    },
-    "T": {
-      "item": "minecraft:netherite_shovel"
-    }
+    "I": "rats:oratchalcum_ingot",
+    "T": "minecraft:netherite_shovel"
   },
   "pattern": [
     " I ",

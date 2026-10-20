@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:herb_bundle"
-    },
-    {
-      "item": "rats:plague_leech"
-    },
-    {
-      "item": "rats:treacle"
-    },
-    {
-      "item": "minecraft:bowl"
-    }
+    "rats:herb_bundle",
+    "rats:plague_leech",
+    "rats:treacle",
+    "minecraft:bowl"
   ],
   "result": {
     "id": "rats:plague_stew"

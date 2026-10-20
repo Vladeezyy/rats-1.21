@@ -28,14 +28,14 @@ public class GenericAddItemLootModifier extends LootModifier {
 	private final Map<Item, Integer> items;
 	private final boolean makeNewPool;
 
-	private GenericAddItemLootModifier(LootItemCondition[] conditions, Map<Item, Integer> items, boolean makeNewPool) {
-		super(conditions);
+	private GenericAddItemLootModifier(LootItemCondition[] conditions, int priority, Map<Item, Integer> items, boolean makeNewPool) {
+		super(conditions, priority);
 		this.items = items;
 		this.makeNewPool = makeNewPool;
 	}
 
 	public GenericAddItemLootModifier(LootItemCondition[] conditions, boolean makeNewPool, ItemStack... stacks) {
-		super(conditions);
+		super(conditions, IGlobalLootModifier.DEFAULT_PRIORITY);
 		this.items = new HashMap<>();
 		for (ItemStack stack : stacks) {
 			this.items.put(stack.getItem(), stack.getCount());

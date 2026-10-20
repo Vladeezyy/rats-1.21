@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.world.level.redstone.Orientation;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
@@ -30,10 +33,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class RatAttractorBlock extends BaseEntityBlock {
+public class RatAttractorBlock extends BaseEntityBlock implements BlockTooltip {
     public static final MapCodec<RatAttractorBlock> CODEC = simpleCodec(RatAttractorBlock::new);
 
     @Override
@@ -51,7 +53,7 @@ public class RatAttractorBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
 		if (!level.isClientSide()) {
 			this.updateState(state, level, pos);
 		}
@@ -62,9 +64,8 @@ public class RatAttractorBlock extends BaseEntityBlock {
 		return AABB;
 	}
 
-	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("block.rats.rat_attractor.desc").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("block.rats.rat_attractor.desc").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

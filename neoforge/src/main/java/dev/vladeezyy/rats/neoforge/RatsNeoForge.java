@@ -15,6 +15,7 @@ import com.github.alexthe666.rats.server.misc.RatsStorages;
 import com.github.alexthe666.rats.server.misc.RegistryAccessHolder;
 import com.mojang.serialization.MapCodec;
 import dev.vladeezyy.rats.platform.PacketContext;
+import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -22,7 +23,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.PathPackResources;
+import net.neoforged.neoforge.resource.JarContentsPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.entity.player.Player;
@@ -146,11 +147,11 @@ public final class RatsNeoForge {
     /** Item, fluid and energy handlers of the mod's blocks and of tamed rats (the 1.20.1 original overrode getCapability) */
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         for (Supplier<? extends BlockEntityType<?>> type : new Supplier[]{RatsBlockEntityRegistry.UPGRADE_COMBINER, RatsBlockEntityRegistry.RAT_QUARRY, RatsBlockEntityRegistry.AUTO_CURDLER, RatsBlockEntityRegistry.RAT_CRAFTING_TABLE}) {
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, (BlockEntityType<BlockEntity>) type.get(), (be, side) -> NeoForgeTransfer.toNeo(RatsStorages.items(be, side)));
+            event.registerBlockEntity(Capabilities.Item.BLOCK, (BlockEntityType<BlockEntity>) type.get(), (BlockEntity be, Direction side) -> NeoForgeTransfer.toNeo(RatsStorages.items(be, side)));
         }
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, (BlockEntityType<BlockEntity>) (BlockEntityType<?>) RatsBlockEntityRegistry.AUTO_CURDLER.get(), (be, side) -> NeoForgeTransfer.toNeo(RatsStorages.fluids(be, side)));
-        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, (BlockEntityType<BlockEntity>) (BlockEntityType<?>) RatsBlockEntityRegistry.RAT_CAGE_WHEEL.get(), (be, side) -> NeoForgeTransfer.toNeo(RatsStorages.energy(be, side)));
-        event.registerEntity(Capabilities.ItemHandler.ENTITY, RatsEntityRegistry.TAMED_RAT.get(), (TamedRat rat, Void context) -> NeoForgeTransfer.toNeo(rat.getItemHandler()));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, (BlockEntityType<BlockEntity>) (BlockEntityType<?>) RatsBlockEntityRegistry.AUTO_CURDLER.get(), (BlockEntity be, Direction side) -> NeoForgeTransfer.toNeo(RatsStorages.fluids(be, side)));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, (BlockEntityType<BlockEntity>) (BlockEntityType<?>) RatsBlockEntityRegistry.RAT_CAGE_WHEEL.get(), (BlockEntity be, Direction side) -> NeoForgeTransfer.toNeo(RatsStorages.energy(be, side)));
+        event.registerEntity(Capabilities.Item.ENTITY, RatsEntityRegistry.TAMED_RAT.get(), (TamedRat rat, Void context) -> NeoForgeTransfer.toNeo(rat.getItemHandler()));
     }
 
     private static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -165,9 +166,9 @@ public final class RatsNeoForge {
     //despite being a builtin datapack, this is still necessary because without it the Ratlantis pack doesn't show up. Whatever.
     private static void addRatlantisDatapack(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.SERVER_DATA) {
-            var resourcePath = ModList.get().getModFileById(RatsMod.MODID).getFile().findResource("data", "minecraft", "datapacks", "ratlantis");
+            var contents = ModList.get().getModFileById(RatsMod.MODID).getFile().getContents();
             var info = new PackLocationInfo(RatlantisPack.PACK_ID, Component.literal("Ratlantis"), PackSource.FEATURE, Optional.empty());
-            var pack = Pack.readMetaAndCreate(info, new PathPackResources.PathResourcesSupplier(resourcePath), PackType.SERVER_DATA,
+            var pack = Pack.readMetaAndCreate(info, new JarContentsPackResources.JarContentsResourcesSupplier(contents, "data/minecraft/datapacks/ratlantis"), PackType.SERVER_DATA,
                 new PackSelectionConfig(RatConfig.ratlantisEnabledByDefault, Pack.Position.TOP, false));
             if (pack != null) {
                 event.addRepositorySource(packConsumer -> packConsumer.accept(pack));

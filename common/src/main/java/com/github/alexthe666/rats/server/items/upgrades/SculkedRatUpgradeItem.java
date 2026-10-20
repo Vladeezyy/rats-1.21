@@ -1,12 +1,13 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 import net.minecraft.core.Holder;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesTextureUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.GlowingEyesUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.StatBoostingUpgrade;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -19,8 +20,8 @@ public class SculkedRatUpgradeItem extends BaseRatUpgradeItem implements StatBoo
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
-		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/sculked.png");
+	public Identifier getTexture() {
+		return Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/sculked.png");
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class SculkedRatUpgradeItem extends BaseRatUpgradeItem implements StatBoo
 
 	@Override
 	public RenderType getEyeTexture(ItemStack stack) {
-		return RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/sculked.png"));
+		return RenderTypes.eyes(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/sculked.png"));
 	}
 
 	@Override

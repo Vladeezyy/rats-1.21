@@ -15,6 +15,6 @@ public class RatlantisPortalBlockEntity extends TheEndPortalBlockEntity {
 
 	@Override
 	public boolean shouldRenderFace(Direction direction) {
-		return this.getLevel() == null || Block.shouldRenderFace(this.getBlockState(), this.getLevel(), this.getBlockPos(), direction, this.getBlockPos().relative(direction));
+		return this.getLevel() == null || Block.shouldRenderFace(this.getBlockState(), this.getLevel().getBlockState(this.getBlockPos().relative(direction)), direction);
 	}
 }

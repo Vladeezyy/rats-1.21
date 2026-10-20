@@ -20,7 +20,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -30,12 +30,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.trading.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -106,7 +106,7 @@ final class GameplayTest {
   }
 
   private static TamedRat tamedRat(ServerLevel level, BlockPos pos, RatCommand command) {
-    TamedRat rat = RatsEntityRegistry.TAMED_RAT.get().spawn(level, pos, MobSpawnType.COMMAND);
+    TamedRat rat = RatsEntityRegistry.TAMED_RAT.get().spawn(level, pos, EntitySpawnReason.COMMAND);
     rat.tame(player);
     rat.setCommand(command);
     return rat;
@@ -143,7 +143,7 @@ final class GameplayTest {
             level.setBlock(pos, Blocks.GLASS.defaultBlockState(), Block.UPDATE_CLIENTS);
           }
         }
-        Rat rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, MobSpawnType.COMMAND);
+        Rat rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, EntitySpawnReason.COMMAND);
         rat.setPlagued(false);
         // a baby rat does not move (canMove)
         rat.setBaby(false);
@@ -156,7 +156,7 @@ final class GameplayTest {
       @Override
       boolean done(ServerLevel level) {
         // #838: the fed cheese does not stay in the tamed rat's paw
-        return around(level, TamedRat.class, this.base).stream().anyMatch(rat -> player.getUUID().equals(rat.getOwnerUUID()) && !RatsItemRegistry.CHEESE.get().equals(rat.getMainHandItem().getItem()));
+        return around(level, TamedRat.class, this.base).stream().anyMatch(rat -> rat.isOwnedBy(player) && !RatsItemRegistry.CHEESE.get().equals(rat.getMainHandItem().getItem()));
       }
 
       @Override
@@ -169,7 +169,7 @@ final class GameplayTest {
     SCENARIOS.add(new Scenario("creative cheese tames a wild rat at once", 20) {
       @Override
       boolean start(ServerLevel level) {
-        Rat rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, MobSpawnType.COMMAND);
+        Rat rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, EntitySpawnReason.COMMAND);
         rat.setPlagued(false);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(RatsItemRegistry.CREATIVE_CHEESE.get()));
         rat.mobInteract(player, InteractionHand.MAIN_HAND);
@@ -179,7 +179,7 @@ final class GameplayTest {
 
       @Override
       boolean done(ServerLevel level) {
-        return around(level, TamedRat.class, this.base).stream().anyMatch(rat -> player.getUUID().equals(rat.getOwnerUUID()) && rat.getCommand() == RatCommand.SIT);
+        return around(level, TamedRat.class, this.base).stream().anyMatch(rat -> rat.isOwnedBy(player) && rat.getCommand() == RatCommand.SIT);
       }
     });
     SCENARIOS.add(new Scenario("#838: a working rat does not stay stuck with food it may not eat", 300) {
@@ -270,10 +270,10 @@ final class GameplayTest {
       boolean done(ServerLevel level) {
         TamedRat rat = tamedRat(level, this.base, RatCommand.PATROL);
         rat.setPatrolNodes(List.of(GlobalPos.of(level.dimension(), this.base.east(3)), GlobalPos.of(level.dimension(), this.base.west(3))));
-        net.minecraft.nbt.CompoundTag saved = new net.minecraft.nbt.CompoundTag();
+        net.minecraft.world.level.storage.TagValueOutput saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
         rat.addAdditionalSaveData(saved);
-        TamedRat loaded = RatsEntityRegistry.TAMED_RAT.get().create(level);
-        loaded.readAdditionalSaveData(saved);
+        TamedRat loaded = RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        loaded.readAdditionalSaveData(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), saved.buildResult()));
         var sent = loaded.getEntityData().getNonDefaultValues();
         return loaded.getPatrolNodes().size() == 2 && sent != null && sent.stream().anyMatch(v -> v.value() instanceof List<?> list && list.size() == 2);
       }
@@ -368,7 +368,7 @@ final class GameplayTest {
         for (int x = 2; x <= 4; x++) {
           text.append("\n  tube ").append(x).append(": ").append(level.getBlockState(this.base.offset(x, 0, 0)));
         }
-        TamedRat probe = RatsEntityRegistry.TAMED_RAT.get().spawn(level, this.base.offset(1, 0, 0), MobSpawnType.COMMAND);
+        TamedRat probe = RatsEntityRegistry.TAMED_RAT.get().spawn(level, this.base.offset(1, 0, 0), EntitySpawnReason.COMMAND);
         probe.tame(player);
         probe.setOnGround(true);
         net.minecraft.world.level.pathfinder.Path path = probe.getNavigation().createPath(this.base.offset(5, 0, 0), 0);
@@ -558,8 +558,8 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        this.sick = EntityType.COW.spawn(level, this.base, MobSpawnType.COMMAND);
-        this.victim = EntityType.COW.spawn(level, this.base.offset(1, 0, 0), MobSpawnType.COMMAND);
+        this.sick = EntityType.COW.spawn(level, this.base, EntitySpawnReason.COMMAND);
+        this.victim = EntityType.COW.spawn(level, this.base.offset(1, 0, 0), EntitySpawnReason.COMMAND);
         this.sick.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 6000));
         this.sick.setHealth(5);
         this.healthBeforeHeal = this.sick.getHealth();
@@ -584,7 +584,7 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), MobSpawnType.COMMAND);
+        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
         this.pig.setNoAi(true);
         // hunting rats do not wander, so it stays in the air as a following one does (wandering, it lands and paths)
         this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
@@ -615,7 +615,7 @@ final class GameplayTest {
       @Override
       boolean start(ServerLevel level) {
         // as a following rat: in the air, where its navigation has no path (owners cannot be fake players here)
-        Mob pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), MobSpawnType.COMMAND);
+        Mob pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
         pig.setNoAi(true);
         TamedRat rat = tamedRat(level, this.base.above(4), RatCommand.FOLLOW);
         rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
@@ -655,18 +655,19 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        Creeper creeper = EntityType.CREEPER.create(level);
+        Creeper creeper = EntityType.CREEPER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         creeper.setPos(Vec3.atCenterOf(this.base));
-        net.minecraft.nbt.CompoundTag powered = new net.minecraft.nbt.CompoundTag();
-        creeper.addAdditionalSaveData(powered);
+        net.minecraft.world.level.storage.TagValueOutput out = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+        creeper.saveWithoutId(out);
+        net.minecraft.nbt.CompoundTag powered = out.buildResult();
         powered.putBoolean("powered", true);
-        creeper.readAdditionalSaveData(powered);
-        LootTable creeperLoot = level.getServer().reloadableRegistries().getLootTable(EntityType.CREEPER.getDefaultLootTable());
+        creeper.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), powered));
+        LootTable creeperLoot = level.getServer().reloadableRegistries().getLootTable(EntityType.CREEPER.getDefaultLootTable().orElseThrow());
         LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.THIS_ENTITY, creeper)
           .withParameter(LootContextParams.ORIGIN, creeper.position()).withParameter(LootContextParams.DAMAGE_SOURCE, level.damageSources().generic())
           .create(LootContextParamSets.ENTITY);
         this.chunk = creeperLoot.getRandomItems(params).stream().anyMatch(s -> s.is(RatsItemRegistry.CHARGED_CREEPER_CHUNK.get()));
-        LootTable gifts = level.getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.withDefaultNamespace("gameplay/cat_morning_gift")));
+        LootTable gifts = level.getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, Identifier.withDefaultNamespace("gameplay/cat_morning_gift")));
         LootParams giftParams = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(this.base))
           .withParameter(LootContextParams.THIS_ENTITY, creeper).create(LootContextParamSets.GIFT);
         for (int i = 0; i < 200 && !this.gift; i++) {
@@ -693,8 +694,15 @@ final class GameplayTest {
 
       @Override
       boolean done(ServerLevel level) {
-        var trades = VillagerTrades.TRADES.get(RatsVillagerRegistry.PET_SHOP_OWNER.get());
-        return trades != null && trades.get(1) != null && trades.get(1).length == 7 && trades.get(5) != null && trades.get(5).length == 5;
+        // 26.x: trade sets are data, one per level
+        var sets = level.registryAccess().lookupOrThrow(Registries.TRADE_SET);
+        var byLevel = RatsVillagerRegistry.PET_SHOP_OWNER.get().tradeSetsByLevel();
+        for (int tradeLevel = 1; tradeLevel <= 5; tradeLevel++) {
+          if (byLevel.get(tradeLevel) == null || sets.get(byLevel.get(tradeLevel)).isEmpty()) {
+            return false;
+          }
+        }
+        return sets.get(byLevel.get(1)).get().value().getTrades().size() == 7 && sets.get(byLevel.get(5)).get().value().getTrades().size() == 5;
       }
     });
     SCENARIOS.add(new Scenario("a rat sack that despawns lets its rats out", 40) {
@@ -705,10 +713,11 @@ final class GameplayTest {
         RatSackItem.packRatIntoSack(sack, rat, 1);
         rat.discard();
         ItemEntity item = new ItemEntity(level, this.base.getX() + 0.5, this.base.getY(), this.base.getZ() + 0.5, sack);
-        net.minecraft.nbt.CompoundTag age = new net.minecraft.nbt.CompoundTag();
-        item.addAdditionalSaveData(age);
+        net.minecraft.world.level.storage.TagValueOutput out = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+        item.saveWithoutId(out);
+        net.minecraft.nbt.CompoundTag age = out.buildResult();
         age.putShort("Age", (short) 5990);
-        item.readAdditionalSaveData(age);
+        item.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), age));
         level.addFreshEntity(item);
         return true;
       }
@@ -736,7 +745,7 @@ final class GameplayTest {
         level.setBlock(this.base.above(2), RatsBlockRegistry.MARBLED_CHEESE_RAW.get().defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(this.base, RatlantisBlockRegistry.RATLANTIS_PORTAL.get().defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(this.base.above(), RatlantisBlockRegistry.RATLANTIS_PORTAL.get().defaultBlockState(), Block.UPDATE_CLIENTS);
-        this.pig = EntityType.PIG.spawn(level, this.base, MobSpawnType.COMMAND);
+        this.pig = EntityType.PIG.spawn(level, this.base, EntitySpawnReason.COMMAND);
         return true;
       }
 
@@ -748,7 +757,7 @@ final class GameplayTest {
 
       @Override
       String detail(ServerLevel level) {
-        return "pig in " + this.pig.level().dimension().location() + " at " + this.pig.position() + " removed " + this.pig.getRemovalReason()
+        return "pig in " + this.pig.level().dimension().identifier() + " at " + this.pig.position() + " removed " + this.pig.getRemovalReason()
           + " cooldown " + this.pig.getPortalCooldown() + " block " + level.getBlockState(this.pig.blockPosition()) + " portal at " + this.base
           + " enabled " + RatsMod.RATLANTIS_DATAPACK_ENABLED;
       }
@@ -766,13 +775,14 @@ final class GameplayTest {
         if (!RatsMod.RATLANTIS_DATAPACK_ENABLED) {
           return false;
         }
-        this.target = EntityType.ZOMBIE.spawn(level, this.base, MobSpawnType.COMMAND);
+        this.target = EntityType.ZOMBIE.spawn(level, this.base, EntitySpawnReason.COMMAND);
         this.target.setNoAi(true);
-        this.target.setInvulnerable(true);
+        // 26.x mobs drop invulnerable targets (Mob.getTarget -> canAttack -> canBeSeenAsEnemy): unhurt by resistance V instead
+        this.target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.RESISTANCE, -1, 4));
         // melee only: the sword throws (1 in 5 hits) send the boss off for 5 s on purpose and made the share random
         this.throwChance = com.github.alexthe666.rats.RatConfig.dutchratSwordThrowChance;
         com.github.alexthe666.rats.RatConfig.dutchratSwordThrowChance = Integer.MAX_VALUE;
-        this.dutchrat = com.github.alexthe666.rats.registry.RatlantisEntityRegistry.DUTCHRAT.get().spawn(level, this.base.offset(8, 6, 0), MobSpawnType.COMMAND);
+        this.dutchrat = com.github.alexthe666.rats.registry.RatlantisEntityRegistry.DUTCHRAT.get().spawn(level, this.base.offset(8, 6, 0), EntitySpawnReason.COMMAND);
         this.dutchrat.setTarget(this.target);
         return true;
       }
@@ -799,7 +809,10 @@ final class GameplayTest {
 
       @Override
       String detail(ServerLevel level) {
-        return "in reach " + this.inReach + " of " + this.counted + " melee ticks, boss at " + this.dutchrat.position() + ", target at " + this.target.position();
+        var move = this.dutchrat.getMoveControl();
+        return "in reach " + this.inReach + " of " + this.counted + " melee ticks, boss at " + this.dutchrat.position() + ", target at " + this.target.position()
+          + ", wanted " + (move.hasWanted() ? move.getWantedX() + " " + move.getWantedY() + " " + move.getWantedZ() : "none") + ", motion " + this.dutchrat.getDeltaMovement()
+          + ", target " + this.dutchrat.getTarget();
       }
     });
     SCENARIOS.add(new Scenario("bosses and Ratlantis mobs fight for 10 seconds without errors", 200) {
@@ -807,12 +820,12 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        Mob target = EntityType.IRON_GOLEM.spawn(level, this.base.offset(0, 0, 6), MobSpawnType.COMMAND);
+        Mob target = EntityType.IRON_GOLEM.spawn(level, this.base.offset(0, 0, 6), EntitySpawnReason.COMMAND);
         for (EntityType<? extends Mob> type : List.of(RatsEntityRegistry.RAT_KING.get(), RatsEntityRegistry.BLACK_DEATH.get(), RatsEntityRegistry.PLAGUE_BEAST.get(),
           com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RATLANTEAN_AUTOMATON.get(), com.github.alexthe666.rats.registry.RatlantisEntityRegistry.DUTCHRAT.get(),
           com.github.alexthe666.rats.registry.RatlantisEntityRegistry.NEO_RATLANTEAN.get(), com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RAT_BARON.get(),
           com.github.alexthe666.rats.registry.RatlantisEntityRegistry.FERAL_RATLANTEAN.get(), RatsEntityRegistry.PIED_PIPER.get())) {
-          Mob mob = type.spawn(level, this.base.offset(this.mobs.size() - 4, 0, -4), MobSpawnType.COMMAND);
+          Mob mob = type.spawn(level, this.base.offset(this.mobs.size() - 4, 0, -4), EntitySpawnReason.COMMAND);
           if (mob != null) {
             mob.setTarget(target);
             this.mobs.add(mob);
@@ -840,7 +853,7 @@ final class GameplayTest {
         ItemStack upgrade = new ItemStack(RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
         net.minecraft.nbt.CompoundTag tag;
         try {
-          tag = net.minecraft.nbt.TagParser.parseTag("{Items:[{Slot:0b,id:\"rats:rat_upgrade_speed\",Count:1b},{Slot:1b,id:\"minecraft:diamond\",Count:5b,tag:{display:{Name:'{\"text\":\"Shiny\"}'}}}]}");
+          tag = net.minecraft.nbt.TagParser.parseCompoundFully("{Items:[{Slot:0b,id:\"rats:rat_upgrade_speed\",Count:1b},{Slot:1b,id:\"minecraft:diamond\",Count:5b,tag:{display:{Name:'{\"text\":\"Shiny\"}'}}}]}");
         } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
           throw new IllegalStateException(e);
         }
@@ -866,12 +879,13 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        com.github.alexthe666.rats.server.entity.monster.PlagueBeast beast = RatsEntityRegistry.PLAGUE_BEAST.get().create(level);
+        com.github.alexthe666.rats.server.entity.monster.PlagueBeast beast = RatsEntityRegistry.PLAGUE_BEAST.get().create(level, EntitySpawnReason.COMMAND);
         this.owner = java.util.UUID.randomUUID();
         beast.setOwnerId(this.owner);
-        net.minecraft.nbt.CompoundTag saved = beast.saveWithoutId(new net.minecraft.nbt.CompoundTag());
-        com.github.alexthe666.rats.server.entity.monster.PlagueBeast copy = RatsEntityRegistry.PLAGUE_BEAST.get().create(level);
-        copy.load(saved);
+        net.minecraft.world.level.storage.TagValueOutput saved = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
+        beast.saveWithoutId(saved);
+        com.github.alexthe666.rats.server.entity.monster.PlagueBeast copy = RatsEntityRegistry.PLAGUE_BEAST.get().create(level, EntitySpawnReason.COMMAND);
+        copy.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), saved.buildResult()));
         this.loaded = copy.getOwnerId();
         return true;
       }

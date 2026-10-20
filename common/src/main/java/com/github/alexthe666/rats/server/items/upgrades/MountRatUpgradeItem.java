@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.server.entity.RatMount;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
@@ -9,11 +11,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import dev.vladeezyy.rats.platform.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class MountRatUpgradeItem<T extends Mob & RatMount> extends BaseRatUpgradeItem {
 
@@ -29,8 +29,8 @@ public class MountRatUpgradeItem<T extends Mob & RatMount> extends BaseRatUpgrad
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		super.appendHoverText(stack, level, tooltip, flag);
-		tooltip.add(Component.translatable(RatsLangConstants.MOUNT_RESPAWN_TIMER).withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, display, tooltip, flag);
+		tooltip.accept(Component.translatable(RatsLangConstants.MOUNT_RESPAWN_TIMER).withStyle(ChatFormatting.GRAY));
 	}
 }

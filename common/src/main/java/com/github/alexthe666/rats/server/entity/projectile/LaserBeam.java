@@ -1,6 +1,7 @@
 package com.github.alexthe666.rats.server.entity.projectile;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -49,7 +50,7 @@ public class LaserBeam extends ArrowlikeProjectile {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putFloat("ColorR", this.getRGB()[0]);
 		compound.putFloat("ColorG", this.getRGB()[1]);
@@ -57,9 +58,9 @@ public class LaserBeam extends ArrowlikeProjectile {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setRGB(compound.getFloat("ColorR"), compound.getFloat("ColorG"), compound.getFloat("ColorB"));
+		this.setRGB(compound.getFloatOr("ColorR", 0.0F), compound.getFloatOr("ColorG", 0.0F), compound.getFloatOr("ColorB", 0.0F));
 	}
 
 	@Override
@@ -67,9 +68,7 @@ public class LaserBeam extends ArrowlikeProjectile {
 		float sqrt = (float) this.getDeltaMovement().length();
 		if (sqrt < 0.3F || this.inGround || this.horizontalCollision) {
 			this.discard();
-			Explosion explosion = this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
-			explosion.explode();
-			explosion.finalizeExplosion(true);
+			this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
 		}
 		super.tick();
 	}

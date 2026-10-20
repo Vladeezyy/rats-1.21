@@ -11,7 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -24,7 +24,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -73,12 +73,12 @@ public interface Platform {
     // --- registration ---
 
     /** Registers an entry (NeoForge: deferred register, Fabric: right away); see {@link Registrar} */
-    <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, ResourceLocation id, Supplier<? extends T> factory);
+    <R, T extends R> void register(ResourceKey<? extends Registry<R>> registry, Identifier id, Supplier<? extends T> factory);
 
     /** A new registry of the mod (synced: the client gets the server's entries) */
     <T> Registry<T> createRegistry(ResourceKey<Registry<T>> key, boolean synced);
 
-    void registerDataSerializer(ResourceLocation id, EntityDataSerializer<?> serializer);
+    void registerDataSerializer(Identifier id, EntityDataSerializer<?> serializer);
 
     /** A spawn egg for a type registered later (NeoForge: deferred spawn egg) */
     Item spawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int background, int highlight, Item.Properties properties);
@@ -147,7 +147,7 @@ public interface Platform {
     // --- hooks of the loader the game code calls (vanilla behaviour on Fabric) ---
 
     @Nullable
-    SpawnGroupData finalizeMobSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData);
+    SpawnGroupData finalizeMobSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnData);
 
     boolean canEntityGrief(Level level, @Nullable Entity entity);
 
@@ -197,7 +197,7 @@ public interface Platform {
     boolean canEquip(ItemStack stack, net.minecraft.world.entity.EquipmentSlot slot, LivingEntity entity);
 
     /** The arrow a bow shoots (NeoForge: BowItem.customArrow, which other mods' bows change) */
-    net.minecraft.world.entity.projectile.AbstractArrow customArrow(net.minecraft.world.item.ProjectileWeaponItem bow, net.minecraft.world.entity.projectile.AbstractArrow arrow, ItemStack ammo, ItemStack weapon);
+    net.minecraft.world.entity.projectile.arrow.AbstractArrow customArrow(net.minecraft.world.item.ProjectileWeaponItem bow, net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow, ItemStack ammo, ItemStack weapon);
 
     /** The enchanting power of a block (NeoForge: getEnchantPowerBonus; vanilla: 1 for the enchantment power provider tag) */
     float enchantPowerBonus(BlockState state, Level level, BlockPos pos);

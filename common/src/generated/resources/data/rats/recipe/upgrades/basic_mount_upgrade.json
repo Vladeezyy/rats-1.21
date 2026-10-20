@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "S": {
-      "item": "minecraft:saddle"
-    }
+    "C": "#c:cheese",
+    "S": "minecraft:saddle"
   },
   "pattern": [
     "CCC",

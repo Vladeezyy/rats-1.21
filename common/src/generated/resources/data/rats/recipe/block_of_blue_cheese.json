@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "rats:block_of_cheese"
-    },
-    {
-      "item": "minecraft:sugar"
-    },
-    {
-      "item": "minecraft:brown_mushroom"
-    }
+    "rats:block_of_cheese",
+    "minecraft:sugar",
+    "minecraft:brown_mushroom"
   ],
   "result": {
     "id": "rats:block_of_blue_cheese"

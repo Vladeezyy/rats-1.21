@@ -8,7 +8,7 @@ import com.mojang.serialization.JsonOps;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -29,30 +29,52 @@ import java.util.Map;
  * Conditions: neoforge:loot_table_id is matched against the table, the others are vanilla or Rats loot conditions.
  */
 final class FabricLootModifiers {
-    private record Modifier(ResourceLocation id, JsonObject json, List<ResourceLocation> tables) {}
+    private record Modifier(Identifier id, JsonObject json, List<Identifier> tables) {}
 
     private record Parsed(List<LootItemCondition> conditions, Map<Item, Integer> items, boolean replacePool) {}
 
     private static final List<Modifier> MODIFIERS = new ArrayList<>();
-    private static final Map<ResourceLocation, Parsed> PARSED = new LinkedHashMap<>();
+    private static final Map<Identifier, Parsed> PARSED = new LinkedHashMap<>();
     private static HolderLookup.Provider parsedWith;
+    /** Loot table ids by table, rebuilt once per data reload (26.x has no reverse lookup; a scan per roll would cost TPS) */
+    private static net.minecraft.server.ReloadableServerRegistries.Holder tablesOf;
+    private static Map<net.minecraft.world.level.storage.loot.LootTable, Identifier> tableIds = Map.of();
+
+    private static synchronized Identifier tableId(net.minecraft.server.MinecraftServer server, net.minecraft.world.level.storage.loot.LootTable table) {
+        var registries = server.reloadableRegistries();
+        if (registries != tablesOf) {
+            Map<net.minecraft.world.level.storage.loot.LootTable, Identifier> ids = new java.util.IdentityHashMap<>();
+            registries.lookup().lookupOrThrow(net.minecraft.core.registries.Registries.LOOT_TABLE).listElements()
+                .forEach(ref -> ids.put(ref.value(), ref.key().identifier()));
+            tableIds = ids;
+            tablesOf = registries;
+        }
+        return tableIds.get(table);
+    }
 
     private FabricLootModifiers() {}
 
     static void register() {
         var mod = FabricLoader.getInstance().getModContainer(RatsMod.MODID).orElseThrow();
-        JsonObject global = read(mod.findPath("data/neoforge/loot_modifiers/global_loot_modifiers.json").orElseThrow());
-        for (JsonElement entry : global.getAsJsonArray("entries")) {
-            ResourceLocation id = ResourceLocation.parse(entry.getAsString());
-            JsonObject json = read(mod.findPath("data/" + id.getNamespace() + "/loot_modifiers/" + id.getPath() + ".json").orElseThrow());
+        // 26.x NeoForge loads every file in loot_modifiers/ (no global list any more): the same files here
+        List<Path> files;
+        try (var list = Files.list(mod.findPath("data/" + RatsMod.MODID + "/loot_modifiers").orElseThrow())) {
+            files = list.filter(file -> file.getFileName().toString().endsWith(".json")).sorted().toList();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not list the loot modifiers of Rats", e);
+        }
+        for (Path file : files) {
+            String name = file.getFileName().toString();
+            Identifier id = Identifier.fromNamespaceAndPath(RatsMod.MODID, name.substring(0, name.length() - ".json".length()));
+            JsonObject json = read(file);
             if (!json.get("type").getAsString().equals(RatsMod.MODID + ":add_item")) {
                 throw new IllegalStateException("Unsupported loot modifier " + id + ": " + json.get("type"));
             }
-            List<ResourceLocation> tables = new ArrayList<>();
+            List<Identifier> tables = new ArrayList<>();
             for (JsonElement condition : json.getAsJsonArray("conditions")) {
                 JsonObject object = condition.getAsJsonObject();
                 if (object.get("condition").getAsString().equals("neoforge:loot_table_id")) {
-                    tables.add(ResourceLocation.parse(object.get("loot_table_id").getAsString()));
+                    tables.add(Identifier.parse(object.get("loot_table_id").getAsString()));
                 }
             }
             MODIFIERS.add(new Modifier(id, json, tables));
@@ -64,8 +86,7 @@ final class FabricLootModifiers {
         if (MODIFIERS.isEmpty()) {
             return;
         }
-        ResourceLocation tableId = context.getLevel().getServer().reloadableRegistries().get()
-            .registryOrThrow(net.minecraft.core.registries.Registries.LOOT_TABLE).getKey(table);
+        Identifier tableId = tableId(context.getLevel().getServer(), table);
         for (Modifier modifier : MODIFIERS) {
             if (!modifier.tables().isEmpty() && !modifier.tables().contains(tableId)) {
                 continue;
@@ -105,7 +126,7 @@ final class FabricLootModifiers {
                 }
             }
             Map<Item, Integer> items = new LinkedHashMap<>();
-            modifier.json().getAsJsonObject("items").entrySet().forEach(e -> items.put(BuiltInRegistries.ITEM.get(ResourceLocation.parse(e.getKey())), e.getValue().getAsInt()));
+            modifier.json().getAsJsonObject("items").entrySet().forEach(e -> items.put(BuiltInRegistries.ITEM.getValue(Identifier.parse(e.getKey())), e.getValue().getAsInt()));
             boolean replacePool = modifier.json().has("replacePool") && modifier.json().get("replacePool").getAsBoolean();
             return new Parsed(conditions, items, replacePool);
         });

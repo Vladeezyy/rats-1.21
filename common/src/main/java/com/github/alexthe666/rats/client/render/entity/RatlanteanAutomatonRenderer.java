@@ -6,14 +6,13 @@ import com.github.alexthe666.rats.client.render.entity.layer.GlowingOverlayLayer
 import com.github.alexthe666.rats.server.entity.monster.boss.RatlanteanAutomaton;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
-public class RatlanteanAutomatonRenderer extends MobRenderer<RatlanteanAutomaton, RatlanteanAutomatonModel<RatlanteanAutomaton>> {
-
-	private static final ResourceLocation MARBLED_CHEESE_GOLEM_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_automaton/ratlantean_automaton.png");
-	private static final ResourceLocation GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_automaton/ratlantean_automaton_glow.png");
+public class RatlanteanAutomatonRenderer extends RatsMobRenderer<RatlanteanAutomaton, RatlanteanAutomatonModel<RatlanteanAutomaton>> {
+	private static final Identifier MARBLED_CHEESE_GOLEM_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_automaton/ratlantean_automaton.png");
+	private static final Identifier GLOW_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_automaton/ratlantean_automaton_glow.png");
+	private static final Vec3 OFFSET = new Vec3(0, 0.35F, 0);
 
 	public RatlanteanAutomatonRenderer(EntityRendererProvider.Context context) {
 		super(context, new RatlanteanAutomatonModel<>(false), 0.95F);
@@ -21,17 +20,17 @@ public class RatlanteanAutomatonRenderer extends MobRenderer<RatlanteanAutomaton
 	}
 
 	@Override
-	protected void scale(RatlanteanAutomaton automaton, PoseStack stack, float partialTicks) {
+	protected void scale(RatsMobRenderState state, PoseStack stack) {
 		stack.scale(1.2F, 1.2F, 1.2F);
 	}
 
 	@Override
-	public Vec3 getRenderOffset(RatlanteanAutomaton rat, float partialTickTime) {
-		return new Vec3(0, 0.35F, 0);
+	public Vec3 getRenderOffset(RatsMobRenderState state) {
+		return OFFSET;
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(RatlanteanAutomaton entity) {
+	protected Identifier getTexture(RatlanteanAutomaton entity) {
 		return MARBLED_CHEESE_GOLEM_TEXTURE;
 	}
 }

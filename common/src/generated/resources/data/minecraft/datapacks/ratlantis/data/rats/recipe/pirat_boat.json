@@ -3,9 +3,7 @@
   "category": "misc",
   "group": "boat",
   "key": {
-    "P": {
-      "item": "rats:pirat_planks"
-    }
+    "P": "rats:pirat_planks"
   },
   "pattern": [
     "P P",

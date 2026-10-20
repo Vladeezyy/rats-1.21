@@ -34,12 +34,8 @@ public class TrashCanBlockEntity extends BlockEntity {
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.loadWithComponents(packet.getTag(), registries);
-	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId(registries);
+		return this.saveWithoutMetadata(registries);
 	}
 }

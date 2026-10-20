@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.HolderLookup;
@@ -49,7 +51,7 @@ public class RatTubeBlockEntity extends BlockEntity {
 	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId(registries);
+		return this.saveWithoutMetadata(registries);
 	}
 
 	private void updateRat(Rat rat) {
@@ -85,23 +87,23 @@ public class RatTubeBlockEntity extends BlockEntity {
 		return false;
 	}
 
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+	public void saveAdditional(ValueOutput compound) {
 		compound.putBoolean("RatNode", isNode);
 		compound.putInt("OpenSide", opening == null ? -1 : opening.ordinal());
 		compound.putInt("TubeColor", color);
-		super.saveAdditional(compound, registries);
+		super.saveAdditional(compound);
 	}
 
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
-		isNode = compound.getBoolean("RatNode");
-		int i = compound.getInt("OpenSide");
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		isNode = compound.getBooleanOr("RatNode", false);
+		int i = compound.getIntOr("OpenSide", 0);
 		if (i == -1) {
 			opening = null;
 		} else {
 			opening = Direction.values()[Mth.clamp(i, 0, Direction.values().length - 1)];
 		}
-		color = compound.getInt("TubeColor");
+		color = compound.getIntOr("TubeColor", 0);
 	}
 
 	public void setEntranceData(Direction side, boolean open) {

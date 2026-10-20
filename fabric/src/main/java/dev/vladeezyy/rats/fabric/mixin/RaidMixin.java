@@ -4,7 +4,7 @@ import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.monster.PiedPiper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.raid.Raid;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,23 +21,19 @@ public abstract class RaidMixin {
     @Shadow
     private int groupsSpawned;
     @Shadow
-    @Final
-    private ServerLevel level;
-
-    @Shadow
-    public abstract void joinRaid(int wave, net.minecraft.world.entity.raid.Raider raider, BlockPos pos, boolean fromSpawn);
+    public abstract void joinRaid(ServerLevel level, int wave, net.minecraft.world.entity.raid.Raider raider, BlockPos pos, boolean fromSpawn);
 
     @Inject(method = "spawnGroup", at = @At("TAIL"))
-    private void rats$spawnPipers(BlockPos pos, CallbackInfo ci) {
+    private void rats$spawnPipers(ServerLevel level, BlockPos pos, CallbackInfo ci) {
         // groupsSpawned was just counted up: it is this wave's number
         int wave = this.groupsSpawned;
         int count = RATS$PIPERS_PER_WAVE[Math.min(wave, RATS$PIPERS_PER_WAVE.length - 1)];
         for (int i = 0; i < count; i++) {
-            PiedPiper piper = RatsEntityRegistry.PIED_PIPER.get().create(this.level);
+            PiedPiper piper = RatsEntityRegistry.PIED_PIPER.get().create(level, net.minecraft.world.entity.EntitySpawnReason.EVENT);
             if (piper == null) {
                 break;
             }
-            this.joinRaid(wave, piper, pos, false);
+            this.joinRaid(level, wave, piper, pos, false);
             piper.setOnGround(true);
         }
     }

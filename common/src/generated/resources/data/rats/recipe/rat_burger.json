@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:bread"
-    },
-    "R": {
-      "item": "rats:cooked_rat"
-    }
+    "B": "minecraft:bread",
+    "R": "rats:cooked_rat"
   },
   "pattern": [
     "B",

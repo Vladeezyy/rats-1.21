@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.server.level.ServerLevel;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -17,7 +18,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -66,7 +67,7 @@ public class RatlanteanRatbot extends Monster implements IAnimatedEntity {
 	}
 
 
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getAnimation() == NO_ANIMATION) {
 			this.setAnimation(ANIMATION_SHOOT);
 		}
@@ -146,7 +147,7 @@ public class RatlanteanRatbot extends Monster implements IAnimatedEntity {
 		this.playSound(SoundEvents.IRON_GOLEM_STEP, 1.0F, 1.0F);
 	}
 
-	public static boolean checkBotSpawnRule(EntityType<? extends Mob> entityType, LevelAccessor world, MobSpawnType reason, BlockPos pos, RandomSource rand) {
+	public static boolean checkBotSpawnRule(EntityType<? extends Mob> entityType, LevelAccessor world, EntitySpawnReason reason, BlockPos pos, RandomSource rand) {
 		return rand.nextInt(8) == 0 && canSpawnAtPos(world, pos) && Mob.checkMobSpawnRules(entityType, world, reason, pos, rand);
 	}
 

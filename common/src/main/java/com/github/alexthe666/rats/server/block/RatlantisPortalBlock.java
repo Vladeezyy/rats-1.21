@@ -1,6 +1,8 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.RatsMod;
@@ -17,7 +19,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
@@ -50,11 +50,11 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
-		return RenderShape.ENTITYBLOCK_ANIMATED;
+		return RenderShape.INVISIBLE;
 	}
 
 	@Override
-	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
 		if (RatsMod.RATLANTIS_DATAPACK_ENABLED) {
 			if (!entity.isPassenger() && !entity.isVehicle() && entity.canUsePortal(false)) {
 				if (entity.isOnPortalCooldown()) {
@@ -64,14 +64,14 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 					ResourceKey<Level> destination = entity.level().dimension() == RatlantisDimensionRegistry.DIMENSION_KEY ? Level.OVERWORLD : RatlantisDimensionRegistry.DIMENSION_KEY;
 					if (server != null) {
 						ServerLevel dest = server.getLevel(destination);
-						if (dest != null && server.isLevelEnabled(dest) && !entity.isPassenger()) {
-							entity.level().getProfiler().push("ratlantis_portal");
+						if (dest != null && !entity.isPassenger()) {
+							net.minecraft.util.profiling.Profiler.get().push("ratlantis_portal");
 							entity.setPortalCooldown();
-							DimensionTransition transition = new RatlantisTeleporter(dest).transition(entity);
+							TeleportTransition transition = new RatlantisTeleporter(dest).transition(entity);
 							if (transition != null) {
-								entity.changeDimension(transition);
+								entity.teleport(transition);
 							}
-							entity.level().getProfiler().pop();
+							net.minecraft.util.profiling.Profiler.get().pop();
 						}
 					}
 				}
@@ -80,7 +80,7 @@ public class RatlantisPortalBlock extends BaseEntityBlock implements CustomItemR
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
 		if (!this.canSurviveAt(level, pos)) {
 			level.destroyBlock(pos, true);
 		}

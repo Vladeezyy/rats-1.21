@@ -31,8 +31,9 @@ public class AviatorHatModel extends AbstractHatModel {
 						.addBox(0.0F, 0.0F, -2.5F, 1.0F, 7.0F, 5.0F),
 				PartPose.offsetAndRotation(4.0F, -8.0F, 0.0F, 0.0F, 0.0F, -0.2618F));
 
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

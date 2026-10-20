@@ -1,9 +1,7 @@
 {
   "type": "rats:archeologist",
   "count": 1,
-  "ingredient": {
-    "item": "rats:piper_hat"
-  },
+  "ingredient": "rats:piper_hat",
   "result": {
     "id": "rats:pirat_hat"
   }

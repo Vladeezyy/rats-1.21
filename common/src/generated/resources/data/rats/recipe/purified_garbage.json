@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "G": {
-      "item": "rats:garbage_pile"
-    },
-    "P": {
-      "item": "rats:purifying_liquid"
-    }
+    "G": "rats:garbage_pile",
+    "P": "rats:purifying_liquid"
   },
   "pattern": [
     "GGG",

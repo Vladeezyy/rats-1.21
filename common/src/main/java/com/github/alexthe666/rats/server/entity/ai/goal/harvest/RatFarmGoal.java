@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
-import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 
 import net.minecraft.world.item.BlockItem;
 
@@ -14,15 +14,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 public class RatFarmGoal extends BaseRatHarvestGoal {
 	private final TamedRat rat;
@@ -117,7 +114,7 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 	 * nothing. Now any farmland where the held seed's plant can stay.
 	 */
 	private boolean canPlantAt(BlockPos soil, BlockState soilState) {
-		if (!(soilState.getBlock() instanceof FarmBlock) || !this.rat.level().isEmptyBlock(soil.above())) {
+		if (!(soilState.getBlock() instanceof FarmlandBlock) || !this.rat.level().isEmptyBlock(soil.above())) {
 			return false;
 		}
 		return this.rat.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof BlockItem item

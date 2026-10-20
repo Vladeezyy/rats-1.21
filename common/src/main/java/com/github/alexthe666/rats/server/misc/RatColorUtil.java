@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.misc;
 
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import com.google.common.collect.Maps;
 import net.minecraft.world.item.DyeColor;
 
@@ -21,7 +21,7 @@ public class RatColorUtil {
 			return new float[]{0.9019608F, 0.9019608F, 0.9019608F};
 		} else {
 			int afloatArgb = color.getTextureDiffuseColor();
-		float[] afloat = {FastColor.ARGB32.red(afloatArgb) / 255.0F, FastColor.ARGB32.green(afloatArgb) / 255.0F, FastColor.ARGB32.blue(afloatArgb) / 255.0F};
+		float[] afloat = {ARGB.red(afloatArgb) / 255.0F, ARGB.green(afloatArgb) / 255.0F, ARGB.blue(afloatArgb) / 255.0F};
 			return new float[]{afloat[0] * 0.75F, afloat[1] * 0.75F, afloat[2] * 0.75F};
 		}
 	}

@@ -22,7 +22,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -99,7 +98,7 @@ public class RatTreeUtils {
 	@Nullable
 	public static Block getSaplingFromLeaves(ServerLevel level, Block leaves) {
 		try {
-			LootTable loot = level.getServer().reloadableRegistries().getLootTable(leaves.getLootTable());
+			LootTable loot = leaves.getLootTable().map(key -> level.getServer().reloadableRegistries().getLootTable(key)).orElse(LootTable.EMPTY);
 			LootParams.Builder context = new LootParams.Builder(level).withParameter(LootContextParams.TOOL, createMaxHoe(level)).withParameter(LootContextParams.BLOCK_STATE, leaves.defaultBlockState()).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).withLuck(Float.MAX_VALUE);
 			for (int i = 0; i < 25; i++) {
 				ObjectArrayList<ItemStack> lootStacks = loot.getRandomItems(context.create(LootContextParamSets.BLOCK));
@@ -117,7 +116,7 @@ public class RatTreeUtils {
 
 	private static ItemStack createMaxHoe(ServerLevel level) {
 		ItemStack hoe = new ItemStack(Items.NETHERITE_HOE);
-		hoe.enchant(level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.FORTUNE), Byte.MAX_VALUE);
+		hoe.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE), Byte.MAX_VALUE);
 		return hoe;
 	}
 

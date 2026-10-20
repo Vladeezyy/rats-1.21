@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.mount;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -7,7 +12,6 @@ import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,7 +50,7 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 	}
 
 
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getAnimation() == NO_ANIMATION) {
 			this.setAnimation(this.getRandom().nextBoolean() ? ANIMATION_SLASH : ANIMATION_BITE);
 		}
@@ -85,12 +89,16 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 		if (this.getTarget() != null && this.distanceTo(this.getTarget()) < 5 && this.hasLineOfSight(this.getTarget()) && this.getTarget().isAlive()) {
 			this.lookAt(this.getTarget(), 360, 80);
 			if (this.getAnimation() == ANIMATION_BITE && (this.getAnimationTick() > 8 && this.getAnimationTick() < 12)) {
-				this.getTarget().hurt(this.damageSources().mobAttack(this), 5);
-				this.getTarget().knockback(0.25F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
+				LivingEntity target = this.getTarget();
+				target.hurt(this.damageSources().mobAttack(this), 5);
+				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
 			}
 			if (this.getAnimation() == ANIMATION_SLASH && (this.getAnimationTick() == 8 || this.getAnimationTick() == 16)) {
-				this.getTarget().hurt(this.damageSources().mobAttack(this), 5);
-				this.getTarget().knockback(0.25F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
+				LivingEntity target = this.getTarget();
+				target.hurt(this.damageSources().mobAttack(this), 5);
+				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
 			}
 		}
 		if (!this.level().isClientSide() && this.getTarget() == null && this.getRandom().nextInt(150) == 0 && this.getAnimation() == NO_ANIMATION) {
@@ -115,23 +123,23 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 		this.getEntityData().set(COLOR_VARIANT, color);
 	}
 
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putInt("ColorVariant", this.getColorVariant());
 	}
 
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setColorVariant(compound.getInt("ColorVariant"));
+		this.setColorVariant(compound.getIntOr("ColorVariant", 0));
 	}
 
 	@Override
-	protected int calculateFallDamage(float dist, float multiplier) {
+	protected int calculateFallDamage(double dist, float multiplier) {
 		return super.calculateFallDamage(dist, multiplier) - 5;
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData) {
 		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.setColorVariant(this.getRandom().nextInt(4));
 		return spawnData;

@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.server.block;
 
-import net.minecraft.world.entity.SpawnPlacementType;
 import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
@@ -8,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;

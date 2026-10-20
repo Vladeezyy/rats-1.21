@@ -28,7 +28,7 @@ public class PiratNavigation extends PathNavigation {
 
 	@Override
 	protected boolean canUpdatePath() {
-		return this.mob.isInWaterOrBubble() || this.mob.isInLava();
+		return this.mob.isInWater() || this.mob.isInLava();
 	}
 
 	@Override
@@ -43,6 +43,11 @@ public class PiratNavigation extends PathNavigation {
 
 	public boolean isStableDestination(BlockPos pos) {
 		return !this.level.getBlockState(pos).is(Blocks.WATER);
+	}
+
+	@Override
+	public boolean canNavigateGround() {
+		return false;
 	}
 
 	@Override

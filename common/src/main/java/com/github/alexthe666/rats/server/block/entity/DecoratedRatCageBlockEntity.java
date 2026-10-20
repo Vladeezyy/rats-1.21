@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.HolderLookup;
@@ -30,24 +33,20 @@ public class DecoratedRatCageBlockEntity extends BlockEntity {
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.loadWithComponents(packet.getTag(), registries);
-	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId(registries);
+		return this.saveWithoutMetadata(registries);
 	}
 
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		ContainerHelper.saveAllItems(compound, this.containedDeco, registries);
-		super.saveAdditional(compound, registries);
+	public void saveAdditional(ValueOutput compound) {
+		ContainerHelper.saveAllItems(compound, this.containedDeco);
+		super.saveAdditional(compound);
 	}
 
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
 		containedDeco = NonNullList.withSize(1, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, containedDeco, registries);
+		ContainerHelper.loadAllItems(compound, containedDeco);
 	}
 
 	public ItemStack getContainedItem() {
@@ -59,5 +58,11 @@ public class DecoratedRatCageBlockEntity extends BlockEntity {
 		this.setChanged();
 	}
 
-
+	// 26.x: the decoration drops when the cage is removed (1.21.1: the block's onRemove)
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+		if (this.level != null && !this.level.isClientSide() && !this.getContainedItem().isEmpty()) {
+			this.level.addFreshEntity(new ItemEntity(this.level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, this.getContainedItem()));
+		}
+	}
 }

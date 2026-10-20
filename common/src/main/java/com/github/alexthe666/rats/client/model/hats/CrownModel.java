@@ -16,13 +16,14 @@ public class CrownModel extends AbstractHatModel {
 		PartDefinition partdefinition = mesh.getRoot();
 
 		partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 						.texOffs(0, 3)
 						.addBox(-4.0F, -11.0F, -4.0F, 8.0F, 4.0F, 8.0F, new CubeDeformation(-0.25F)),
 				PartPose.ZERO);
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

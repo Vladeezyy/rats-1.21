@@ -2,24 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "rats:rat_upgrade_armor"
-    },
-    "B": {
-      "tag": "c:storage_blocks/diamond"
-    },
-    "D": {
-      "tag": "c:gems/diamond"
-    },
-    "F": {
-      "item": "rats:rat_upgrade_strength"
-    },
-    "H": {
-      "item": "rats:rat_upgrade_health"
-    },
-    "S": {
-      "item": "minecraft:diamond_sword"
-    }
+    "A": "rats:rat_upgrade_armor",
+    "B": "#c:storage_blocks/diamond",
+    "D": "#c:gems/diamond",
+    "F": "rats:rat_upgrade_strength",
+    "H": "rats:rat_upgrade_health",
+    "S": "minecraft:diamond_sword"
   },
   "pattern": [
     "DSD",

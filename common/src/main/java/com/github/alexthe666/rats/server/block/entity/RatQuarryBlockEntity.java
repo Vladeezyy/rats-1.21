@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.data.tags.RatsBlockTags;
@@ -125,15 +127,15 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 		}
 	}
 
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
 		this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.inventory, registries);
+		ContainerHelper.loadAllItems(compound, this.inventory);
 	}
 
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.saveAdditional(compound, registries);
-		ContainerHelper.saveAllItems(compound, this.inventory, registries);
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
+		ContainerHelper.saveAllItems(compound, this.inventory);
 	}
 
 	@Override
@@ -162,13 +164,9 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.loadWithComponents(packet.getTag(), registries);
-	}
 
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId(registries);
+		return this.saveWithoutMetadata(registries);
 	}
 
 	public int getRadius() {
@@ -179,7 +177,7 @@ public class RatQuarryBlockEntity extends BaseContainerBlockEntity implements Wo
 		int yLevel = this.getBlockPos().getY() - 1;
 		BlockPos stairPos = this.getBlockPos().offset(-this.getRadius(), -1, -this.getRadius());
 		int passedLevels = 0;
-		while (yLevel > this.getLevel().getMinBuildHeight() + 1) {
+		while (yLevel > this.getLevel().getMinY() + 1) {
 			if (yLevel == this.getBlockPos().getY() - 1) {
 				BlockPos checkingPos = this.getBlockPos().below();
 				for (int i = 0; i < this.getRadius(); i++) {

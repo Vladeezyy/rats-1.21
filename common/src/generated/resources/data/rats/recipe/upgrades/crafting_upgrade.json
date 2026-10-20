@@ -2,24 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "minecraft:stone_axe"
-    },
-    "C": {
-      "tag": "c:cheese"
-    },
-    "P": {
-      "tag": "minecraft:planks"
-    },
-    "S": {
-      "item": "minecraft:stone_pickaxe"
-    },
-    "T": {
-      "item": "minecraft:crafting_table"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "A": "minecraft:stone_axe",
+    "C": "#c:cheese",
+    "P": "#minecraft:planks",
+    "S": "minecraft:stone_pickaxe",
+    "T": "minecraft:crafting_table",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "PCP",

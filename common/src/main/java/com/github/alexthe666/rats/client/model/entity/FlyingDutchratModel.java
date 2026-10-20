@@ -11,7 +11,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.model.ArmedModel;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class FlyingDutchratModel<T extends Dutchrat> extends AdvancedEntityModel<T> implements ArmedModel {
+public class FlyingDutchratModel<T extends Dutchrat> extends AdvancedEntityModel<T> {
 	public final AdvancedModelBox body1;
 	public final AdvancedModelBox body2;
 	public final AdvancedModelBox neck;
@@ -365,7 +365,7 @@ public class FlyingDutchratModel<T extends Dutchrat> extends AdvancedEntityModel
 				this.paw);
 	}
 
-	@Override
+	/** Where the held sword goes (the Dutchrat renderer\'s held item layer) */
 	public void translateToHand(HumanoidArm arm, PoseStack stack) {
 		this.body1.translateRotate(stack);
 		this.rightArm1.translateRotate(stack);

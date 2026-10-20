@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -33,7 +33,7 @@ final class FabricMilk {
     private FabricMilk() {}
 
     static void register() {
-        Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "milk"), MILK);
+        Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(RatsMod.MODID, "milk"), MILK);
         FluidStorage.combinedItemApiProvider(Items.MILK_BUCKET).register(context ->
             new FullItemFluidStorage(context, Items.BUCKET, FluidVariant.of(MILK), FluidConstants.BUCKET));
         FluidStorage.combinedItemApiProvider(Items.BUCKET).register(context ->

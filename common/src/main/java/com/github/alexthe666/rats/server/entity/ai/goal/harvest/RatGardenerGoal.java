@@ -2,13 +2,9 @@ package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class RatGardenerGoal extends BaseRatHarvestGoal {
 	public RatGardenerGoal(TamedRat rat) {

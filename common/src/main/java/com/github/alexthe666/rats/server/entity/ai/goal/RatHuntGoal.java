@@ -41,7 +41,7 @@ public class RatHuntGoal extends TargetGoal {
 	}
 
 	protected void findTarget() {
-		this.target = this.rat.level().getNearestEntity(this.rat.level().getEntitiesOfClass(LivingEntity.class, this.getTargetSearchArea(this.getFollowDistance()), entity -> (!(entity instanceof OwnableEntity ownable) || ownable.getOwner() != this.rat.getOwner()) && entity != this.rat.getOwner() && this.targetsList.getFirst() == this.targetsList.getSecond().contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())), TargetingConditions.DEFAULT, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
+		this.target = getServerLevel(this.rat).getNearestEntity(this.rat.level().getEntitiesOfClass(LivingEntity.class, this.getTargetSearchArea(this.getFollowDistance()), entity -> (!(entity instanceof OwnableEntity ownable) || ownable.getOwner() != this.rat.getOwner()) && entity != this.rat.getOwner() && this.targetsList.getFirst() == this.targetsList.getSecond().contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())), TargetingConditions.DEFAULT, this.mob, this.mob.getX(), this.mob.getEyeY(), this.mob.getZ());
 	}
 
 	@Override

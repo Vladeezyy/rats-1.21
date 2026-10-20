@@ -89,7 +89,7 @@ public class WildRatTargetFoodGoal extends Goal {
 			duplicate.setCount(1);
 			this.targetItem.getItem().shrink(1);
 			if (!this.rat.getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && !this.rat.level().isClientSide()) {
-				this.rat.spawnAtLocation(this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
+				this.rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.rat.level(), this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
 			}
 			this.rat.setItemInHand(InteractionHand.MAIN_HAND, duplicate);
 			if (this.rat instanceof Rat wildBoi && !wildBoi.hasPlague() && this.targetItem.getOwner() instanceof Player targetPlayer) {

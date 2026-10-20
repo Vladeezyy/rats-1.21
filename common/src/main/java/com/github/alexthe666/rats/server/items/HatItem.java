@@ -1,10 +1,12 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import com.github.alexthe666.rats.registry.RatsArmorMaterialRegistry;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.registry.RatsArmorMaterialRegistry;
-import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.RatsMod;
-import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.hats.*;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -14,41 +16,34 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
 import net.minecraft.core.registries.BuiltInRegistries;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
-public class HatItem extends ArmorItem {
+public class HatItem extends Item {
 
 	private final int loreLines;
 
-	public HatItem(Item.Properties properties, Holder<ArmorMaterial> material, int loreLines) {
-		super(material, Type.HELMET, withDurability(properties, material, Type.HELMET));
+	public HatItem(Item.Properties properties, ArmorMaterial material, int loreLines) {
+		super(RatsArmorMaterialRegistry.hat(properties, material));
 		this.loreLines = loreLines;
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		if (stack.is(RatsItemRegistry.BLACK_DEATH_MASK.get())) {
-			tooltip.add(Component.translatable("item.rats.plague_doctor_mask.desc").withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("item.rats.plague_doctor_mask.desc").withStyle(ChatFormatting.GRAY));
 		}
 		if (this.loreLines > 0) {
 			for (int i = 0; i < this.loreLines; i++) {
-				tooltip.add(Component.translatable(this.getDescriptionId() + ".desc" + (this.loreLines == 1 ? "" : i)).withStyle(ChatFormatting.GRAY));
+				tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc" + (this.loreLines == 1 ? "" : i)).withStyle(ChatFormatting.GRAY));
 			}
 		}
 	}
@@ -86,7 +81,6 @@ public class HatItem extends ArmorItem {
 		if (this == RatlantisItemRegistry.GHOST_PIRAT_HAT.get()) {
 			float piratScale = rat instanceof GhostPirat ? 1.1F : 1.425F;
 			float piratTranslate = rat instanceof GhostPirat ? 0.05F : -0.125F;
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.3F);
 			stack.mulPose(Axis.XN.rotationDegrees(5.0F));
 			stack.translate(0.0F, piratTranslate, 0.0F);
 			stack.scale(piratScale, piratScale, piratScale);
@@ -145,15 +139,10 @@ public class HatItem extends ArmorItem {
 		return 0.0F;
 	}
 
-	/** The durability the 1.20.1 armor material gave (hats without durability stay at stack size 1) */
-	public static Item.Properties withDurability(Item.Properties properties, Holder<ArmorMaterial> material, Type type) {
-		int durability = RatsArmorMaterialRegistry.durability(material, type);
-		return durability > 0 ? properties.durability(durability) : properties;
-	}
 
-	// NeoForge calls it (an item extension); Fabric draws the hats itself with this texture
-	public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean innerModel) {
-		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/" + BuiltInRegistries.ITEM.getKey(this).getPath() + ".png");
+	/** The hat's texture (the hats are drawn by Rats on both loaders) */
+	public Identifier getHatTexture() {
+		return Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/model/hat/" + BuiltInRegistries.ITEM.getKey(this).getPath() + ".png");
 	}
 
 }

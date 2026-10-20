@@ -4,8 +4,8 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
@@ -15,7 +15,7 @@ public class PiratHatModel extends AbstractHatModel {
 		super(root);
 	}
 
-	public PiratHatModel(ModelPart root, Function<ResourceLocation, RenderType> function) {
+	public PiratHatModel(ModelPart root, Function<Identifier, RenderType> function) {
 		super(root, function);
 	}
 
@@ -24,7 +24,6 @@ public class PiratHatModel extends AbstractHatModel {
 		PartDefinition partdefinition = mesh.getRoot();
 
 		partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		PartDefinition hat = partdefinition.getChild("head").addOrReplaceChild("main_hat", CubeListBuilder.create().texOffs(36, 0).addBox(-4.0F, -5.0F, -3.0F, 8.0F, 5.0F, 6.0F, new CubeDeformation(0.0F))
 				.texOffs(23, 3).addBox(6.0F, -3.0F, -4.0F, 1.0F, 3.0F, 8.0F, new CubeDeformation(-0.01F))
@@ -38,6 +37,8 @@ public class PiratHatModel extends AbstractHatModel {
 				.texOffs(30, 15).addBox(-5.0F, -6.0F, 0.0F, 10.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 4.0F, 0.1745F, 0.0F, 0.0F));
 
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "A": {
-      "item": "minecraft:netherite_chestplate"
-    },
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    },
-    "T": {
-      "item": "rats:arcane_technology"
-    }
+    "A": "minecraft:netherite_chestplate",
+    "I": "rats:oratchalcum_ingot",
+    "T": "rats:arcane_technology"
   },
   "pattern": [
     "ITI",

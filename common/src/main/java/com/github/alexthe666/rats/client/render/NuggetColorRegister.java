@@ -3,6 +3,9 @@ package com.github.alexthe666.rats.client.render;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.items.OreRatNuggetItem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -27,7 +30,7 @@ public class NuggetColorRegister {
 				Color texColour = getAverageColour(getTextureAtlas(poopStack));
 				color = texColour.getARGB();
 			} catch (NullPointerException e) {
-				RatsMod.LOGGER.warn("Could not fetch average nugget color for resource {}, defaulting to white.", poopStack.getItem().getDescription().getString());
+				RatsMod.LOGGER.warn("Could not fetch average nugget color for resource {}, defaulting to white.", poopStack.getHoverName().getString());
 			}
 			TEXTURES_TO_COLOR.put(poopName, color);
 			return color;
@@ -43,13 +46,14 @@ public class NuggetColorRegister {
 		int vMax = image.contents().height();
 		for (float i = 0; i < uMax; i++)
 			for (float j = 0; j < vMax; j++) {
-				int alpha = image.contents().byMipLevel[0].getPixelRGBA((int) i, (int) j) >> 24 & 0xFF;
-				if (alpha != 255) {
+				// ARGB (1.21.1 read ABGR with getPixelRGBA)
+				int pixel = image.contents().byMipLevel[0].getPixel((int) i, (int) j);
+				if ((pixel >> 24 & 0xFF) != 255) {
 					continue;
 				}
-				red += image.contents().byMipLevel[0].getPixelRGBA((int) i, (int) j) & 0xFF;
-				green += image.contents().byMipLevel[0].getPixelRGBA((int) i, (int) j) >> 8 & 0xFF;
-				blue += image.contents().byMipLevel[0].getPixelRGBA((int) i, (int) j) >> 16 & 0xFF;
+				red += pixel >> 16 & 0xFF;
+				green += pixel >> 8 & 0xFF;
+				blue += pixel & 0xFF;
 				count++;
 			}
 		//Average color
@@ -57,7 +61,10 @@ public class NuggetColorRegister {
 	}
 
 	private static TextureAtlasSprite getTextureAtlas(ItemStack oreStack) {
-		return Objects.requireNonNull(Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(oreStack.getItem())).getParticleIcon();
+		// the particle sprite of the item's model (26.x: resolved into a render state)
+		ItemStackRenderState state = new ItemStackRenderState();
+		Minecraft.getInstance().getItemModelResolver().updateForTopItem(state, oreStack, ItemDisplayContext.GROUND, null, null, 0);
+		return Objects.requireNonNull(state.pickParticleMaterial(RandomSource.create(0L))).sprite();
 	}
 
 	//java.awt bad

@@ -2,34 +2,33 @@ package com.github.alexthe666.rats.client.render.entity.layer;
 
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatModel;
+import com.github.alexthe666.rats.client.render.EntityLayer;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import dev.vladeezyy.rampart.client.render.RampartLivingRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public class RatOverlayLayer extends RenderLayer<Rat, RatModel<Rat>> {
+/** Wild rats: the plague overlay and the toga */
+public class RatOverlayLayer<S extends RampartLivingRenderState> extends EntityLayer<Rat, S, RatModel<Rat>> {
+	private static final RenderType PLAGUE_TEX = RenderTypes.entityTranslucent(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/plague_overlay.png"), false);
+	private static final RenderType TOGA_TEX = RenderTypes.entityCutoutCull(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/toga.png"));
 
-	private static final RenderType PLAGUE_TEX = RenderType.entityNoOutline(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/plague_overlay.png"));
-	private static final RenderType TOGA_TEX = RenderType.entitySmoothCutout(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/toga.png"));
-
-	public RatOverlayLayer(RenderLayerParent<Rat, RatModel<Rat>> parent) {
+	public RatOverlayLayer(RenderLayerParent<S, RatModel<Rat>> parent) {
 		super(parent);
 	}
 
 	@Override
-	public void render(PoseStack stack, MultiBufferSource buffer, int light, Rat rat, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	protected void submit(PoseStack stack, SubmitNodeCollector collector, int light, S state, Rat rat) {
 		if (rat.hasPlague()) {
-			VertexConsumer consumer = buffer.getBuffer(PLAGUE_TEX);
-			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+			this.submitParent(stack, collector, state, PLAGUE_TEX, light);
 		}
 		if (rat.hasToga()) {
-			VertexConsumer consumer = buffer.getBuffer(TOGA_TEX);
-			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+			this.submitParent(stack, collector, state, TOGA_TEX, light, OverlayTexture.NO_OVERLAY, -1, 2);
 		}
 	}
 }

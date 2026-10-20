@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "item": "rats:nether_cheese"
-    },
-    "T": {
-      "item": "minecraft:ghast_tear"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic_mount"
-    },
-    "W": {
-      "item": "minecraft:warped_fungus"
-    }
+    "C": "rats:nether_cheese",
+    "T": "minecraft:ghast_tear",
+    "U": "rats:rat_upgrade_basic_mount",
+    "W": "minecraft:warped_fungus"
   },
   "pattern": [
     "WCW",

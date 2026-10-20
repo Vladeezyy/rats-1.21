@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -29,11 +31,11 @@ public class DJRatUpgradeItem extends BaseRatUpgradeItem implements HoldsItemUpg
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		model.translateToBody(stack);
 		stack.scale(-0.35F, -0.35F, 0.35F);
 		stack.translate(-0.5F, -0.5F, -0.65F);
-		context.getBlockRenderDispatcher().renderSingleBlock(Blocks.JUKEBOX.defaultBlockState(), stack, buffer, light, OverlayTexture.NO_OVERLAY);
+		context.block(Blocks.JUKEBOX.defaultBlockState(), stack, buffer, light);
 	}
 
 	@Override

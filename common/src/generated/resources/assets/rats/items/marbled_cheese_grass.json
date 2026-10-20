@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "rats:item/marbled_cheese_grass",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -10769594
+      }
+    ]
+  }
+}

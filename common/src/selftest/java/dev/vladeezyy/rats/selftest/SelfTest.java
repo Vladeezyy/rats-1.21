@@ -61,7 +61,7 @@ public final class SelfTest {
       return;
     }
     ServerLevel level = server.overworld();
-    BlockPos spawn = level.getSharedSpawnPos();
+    BlockPos spawn = level.getRespawnData().pos();
     origin = new BlockPos(spawn.getX() + 200, 120, spawn.getZ());
     for (int cx = -1; cx <= 1; cx++) {
       for (int cz = -1; cz <= 1; cz++) {
@@ -130,37 +130,37 @@ public final class SelfTest {
 
   private static void checks(MinecraftServer server, ServerLevel level) {
     check("items, blocks and entities registered", () ->
-      BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "cheese"))
-        && BuiltInRegistries.BLOCK.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "rat_crafting_table"))
-        && BuiltInRegistries.ENTITY_TYPE.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tamed_rat"))
-        && BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis_helmet")));
+      BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "cheese"))
+        && BuiltInRegistries.BLOCK.containsKey(net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "rat_crafting_table"))
+        && BuiltInRegistries.ENTITY_TYPE.containsKey(net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "tamed_rat"))
+        && BuiltInRegistries.ITEM.containsKey(net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "ratlantis_helmet")));
     check("enum extensions: rat spawn category and Ratlantis rarity", () ->
       RatsMod.RATS.getName().equals("rats:rats") && RatsMod.RATLANTIS_SPECIAL != null);
     check("rat variants registry has the 13 variants", () ->
       com.github.alexthe666.rats.registry.RatVariantRegistry.RAT_VARIANT_REGISTRY.size() == 13);
     check("recipes loaded (crafting, chef, archeologist)", () -> {
       var manager = server.getRecipeManager();
-      long rats = manager.getRecipes().stream().filter(r -> r.id().getNamespace().equals(RatsMod.MODID)).count();
+      long rats = manager.getRecipes().stream().filter(r -> r.id().identifier().getNamespace().equals(RatsMod.MODID)).count();
       RatsMod.LOGGER.info(PREFIX + "{} rats recipes", rats);
-      return rats > 100 && !manager.getAllRecipesFor(com.github.alexthe666.rats.registry.RatsRecipeRegistry.CHEF.get()).isEmpty();
+      return rats > 100 && manager.getRecipes().stream().anyMatch(r -> r.value().getType() == com.github.alexthe666.rats.registry.RatsRecipeRegistry.CHEF.get());
     });
     check("#864: plastic recipes by default, the glass ones only with plastic off", () -> {
       var manager = server.getRecipeManager();
-      return manager.byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_plastic")).isPresent() == com.github.alexthe666.rats.RatConfig.plasticRecipes
-        && manager.byKey(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_glass")).isPresent() != com.github.alexthe666.rats.RatConfig.plasticRecipes;
+      return manager.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_plastic"))).isPresent() == com.github.alexthe666.rats.RatConfig.plasticRecipes
+        && manager.byKey(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "tubes/rat_tube_glass"))).isPresent() != com.github.alexthe666.rats.RatConfig.plasticRecipes;
     });
     check("rat loot table exists", () -> server.reloadableRegistries().getLootTable(
-      net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);
-    check("banner patterns registered", () -> server.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BANNER_PATTERN)
+      net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);
+    check("banner patterns registered", () -> server.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BANNER_PATTERN)
       .containsKey(com.github.alexthe666.rats.registry.RatsBannerPatternRegistry.RAT_PATTERN));
     check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().stream().anyMatch(id -> id.equals("ratlantis") || id.endsWith(":ratlantis") || id.endsWith("/ratlantis")));
     check("Ratlantis pack on means Ratlantis on (1.20.1 pack id)", () -> com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server) == com.github.alexthe666.rats.RatsMod.RATLANTIS_DATAPACK_ENABLED);
     check("wild rat spawns", () -> {
-      spawned = com.github.alexthe666.rats.registry.RatsEntityRegistry.RAT.get().spawn(level, at(1, 0, 1), net.minecraft.world.entity.MobSpawnType.COMMAND);
+      spawned = com.github.alexthe666.rats.registry.RatsEntityRegistry.RAT.get().spawn(level, at(1, 0, 1), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       return spawned != null && spawned.isAlive();
     });
     check("tamed rat with a combined upgrade holding a speed upgrade", () -> {
-      tamed = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().spawn(level, at(-1, 0, 1), net.minecraft.world.entity.MobSpawnType.COMMAND);
+      tamed = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().spawn(level, at(-1, 0, 1), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       if (tamed == null) {
         return false;
       }
@@ -173,23 +173,23 @@ public final class SelfTest {
       return tamed.isTame() && com.github.alexthe666.rats.server.misc.RatUpgradeUtils.hasUpgrade(tamed, com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get());
     });
     check("piglins see a mob carrying a rat with the idol upgrade as wearing gold (common mixin)", () -> {
-      net.minecraft.world.entity.monster.Zombie carrier = net.minecraft.world.entity.EntityType.ZOMBIE.create(level);
-      com.github.alexthe666.rats.server.entity.rat.TamedRat rider = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level);
+      net.minecraft.world.entity.monster.zombie.Zombie carrier = net.minecraft.world.entity.EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      com.github.alexthe666.rats.server.entity.rat.TamedRat rider = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       carrier.setPos(at(-3, 0, 3).getCenter());
       rider.setPos(at(-3, 0, 3).getCenter());
       level.addFreshEntity(carrier);
       level.addFreshEntity(rider);
-      boolean before = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingGold(carrier);
+      boolean before = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingSafeArmor(carrier);
       rider.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_IDOL.get()));
-      rider.startRiding(carrier, true);
-      boolean after = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingGold(carrier);
+      rider.startRiding(carrier, true, false);
+      boolean after = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingSafeArmor(carrier);
       rider.discard();
       carrier.discard();
       return !before && after;
     });
     check("wardens ignore rats with the sculked upgrade (common mixin)", () -> {
-      net.minecraft.world.entity.monster.warden.Warden warden = net.minecraft.world.entity.EntityType.WARDEN.create(level);
-      com.github.alexthe666.rats.server.entity.rat.TamedRat rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level);
+      net.minecraft.world.entity.monster.warden.Warden warden = net.minecraft.world.entity.EntityType.WARDEN.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      com.github.alexthe666.rats.server.entity.rat.TamedRat rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       warden.setPos(at(-5, 0, 3).getCenter());
       rat.setPos(at(-6, 0, 3).getCenter());
       level.addFreshEntity(warden);

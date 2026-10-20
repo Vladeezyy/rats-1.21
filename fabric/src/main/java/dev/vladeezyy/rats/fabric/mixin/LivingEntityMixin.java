@@ -26,9 +26,11 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "onEffectRemoved", at = @At("HEAD"))
-    private void rats$effectEnded(MobEffectInstance instance, CallbackInfo ci) {
-        RatsEvents.onEffectEnded((LivingEntity) (Object) this, instance);
+    @Inject(method = "onEffectsRemoved", at = @At("HEAD"))
+    private void rats$effectEnded(java.util.Collection<MobEffectInstance> instances, CallbackInfo ci) {
+        for (MobEffectInstance instance : instances) {
+            RatsEvents.onEffectEnded((LivingEntity) (Object) this, instance);
+        }
     }
 
     @Inject(method = "tick", at = @At("HEAD"))

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "rats:item/auto_curdler",
+    "model": {
+      "type": "rats:block_entity",
+      "block": "auto_curdler"
+    }
+  }
+}

@@ -1,8 +1,5 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
 
-import com.github.alexthe666.rats.data.tags.CommonTags;
-import net.minecraft.world.level.Level;
-import com.github.alexthe666.rats.server.misc.StoredItems;
 public class RatMineGoal {
 }/* extends BaseRatHarvestGoal {
 	private final TamedRat rat;
@@ -48,7 +45,7 @@ public class RatMineGoal {
 
 	private boolean isWanted(Level level, @Nullable NonNullList<ItemStack> list, boolean ores, BlockPos pos, BlockState state) {
 		if (list != null) {
-			ItemStack stack = state.getBlock().getCloneItemStack(level, pos, state);
+			ItemStack stack = state.getCloneItemStack(level, pos, false);
 			for (ItemStack currentStack : list) {
 				if (currentStack.sameItem(stack)) {
 					return true;

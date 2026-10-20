@@ -4,25 +4,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.PacketContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import com.github.alexthe666.rats.client.util.RatRecordSoundInstance;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 
 public record UpdateRatMusicPacket(int id, Item record) implements CustomPacketPayload {
 
-	public static final Type<UpdateRatMusicPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "update_rat_music"));
+	public static final Type<UpdateRatMusicPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "update_rat_music"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, UpdateRatMusicPacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), UpdateRatMusicPacket::decode);
 
 	@Override
@@ -50,7 +47,7 @@ public record UpdateRatMusicPacket(int id, Item record) implements CustomPacketP
 						Entity entity = Minecraft.getInstance().level.getEntity(packet.id());
 						if (entity instanceof TamedRat rat) {
 							// 1.21: discs play jukebox songs
-							JukeboxSong.fromStack(rat.level().registryAccess(), new ItemStack(packet.record())).ifPresent(song -> {
+							JukeboxSong.fromStack(new ItemStack(packet.record())).ifPresent(song -> {
 								Minecraft.getInstance().getSoundManager().queueTickingSound(new RatRecordSoundInstance(rat, packet.record(), song.value().soundEvent().value()));
 								Minecraft.getInstance().gui.setNowPlaying(song.value().description());
 							});

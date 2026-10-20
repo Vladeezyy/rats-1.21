@@ -1,26 +1,25 @@
 package com.github.alexthe666.rats.server.items;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.registry.RatsToolMaterialRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
-public class PlagueScytheItem extends SwordItem {
+public class PlagueScytheItem extends Item {
 	public PlagueScytheItem(Item.Properties properties) {
-		super(RatsToolMaterialRegistry.PLAGUE_SCYTHE, properties.attributes(SwordItem.createAttributes(RatsToolMaterialRegistry.PLAGUE_SCYTHE, 3, -0.5F)));
+		super(properties.sword(RatsToolMaterialRegistry.PLAGUE_SCYTHE, 3, -0.5F));
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable(this.getDescriptionId() + ".desc").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

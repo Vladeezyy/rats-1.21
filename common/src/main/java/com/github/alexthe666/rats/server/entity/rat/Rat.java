@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.rat;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rats.platform.Platform;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -18,7 +23,6 @@ import com.github.alexthe666.rats.server.misc.RatUtils;
 import com.github.alexthe666.rats.server.misc.RatsDateFetcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -88,7 +92,7 @@ public class Rat extends DiggingRat {
 		});
 		this.targetSelector.addGoal(0, new WildRatTargetFoodGoal(this));
 		this.targetSelector.addGoal(1, new WildRatDefendPlagueDoctorGoal(this));
-		this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true, entity -> {
+		this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true, (entity, level) -> {
 			if (!EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(entity) || !Rat.this.hasPlague()) return false;
 			return !entity.isAlliedTo(Rat.this) && !entity.getItemBySlot(EquipmentSlot.HEAD).is(RatsItemRegistry.BLACK_DEATH_MASK.get()) && entity.level().getDifficulty() != Difficulty.PEACEFUL;
 		}));
@@ -103,12 +107,12 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
-		if (this.getRestrictCenter() != BlockPos.ZERO) {
-			BlockPos home = this.getRestrictCenter();
-			compound.put("Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
-			compound.putFloat("HomeDistance", this.getRestrictRadius());
+		if (this.getHomePosition() != BlockPos.ZERO) {
+			BlockPos home = this.getHomePosition();
+			Values.put(compound, "Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
+			compound.putFloat("HomeDistance", this.getHomeRadius());
 		}
 
 		compound.putInt("CheeseFeedings", this.cheeseFeedings);
@@ -118,19 +122,19 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		if (compound.contains("Home", 9)) {
-			ListTag nbttaglist = compound.getList("Home", 6);
-			int hx = (int) nbttaglist.getDouble(0);
-			int hy = (int) nbttaglist.getDouble(1);
-			int hz = (int) nbttaglist.getDouble(2);
-			this.restrictTo(new BlockPos(hx, hy, hz), (int) compound.getFloat("HomeDistance"));
+		if (Values.contains(compound, "Home")) {
+			ListTag nbttaglist = Values.list(compound, "Home");
+			int hx = (int) nbttaglist.getDoubleOr(0, 0.0D);
+			int hy = (int) nbttaglist.getDoubleOr(1, 0.0D);
+			int hz = (int) nbttaglist.getDoubleOr(2, 0.0D);
+			this.setHomeTo(new BlockPos(hx, hy, hz), (int) compound.getFloatOr("HomeDistance", 0.0F));
 		}
-		this.wildTrust = compound.getInt("WildTrust");
-		this.cheeseFeedings = compound.getInt("CheeseFeedings");
-		this.setPlagued(compound.getBoolean("Plague"));
-		this.setToga(compound.getBoolean("Toga"));
+		this.wildTrust = compound.getIntOr("WildTrust", 0);
+		this.cheeseFeedings = compound.getIntOr("CheeseFeedings", 0);
+		this.setPlagued(compound.getBooleanOr("Plague", false));
+		this.setToga(compound.getBooleanOr("Toga", false));
 	}
 
 	@Override
@@ -138,7 +142,7 @@ public class Rat extends DiggingRat {
 		super.aiStep();
 
 		if (this.getOwner() == null || !this.getOwner().isAlive()) {
-			this.setOwnerUUID(null);
+			this.setOwnerReference(null);
 		}
 
 		if (this.hasPlague() && this.getRandom().nextFloat() < 0.3F) {
@@ -148,10 +152,10 @@ public class Rat extends DiggingRat {
 			this.level().addParticle(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, (float) d0, (float) d1, (float) d2), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight()), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), 0.0D, 0.0D, 0.0D);
 		}
 
-		if (this.isBecomingRatKing() && (!this.getMainHandItem().is(RatsItemRegistry.FILTH_CORRUPTION.get()) || this.level().getCurrentDifficultyAt(this.blockPosition()).getDifficulty() == Difficulty.PEACEFUL)) {
+		if (this.isBecomingRatKing() && (!this.getMainHandItem().is(RatsItemRegistry.FILTH_CORRUPTION.get()) || this.level().getDifficulty() == Difficulty.PEACEFUL)) {
 			this.getEntityData().set(RAT_KING_TRANSFORMATION, false);
-			if (this.level().getCurrentDifficultyAt(this.blockPosition()).getDifficulty() == Difficulty.PEACEFUL) {
-				this.spawnAtLocation(this.getMainHandItem());
+			if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
+				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), this.getMainHandItem());
 				this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 			}
 		}
@@ -166,15 +170,15 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	protected int getBaseExperienceReward() {
-		return this.hasPlague() ? 10 : super.getBaseExperienceReward();
+	protected int getBaseExperienceReward(ServerLevel level) {
+		return this.hasPlague() ? 10 : super.getBaseExperienceReward(level);
 	}
 
 	@Nullable
 	@Override
 	public LivingEntity getOwner() {
 		try {
-			UUID uuid = this.getOwnerUUID();
+			UUID uuid = this.getOwnerReference() != null ? this.getOwnerReference().getUUID() : null;
 			if (this.level() instanceof ServerLevel server) {
 				Entity entity = server.getEntity(uuid);
 				if (entity instanceof LivingEntity living) {
@@ -214,7 +218,7 @@ public class Rat extends DiggingRat {
 		if (this.ratKingTransformTicks == 200 && !this.level().isClientSide()) {
 			RatKing king = new RatKing(RatsEntityRegistry.RAT_KING.get(), this.level());
 			king.copyPosition(this);
-			Platform.INSTANCE.finalizeMobSpawn(king, (ServerLevelAccessor) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.CONVERSION, null);
+			Platform.INSTANCE.finalizeMobSpawn(king, (ServerLevelAccessor) this.level(), ((net.minecraft.world.level.ServerLevelAccessor) this.level()).getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.CONVERSION, null);
 			this.level().addFreshEntity(king);
 			this.discard();
 		}
@@ -225,7 +229,7 @@ public class Rat extends DiggingRat {
 		return (this.isBecomingRatKing() || this.isEating()) && this.sleepProgress <= 0.0F;
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return this.hasPlague();
 	}
@@ -233,15 +237,15 @@ public class Rat extends DiggingRat {
 	@Override
 	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean playerKill) {
 		if (this.hasToga()) {
-			this.spawnAtLocation(new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
+			this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
 		}
 		super.dropCustomDeathLoot(level, source, playerKill);
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
-		if (this.getRandom().nextInt(15) == 0 && this.level().getDifficulty() != Difficulty.PEACEFUL && type != MobSpawnType.CONVERSION) {
+		if (this.getRandom().nextInt(15) == 0 && this.level().getDifficulty() != Difficulty.PEACEFUL && type != EntitySpawnReason.CONVERSION) {
 			this.setPlagued(true);
 		}
 		if (accessor.getLevel().dimension().equals(RatlantisDimensionRegistry.DIMENSION_KEY)) {
@@ -256,7 +260,7 @@ public class Rat extends DiggingRat {
 				this.setGuaranteedDrop(EquipmentSlot.HEAD);
 			} else if ((RatsDateFetcher.isNewYearsEve() && this.getRandom().nextFloat() <= 0.25F) || RatsDateFetcher.isAlexsBDay() || RatsDateFetcher.isGizmosBDay() || (RatConfig.ratsSpawnWithPartyHats && this.getRandom().nextInt(100) == 0)) {
 				ItemStack stack = new ItemStack(RatsItemRegistry.PARTY_HAT.get());
-				stack.set(DataComponents.DYED_COLOR, new DyedItemColor((int) (this.getRandom().nextFloat() * 0xFFFFFF), true));
+				stack.set(DataComponents.DYED_COLOR, new DyedItemColor((int) (this.getRandom().nextFloat() * 0xFFFFFF)));
 				this.setItemSlot(EquipmentSlot.HEAD, stack);
 				this.setGuaranteedDrop(EquipmentSlot.HEAD);
 			} else if (RatsDateFetcher.isPirateDay() && this.getRandom().nextFloat() <= 0.25F) {
@@ -276,10 +280,10 @@ public class Rat extends DiggingRat {
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
 		if (!this.hasPlague()) {
-			if (itemstack.is(RatsItemRegistry.FILTH_CORRUPTION.get()) && this.level().getCurrentDifficultyAt(this.blockPosition()).getDifficulty() != Difficulty.PEACEFUL) {
+			if (itemstack.is(RatsItemRegistry.FILTH_CORRUPTION.get()) && this.level().getDifficulty() != Difficulty.PEACEFUL) {
 				this.playSound(RatsSoundRegistry.RAT_KING_SUMMON.get(), 1F, 1.5F);
 				if (!this.getMainHandItem().isEmpty()) {
-					this.spawnAtLocation(this.getMainHandItem());
+					this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), this.getMainHandItem());
 					this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 				}
 				this.setItemInHand(InteractionHand.MAIN_HAND, player.getItemInHand(hand).copyWithCount(1));
@@ -325,8 +329,8 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	public boolean isInvulnerableTo(DamageSource source) {
-		return this.isBecomingRatKing() || super.isInvulnerableTo(source);
+	public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+		return this.isBecomingRatKing() || super.isInvulnerableTo(level, source);
 	}
 
 	@Override
@@ -334,16 +338,16 @@ public class Rat extends DiggingRat {
 		return super.isInvulnerable() || this.isBecomingRatKing();
 	}
 
-	public static boolean checkRatSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor accessor, MobSpawnType type, BlockPos pos, RandomSource random) {
+	public static boolean checkRatSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor accessor, EntitySpawnReason type, BlockPos pos, RandomSource random) {
 		if (random.nextInt(16) == 0) {
-			return type == MobSpawnType.SPAWNER || spawnCheck(accessor, pos, random, type);
+			return type == EntitySpawnReason.SPAWNER || spawnCheck(accessor, pos, random, type);
 		}
 		return false;
 	}
 
-	private static boolean spawnCheck(LevelAccessor accessor, BlockPos pos, RandomSource random, MobSpawnType type) {
-		if (!accessor.getLevelData().getGameRules().getBoolean(RatsMod.SPAWN_RATS)) return false;
-		if (type != MobSpawnType.NATURAL) return true;
+	private static boolean spawnCheck(LevelAccessor accessor, BlockPos pos, RandomSource random, EntitySpawnReason type) {
+		if (!RatsMod.spawnRule(accessor, RatsMod.SPAWN_RATS)) return false;
+		if (type != EntitySpawnReason.NATURAL) return true;
 		int spawnRoll = RatConfig.ratSpawnDecrease;
 		if (accessor instanceof ServerLevelAccessor server && server.getLevel().dimension().equals(RatlantisDimensionRegistry.DIMENSION_KEY))
 			return spawnRoll <= 0 || random.nextInt(spawnRoll) == 0;
@@ -364,7 +368,7 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	public boolean checkSpawnRules(LevelAccessor accessor, MobSpawnType type) {
+	public boolean checkSpawnRules(LevelAccessor accessor, EntitySpawnReason type) {
 		return spawnCheck(accessor, this.blockPosition(), accessor.getRandom(), type);
 	}
 
@@ -390,8 +394,8 @@ public class Rat extends DiggingRat {
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
-		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
+		boolean flag = entity.hurtOrSimulate(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		if (flag && this.hasPlague()) {
 			if (this.level() instanceof ServerLevel serverLevel) {
 				EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().mobAttack(this));
@@ -421,5 +425,14 @@ public class Rat extends DiggingRat {
 			return this.getRandom().nextFloat() < 0.3F;
 		}
 		return true;
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+			this.discard();
+		} else {
+			super.checkDespawn();
+		}
 	}
 }

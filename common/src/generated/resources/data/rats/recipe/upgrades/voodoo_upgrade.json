@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "H": {
-      "item": "rats:top_hat"
-    },
-    "P": {
-      "item": "rats:plague_essence"
-    },
-    "S": {
-      "item": "rats:rat_skull"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_health"
-    }
+    "H": "rats:top_hat",
+    "P": "rats:plague_essence",
+    "S": "rats:rat_skull",
+    "T": "minecraft:totem_of_undying",
+    "U": "rats:rat_upgrade_health"
   },
   "pattern": [
     "PHP",

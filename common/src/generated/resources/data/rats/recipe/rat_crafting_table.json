@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "tag": "c:storage_blocks/cheese"
-    },
-    "W": {
-      "item": "minecraft:crafting_table"
-    }
+    "C": "#c:storage_blocks/cheese",
+    "W": "minecraft:crafting_table"
   },
   "pattern": [
     "CCC",

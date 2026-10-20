@@ -1,16 +1,15 @@
 package com.github.alexthe666.rats.server.world;
 
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsVillagerRegistry;
 import com.github.alexthe666.rats.registry.worldgen.RatlantisDimensionRegistry;
-import net.minecraft.BlockUtil;
+import net.minecraft.util.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -30,10 +28,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
- * Finds or builds the Ratlantis portal on the other side (1.21: a DimensionTransition; the original was a Forge
+ * Finds or builds the Ratlantis portal on the other side (1.21: a TeleportTransition; the original was a Forge
  * ITeleporter). The destination is the same as in the original: the portal's corner, half a block in.
  */
 public class RatlantisTeleporter {
@@ -54,7 +51,7 @@ public class RatlantisTeleporter {
 				this.level.getBlockState(poi.getPos()).is(RatlantisBlockRegistry.RATLANTIS_PORTAL.get())).findFirst();
 		return optional.map(poi -> {
 			BlockPos blockpos = poi.getPos();
-			this.level.getChunkSource().addRegionTicket(TicketType.PORTAL, new ChunkPos(blockpos), 3, blockpos);
+			this.level.getChunkSource().addTicketWithRadius(TicketType.PORTAL, ChunkPos.containing(blockpos), 3);
 			BlockState blockstate = this.level.getBlockState(blockpos);
 			return BlockUtil.getLargestRectangleAround(blockpos, Direction.Axis.Y, 21, Direction.Axis.Y, 21, (posIn) ->
 					this.level.getBlockState(posIn) == blockstate);
@@ -62,13 +59,14 @@ public class RatlantisTeleporter {
 	}
 
 	public Optional<BlockUtil.FoundRectangle> makePortal(BlockPos pos) {
-		ChunkPos chunkPos = new ChunkPos(pos);
+		ChunkPos chunkPos = ChunkPos.containing(pos);
 		//load chunk if it doesnt exist so the heightmap is correctly calculated
-		if (!this.level.hasChunk(chunkPos.x, chunkPos.z)) {
-			this.level.getChunk(chunkPos.x, chunkPos.z);
+		if (!this.level.hasChunk(chunkPos.x(), chunkPos.z())) {
+			this.level.getChunk(chunkPos.x(), chunkPos.z());
 		}
 		//set portal position to be on the ground (or rather, one block above it)
-		pos = this.level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE_WG, pos).above();
+		// 26.x: a loaded chunk keeps only the final heightmaps (WORLD_SURFACE_WG is "unprimed" there and gives the bottom)
+		pos = this.level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, pos).above();
 
 		this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		this.level.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
@@ -101,7 +99,7 @@ public class RatlantisTeleporter {
 	}
 
 	@Nullable
-	public DimensionTransition transition(Entity entity) {
+	public TeleportTransition transition(Entity entity) {
 		ServerLevel level = this.level;
 		boolean ratlantis = level.dimension() == RatlantisDimensionRegistry.DIMENSION_KEY;
 		if (entity.level().dimension() != RatlantisDimensionRegistry.DIMENSION_KEY && !ratlantis) {
@@ -120,7 +118,7 @@ public class RatlantisTeleporter {
 			double along = dimensions.width() / 2.0D + (rectangle.axis1Size - dimensions.width()) * 0.5D;
 			Vec3 target = new Vec3(corner.getX() + along, corner.getY(), corner.getZ() + 0.5D);
 			Vec3 free = PortalShape.findCollisionFreePosition(target, level, entity, dimensions);
-			return new DimensionTransition(level, free, Vec3.ZERO, entity.getYRot(), entity.getXRot(), DimensionTransition.PLACE_PORTAL_TICKET);
+			return new TeleportTransition(level, free, Vec3.ZERO, entity.getYRot(), entity.getXRot(), TeleportTransition.PLACE_PORTAL_TICKET);
 		}).orElse(null);
 	}
 

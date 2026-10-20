@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.misc;
+import net.minecraft.server.level.ServerLevel;
 
 import com.github.alexthe666.rats.registry.RatsParticleRegistry;
 import com.github.alexthe666.rats.server.entity.ai.navigation.control.EtherealRatMoveControl;
@@ -22,15 +23,15 @@ public class RatProtector extends AbstractRat {
 	}
 
 	@Override
-	protected int getBaseExperienceReward() {
+	protected int getBaseExperienceReward(ServerLevel level) {
 		return 0;
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
-		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
+		boolean flag = entity.hurtOrSimulate(this.damageSources().mobAttack(this), (float) ((int) this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 		if (flag) {
-			this.kill();
+			if (this.level() instanceof ServerLevel serverLevel) this.kill(serverLevel);
 		}
 		return flag;
 	}
@@ -76,7 +77,7 @@ public class RatProtector extends AbstractRat {
 		this.noPhysics = true;
 		if (!this.level().isClientSide()) {
 			if (this.getTarget() == null || !this.getTarget().isAlive()) {
-				this.kill();
+				if (this.level() instanceof ServerLevel serverLevel) this.kill(serverLevel);
 			} else {
 				LivingEntity target = this.getTarget();
 				this.getMoveControl().setWantedPosition(target.getX(), target.getY() + target.getBbHeight() / 2, target.getZ(), 1);

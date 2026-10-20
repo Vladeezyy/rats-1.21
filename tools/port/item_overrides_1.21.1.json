@@ -1,0 +1,362 @@
+{
+  "rat_sack": [
+    {
+      "model": "rats:item/rat_sack_1",
+      "predicate": {
+        "minecraft:rat_count": 1.0
+      }
+    },
+    {
+      "model": "rats:item/rat_sack_2",
+      "predicate": {
+        "minecraft:rat_count": 2.0
+      }
+    },
+    {
+      "model": "rats:item/rat_sack_3",
+      "predicate": {
+        "minecraft:rat_count": 3.0
+      }
+    }
+  ],
+  "rat_upgrade_demon": [
+    {
+      "model": "rats:item/rat_upgrade_soul_demon",
+      "predicate": {
+        "rats:soul": 1.0
+      }
+    }
+  ],
+  "ratbow_essence": [
+    {
+      "model": "rats:item/ratbow_essence_agender",
+      "predicate": {
+        "rats:special": 1.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_aro",
+      "predicate": {
+        "rats:special": 2.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_ace",
+      "predicate": {
+        "rats:special": 3.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_bi",
+      "predicate": {
+        "rats:special": 4.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_gay",
+      "predicate": {
+        "rats:special": 5.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_genderfluid",
+      "predicate": {
+        "rats:special": 6.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_enby",
+      "predicate": {
+        "rats:special": 7.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_lesbian",
+      "predicate": {
+        "rats:special": 8.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_pan",
+      "predicate": {
+        "rats:special": 9.0
+      }
+    },
+    {
+      "model": "rats:item/ratbow_essence_trans",
+      "predicate": {
+        "rats:special": 10.0
+      }
+    }
+  ],
+  "ratlantis_boots": [
+    {
+      "model": "rats:item/ratlantis_boots_quartz_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.1
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_iron_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.2
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_netherite_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.3
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_redstone_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.4
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_copper_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.5
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_gold_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.6
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_emerald_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.7
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_diamond_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.8
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_lapis_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.9
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_boots_amethyst_trim",
+      "predicate": {
+        "minecraft:trim_type": 1.0
+      }
+    }
+  ],
+  "ratlantis_bow": [
+    {
+      "model": "rats:item/ratlantis_bow_pulling_0",
+      "predicate": {
+        "minecraft:pulling": 1.0
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_bow_pulling_1",
+      "predicate": {
+        "minecraft:pull": 0.65,
+        "minecraft:pulling": 1.0
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_bow_pulling_2",
+      "predicate": {
+        "minecraft:pull": 0.9,
+        "minecraft:pulling": 1.0
+      }
+    }
+  ],
+  "ratlantis_chestplate": [
+    {
+      "model": "rats:item/ratlantis_chestplate_quartz_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.1
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_iron_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.2
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_netherite_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.3
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_redstone_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.4
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_copper_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.5
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_gold_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.6
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_emerald_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.7
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_diamond_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.8
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_lapis_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.9
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_chestplate_amethyst_trim",
+      "predicate": {
+        "minecraft:trim_type": 1.0
+      }
+    }
+  ],
+  "ratlantis_helmet": [
+    {
+      "model": "rats:item/ratlantis_helmet_quartz_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.1
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_iron_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.2
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_netherite_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.3
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_redstone_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.4
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_copper_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.5
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_gold_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.6
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_emerald_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.7
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_diamond_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.8
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_lapis_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.9
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_helmet_amethyst_trim",
+      "predicate": {
+        "minecraft:trim_type": 1.0
+      }
+    }
+  ],
+  "ratlantis_leggings": [
+    {
+      "model": "rats:item/ratlantis_leggings_quartz_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.1
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_iron_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.2
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_netherite_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.3
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_redstone_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.4
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_copper_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.5
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_gold_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.6
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_emerald_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.7
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_diamond_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.8
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_lapis_trim",
+      "predicate": {
+        "minecraft:trim_type": 0.9
+      }
+    },
+    {
+      "model": "rats:item/ratlantis_leggings_amethyst_trim",
+      "predicate": {
+        "minecraft:trim_type": 1.0
+      }
+    }
+  ]
+}

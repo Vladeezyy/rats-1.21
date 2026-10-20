@@ -1,32 +1,35 @@
 package com.github.alexthe666.rats.server.items;
 
-import net.minecraft.world.entity.LivingEntity;
 import com.github.alexthe666.rats.RatsMod;
-import com.github.alexthe666.rats.client.render.RatsBEWLR;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
-import com.github.alexthe666.rats.server.block.CustomItemRarity;
+import com.github.alexthe666.rats.server.block.BlockTooltip;
 import com.github.alexthe666.rats.server.block.WearableOnHead;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 
-import java.util.function.Consumer;
 
 public class RatsBlockItem extends BlockItem {
 
 	public RatsBlockItem(Block block, Properties properties) {
-		super(block, properties);
+		// blocks worn as hats go on the head as a carved pumpkin does (equippable component, both loaders)
+		super(block, block instanceof WearableOnHead ? properties.equippableUnswappable(EquipmentSlot.HEAD) : properties);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, LivingEntity entity) {
-		return this.getBlock() instanceof WearableOnHead && EquipmentSlot.HEAD == armorType;
+	@Override
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, context, display, tooltip, flag);
+		if (this.getBlock() instanceof BlockTooltip block) {
+			block.appendHoverText(stack, context, display, tooltip, flag);
+		}
 	}
 
 

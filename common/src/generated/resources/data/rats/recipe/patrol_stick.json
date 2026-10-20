@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "item": "rats:nether_cheese"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "C": "rats:nether_cheese",
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     " C",

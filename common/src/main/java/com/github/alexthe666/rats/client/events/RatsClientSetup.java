@@ -1,5 +1,31 @@
 package com.github.alexthe666.rats.client.events;
 
+import com.github.alexthe666.rats.client.render.RatsItemModels;
+import com.github.alexthe666.rats.client.render.RatsItemSpecialRenderer;
+import com.github.alexthe666.rats.client.render.entity.layer.HatLayer;
+import com.github.alexthe666.rats.client.render.entity.layer.RatProtectorLayer;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.block.BlockTintSources;
+import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
+import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperty;
+import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import net.minecraft.world.entity.Entity;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.gui.*;
@@ -20,24 +46,15 @@ import com.github.alexthe666.rats.client.render.entity.layer.PartyHatLayer;
 import com.github.alexthe666.rats.client.render.entity.layer.PlagueLayer;
 import com.github.alexthe666.rats.registry.*;
 import com.github.alexthe666.rats.server.block.entity.RatTubeBlockEntity;
-import com.github.alexthe666.rats.server.entity.misc.PiratWoodBoat;
 import com.github.alexthe666.rats.server.items.*;
 import com.github.alexthe666.rats.server.items.upgrades.DemonRatUpgradeItem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import dev.vladeezyy.rats.platform.RegistryEntry;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.model.BoatModel;
-import net.minecraft.client.model.ChestBoatModel;
+import net.minecraft.client.model.object.boat.BoatModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.LayerDefinitions;
@@ -47,22 +64,17 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.BiomeColors;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.BoatRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.DyeColor;
@@ -81,7 +93,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class RatsClientSetup {
 
-	private static ShaderInstance rendertypeRatlantisPortalShader;
 
 	private RatsClientSetup() {
 	}
@@ -99,44 +110,25 @@ public final class RatsClientSetup {
 		Minecraft.getInstance().setScreen(new MobFilterScreen(hand));
 	}
 
-	/** The shader of the Ratlantis portal ({@code shaders/core/rendertype_ratlantis_portal.json}), set by the loader */
-	public static final ResourceLocation RATLANTIS_PORTAL_SHADER = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "rendertype_ratlantis_portal");
+	/** What the item definitions (assets/rats/items/*.json) use beyond vanilla: properties, tints, special models */
+	public interface ItemModelSink {
+		void rangeProperty(Identifier id, MapCodec<? extends RangeSelectItemModelProperty> codec);
 
-	public static void setRendertypeRatlantisPortalShader(ShaderInstance shader) {
-		rendertypeRatlantisPortalShader = shader;
+		void conditionalProperty(Identifier id, MapCodec<? extends ConditionalItemModelProperty> codec);
+
+		void tintSource(Identifier id, MapCodec<? extends ItemTintSource> codec);
+
+		void specialRenderer(Identifier id, MapCodec<? extends SpecialModelRenderer.Unbaked<?>> codec);
 	}
 
-	public static ShaderInstance getRendertypeRatlantisPortalShader() {
-		return rendertypeRatlantisPortalShader;
+	public static void registerItemModels(ItemModelSink sink) {
+		sink.rangeProperty(RatsItemModels.RAT_COUNT, RatsItemModels.RatCount.MAP_CODEC);
+		sink.rangeProperty(RatsItemModels.SPECIAL_DYE, RatsItemModels.SpecialDye.MAP_CODEC);
+		sink.conditionalProperty(RatsItemModels.SOUL, RatsItemModels.Soul.MAP_CODEC);
+		sink.tintSource(RatsItemModels.NUGGET_ORE, RatsItemModels.NuggetOre.MAP_CODEC);
+		sink.tintSource(RatsItemModels.PARTY_HAT, RatsItemModels.PartyHatInverse.MAP_CODEC);
+		sink.specialRenderer(RatsItemSpecialRenderer.ID, RatsItemSpecialRenderer.Unbaked.MAP_CODEC);
 	}
-
-	public interface ItemPropertySink {
-		void register(Item item, ResourceLocation id, ClampedItemPropertyFunction function);
-	}
-
-	public static void registerItemProperties(ItemPropertySink sink) {
-			sink.register(RatsItemRegistry.RAT_SACK.get(), ResourceLocation.parse("rat_count"), (stack, level, entity, i) -> Math.min(3, RatSackItem.getRatsInSack(stack)));
-
-			sink.register(RatlantisItemRegistry.RATLANTIS_BOW.get(), ResourceLocation.parse("pull"), (stack, level, living, i) -> {
-				if (living == null) {
-					return 0.0F;
-				} else {
-					return living.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(living) - living.getUseItemRemainingTicks()) / 10.0F;
-				}
-			});
-
-			sink.register(RatlantisItemRegistry.RATLANTIS_BOW.get(), ResourceLocation.parse("pulling"), (stack, level, living, i) -> living != null && living.isUsingItem() && living.getUseItem() == stack ? 1.0F : 0.0F);
-
-			sink.register(RatsItemRegistry.RATBOW_ESSENCE.get(), ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "special"), (stack, level, entity, i) -> {
-				if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
-					RatsRenderType.GlintType type = RatsRenderType.GlintType.getGlintBasedOnKeyword(stack.getHoverName().getString());
-					return type != null && type.changesItemTexture() ? type.ordinal() + 1 : 0;
-				}
-				return 0;
-			});
-
-			sink.register(RatsItemRegistry.RAT_UPGRADE_DEMON.get(), ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "soul"), (stack, level, living, i) -> DemonRatUpgradeItem.isSoulVersion(stack) ? 1 : 0);
-			}
 
 	public interface ScreenSink {
 		<M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void screen(MenuType<? extends M> type, MenuScreens.ScreenConstructor<M, U> constructor);
@@ -155,14 +147,13 @@ public final class RatsClientSetup {
 	}
 
 	public static void registerLayerDefinitions(LayerSink sink) {
-		for (PiratWoodBoat.Type boatType : PiratWoodBoat.Type.values()) {
-			sink.layer(PiratWoodBoatRenderer.createBoatModelName(boatType), BoatModel::createBodyModel);
-			sink.layer(PiratWoodBoatRenderer.createChestBoatModelName(boatType), ChestBoatModel::createBodyModel);
-		}
+		sink.layer(RatsModelLayers.PIRAT_WOOD_BOAT, BoatModel::createBoatModel);
+		sink.layer(RatsModelLayers.PIRAT_WOOD_CHEST_BOAT, BoatModel::createChestBoatModel);
 
 		sink.layer(RatsModelLayers.BLACK_DEATH, BlackDeathModel::create);
 		sink.layer(RatsModelLayers.PIPER, PiedPiperModel::create);
 		sink.layer(RatsModelLayers.PIRAT_BOAT, PiratBoatModel::create);
+		sink.layer(RatsModelLayers.PIRAT_BOAT_WATER_PATCH, PiratBoatModel::createWaterPatch);
 		sink.layer(RatsModelLayers.PLAGUE_DOCTOR, PlagueDoctorModel::create);
 		sink.layer(RatsModelLayers.RAT_STRIDER_MOUNT, RatStriderMountModel::create);
 		sink.layer(RatsModelLayers.THROWN_BLOCK, CubeModel::create);
@@ -195,7 +186,7 @@ public final class RatsClientSetup {
 	public interface RendererSink {
 		<E extends Entity> void entity(EntityType<? extends E> type, EntityRendererProvider<E> provider);
 
-		<B extends BlockEntity> void blockEntity(BlockEntityType<? extends B> type, BlockEntityRendererProvider<B> provider);
+		<B extends BlockEntity, S extends BlockEntityRenderState> void blockEntity(BlockEntityType<? extends B> type, BlockEntityRendererProvider<B, S> provider);
 	}
 
 	public static void registerRenderers(RendererSink sink) {
@@ -255,21 +246,22 @@ public final class RatsClientSetup {
 		sink.entity(RatlantisEntityRegistry.LASER_BEAM.get(), LaserBeamRenderer::new);
 		sink.entity(RatlantisEntityRegistry.LASER_PORTAL.get(), LaserPortalRenderer::new);
 		sink.entity(RatlantisEntityRegistry.VIAL_OF_SENTIENCE.get(), ThrownItemRenderer::new);
-		sink.entity(RatlantisEntityRegistry.PIRAT_BOAT.get(), context -> new PiratBoatRenderer<>(context, new PiratBoatModel<>(context.bakeLayer(RatsModelLayers.PIRAT_BOAT))));
+		sink.entity(RatlantisEntityRegistry.PIRAT_BOAT.get(), PiratBoatRenderer::new);
 		sink.entity(RatlantisEntityRegistry.CHEESE_CANNONBALL.get(), ThrownItemRenderer::new);
-		sink.entity(RatlantisEntityRegistry.BOAT.get(), context -> new PiratWoodBoatRenderer(context, false));
-		sink.entity(RatlantisEntityRegistry.CHEST_BOAT.get(), context -> new PiratWoodBoatRenderer(context, true));
+		sink.entity(RatlantisEntityRegistry.BOAT.get(), context -> new BoatRenderer(context, RatsModelLayers.PIRAT_WOOD_BOAT));
+		sink.entity(RatlantisEntityRegistry.CHEST_BOAT.get(), context -> new BoatRenderer(context, RatsModelLayers.PIRAT_WOOD_CHEST_BOAT));
 
 		sink.blockEntity(RatlantisBlockEntityRegistry.RATLANTIS_PORTAL.get(), RatlantisPortalRenderer::new);
 		sink.blockEntity(RatlantisBlockEntityRegistry.DUTCHRAT_BELL.get(), DutchratBellRenderer::new);
 		sink.blockEntity(RatlantisBlockEntityRegistry.AUTOMATON_HEAD.get(), RatlanteanAutomatonHeadRenderer::new);
 		sink.blockEntity(RatlantisBlockEntityRegistry.TOKEN.get(), RatlantisTokenRenderer::new);
-		sink.blockEntity(RatlantisBlockEntityRegistry.PIRAT_SIGN.get(), PiratSignRenderer::new);
-		sink.blockEntity(RatlantisBlockEntityRegistry.PIRAT_HANGING_SIGN.get(), PiratHangingSignRenderer::new);
+		// vanilla's sign renderers (the pirat wood type's textures in the sign atlases)
+		sink.blockEntity(RatlantisBlockEntityRegistry.PIRAT_SIGN.get(), signRenderer(StandingSignRenderer::new));
+		sink.blockEntity(RatlantisBlockEntityRegistry.PIRAT_HANGING_SIGN.get(), signRenderer(HangingSignRenderer::new));
 	}
 
 	public interface ParticleSink {
-		<T extends ParticleOptions> void sprite(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<T> registration);
+		<T extends ParticleOptions> void sprite(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> registration);
 
 		<T extends ParticleOptions> void special(ParticleType<T> type, ParticleProvider<T> provider);
 	}
@@ -289,81 +281,44 @@ public final class RatsClientSetup {
 		sink.sprite(RatsParticleRegistry.UPGRADE_COMBINER.get(), UpgradeCombinerParticle.Provider::new);
 	}
 
-	public interface BlockColorSink {
-		void register(BlockColor color, Block... blocks);
+	public interface BlockTintSink {
+		void register(List<BlockTintSource> tints, Block... blocks);
 	}
 
-	public static void registerBlockColors(BlockColorSink sink) {
-		sink.register((state, level, pos, tint) -> {
-			int meta = 0;
-			if (level != null && pos != null && level.getBlockEntity(pos) instanceof RatTubeBlockEntity tube) {
-				meta = tube.getColor();
+	public static void registerBlockTints(BlockTintSink sink) {
+		// a tube's dye color (kept by its block entity)
+		sink.register(List.of(new BlockTintSource() {
+			@Override
+			public int color(BlockState state) {
+				return ARGB.opaque(DyeColor.WHITE.getFireworkColor());
 			}
-			DyeColor color = DyeColor.byId(meta);
-			return color.getFireworkColor();
-		}, RatsBlockRegistry.RAT_TUBE_COLOR.get());
 
-
-		sink.register((state, level, pos, tint) -> level != null && pos != null ? BiomeColors.getAverageFoliageColor(level, pos) : FoliageColor.get(0.5D, 1.0D), RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get());
-	}
-
-	public interface ItemColorSink {
-		void register(ItemColor color, ItemLike... items);
-	}
-
-	public static void registerItemColors(ItemColorSink sink) {
-		sink.register((stack, tint) -> FoliageColor.get(0.5D, 1.0D), RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get().asItem());
-
-		for (RegistryEntry<Item, Item> item : RatsItemRegistry.RAT_TUBES) {
-			sink.register((stack, tint) -> ((RatTubeItem) item.get()).color.getFireworkColor(), item.get());
-		}
-		for (RegistryEntry<Item, Item> item : RatsItemRegistry.RAT_IGLOOS) {
-			sink.register((stack, tint) -> ((RatIglooItem) item.get()).color.getFireworkColor(), item.get());
-		}
-		for (RegistryEntry<Item, Item> item : RatsItemRegistry.RAT_HAMMOCKS) {
-			sink.register((stack, tint) -> ((RatHammockItem) item.get()).color.getFireworkColor(), item.get());
-		}
-		sink.register((stack, tint) -> {
-			if (tint == 1) {
-				return NuggetColorRegister.getNuggetColor(stack);
-			} else {
-				return -1;
+			@Override
+			public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+				int meta = level.getBlockEntity(pos) instanceof RatTubeBlockEntity tube ? tube.getColor() : 0;
+				return ARGB.opaque(DyeColor.byId(meta).getFireworkColor());
 			}
-		}, RatsItemRegistry.RAT_NUGGET_ORE.get());
-
-		sink.register((stack, tintIndex) -> {
-					int colorToUse;
-					if (tintIndex == 0) {
-						colorToUse = stack.getItem() instanceof PartyHatItem hat
-								? PartyHatItem.getColor(stack)
-								: 0x25C9E7;
-					} else {
-						colorToUse = stack.getItem() instanceof PartyHatItem hat
-								? invertColor(PartyHatItem.getColor(stack))
-								: invertColor(0x25C9E7);
-					}
-					return colorToUse;
-				},
-				RatsItemRegistry.PARTY_HAT.get());
+		}), RatsBlockRegistry.RAT_TUBE_COLOR.get());
+		sink.register(List.of(BlockTintSources.foliage()), RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get());
 	}
 
-	private static int invertColor(int color) {
-		int a = (color >> 24) & 0xff;
-		int r = (color >> 16) & 0xff;
-		int g = (color >> 8) & 0xff;
-		int b = color & 0xff;
-
-		r = 255 - r;
-		g = 255 - g;
-		b = 255 - b;
-		return (a & 0xff) << 24 | (r & 0xff) << 16 | (g & 0xff) << 8 | (b & 0xff);
-	}
-
-	/** The plague and party hat layers every living renderer gets (the loaders call it for each renderer) */
-	public static <T extends LivingEntity, M extends EntityModel<T>> void attachRenderLayers(LivingEntityRenderer<T, M> renderer) {
-		renderer.addLayer(new PlagueLayer<>(renderer));
+	/**
+	 * The layers vanilla renderers get (the loaders call it for each living renderer): the plague overlay; on humanoids
+	 * the mod's hats, the party hat and the Ratlantis armor's protector rats
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static void attachRenderLayers(LivingEntityRenderer<?, ?, ?> renderer, Consumer<RenderLayer<?, ?>> addLayer) {
+		LivingEntityRenderer raw = renderer;
+		addLayer.accept(new PlagueLayer<>(raw));
 		if (renderer.getModel() instanceof HumanoidModel<?>) {
-			renderer.addLayer(new PartyHatLayer<>(renderer, new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR))));
+			addLayer.accept(new HatLayer<>(raw));
+			addLayer.accept(new RatProtectorLayer<>(raw));
 		}
+	}
+
+	/** Vanilla's sign renderers for the pirat signs' own block entity types */
+	@SuppressWarnings("unchecked")
+	private static <B extends BlockEntity, S extends BlockEntityRenderState> BlockEntityRendererProvider<B, S> signRenderer(Function<BlockEntityRendererProvider.Context, ? extends BlockEntityRenderer<SignBlockEntity, ?>> factory) {
+		return context -> (BlockEntityRenderer<B, S>) (BlockEntityRenderer<?, ?>) factory.apply(context);
 	}
 }

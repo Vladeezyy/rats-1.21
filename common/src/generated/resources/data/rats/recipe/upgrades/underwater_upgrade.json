@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "F": {
-      "item": "minecraft:pufferfish"
-    },
-    "G": {
-      "tag": "c:gravels"
-    },
-    "S": {
-      "tag": "c:sands"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    },
-    "W": {
-      "item": "minecraft:water_bucket"
-    }
+    "F": "minecraft:pufferfish",
+    "G": "#c:gravels",
+    "S": "#c:sands",
+    "U": "rats:rat_upgrade_basic",
+    "W": "minecraft:water_bucket"
   },
   "pattern": [
     "GGG",

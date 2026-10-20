@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import java.util.Optional;
 import com.github.alexthe666.rats.server.misc.RatsCaps;
@@ -12,14 +15,13 @@ import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesOverla
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import dev.vladeezyy.rats.platform.transfer.EnergyHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,20 +43,20 @@ public class EnergyRatUpgradeItem extends BaseRatUpgradeItem implements ChangesO
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		super.appendHoverText(stack, level, tooltip, flag);
-		tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_DESC0).withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_DESC1).withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_TRANSFER, this.transferRate).withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, display, tooltip, flag);
+		tooltip.accept(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_DESC0).withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_DESC1).withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_TRANSFER, this.transferRate).withStyle(ChatFormatting.GRAY));
 		if (RatConfig.ratsChargeHeldItems) {
-			tooltip.add(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_CHARGE, this.chargeRate).withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable(RatsLangConstants.RAT_UPGRADE_ENERGY_CHARGE, this.chargeRate).withStyle(ChatFormatting.GRAY));
 		}
 	}
 
 	@Override
 	public @Nullable RenderType getOverlayTexture(ItemStack stack, TamedRat rat, float partialTicks) {
 		float f = (float) rat.tickCount + partialTicks;
-		return rat.getHeldRF() > 0 ? RenderType.energySwirl(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/psychic.png"), f * 0.01F, f * 0.01F) : null;
+		return rat.getHeldRF() > 0 ? RenderTypes.energySwirl(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/psychic.png"), f * 0.01F, f * 0.01F) : null;
 	}
 
 	@Override

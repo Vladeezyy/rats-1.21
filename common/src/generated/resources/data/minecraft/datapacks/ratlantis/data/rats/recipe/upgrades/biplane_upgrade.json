@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "rats:aviator_hat"
-    },
-    "B": {
-      "item": "rats:ratbot_barrel"
-    },
-    "I": {
-      "tag": "c:storage_blocks/iron"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic_mount"
-    },
-    "W": {
-      "item": "rats:biplane_wing"
-    }
+    "A": "rats:aviator_hat",
+    "B": "rats:ratbot_barrel",
+    "I": "#c:storage_blocks/iron",
+    "U": "rats:rat_upgrade_basic_mount",
+    "W": "rats:biplane_wing"
   },
   "pattern": [
     "IAI",

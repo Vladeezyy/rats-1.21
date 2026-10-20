@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "N": {
-      "item": "minecraft:nether_star"
-    },
-    "S": {
-      "item": "rats:golden_rat_skull"
-    },
-    "W": {
-      "item": "rats:rat_upgrade_warrior"
-    }
+    "N": "minecraft:nether_star",
+    "S": "rats:golden_rat_skull",
+    "W": "rats:rat_upgrade_warrior"
   },
   "pattern": [
     "SWS",

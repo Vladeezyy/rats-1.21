@@ -16,7 +16,6 @@ public class TopHatModel extends AbstractHatModel {
 		PartDefinition partdefinition = mesh.getRoot();
 
 		partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 						.texOffs(0, 15)
@@ -25,6 +24,8 @@ public class TopHatModel extends AbstractHatModel {
 						.addBox(-3.5F, -3.0F, 2.5F, 7.0F, 8.0F, 7.0F),
 				PartPose.offset(0.0F, -13.0F, -6.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

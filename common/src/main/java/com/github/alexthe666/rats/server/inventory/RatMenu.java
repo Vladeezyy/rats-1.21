@@ -6,25 +6,23 @@ import com.github.alexthe666.rats.registry.RatsMenuRegistry;
 import com.github.alexthe666.rats.registry.RatsUpgradeConflictRegistry;
 import com.github.alexthe666.rats.server.inventory.container.RatContainer;
 import com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 
 public class RatMenu extends AbstractContainerMenu {
 	private final Container ratInventory;
-	private static final ResourceLocation EMPTY_HELMET_SLOT = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "item/empty_rat_helmet_slot");
-	private static final ResourceLocation EMPTY_BANNER_SLOT = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "item/empty_rat_banner_slot");
-	private static final ResourceLocation EMPTY_ITEM_SLOT = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "item/empty_rat_item_slot");
-	private static final ResourceLocation EMPTY_UPGRADE_SLOT = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "item/empty_rat_upgrade_slot");
+	private static final Identifier EMPTY_HELMET_SLOT = Identifier.fromNamespaceAndPath(RatsMod.MODID, "container/slot/empty_rat_helmet_slot");
+	private static final Identifier EMPTY_BANNER_SLOT = Identifier.fromNamespaceAndPath(RatsMod.MODID, "container/slot/empty_rat_banner_slot");
+	private static final Identifier EMPTY_ITEM_SLOT = Identifier.fromNamespaceAndPath(RatsMod.MODID, "container/slot/empty_rat_item_slot");
+	private static final Identifier EMPTY_UPGRADE_SLOT = Identifier.fromNamespaceAndPath(RatsMod.MODID, "container/slot/empty_rat_upgrade_slot");
 
 	public RatMenu(int id, Container ratInventory, Inventory playerInventory) {
 		super(RatsMenuRegistry.RAT_CONTAINER.get(), id);
@@ -32,8 +30,8 @@ public class RatMenu extends AbstractContainerMenu {
 		ratInventory.startOpen(playerInventory.player);
 		this.addSlot(new Slot(ratInventory, 0, 70, 54) {
 			@Override
-			public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-				return Pair.of(InventoryMenu.BLOCK_ATLAS, EMPTY_ITEM_SLOT);
+			public Identifier getNoItemIcon() {
+				return EMPTY_ITEM_SLOT;
 			}
 		});
 		this.addSlot(new Slot(ratInventory, 1, 70, 18) {
@@ -43,8 +41,8 @@ public class RatMenu extends AbstractContainerMenu {
 			}
 
 			@Override
-			public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-				return Pair.of(InventoryMenu.BLOCK_ATLAS, EMPTY_HELMET_SLOT);
+			public Identifier getNoItemIcon() {
+				return EMPTY_HELMET_SLOT;
 			}
 		});
 		this.addSlot(new Slot(ratInventory, 2, 70, 36) {
@@ -53,8 +51,8 @@ public class RatMenu extends AbstractContainerMenu {
 			}
 
 			@Override
-			public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-				return Pair.of(InventoryMenu.BLOCK_ATLAS, EMPTY_BANNER_SLOT);
+			public Identifier getNoItemIcon() {
+				return EMPTY_BANNER_SLOT;
 			}
 		});
 
@@ -72,8 +70,8 @@ public class RatMenu extends AbstractContainerMenu {
 				}
 
 				@Override
-				public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-					return Pair.of(InventoryMenu.BLOCK_ATLAS, EMPTY_UPGRADE_SLOT);
+				public Identifier getNoItemIcon() {
+					return EMPTY_UPGRADE_SLOT;
 				}
 			});
 		}

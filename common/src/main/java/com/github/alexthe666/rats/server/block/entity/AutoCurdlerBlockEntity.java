@@ -1,8 +1,8 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
-import org.jetbrains.annotations.NotNull;
-import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
@@ -15,7 +15,6 @@ import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -40,7 +39,6 @@ import dev.vladeezyy.rats.platform.transfer.ItemHandler;
 import dev.vladeezyy.rats.platform.transfer.SidedInvWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
 public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer, MenuProvider {
@@ -129,22 +127,22 @@ public class AutoCurdlerBlockEntity extends BaseContainerBlockEntity implements 
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
-		this.tank.readFromNBT(registries, compound);
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		this.tank.load(compound);
 		this.curdlerStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.curdlerStacks, registries);
-		this.cookTime = compound.getInt("CookTime");
-		this.totalCookTime = compound.getInt("CookTimeTotal");
+		ContainerHelper.loadAllItems(compound, this.curdlerStacks);
+		this.cookTime = compound.getIntOr("CookTime", 0);
+		this.totalCookTime = compound.getIntOr("CookTimeTotal", 0);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.saveAdditional(compound, registries);
-		this.tank.writeToNBT(registries, compound);
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
+		this.tank.save(compound);
 		compound.putInt("CookTime", (short) this.cookTime);
 		compound.putInt("CookTimeTotal", (short) this.totalCookTime);
-		ContainerHelper.saveAllItems(compound, this.curdlerStacks, registries);
+		ContainerHelper.saveAllItems(compound, this.curdlerStacks);
 	}
 
 	@Override

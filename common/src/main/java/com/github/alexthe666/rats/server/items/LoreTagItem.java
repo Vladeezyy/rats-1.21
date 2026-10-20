@@ -1,14 +1,14 @@
 package com.github.alexthe666.rats.server.items;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class LoreTagItem extends Item {
 
@@ -26,10 +26,10 @@ public class LoreTagItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		if (this.lines > 0) {
 			for (int i = 0; i < this.lines; i++) {
-				tooltip.add(Component.translatable(this.getDescriptionId() + ".desc" + (this.lines == 1 ? "" : i)).withStyle(ChatFormatting.GRAY));
+				tooltip.accept(Component.translatable(this.getDescriptionId() + ".desc" + (this.lines == 1 ? "" : i)).withStyle(ChatFormatting.GRAY));
 			}
 		}
 	}

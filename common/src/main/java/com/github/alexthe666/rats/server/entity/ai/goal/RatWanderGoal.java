@@ -42,7 +42,7 @@ public class RatWanderGoal extends WaterAvoidingRandomStrollGoal {
 //		if (this.rat.blockPosition().getY() + 20 > this.rat.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.rat.blockPosition()).getY()) {
 //			return Vec3.atCenterOf(this.rat.level().getHeightmapPos(Heightmap.Types.WORLD_SURFACE, this.rat.blockPosition()).above(3 + this.rat.getRandom().nextInt(5)));
 //		}
-		if (this.mob.isInWaterOrBubble()) {
+		if (this.mob.isInWater()) {
 			vec31 = LandRandomPos.getPos(this.mob, 15, 15);
 		}
 		if (this.rat.hasFlightUpgrade()) {

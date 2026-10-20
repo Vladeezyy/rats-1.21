@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "E": {
-      "item": "rats:ghost_pirat_ectoplasm"
-    },
-    "P": {
-      "tag": "minecraft:planks"
-    }
+    "E": "rats:ghost_pirat_ectoplasm",
+    "P": "#minecraft:planks"
   },
   "pattern": [
     "PPP",

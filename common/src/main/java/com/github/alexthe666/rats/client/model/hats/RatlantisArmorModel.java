@@ -6,7 +6,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 public class RatlantisArmorModel extends AbstractHatModel {
 	public final ModelPart leftEar;
@@ -24,7 +24,6 @@ public class RatlantisArmorModel extends AbstractHatModel {
 		MeshDefinition mesh = HumanoidModel.createMesh(deformation, 0.0F);
 		PartDefinition partDefinition = mesh.getRoot();
 
-		partDefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		partDefinition.getChild("head").addOrReplaceChild("nose", CubeListBuilder.create().texOffs(54, 15).addBox(-1.0F, -1.0F, -2.0F, 2.0F, 2.0F, 3.0F), PartPose.offsetAndRotation(0.0F, -4.0F, -8.0F, 0.2618F, 0.0F, 0.0F));
 		partDefinition.getChild("head").addOrReplaceChild("left_ear", CubeListBuilder.create().texOffs(24, 0).addBox(1.0F, -4.0F, -1.0F, 7.0F, 7.0F, 1.0F), PartPose.offsetAndRotation(4.0F, -8.0F, 4.0F, 0.0F, -0.7854F, 0.0F));
 		partDefinition.getChild("head").addOrReplaceChild("right_ear", CubeListBuilder.create().texOffs(24, 0).addBox(-8.0F, -4.0F, -1.0F, 7.0F, 7.0F, 1.0F), PartPose.offsetAndRotation(-4.0F, -8.0F, 4.0F, 0.0F, 0.7854F, 0.0F));
@@ -33,11 +32,16 @@ public class RatlantisArmorModel extends AbstractHatModel {
 		partDefinition.getChild("left_arm").addOrReplaceChild("left_rat", CubeListBuilder.create().texOffs(54, 0).addBox(-2.0F, -5.0F, 0.0F, 5.0F, 9.0F, 0.0F), PartPose.offsetAndRotation(2.0F, -3.0F, 0.0F, 0.0F, 0.0F, 0.3927F));
 		partDefinition.getChild("right_arm").addOrReplaceChild("right_rat", CubeListBuilder.create().texOffs(54, 0).addBox(-3.0F, -5.0F, 0.0F, 5.0F, 9.0F, 0.0F), PartPose.offsetAndRotation(-2.0F, -3.0F, 0.0F, 0.0F, 0.0F, -0.3927F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 
-	public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+	@Override
+	public void setupAnim(HumanoidRenderState state) {
+		super.setupAnim(state);
+		float limbSwing = state.walkAnimationPos;
+		float ageInTicks = state.ageInTicks;
 		this.jaw.xRot = (float) (Math.sin(limbSwing * (float) Math.PI * 0.2F) + 1.0D) * 0.2F;
 
 		this.leftEar.y = Mth.sin((ageInTicks / 60.0F) * 40.0F) + 0.4F;

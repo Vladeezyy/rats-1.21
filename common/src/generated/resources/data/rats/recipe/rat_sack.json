@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "L": {
-      "tag": "c:leathers"
-    }
+    "C": "#c:cheese",
+    "L": "#c:leathers"
   },
   "pattern": [
     "L L",

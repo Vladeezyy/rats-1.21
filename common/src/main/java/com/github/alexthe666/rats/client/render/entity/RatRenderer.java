@@ -7,9 +7,10 @@ import com.github.alexthe666.rats.server.entity.rat.Rat;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 public class RatRenderer extends AbstractRatRenderer<Rat, RatModel<Rat>> {
+
 	public RatRenderer(EntityRendererProvider.Context context) {
 		super(context, new RatModel<>());
-		this.addLayer(new RatOverlayLayer(this));
+		this.addLayer(new RatOverlayLayer<>(this));
 		this.addLayer(new RatEyesLayer<>(this));
 	}
 }

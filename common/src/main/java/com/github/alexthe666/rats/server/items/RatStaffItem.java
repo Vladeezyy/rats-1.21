@@ -1,8 +1,9 @@
 package com.github.alexthe666.rats.server.items;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.client.util.ClientRatSelection;
-import com.github.alexthe666.rats.server.capability.SelectedRats;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -11,10 +12,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class RatStaffItem extends LoreTagItem {
 	public RatStaffItem(Properties properties) {
@@ -28,12 +27,12 @@ public class RatStaffItem extends LoreTagItem {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		super.appendHoverText(stack, level, tooltip, flag);
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, display, tooltip, flag);
 		if (Platform.INSTANCE.isClient()) {
 			TamedRat rat = ClientRatSelection.selectedRat();
 			if (rat != null) {
-				tooltip.add(Component.translatable(RatsLangConstants.CHEESE_STAFF_SELECTED, rat.getDisplayName(), rat.getUUID().toString()).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+				tooltip.accept(Component.translatable(RatsLangConstants.CHEESE_STAFF_SELECTED, rat.getDisplayName(), rat.getUUID().toString()).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 			}
 		}
 	}

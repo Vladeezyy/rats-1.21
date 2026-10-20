@@ -48,7 +48,7 @@ public class RatPathingHelper {
 			return d0 <= d1 ? blockhitresult : blockhitresult1;
 		}, context -> {
 			Vec3 vec3 = context.getFrom().subtract(context.getTo());
-			return BlockHitResult.miss(context.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(context.getTo()));
+			return BlockHitResult.miss(context.getTo(), Direction.getApproximateNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(context.getTo()));
 		});
 	}
 
@@ -125,7 +125,7 @@ public class RatPathingHelper {
 	}
 
 	private static boolean canDigBlock(BlockGetter getter, BlockPos pos) {
-		return getter.getBlockState(pos).is(RatsBlockTags.DIGGABLE_BLOCKS) && getter.getBlockState(pos).isSolidRender(getter, pos);
+		return getter.getBlockState(pos).is(RatsBlockTags.DIGGABLE_BLOCKS) && getter.getBlockState(pos).isSolidRender();
 	}
 
 	private static boolean shouldIgnoreBlockDuringTracing(BlockGetter getter, BlockPos pos, boolean ignoreDiggables) {

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "B": {
-      "item": "minecraft:hay_block"
-    },
-    "W": {
-      "tag": "c:crops/wheat"
-    }
+    "B": "minecraft:hay_block",
+    "W": "#c:crops/wheat"
   },
   "pattern": [
     " B ",

@@ -3,14 +3,12 @@ package com.github.alexthe666.rats.server.world;
 import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.rats.registry.worldgen.RatlantisFeatureRegistry;
 import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 

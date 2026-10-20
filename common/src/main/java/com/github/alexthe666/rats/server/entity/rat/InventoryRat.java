@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.rat;
+import net.minecraft.world.ItemStackWithSlot;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rats.platform.Platform;
 import dev.vladeezyy.rats.platform.transfer.ItemHandler;
@@ -11,7 +16,6 @@ import com.github.alexthe666.rats.server.items.RatStaffItem;
 import com.github.alexthe666.rats.server.message.OpenRatScreenPacket;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -31,14 +35,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.vladeezyy.rats.platform.transfer.InvWrapper;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class InventoryRat extends DiggingRat implements ContainerListener {
+public abstract class InventoryRat extends DiggingRat {
 
 	private static final EntityDataAccessor<Integer> COMMAND = SynchedEntityData.defineId(InventoryRat.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Optional<GlobalPos>> RADIUS_CENTER = SynchedEntityData.defineId(InventoryRat.class, EntityDataSerializers.OPTIONAL_GLOBAL_POS);
@@ -69,59 +72,52 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
-		ListTag listtag = new ListTag();
+		// the same "Items" list as 1.21.1 (each stack with its "Slot")
+		ValueOutput.TypedOutputList<ItemStackWithSlot> items = tag.list("Items", ItemStackWithSlot.CODEC);
 		for (int i = 0; i < this.getInventory().getContainerSize(); ++i) {
 			ItemStack itemstack = this.getInventory().getItem(i);
 			if (!itemstack.isEmpty()) {
-				CompoundTag compoundtag = new CompoundTag();
-				compoundtag.putByte("Slot", (byte) i);
-				itemstack.save(this.registryAccess(), compoundtag);
-				listtag.add(compoundtag);
+				items.add(new ItemStackWithSlot(i, itemstack));
 			}
 		}
-		tag.put("Items", listtag);
 		tag.putByte("InvisibleSlots", this.getEntityData().get(VISIBILITY_FLAGS));
 
-		this.getHomePoint().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> tag.put("HomePos", tag1));
+		this.getHomePoint().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> Values.put(tag, "HomePos", tag1));
 
-		this.getRadiusCenter().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> tag.put("RadiusPos", tag1));
+		this.getRadiusCenter().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> Values.put(tag, "RadiusPos", tag1));
 		tag.putInt("SearchRadius", this.getRadius());
 
 		if (!this.getPatrolNodes().isEmpty()) {
 			ListTag listTag = new ListTag();
 			this.getPatrolNodes().forEach(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error).ifPresent(listTag::add));
-			tag.put("PatrolNodesTag", listTag);
+			Values.put(tag, "PatrolNodesTag", listTag);
 		}
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		ListTag listtag = tag.getList("Items", 10);
-
-		for (int i = 0; i < listtag.size(); ++i) {
-			CompoundTag compoundtag = listtag.getCompound(i);
-			int j = compoundtag.getByte("Slot") & 255;
-			if (j < this.getInventory().getContainerSize()) {
-				this.getInventory().setItem(j, ItemStack.parseOptional(this.registryAccess(), compoundtag));
+		for (ItemStackWithSlot item : tag.listOrEmpty("Items", ItemStackWithSlot.CODEC)) {
+			if (item.isValidInContainer(this.getInventory().getContainerSize())) {
+				this.getInventory().setItem(item.slot(), item.stack());
 			}
 		}
 
-		this.getEntityData().set(VISIBILITY_FLAGS, tag.getByte("InvisibleSlots"));
-		if (tag.contains("HomePos")) {
-			this.setHomePoint(GlobalPos.CODEC.parse(NbtOps.INSTANCE, tag.get("HomePos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
+		this.getEntityData().set(VISIBILITY_FLAGS, tag.getByteOr("InvisibleSlots", (byte) 0));
+		if (Values.contains(tag, "HomePos")) {
+			this.setHomePoint(GlobalPos.CODEC.parse(NbtOps.INSTANCE, Values.get(tag, "HomePos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
 		}
-		if (tag.contains("RadiusPos")) {
-			this.setRadiusCenter(GlobalPos.CODEC.parse(NbtOps.INSTANCE, tag.get("RadiusPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
+		if (Values.contains(tag, "RadiusPos")) {
+			this.setRadiusCenter(GlobalPos.CODEC.parse(NbtOps.INSTANCE, Values.get(tag, "RadiusPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
 		}
-		this.setRadius(tag.getInt("SearchRadius"));
+		this.setRadius(tag.getIntOr("SearchRadius", 0));
 
-		if (tag.contains("PatrolNodesTag")) {
+		if (Values.contains(tag, "PatrolNodesTag")) {
 			// #787: a new list set into the entity data (adding to the synced list in place never reached the clients)
 			List<GlobalPos> nodes = new ArrayList<>();
-			for (Tag pos : tag.getList("PatrolNodesTag", Tag.TAG_COMPOUND)) {
+			for (Tag pos : Values.list(tag, "PatrolNodesTag")) {
 				GlobalPos.CODEC.parse(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error).ifPresent(nodes::add);
 			}
 			this.setPatrolNodes(nodes);
@@ -132,7 +128,6 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 		SimpleContainer simplecontainer = this.getInventory();
 		this.inventory = new RatContainer(this, 6);
 		if (simplecontainer != null) {
-			simplecontainer.removeListener(this);
 			int i = Math.min(simplecontainer.getContainerSize(), this.getInventory().getContainerSize());
 
 			for (int j = 0; j < i; ++j) {
@@ -143,7 +138,6 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			}
 		}
 
-		this.getInventory().addListener(this);
 		this.itemHandler = new InvWrapper(this.getInventory());
 	}
 
@@ -327,11 +321,6 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 
 	public List<GlobalPos> getPatrolNodes() {
 		return this.getEntityData().get(PATROL_NODES);
-	}
-
-	@Override
-	public void containerChanged(Container container) {
-
 	}
 
 	public boolean isSlotVisible(EquipmentSlot slot) {

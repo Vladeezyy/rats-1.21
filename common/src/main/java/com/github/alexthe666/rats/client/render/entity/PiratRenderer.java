@@ -13,8 +13,9 @@ public class PiratRenderer extends AbstractRatRenderer<Pirat, RatModel<Pirat>> {
 		this.addLayer(new RatEyesLayer<>(this));
 	}
 
-	protected void scale(Pirat rat, PoseStack stack, float partialTickTime) {
-		super.scale(rat, stack, partialTickTime);
+	@Override
+	protected void scale(RatRenderState state, PoseStack stack) {
+		super.scale(state, stack);
 		stack.scale(1.6F, 1.6F, 1.6F);
 	}
 }

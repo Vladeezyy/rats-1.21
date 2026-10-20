@@ -4,7 +4,7 @@ import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesTextureUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.DamageImmunityUpgrade;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 
@@ -14,8 +14,8 @@ public class AquaticRatUpgradeItem extends BaseRatUpgradeItem implements Changes
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
-		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/aquatic.png");
+	public Identifier getTexture() {
+		return Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/aquatic.png");
 	}
 
 	@Override

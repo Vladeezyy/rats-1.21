@@ -7,7 +7,7 @@ import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesTextur
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.PostAttackUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
 import com.github.alexthe666.rats.server.misc.RatUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,8 +25,8 @@ public class BeeRatUpgradeItem extends BaseFlightRatUpgradeItem implements Chang
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
-		return ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/bee.png");
+	public Identifier getTexture() {
+		return Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/upgrades/bee.png");
 	}
 
 	@Override

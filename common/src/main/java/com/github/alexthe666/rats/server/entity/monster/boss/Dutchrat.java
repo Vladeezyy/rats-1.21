@@ -1,4 +1,11 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -10,7 +17,6 @@ import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.DutchratSword;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -56,7 +62,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	public static final Animation ANIMATION_SPEAK = Animation.create(10);
 	private static final EntityDataAccessor<Boolean> THROWN_SWORD = SynchedEntityData.defineId(Dutchrat.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Integer> BELL_SPAWN_TICKS = SynchedEntityData.defineId(Dutchrat.class, EntityDataSerializers.INT);
-	private final ServerBossEvent bossInfo = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.GREEN, BossEvent.BossBarOverlay.PROGRESS);
+	private final ServerBossEvent bossInfo = new ServerBossEvent(java.util.UUID.randomUUID(), this.getDisplayName(), BossEvent.BossBarColor.GREEN, BossEvent.BossBarOverlay.PROGRESS);
 
 	public Dutchrat(EntityType<? extends Monster> type, Level level) {
 		super(type, level);
@@ -74,16 +80,16 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	protected void customServerAiStep() {
+	protected void customServerAiStep(ServerLevel level) {
 		if (this.getBellSummonTicks() > 0) {
-			if (!this.level().getBlockState(this.getRestrictCenter()).is(RatlantisBlockRegistry.DUTCHRAT_BELL.get())) {
+			if (!this.level().getBlockState(this.getHomePosition()).is(RatlantisBlockRegistry.DUTCHRAT_BELL.get())) {
 				this.discard();
 			}
 			int k1 = this.getBellSummonTicks() - 1;
 			this.bossInfo.setProgress(1.0F - (float) k1 / 160.0F);
 			this.getEntityData().set(BELL_SPAWN_TICKS, k1);
 		} else {
-			super.customServerAiStep();
+			super.customServerAiStep(level);
 			this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 		}
 	}
@@ -100,7 +106,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false, false) {
 			@Override
 			public boolean canContinueToUse() {
-				return super.canContinueToUse() && Dutchrat.this.getTarget() != null && Dutchrat.this.isWithinRestriction(Dutchrat.this.getTarget().blockPosition()) && Dutchrat.this.getBellSummonTicks() <= 0;
+				return super.canContinueToUse() && Dutchrat.this.getTarget() != null && Dutchrat.this.isWithinHome(Dutchrat.this.getTarget().blockPosition()) && Dutchrat.this.getBellSummonTicks() <= 0;
 			}
 		});
 	}
@@ -130,7 +136,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 
@@ -160,7 +166,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 				double tz = this.getTarget().getZ() - sz;
 				DutchratSword sword = new DutchratSword(RatlantisEntityRegistry.DUTCHRAT_SWORD.get(), this.level(), this);
 				sword.shoot(tx, ty, tz, 1.75F, 1.0F);
-				sword.moveTo(sx, sy, sz, this.getYRot(), this.getXRot());
+				sword.snapTo(sx, sy, sz, this.getYRot(), this.getXRot());
 				this.level().addFreshEntity(sword);
 				this.useRangedAttack = false;
 			}
@@ -185,13 +191,16 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 			}
 			this.lookAt(this.getTarget(), 360, 80);
 			if (this.getAnimation() == ANIMATION_SLASH && (this.getAnimationTick() == 10 || this.getAnimationTick() == 20)) {
-				this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-				this.getTarget().knockback(1.5F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
+				LivingEntity target = this.getTarget();
+				target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ());
 				this.useRangedAttack = this.getRandom().nextInt(RatConfig.dutchratSwordThrowChance) == 0;
 			}
 			if (this.getAnimation() == ANIMATION_STAB && this.getAnimationTick() == 10) {
-				this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-				this.getTarget().knockback(1.5F, this.getTarget().getX() - this.getX(), this.getTarget().getZ() - this.getZ());
+				LivingEntity target = this.getTarget();
+				target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+				target.knockback(1.5F, target.getX() - this.getX(), target.getZ() - this.getZ());
 				this.useRangedAttack = this.getRandom().nextInt(RatConfig.dutchratSwordThrowChance) == 0;
 			}
 		}
@@ -206,8 +215,8 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	@Override
 	public void checkDespawn() {
 		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.getBellSummonTicks() <= 0) {
-			if (this.hasRestriction()) {
-				this.level().setBlockAndUpdate(this.getRestrictCenter(), RatlantisBlockRegistry.DUTCHRAT_BELL.get().defaultBlockState());
+			if (this.hasHome()) {
+				this.level().setBlockAndUpdate(this.getHomePosition(), RatlantisBlockRegistry.DUTCHRAT_BELL.get().defaultBlockState());
 			}
 			this.discard();
 		} else {
@@ -217,28 +226,28 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_CUTLASS.get()));
 		this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_HAT.get()));
-		if (type != MobSpawnType.MOB_SUMMONED) {
-			this.restrictTo(this.blockPosition(), RatConfig.dutchratRestrictionRadius);
+		if (type != EntitySpawnReason.MOB_SUMMONED) {
+			this.setHomeTo(this.blockPosition(), RatConfig.dutchratRestrictionRadius);
 		}
 		return data;
 	}
 
 	@Override
-	public boolean hurt(DamageSource source, float amount) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		if (this.getBellSummonTicks() > 0 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
 			return false;
 		} else {
-			return super.hurt(source, amount);
+			return super.hurtServer(level, source, amount);
 		}
 	}
 
 	@Override
-	public boolean isInvulnerableTo(DamageSource source) {
-		return source.is(DamageTypeTags.IS_EXPLOSION) || super.isInvulnerableTo(source);
+	public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+		return source.is(DamageTypeTags.IS_EXPLOSION) || super.isInvulnerableTo(level, source);
 	}
 
 	@Override
@@ -267,29 +276,29 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
-		if (this.getRestrictCenter() != BlockPos.ZERO) {
-			BlockPos home = this.getRestrictCenter();
-			tag.put("Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
+		if (this.getHomePosition() != BlockPos.ZERO) {
+			BlockPos home = this.getHomePosition();
+			Values.put(tag, "Home", this.makeDoubleList(home.getX(), home.getY(), home.getZ()));
 		}
 		tag.putInt("Invul", this.getBellSummonTicks());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
 		if (this.hasCustomName()) {
 			this.bossInfo.setName(this.getDisplayName());
 		}
-		if (tag.contains("Home", 9)) {
-			ListTag nbttaglist = tag.getList("Home", 6);
-			int hx = (int) nbttaglist.getDouble(0);
-			int hy = (int) nbttaglist.getDouble(1);
-			int hz = (int) nbttaglist.getDouble(2);
-			this.restrictTo(new BlockPos(hx, hy, hz), RatConfig.dutchratRestrictionRadius);
+		if (Values.contains(tag, "Home")) {
+			ListTag nbttaglist = Values.list(tag, "Home");
+			int hx = (int) nbttaglist.getDoubleOr(0, 0.0D);
+			int hy = (int) nbttaglist.getDoubleOr(1, 0.0D);
+			int hz = (int) nbttaglist.getDoubleOr(2, 0.0D);
+			this.setHomeTo(new BlockPos(hx, hy, hz), RatConfig.dutchratRestrictionRadius);
 		}
-		this.getEntityData().set(BELL_SPAWN_TICKS, tag.getInt("Invul"));
+		this.getEntityData().set(BELL_SPAWN_TICKS, tag.getIntOr("Invul", 0));
 	}
 
 	private ListTag makeDoubleList(double... pNumbers) {
@@ -353,13 +362,13 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 	}
 
 	@Override
-	public boolean isWithinRestriction(BlockPos pos) {
-		if (this.getRestrictRadius() == -1) {
+	public boolean isWithinHome(BlockPos pos) {
+		if (this.getHomeRadius() == -1) {
 			return true;
 		} else {
-			int distX = Math.abs(this.getRestrictCenter().getX() - pos.getX());
-			int distY = Math.abs(this.getRestrictCenter().getY() - pos.getY());
-			int distZ = Math.abs(this.getRestrictCenter().getZ() - pos.getZ());
+			int distX = Math.abs(this.getHomePosition().getX() - pos.getX());
+			int distY = Math.abs(this.getHomePosition().getY() - pos.getY());
+			int distZ = Math.abs(this.getHomePosition().getZ() - pos.getZ());
 
 			return distX <= 20 && distY <= 10 && distZ <= 20;
 		}
@@ -425,8 +434,8 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 		@Override
 		public void tick() {
 			BlockPos blockpos = Dutchrat.this.blockPosition();
-			if (Dutchrat.this.hasRestriction()) {
-				blockpos = Dutchrat.this.getRestrictCenter();
+			if (Dutchrat.this.hasHome()) {
+				blockpos = Dutchrat.this.getHomePosition();
 			}
 			for (int i = 0; i < 3; ++i) {
 				BlockPos blockpos1 = blockpos.offset(Dutchrat.this.getRandom().nextInt(15) - 7, Math.min(Dutchrat.this.getRandom().nextInt(10) - 5, 10), Dutchrat.this.getRandom().nextInt(15) - 7);
@@ -457,7 +466,7 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 			this.followDist = Dutchrat.this.getBoundingBox().getSize();
 			LivingEntity living = this.dutchrat.getTarget();
 			double maxFollow = this.dutchrat.useRangedAttack ? 5 * this.followDist : this.followDist;
-			return Dutchrat.this.getBellSummonTicks() <= 0 && living != null && Dutchrat.this.isWithinRestriction(living.blockPosition()) && (living.distanceTo(this.dutchrat) >= maxFollow || !this.dutchrat.hasLineOfSight(living));
+			return Dutchrat.this.getBellSummonTicks() <= 0 && living != null && Dutchrat.this.isWithinHome(living.blockPosition()) && (living.distanceTo(this.dutchrat) >= maxFollow || !this.dutchrat.hasLineOfSight(living));
 		}
 
 		@Override
@@ -467,8 +476,8 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 			if (living != null && (living.distanceTo(this.dutchrat) >= maxFollow || !this.dutchrat.hasLineOfSight(living))) {
 				if (Dutchrat.this.hasThrownSword()) {
 					BlockPos blockpos = Dutchrat.this.blockPosition();
-					if (Dutchrat.this.hasRestriction()) {
-						blockpos = Dutchrat.this.getRestrictCenter();
+					if (Dutchrat.this.hasHome()) {
+						blockpos = Dutchrat.this.getHomePosition();
 					}
 					// as in 1.16: a random point around; 1.19 made it nextInt(6) - 12, always off to the north-west
 					BlockPos blockpos1 = blockpos.offset(Dutchrat.this.getRandom().nextInt(15) - 7, 0, Dutchrat.this.getRandom().nextInt(15) - 7);

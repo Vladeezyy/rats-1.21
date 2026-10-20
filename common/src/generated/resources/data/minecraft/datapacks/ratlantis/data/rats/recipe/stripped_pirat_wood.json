@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "L": {
-      "item": "rats:stripped_pirat_log"
-    }
+    "L": "rats:stripped_pirat_log"
   },
   "pattern": [
     "LL",

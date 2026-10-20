@@ -1,53 +1,44 @@
 package com.github.alexthe666.rats.client.render.block;
 
-import net.minecraft.world.phys.AABB;
-import net.minecraft.util.FastColor;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.RatlanteanSpiritModel;
 import com.github.alexthe666.rats.client.render.RatsRenderType;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 import com.github.alexthe666.rats.server.block.entity.UpgradeCombinerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 
-public class UpgradeCombinerRenderer implements BlockEntityRenderer<UpgradeCombinerBlockEntity> {
+/** The upgrade combiner: its spirit floating and turning above it */
+public class UpgradeCombinerRenderer extends StateBlockEntityRenderer<UpgradeCombinerBlockEntity> {
 	private static final RatlanteanSpiritModel<?> MODEL_SPIRIT = new RatlanteanSpiritModel<>();
-	private static final RenderType TEXTURE = RatsRenderType.getGlowingTranslucent(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/upgrade_combiner.png"));
+	private static final RenderType TEXTURE = RatsRenderType.getGlowingTranslucent(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/upgrade_combiner.png"));
 
 	public UpgradeCombinerRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
 	@Override
-	public void render(UpgradeCombinerBlockEntity entity, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light, int overlay) {
+	protected void submit(UpgradeCombinerBlockEntity entity, float partialTicks, PoseStack stack, SubmitNodeCollector collector, int light, int overlay) {
 		stack.pushPose();
 		stack.translate(0.5D, 0.0D, 0.5D);
-		float f = (float) entity.tickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+		float f = (float) entity.tickCount + partialTicks;
 		stack.translate(0.0F, 3.25F + Mth.sin(f * 0.1F) * 0.1F, 0.0F);
-		float f1;
-
-		for (f1 = entity.ratRotation - entity.ratRotationPrev; f1 >= (float) Math.PI; f1 -= ((float) Math.PI * 2F)) {
-		}
-
-		while (f1 < -(float) Math.PI) {
-			f1 += ((float) Math.PI * 2F);
-		}
-		float f2 = entity.ratRotationPrev + f1 * Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+		float f1 = Mth.wrapDegrees((entity.ratRotation - entity.ratRotationPrev) * Mth.RAD_TO_DEG) * Mth.DEG_TO_RAD;
+		float f2 = entity.ratRotationPrev + f1 * partialTicks;
 		stack.mulPose(Axis.YP.rotationDegrees(-f2 * (180F / (float) Math.PI) - 90F));
 		stack.mulPose(Axis.ZP.rotationDegrees(180));
 		stack.scale(1.5F, 1.5F, 1.5F);
-		VertexConsumer consumer = buffer.getBuffer(TEXTURE);
-		MODEL_SPIRIT.renderToBuffer(stack, consumer, 244, overlay, FastColor.ARGB32.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F));
+		collector.submitModel(MODEL_SPIRIT, SubmitHelper.NO_STATE, stack, TEXTURE, 244, overlay, ARGB.colorFromFloat(0.5F, 1.0F, 1.0F, 1.0F), null, 0, null);
 		stack.popPose();
 	}
 
-	// 1.21: the renderer gives the render bounds (the original overrode BlockEntity.getRenderBoundingBox)
+	// the renderer gives the render bounds (the original overrode BlockEntity.getRenderBoundingBox)
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
 	public AABB getRenderBoundingBox(UpgradeCombinerBlockEntity blockEntity) {
 		return blockEntity.getRenderBoundingBox();

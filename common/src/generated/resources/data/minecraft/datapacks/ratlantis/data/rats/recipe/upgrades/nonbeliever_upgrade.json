@@ -2,24 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "rats:arcane_technology"
-    },
-    "B": {
-      "item": "rats:psionic_rat_brain"
-    },
-    "C": {
-      "item": "rats:corrupt_rat_skull"
-    },
-    "G": {
-      "item": "rats:rat_upgrade_god"
-    },
-    "I": {
-      "item": "rats:idol_of_ratlantis"
-    },
-    "W": {
-      "item": "rats:dutchrat_wheel"
-    }
+    "A": "rats:arcane_technology",
+    "B": "rats:psionic_rat_brain",
+    "C": "rats:corrupt_rat_skull",
+    "G": "rats:rat_upgrade_god",
+    "I": "rats:idol_of_ratlantis",
+    "W": "rats:dutchrat_wheel"
   },
   "pattern": [
     "AGB",

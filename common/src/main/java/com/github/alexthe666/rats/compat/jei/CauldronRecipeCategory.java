@@ -12,12 +12,12 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -29,7 +29,7 @@ public class CauldronRecipeCategory implements IRecipeCategory<CauldronInfoHolde
 	private final IDrawable arrowIcon;
 
 	public CauldronRecipeCategory(IGuiHelper helper) {
-		ResourceLocation location = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/jei/cauldron_jei.png");
+		Identifier location = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/jei/cauldron_jei.png");
 		this.background = helper.createDrawable(location, 0, 0, WIDTH, HEIGHT);
 		this.arrowIcon = helper.drawableBuilder(location, 170, 0, 24, 16)
 				.buildAnimated(RatConfig.milkCauldronTime, IDrawableAnimated.StartDirection.LEFT, false);
@@ -37,7 +37,7 @@ public class CauldronRecipeCategory implements IRecipeCategory<CauldronInfoHolde
 	}
 
 	@Override
-	public RecipeType<CauldronInfoHolder> getRecipeType() {
+	public IRecipeType<CauldronInfoHolder> getRecipeType() {
 		return RatsRecipeTypes.CAULDRON;
 	}
 
@@ -47,8 +47,13 @@ public class CauldronRecipeCategory implements IRecipeCategory<CauldronInfoHolde
 	}
 
 	@Override
-	public IDrawable getBackground() {
-		return this.background;
+	public int getWidth() {
+		return 170;
+	}
+
+	@Override
+	public int getHeight() {
+		return 75;
 	}
 
 	@Override
@@ -58,18 +63,19 @@ public class CauldronRecipeCategory implements IRecipeCategory<CauldronInfoHolde
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, CauldronInfoHolder recipe, IFocusGroup focuses) {
-		builder.addSlot(RecipeIngredientRole.INPUT, 35, 32).addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.additionStack()));
-		builder.addSlot(RecipeIngredientRole.CATALYST, 77, 32).addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.cauldron()));
-		builder.addSlot(RecipeIngredientRole.OUTPUT, 128, 32).addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.result()));
-		builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(recipe.cauldronContents()));
+		builder.addSlot(RecipeIngredientRole.INPUT, 35, 32).add(new ItemStack(recipe.additionStack()));
+		builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 77, 32).add(new ItemStack(recipe.cauldron()));
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 128, 32).add(new ItemStack(recipe.result()));
+		builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(new ItemStack(recipe.cauldronContents()));
 	}
 
 	@Override
-	public void draw(CauldronInfoHolder recipe, IRecipeSlotsView view, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(CauldronInfoHolder recipe, IRecipeSlotsView view, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+		this.background.draw(graphics);
 		if (recipe.additionStack().asItem() == Items.AIR) {
 			this.arrowIcon.draw(graphics, 95, 31);
 			Component text = Component.literal(RatConfig.milkCauldronTime / 20 + "s");
-			graphics.drawString(Minecraft.getInstance().font, text, 105 - (text.getString().length() * 2), 50, 0xFF808080, false);
+			graphics.text(Minecraft.getInstance().font, text, 105 - (text.getString().length() * 2), 50, 0xFF808080, false);
 		}
 	}
 }

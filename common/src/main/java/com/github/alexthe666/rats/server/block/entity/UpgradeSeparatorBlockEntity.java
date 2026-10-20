@@ -2,17 +2,13 @@ package com.github.alexthe666.rats.server.block.entity;
 
 import net.minecraft.world.phys.Vec3;
 import com.github.alexthe666.rats.server.misc.StoredItems;
-import com.github.alexthe666.rats.server.misc.ItemNbt;
-import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.items.upgrades.CombinedRatUpgradeItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -54,8 +50,8 @@ public class UpgradeSeparatorBlockEntity extends BlockEntity {
 					}
 				}
 				if (spawnedItem > 0) {
-					itemEntity.playSound(SoundEvents.ITEM_BREAK, 1, 1);
-					itemEntity.kill();
+					itemEntity.playSound(SoundEvents.ITEM_BREAK.value(), 1, 1);
+					itemEntity.discard();
 					ItemEntity splitEntity = new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), new ItemStack(getFuel(), spawnedItem));
 					if (!level.isClientSide()) {
 						level.addFreshEntity(splitEntity);

@@ -1,15 +1,14 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import net.minecraft.client.model.VillagerModel;
+import net.minecraft.client.model.npc.VillagerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.world.entity.npc.AbstractVillager;
 
-public class PlagueDoctorModel<T extends AbstractVillager> extends VillagerModel<T> {
+public class PlagueDoctorModel extends VillagerModel {
 
 	public PlagueDoctorModel(ModelPart root) {
 		super(root);

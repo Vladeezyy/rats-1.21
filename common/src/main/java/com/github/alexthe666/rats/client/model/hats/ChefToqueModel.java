@@ -16,13 +16,14 @@ public class ChefToqueModel extends AbstractHatModel {
 		PartDefinition partDefinition = mesh.getRoot();
 
 		partDefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partDefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		partDefinition.getChild("head").addOrReplaceChild("toupe", CubeListBuilder.create()
 						.texOffs(0, 0)
 						.addBox(-4.5F, -15.0F, -4.5F, 9, 16, 9),
 				PartPose.offsetAndRotation(0.0F, -7.0F, 0.0F, -0.27314402793711257F, 0.0F, 0.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

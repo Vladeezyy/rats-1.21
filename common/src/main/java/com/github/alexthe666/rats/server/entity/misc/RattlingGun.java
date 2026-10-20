@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.misc;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
@@ -8,7 +13,6 @@ import com.github.alexthe666.rats.server.entity.AdjustsRatTail;
 import com.github.alexthe666.rats.server.entity.projectile.RattlingGunBullet;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -35,12 +39,12 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 	}
 
 	@Override
-	protected void readAdditionalSaveData(CompoundTag tag) {
+	protected void readAdditionalSaveData(ValueInput tag) {
 
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundTag tag) {
+	protected void addAdditionalSaveData(ValueOutput tag) {
 
 	}
 
@@ -109,7 +113,7 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 		LivingEntity passenger = this.getControllingPassenger();
 		if (this.getVehicle() != null) {
 			if (!this.getVehicle().isPassenger()) {
-				this.getVehicle().startRiding(this, true);
+				this.getVehicle().startRiding(this, true, true);
 			}
 		}
 		if (!this.level().isClientSide()) {
@@ -135,25 +139,25 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 			this.setRot(this.getYRot(), this.getXRot());
 		}
 
-		this.checkInsideBlocks();
+		this.applyEffectsFromBlocks();
 	}
 
 	@Override
-	public InteractionResult interact(Player player, InteractionHand hand) {
+	public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
 		if (this.getControllingPassenger() == null) {
 			if (!player.getPassengers().isEmpty()) {
 				boolean flag = false;
 				for (Entity entity : player.getPassengers()) {
 					if (entity instanceof TamedRat) {
 						flag = true;
-						entity.startRiding(this, false);
+						entity.startRiding(this, false, true);
 						break;
 					}
 				}
 				return flag ? InteractionResult.SUCCESS : InteractionResult.PASS;
 			} else {
 				if (player.isShiftKeyDown()) {
-					this.spawnAtLocation(RatlantisItemRegistry.RATTLING_GUN.get());
+					this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), RatlantisItemRegistry.RATTLING_GUN.get());
 					this.discard();
 					return InteractionResult.SUCCESS;
 				}
@@ -208,5 +212,10 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 	public void adjustRatTailRotation(AbstractRat rat, AdvancedModelBox upperTail, AdvancedModelBox lowerTail) {
 		this.progressRotation(upperTail, rat.sitProgress, 1.1F, 0.17453292F, 0.6981317F, 20.0F);
 		this.progressRotation(lowerTail, rat.sitProgress, 0.3F, 0.61086524F, 0.0F, 20.0F);
+	}
+
+	@Override
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		return false;
 	}
 }

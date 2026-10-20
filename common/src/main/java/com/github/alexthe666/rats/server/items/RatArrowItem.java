@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.items;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
@@ -9,8 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,15 +29,15 @@ public class RatArrowItem extends ArrowItem {
 		ItemStack stack = context.getPlayer().getItemInHand(context.getHand());
 		CompoundTag ratTag = new CompoundTag();
 		if (ItemNbt.hasTag(stack)) {
-			ratTag = ItemNbt.view(stack).getCompound("Rat");
+			ratTag = ItemNbt.view(stack).getCompoundOrEmpty("Rat");
 		}
 		TamedRat rat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), context.getLevel());
 		BlockPos offset = context.getClickedPos().relative(context.getClickedFace());
-		rat.readAdditionalSaveData(ratTag);
-		if (!ratTag.getString("CustomName").isEmpty()) {
-			rat.setCustomName(Component.Serializer.fromJson(ratTag.getString("CustomName"), rat.registryAccess()));
+		if (!ratTag.isEmpty()) {
+			// the rat's save data, its name included (as the rat arrow entity loads it)
+			Values.load(rat, ratTag);
 		}
-		rat.moveTo(offset.getX() + 0.5D, offset.getY(), offset.getZ() + 0.5D, 0, 0);
+		rat.snapTo(offset.getX() + 0.5D, offset.getY(), offset.getZ() + 0.5D, 0, 0);
 		if (!context.getLevel().isClientSide()) {
 			context.getLevel().addFreshEntity(rat);
 		}

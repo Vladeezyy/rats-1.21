@@ -16,7 +16,6 @@ public class FarmerHatModel extends AbstractHatModel {
 		PartDefinition partDefinition = mesh.getRoot();
 
 		partDefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partDefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		var hat = partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 						.texOffs(0, 0)
@@ -28,6 +27,8 @@ public class FarmerHatModel extends AbstractHatModel {
 						.addBox(-8.0F, 0.0F, -8.0F, 16, 0, 16),
 				PartPose.offset(0.0F, 0.0F, 0.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

@@ -3,7 +3,7 @@ package com.github.alexthe666.rats.server.message;
 import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.PacketContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -12,14 +12,12 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
 
 public record SyncRatStaffPacket(int entityId, long pos, int facing, int control, int extraData) implements CustomPacketPayload {
 
-	public static final Type<SyncRatStaffPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "sync_rat_staff"));
+	public static final Type<SyncRatStaffPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "sync_rat_staff"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, SyncRatStaffPacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), SyncRatStaffPacket::decode);
 
 	@Override

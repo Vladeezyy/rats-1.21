@@ -17,7 +17,6 @@ public class PlagueDoctorMaskModel extends AbstractHatModel {
 		PartDefinition partDefinition = mesh.getRoot();
 
 		partDefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partDefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		var hat = partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 						.texOffs(0, 0)
@@ -38,6 +37,8 @@ public class PlagueDoctorMaskModel extends AbstractHatModel {
 						.addBox(-7.0F, 0.0F, -7.0F, 14, 0, 14),
 				PartPose.offset(0.0F, -8.1F, 0.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 

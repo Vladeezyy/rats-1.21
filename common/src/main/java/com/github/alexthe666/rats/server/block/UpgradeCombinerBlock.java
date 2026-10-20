@@ -3,7 +3,7 @@ package com.github.alexthe666.rats.server.block;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.UpgradeCombinerBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -64,16 +64,16 @@ public class UpgradeCombinerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull InteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isCrouching()) {
 			if (level.isClientSide()) {
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else {
 				player.openMenu(this.getMenuProvider(state, level, pos));
-				return ItemInteractionResult.CONSUME;
+				return InteractionResult.CONSUME;
 			}
 		}
-		return ItemInteractionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 
 	@Override

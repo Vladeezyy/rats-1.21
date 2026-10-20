@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:block_of_cheese"
-    },
-    {
-      "item": "minecraft:paper"
-    }
+    "rats:block_of_cheese",
+    "minecraft:paper"
   ],
   "result": {
     "id": "rats:cheese_banner_pattern"

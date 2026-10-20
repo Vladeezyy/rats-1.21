@@ -8,7 +8,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -76,8 +76,8 @@ public class RatUpgradeMenu extends AbstractContainerMenu {
 	}
 
 	@Override
-	public void clicked(int slotIndex, int mouseButton, ClickType type, Player player) {
-		if (type == ClickType.QUICK_MOVE && slotIndex > this.inventory.getContainerSize()) {
+	public void clicked(int slotIndex, int mouseButton, ContainerInput type, Player player) {
+		if (type == ContainerInput.QUICK_MOVE && slotIndex > this.inventory.getContainerSize()) {
 			return;
 		}
 

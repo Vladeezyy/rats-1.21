@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "G": {
-      "item": "rats:compressed_garbage"
-    },
-    "P": {
-      "item": "rats:pied_wool"
-    }
+    "G": "rats:compressed_garbage",
+    "P": "rats:pied_wool"
   },
   "pattern": [
     "PPP",

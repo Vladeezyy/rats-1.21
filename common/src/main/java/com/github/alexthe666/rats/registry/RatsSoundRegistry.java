@@ -5,7 +5,7 @@ import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.resources.ResourceKey;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import dev.vladeezyy.rats.platform.Registrar;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,8 +39,8 @@ public class RatsSoundRegistry {
 	public static final RegistryEntry<SoundEvent, SoundEvent> LIVING_MICE = createSoundEvent("music_disc.rats.living_mice");
 	public static final RegistryEntry<SoundEvent, SoundEvent> MICE_ON_VENUS = createSoundEvent("music_disc.rats.mice_on_venus");
 	// 1.21: the discs play jukebox songs (data/rats/jukebox_song), which point at the sound events above
-	public static final ResourceKey<JukeboxSong> LIVING_MICE_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "living_mice"));
-	public static final ResourceKey<JukeboxSong> MICE_ON_VENUS_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "mice_on_venus"));
+	public static final ResourceKey<JukeboxSong> LIVING_MICE_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, Identifier.fromNamespaceAndPath(RatsMod.MODID, "living_mice"));
+	public static final ResourceKey<JukeboxSong> MICE_ON_VENUS_SONG = ResourceKey.create(Registries.JUKEBOX_SONG, Identifier.fromNamespaceAndPath(RatsMod.MODID, "mice_on_venus"));
 	public static final RegistryEntry<SoundEvent, SoundEvent> NEORATLANTEAN_DIE = createSoundEvent("entity.rats.neoratlantean.death");
 	public static final RegistryEntry<SoundEvent, SoundEvent> NEORATLANTEAN_HURT = createSoundEvent("entity.rats.neoratlantean.hurt");
 	public static final RegistryEntry<SoundEvent, SoundEvent> NEORATLANTEAN_IDLE = createSoundEvent("entity.rats.neoratlantean.ambient");
@@ -111,7 +111,7 @@ public class RatsSoundRegistry {
 	public static final RegistryEntry<SoundEvent, SoundEvent> TRASH_CAN_FILL = createSoundEvent("block.rats.trash_can.fill");
 
 	private static RegistryEntry<SoundEvent, SoundEvent> createSoundEvent(final String soundName) {
-		return SOUNDS.register(soundName, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, soundName)));
+		return SOUNDS.register(soundName, () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(RatsMod.MODID, soundName)));
 	}
 
 	public static SoundEvent getFluteSound() {

@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -20,9 +21,9 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -66,7 +67,7 @@ public class RatlanteanSpirit extends Monster implements IAnimatedEntity {
 
 	public void move(MoverType type, Vec3 pos) {
 		super.move(type, pos);
-		this.checkInsideBlocks();
+		this.applyEffectsFromBlocks();
 	}
 
 	public void tick() {
@@ -226,8 +227,8 @@ public class RatlanteanSpirit extends Monster implements IAnimatedEntity {
 		}
 	}
 
-	public static boolean checkSpiritSpawnRules(EntityType<? extends Mob> entity, LevelAccessor accessor, MobSpawnType type, BlockPos pos, RandomSource random) {
+	public static boolean checkSpiritSpawnRules(EntityType<? extends Mob> entity, LevelAccessor accessor, EntitySpawnReason type, BlockPos pos, RandomSource random) {
 		BlockPos blockpos = pos.below();
-		return type == MobSpawnType.SPAWNER || accessor.getBlockState(blockpos).isValidSpawn(accessor, blockpos, entity) && random.nextInt(5) == 0;
+		return type == EntitySpawnReason.SPAWNER || accessor.getBlockState(blockpos).isValidSpawn(accessor, blockpos, entity) && random.nextInt(5) == 0;
 	}
 }

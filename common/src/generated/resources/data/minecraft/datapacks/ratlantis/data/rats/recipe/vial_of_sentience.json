@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:glass_bottle"
-    },
-    "C": {
-      "item": "rats:feral_rat_claw"
-    },
-    "P": {
-      "item": "rats:ratglove_petals"
-    },
-    "S": {
-      "item": "rats:ratlantean_flame"
-    }
+    "B": "minecraft:glass_bottle",
+    "C": "rats:feral_rat_claw",
+    "P": "rats:ratglove_petals",
+    "S": "rats:ratlantean_flame"
   },
   "pattern": [
     "SCS",

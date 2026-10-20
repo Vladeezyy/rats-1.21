@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.projectile.Fireball;
+import net.minecraft.world.entity.projectile.hurtingprojectile.Fireball;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -67,7 +67,7 @@ public class RatDragonFire extends Fireball {
 		Entity entity = result.getEntity();
 		if (!entity.fireImmune()) {
 			entity.igniteForSeconds(10);
-			boolean flag = entity.hurt(this.damageSources().fireball(this, this.getOwner()), 5.0F);
+			boolean flag = entity.hurtOrSimulate(this.damageSources().fireball(this, this.getOwner()), 5.0F);
 			if (flag && this.getOwner() instanceof LivingEntity living) {
 				if (this.level() instanceof ServerLevel serverLevel) {
 					EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().fireball(this, living));
@@ -91,7 +91,7 @@ public class RatDragonFire extends Fireball {
 	}
 
 	@Override
-	public boolean hurt(DamageSource source, float amount) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		return false;
 	}
 

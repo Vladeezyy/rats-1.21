@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin {
     @Inject(method = "getFieldOfViewModifier", at = @At("RETURN"), cancellable = true)
-    private void rats$fovModifier(CallbackInfoReturnable<Float> cir) {
+    private void rats$fovModifier(boolean firstPerson, float effectScale, CallbackInfoReturnable<Float> cir) {
         cir.setReturnValue(RatsClientEvents.fovModifier((AbstractClientPlayer) (Object) this, cir.getReturnValueF()));
     }
 }

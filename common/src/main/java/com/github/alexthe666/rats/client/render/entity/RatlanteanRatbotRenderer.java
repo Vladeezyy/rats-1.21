@@ -7,27 +7,28 @@ import com.github.alexthe666.rats.server.entity.monster.RatlanteanRatbot;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public class RatlanteanRatbotRenderer extends MobRenderer<RatlanteanRatbot, RatlanteanRatbotModel<RatlanteanRatbot>> {
-	private static final ResourceLocation RATBOT_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_ratbot/ratlantean_ratbot.png");
+public class RatlanteanRatbotRenderer extends RatsMobRenderer<RatlanteanRatbot, RatlanteanRatbotModel<RatlanteanRatbot>> {
+	private static final Identifier RATBOT_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/ratlantean_ratbot/ratlantean_ratbot.png");
 
 	public RatlanteanRatbotRenderer(EntityRendererProvider.Context context) {
 		super(context, new RatlanteanRatbotModel<>(0.0F), 0.5F);
 		this.addLayer(new RatbotEyesLayer(this));
-
 	}
 
-	public ResourceLocation getTextureLocation(RatlanteanRatbot entity) {
+	@Override
+	protected Identifier getTexture(RatlanteanRatbot entity) {
 		return RATBOT_TEXTURE;
 	}
 
-	protected void scale(RatlanteanRatbot rat, PoseStack stack, float partialTickTime) {
-		super.scale(rat, stack, partialTickTime);
+	@Override
+	protected void scale(RatsMobRenderState state, PoseStack stack) {
+		super.scale(state, stack);
 		stack.scale(1.9F, 1.9F, 1.9F);
-		if (!((double) rat.walkAnimation.speed() < 0.01D)) {
-			float f1 = rat.walkAnimation.position() - rat.walkAnimation.speed() * (1.0F - partialTickTime) + 6.0F;
+		if (!((double) state.walkAnimationSpeed < 0.01D)) {
+			// the state's walk position is already the partial tick's (1.21.1: position - speed * (1 - partialTick))
+			float f1 = state.walkAnimationPos + 6.0F;
 			float f2 = (Math.abs(f1 % 13.0F - 6.5F) - 3.25F) / 3.25F;
 			stack.mulPose(Axis.ZP.rotationDegrees(6.5F * f2));
 		}

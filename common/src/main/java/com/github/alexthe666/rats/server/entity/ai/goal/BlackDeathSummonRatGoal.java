@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.ai.goal;
+import net.minecraft.world.entity.EntityReference;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatConfig;
@@ -6,7 +7,7 @@ import com.github.alexthe666.rats.registry.RatsEntityRegistry;
 import com.github.alexthe666.rats.server.entity.monster.boss.BlackDeath;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 public class BlackDeathSummonRatGoal extends BlackDeathAbstractSummonGoal {
 	public BlackDeathSummonRatGoal(BlackDeath death) {
@@ -23,11 +24,11 @@ public class BlackDeathSummonRatGoal extends BlackDeathAbstractSummonGoal {
 		this.death.level().broadcastEntityEvent(this.death, (byte) 82);
 
 		Rat rat = new Rat(RatsEntityRegistry.RAT.get(), this.death.level());
-		Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevel) this.death.level(), this.death.level().getCurrentDifficultyAt(this.death.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
+		Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevel) this.death.level(), ((net.minecraft.world.level.ServerLevelAccessor) this.death.level()).getCurrentDifficultyAt(this.death.blockPosition()), EntitySpawnReason.MOB_SUMMONED, null);
 		rat.copyPosition(this.death);
 		rat.setPlagued(true);
 		this.death.level().addFreshEntity(rat);
-		rat.setOwnerUUID(this.death.getUUID());
+		rat.setOwnerReference(EntityReference.of(this.death.getUUID()));
 		if (this.death.getTarget() != null) {
 			rat.setTarget(this.death.getTarget());
 		}

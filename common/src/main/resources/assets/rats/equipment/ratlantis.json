@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "rats:ratlantis"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "rats:ratlantis"
+      }
+    ]
+  }
+}

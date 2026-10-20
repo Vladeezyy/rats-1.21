@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.entity.rat;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatConfig;
@@ -10,7 +12,6 @@ import com.github.alexthe666.rats.server.entity.ai.goal.RatRaidChestsGoal;
 import com.github.alexthe666.rats.server.entity.ai.goal.RatRaidCropsGoal;
 import com.github.alexthe666.rats.server.misc.RatPathingHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.level.ClipContext;
@@ -57,15 +58,15 @@ public abstract class DiggingRat extends AbstractRat {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
 		tag.putInt("DigCooldown", this.digCooldown);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		this.digCooldown = tag.getInt("DigCooldown");
+		this.digCooldown = tag.getIntOr("DigCooldown", 0);
 	}
 
 	public boolean isOnDiggingCooldown() {
@@ -150,7 +151,7 @@ public abstract class DiggingRat extends AbstractRat {
 
 	private boolean canDigBlock(Level level, BlockPos pos) {
 		BlockState state = level.getBlockState(pos);
-		return (state.is(RatsBlockTags.DIGGABLE_BLOCKS) && state.isSolidRender(level, pos));
+		return (state.is(RatsBlockTags.DIGGABLE_BLOCKS) && state.isSolidRender());
 	}
 
 	@Override

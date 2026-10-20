@@ -1,4 +1,10 @@
 package com.github.alexthe666.rats.server.entity.rat;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rats.platform.Platform;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -49,21 +55,18 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -81,7 +84,7 @@ import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
 import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -104,7 +107,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -162,8 +164,10 @@ public class TamedRat extends InventoryRat {
 
 	public TamedRat(EntityType<? extends TamableAnimal> type, Level level) {
 		super(type, level);
-		Arrays.fill(this.armorDropChances, 2.0F);
-		Arrays.fill(this.handDropChances, 2.0F);
+		// 26.x: drop chances per slot (above 1: always dropped, unharmed)
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			this.setDropChance(slot, 2.0F);
+		}
 		this.xpReward = 0;
 		this.updateNavigationCooldown = 100;
 	}
@@ -202,7 +206,7 @@ public class TamedRat extends InventoryRat {
 		this.goalSelector.addGoal(6, new SitWhenOrderedToGoal(this) {
 			@Override
 			public boolean canUse() {
-				return TamedRat.this.isTame() && !TamedRat.this.isInWaterOrBubble() && (TamedRat.this.onGround() || TamedRat.this.noPhysics) && TamedRat.this.isOrderedToSit();
+				return TamedRat.this.isTame() && !TamedRat.this.isInWater() && (TamedRat.this.onGround() || TamedRat.this.noPhysics) && TamedRat.this.isOrderedToSit();
 			}
 		});
 		this.goalSelector.addGoal(7, new RatWanderGoal(this, 1.25D));
@@ -370,7 +374,7 @@ public class TamedRat extends InventoryRat {
 		if (!held.isEmpty() && !this.getCommand().allowsEating && this.getDepositPos().isEmpty() && RatUtils.isRatFood(held)
 			&& !this.isCurrentlyWorking && !this.holdsItemInHandUpgrade()) {
 			if (++this.stuckFoodTicks >= 100) {
-				this.spawnAtLocation(held);
+				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), held);
 				this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 				this.stuckFoodTicks = 0;
 			}
@@ -397,11 +401,11 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getVehicle() instanceof LivingEntity living && this.isRidingSpecialMount()) {
-			return living.doHurtTarget(entity);
+			return living.doHurtTarget((net.minecraft.server.level.ServerLevel) living.level(), entity);
 		}
-		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
+		boolean flag = entity.hurtOrSimulate(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
 		if (flag) {
 			if (this.level() instanceof ServerLevel serverLevel) {
 				EnchantmentHelper.doPostAttackEffects(serverLevel, entity, this.damageSources().mobAttack(this));
@@ -450,7 +454,7 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
 		tag.putInt("NavCooldown", this.updateNavigationCooldown);
 		tag.putInt("CookingProgress", this.cookingProgress);
@@ -467,49 +471,49 @@ public class TamedRat extends InventoryRat {
 		tag.putBoolean("Dyed", this.isDyed());
 		tag.putByte("DyeColor", (byte) this.getDyeColor());
 		tag.putString("SpecialDye", this.getSpecialDye());
-		this.getDepositPos().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> tag.put("DepositPos", tag1));
-		this.getPickupPos().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> tag.put("PickupPos", tag1));
+		this.getDepositPos().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> Values.put(tag, "DepositPos", tag1));
+		this.getPickupPos().flatMap(pos -> GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).resultOrPartial(RatsMod.LOGGER::error)).ifPresent(tag1 -> Values.put(tag, "PickupPos", tag1));
 		tag.putInt("RandomEffectCooldown", this.randomEffectCooldown);
 		if (this.transportingFluid != null) {
 			CompoundTag fluidTag = new CompoundTag();
 			fluidTag.merge((CompoundTag) this.transportingFluid.saveOptional(this.registryAccess()));
-			tag.put("TransportingFluid", fluidTag);
+			Values.put(tag, "TransportingFluid", fluidTag);
 		}
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		this.updateNavigationCooldown = tag.getInt("NavCooldown");
-		this.cookingProgress = tag.getInt("CookingProgress");
-		this.breedCooldown = tag.getInt("BreedCooldown");
-		this.coinCooldown = tag.getInt("CoinCooldown");
-		this.pickpocketCooldown = tag.getInt("PickpocketCooldown");
-		this.setMountCooldown(tag.getInt("MountCooldown"));
-		this.randomEffectCooldown = tag.getInt("RandomEffectCooldown");
-		this.setHeldRF(tag.getInt("TransportingRF"));
-		this.setRespawnCountdown(tag.getInt("RespawnCountdown"));
-		this.setCommandInteger(tag.getInt("Command"));
-		this.setDancing(tag.getBoolean("Dancing"));
-		this.setVisualFlag(tag.getBoolean("VisualFlag"));
-		this.setToga(tag.getBoolean("Toga"));
-		this.setDyed(tag.getBoolean("Dyed"));
-		this.setDyeColor((tag.getByte("DyeColor")));
-		this.setSpecialDye(tag.getString("SpecialDye"));
-		if (tag.contains("DepositPos")) {
-			this.setDepositPos(GlobalPos.CODEC.parse(NbtOps.INSTANCE, tag.get("DepositPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
+		this.updateNavigationCooldown = tag.getIntOr("NavCooldown", 0);
+		this.cookingProgress = tag.getIntOr("CookingProgress", 0);
+		this.breedCooldown = tag.getIntOr("BreedCooldown", 0);
+		this.coinCooldown = tag.getIntOr("CoinCooldown", 0);
+		this.pickpocketCooldown = tag.getIntOr("PickpocketCooldown", 0);
+		this.setMountCooldown(tag.getIntOr("MountCooldown", 0));
+		this.randomEffectCooldown = tag.getIntOr("RandomEffectCooldown", 0);
+		this.setHeldRF(tag.getIntOr("TransportingRF", 0));
+		this.setRespawnCountdown(tag.getIntOr("RespawnCountdown", 0));
+		this.setCommandInteger(tag.getIntOr("Command", 0));
+		this.setDancing(tag.getBooleanOr("Dancing", false));
+		this.setVisualFlag(tag.getBooleanOr("VisualFlag", false));
+		this.setToga(tag.getBooleanOr("Toga", false));
+		this.setDyed(tag.getBooleanOr("Dyed", false));
+		this.setDyeColor((tag.getByteOr("DyeColor", (byte) 0)));
+		this.setSpecialDye(tag.getStringOr("SpecialDye", ""));
+		if (Values.contains(tag, "DepositPos")) {
+			this.setDepositPos(GlobalPos.CODEC.parse(NbtOps.INSTANCE, Values.get(tag, "DepositPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
 		}
-		if (tag.contains("PickupPos")) {
-			this.setPickupPos(GlobalPos.CODEC.parse(NbtOps.INSTANCE, tag.get("PickupPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
+		if (Values.contains(tag, "PickupPos")) {
+			this.setPickupPos(GlobalPos.CODEC.parse(NbtOps.INSTANCE, Values.get(tag, "PickupPos")).resultOrPartial(RatsMod.LOGGER::error).orElse(null));
 		}
-		if (tag.contains("DepositFacing")) {
-			this.depositFacing = Direction.values()[tag.getInt("DepositFacing")];
+		if (Values.contains(tag, "DepositFacing")) {
+			this.depositFacing = Direction.values()[tag.getIntOr("DepositFacing", 0)];
 		}
-		if (tag.contains("PickupFacing")) {
-			this.pickupFacing = Direction.values()[tag.getInt("PickupFacing")];
+		if (Values.contains(tag, "PickupFacing")) {
+			this.pickupFacing = Direction.values()[tag.getIntOr("PickupFacing", 0)];
 		}
-		if (tag.contains("TransportingFluid")) {
-			CompoundTag fluidTag = tag.getCompound("TransportingFluid");
+		if (Values.contains(tag, "TransportingFluid")) {
+			CompoundTag fluidTag = Values.compound(tag, "TransportingFluid");
 			if (!fluidTag.isEmpty()) {
 				this.transportingFluid = FluidStack.parseOptional(this.registryAccess(), fluidTag);
 			}
@@ -549,15 +553,15 @@ public class TamedRat extends InventoryRat {
 		this.setNoAi(this.getRespawnCountdown() > 0);
 
 		if (!this.level().isClientSide() && this.getMountEntityType() != null && !this.isPassenger() && this.getMountCooldown() == 0) {
-			Entity entity = this.getMountEntityType().create(this.level());
+			Entity entity = this.getMountEntityType().create(this.level(), EntitySpawnReason.MOB_SUMMONED);
 			entity.copyPosition(this);
 			if (entity instanceof Mob mob && this.level() instanceof ServerLevelAccessor accessor) {
-				Platform.INSTANCE.finalizeMobSpawn(mob, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
+				Platform.INSTANCE.finalizeMobSpawn(mob, accessor, ((net.minecraft.world.level.ServerLevelAccessor) this.level()).getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.MOB_SUMMONED, null);
 			}
 			this.level().addFreshEntity(entity);
 
 			this.level().broadcastEntityEvent(this, (byte) 127);
-			this.startRiding(entity, true);
+			this.startRiding(entity, true, true);
 		}
 
 		RatUpgradeUtils.forEachUpgrade(this, item -> item instanceof TickRatUpgrade, (stack, slot) -> ((TickRatUpgrade) stack.getItem()).tick(this));
@@ -661,8 +665,8 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public boolean hurt(DamageSource source, float amount) {
-		if (this.isBaby() || this.isInvulnerableTo(source) || (source.is(DamageTypes.IN_WALL) && this.isPassenger())) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		if (this.isBaby() || this.isInvulnerableTo(level, source) || (source.is(DamageTypes.IN_WALL) && this.isPassenger())) {
 			return false;
 		} else {
 			Entity entity = source.getEntity();
@@ -671,7 +675,7 @@ public class TamedRat extends InventoryRat {
 				amount = (amount + 1.0F) / 2.0F;
 			}
 
-			boolean flag = super.hurt(source, amount);
+			boolean flag = super.hurtServer(level, source, amount);
 
 			if (flag && this.getVehicle() != null && this.isRidingSpecialMount()) {
 				this.getVehicle().hurt(source, amount);
@@ -685,7 +689,7 @@ public class TamedRat extends InventoryRat {
 
 	@Override
 	public ItemStack getPickResult() {
-		return new ItemStack(SpawnEggItem.byId(RatsEntityRegistry.RAT.get()));
+		return SpawnEggItem.byId(RatsEntityRegistry.RAT.get()).map(ItemStack::new).orElse(ItemStack.EMPTY);
 	}
 
 	public void setFlying(boolean flying) {
@@ -806,9 +810,10 @@ public class TamedRat extends InventoryRat {
 		ItemStack handCopy = this.getMainHandItem().copy();
 		if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_ORE_DOUBLING.get()) && OreDoublingRatUpgradeItem.isProcessable(this.level(), handCopy)) {
 			ItemStack attemptedSmelt = handCopy.copy();
-			SmeltingRecipe recipe = this.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(attemptedSmelt), this.level()).map(RecipeHolder::value).orElse(null);
-			if (recipe != null && !recipe.getResultItem(this.level().registryAccess()).isEmpty()) {
-				attemptedSmelt = recipe.getResultItem(this.level().registryAccess()).copy();
+			SingleRecipeInput input = new SingleRecipeInput(attemptedSmelt);
+			SmeltingRecipe recipe = this.level() instanceof ServerLevel server ? server.recipeAccess().getRecipeFor(RecipeType.SMELTING, input, server).map(RecipeHolder::value).orElse(null) : null;
+			if (recipe != null && !recipe.assemble(input).isEmpty()) {
+				attemptedSmelt = recipe.assemble(input);
 			}
 
 			if (!attemptedSmelt.is(handCopy.getItem())) {
@@ -817,7 +822,7 @@ public class TamedRat extends InventoryRat {
 					this.playSound(RatsSoundRegistry.RAT_POOP.get(), 0.5F + this.getRandom().nextFloat() * 0.5F, 1.0F + this.getRandom().nextFloat() * 0.5F);
 				}
 				if (!this.level().isClientSide()) {
-					this.spawnAtLocation(nugget, 0.0F);
+					this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), nugget, 0.0F);
 				}
 				this.getMainHandItem().shrink(1);
 			}
@@ -827,7 +832,7 @@ public class TamedRat extends InventoryRat {
 				this.playSound(RatsSoundRegistry.RAT_POOP.get(), 0.5F + this.getRandom().nextFloat() * 0.5F, 1.0F + this.getRandom().nextFloat() * 0.5F);
 			}
 			if (!this.level().isClientSide()) {
-				this.spawnAtLocation(nugget, 0.0F);
+				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), nugget, 0.0F);
 			}
 		} else {
 			this.getMainHandItem().shrink(1);
@@ -853,10 +858,10 @@ public class TamedRat extends InventoryRat {
 		baby.setCommand(RatCommand.SIT);
 		if (mother.isTame()) {
 			baby.setTame(true, true);
-			baby.setOwnerUUID(mother.getOwnerUUID());
+			baby.setOwnerReference(mother.getOwnerReference());
 		} else if (father.isTame()) {
 			baby.setTame(true, true);
-			baby.setOwnerUUID(father.getOwnerUUID());
+			baby.setOwnerReference(father.getOwnerReference());
 		}
 		this.level().addFreshEntity(baby);
 	}
@@ -867,9 +872,10 @@ public class TamedRat extends InventoryRat {
 	}
 
 	public <R extends SingleItemRecipe> ItemStack getResultForRecipe(RecipeType<R> recipe, ItemStack stack) {
-		Optional<R> optional = this.level().getRecipeManager().getRecipeFor(recipe, new SingleRecipeInput(stack), this.level()).map(RecipeHolder::value);
+		SingleRecipeInput input = new SingleRecipeInput(stack);
+		Optional<R> optional = this.level() instanceof ServerLevel server ? server.recipeAccess().getRecipeFor(recipe, input, server).map(RecipeHolder::value) : Optional.empty();
 		if (optional.isPresent()) {
-			ItemStack itemstack = optional.get().getResultItem(this.level().registryAccess());
+			ItemStack itemstack = optional.get().assemble(input);
 			if (!itemstack.isEmpty()) {
 				ItemStack itemstack1 = itemstack.copy();
 				itemstack1.setCount(stack.getCount() * itemstack.getCount());
@@ -912,19 +918,20 @@ public class TamedRat extends InventoryRat {
 	@Override
 	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean playerKill) {
 		if (this.hasToga()) {
-			this.spawnAtLocation(new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
+			this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
 		}
 		super.dropCustomDeathLoot(level, source, playerKill);
 	}
 
 	public void spawnAngelCopy() {
-		TamedRat copy = RatsEntityRegistry.TAMED_RAT.get().create(this.level());
-		CompoundTag tag = new CompoundTag();
-		this.addAdditionalSaveData(tag);
+		TamedRat copy = RatsEntityRegistry.TAMED_RAT.get().create(this.level(), EntitySpawnReason.MOB_SUMMONED);
+		CompoundTag tag = Values.save(this);
 		tag.putShort("HurtTime", (short) 0);
 		tag.putInt("HurtByTimestamp", 0);
 		tag.putShort("DeathTime", (short) 0);
-		copy.readAdditionalSaveData(tag);
+		// the copy is a new entity: not this one's id
+		tag.remove("UUID");
+		Values.load(copy, tag);
 		copy.setHealth(copy.getMaxHealth());
 		copy.copyPosition(this);
 		copy.setRespawnCountdown(1200);
@@ -949,18 +956,18 @@ public class TamedRat extends InventoryRat {
 	@Override
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
-		if (this.getRespawnCountdown() > 0 || itemstack.is(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "rat_spawn_egg")))) {
+		if (this.getRespawnCountdown() > 0 || itemstack.is(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(RatsMod.MODID, "rat_spawn_egg")))) {
 			return InteractionResult.PASS;
 		}
 		if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_CARRAT.get())) {
 			if (player.getFoodData().needsFood()) {
 				player.getFoodData().eat(1, 0.1F);
-				player.playSound(SoundEvents.GENERIC_EAT, 1.0F, 1.0F);
+				player.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
 				for (int i = 0; i < 8; i++) {
 					double d0 = this.getRandom().nextGaussian() * 0.02D;
 					double d1 = this.getRandom().nextGaussian() * 0.02D;
 					double d2 = this.getRandom().nextGaussian() * 0.02D;
-					this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.CARROT)), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
+					this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, Items.CARROT), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
 				}
 				if (RatConfig.carratDamagePerBite > 0.0D) {
 					this.hurt(this.damageSources().playerAttack(player), (float) RatConfig.carratDamagePerBite);
@@ -974,20 +981,20 @@ public class TamedRat extends InventoryRat {
 					itemstack.shrink(1);
 				}
 				this.ageUp(getSpeedUpSecondsWhenFeeding(-this.getAge()), true);
-				return InteractionResult.sidedSuccess(this.level().isClientSide());
+				return InteractionResult.SUCCESS;
 			}
 			if (itemstack.is(RatsItemRegistry.CREATIVE_CHEESE.get())) {
 				this.ageUp(-(this.getAge() / 20), true);
-				return InteractionResult.sidedSuccess(this.level().isClientSide());
+				return InteractionResult.SUCCESS;
 			}
 		}
 		if (!this.isBaby() && this.isOwnedBy(player)) {
 			if (player.isSecondaryUseActive() && !this.isPassenger()) {
 				if (player.getPassengers().size() < 3) {
-					this.startRiding(player, true);
-					player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_DISMOUNT), true);
+					this.startRiding(player, true, true);
+					player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_DISMOUNT));
 				}
-				return InteractionResult.sidedSuccess(this.level().isClientSide());
+				return InteractionResult.SUCCESS;
 			}
 			if (itemstack.is(RatsItemRegistry.RAT_PAPERS.get())) {
 				InteractionResult result = itemstack.interactLivingEntity(player, this, hand);
@@ -1001,7 +1008,7 @@ public class TamedRat extends InventoryRat {
 					}
 				} else {
 					if (!this.level().isClientSide()) {
-						this.spawnAtLocation(new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
+						this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), new ItemStack(RatlantisItemRegistry.RAT_TOGA.get()), 0.0F);
 					}
 				}
 				this.setToga(!this.hasToga());
@@ -1015,7 +1022,7 @@ public class TamedRat extends InventoryRat {
 					double d0 = this.getRandom().nextGaussian() * 0.02D;
 					double d1 = this.getRandom().nextGaussian() * 0.02D;
 					double d2 = this.getRandom().nextGaussian() * 0.02D;
-					this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(RatsBlockRegistry.DYE_SPONGE.get())), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
+					this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, RatsBlockRegistry.DYE_SPONGE.get().asItem()), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
 				}
 				this.playSound(RatsSoundRegistry.DYE_SPONGE_USED.get(), this.getSoundVolume(), this.getVoicePitch());
 				return InteractionResult.SUCCESS;
@@ -1025,7 +1032,7 @@ public class TamedRat extends InventoryRat {
 				return InteractionResult.SUCCESS;
 			} else if (itemstack.is(RatsItemRegistry.RAT_SACK.get())) {
 				if (RatSackItem.getRatsInSack(itemstack) >= RatConfig.ratSackCapacity) {
-					player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_SACK_TOO_FULL).withStyle(ChatFormatting.RED), true);
+					player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_SACK_TOO_FULL).withStyle(ChatFormatting.RED));
 					return InteractionResult.PASS;
 				} else {
 					RatSackItem.packRatIntoSack(itemstack, this, RatSackItem.getRatsInSack(itemstack) + 1);
@@ -1040,17 +1047,14 @@ public class TamedRat extends InventoryRat {
 				if (!this.level().isClientSide() && player instanceof ServerPlayer sp) {
 					RatsNetworkHandler.toPlayer(sp, new ManageRatStaffPacket(this.getId(), BlockPos.ZERO, Direction.NORTH.ordinal(), false, false));
 				}
-				player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_STAFF_BIND, this.getName()), true);
+				player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_STAFF_BIND, this.getName()));
 				return InteractionResult.SUCCESS;
 			} else if (itemstack.is(Items.ARROW)) {
 				itemstack.shrink(1);
 				ItemStack arrow = new ItemStack(RatsItemRegistry.RAT_ARROW.get());
 				CompoundTag tag = new CompoundTag();
-				CompoundTag ratTag = new CompoundTag();
-				this.addAdditionalSaveData(ratTag);
-				if (this.hasCustomName()) {
-					ratTag.putString("CustomName", Component.Serializer.toJson(this.getCustomName(), this.registryAccess()));
-				}
+				// the rat's save data (its name included, as the original stored it)
+				CompoundTag ratTag = Values.save(this);
 				tag.put("Rat", ratTag);
 				ItemNbt.setTag(arrow, tag);
 				if (itemstack.isEmpty()) {
@@ -1070,16 +1074,16 @@ public class TamedRat extends InventoryRat {
 	}
 
 	public boolean applyNormalDyeIfPossible(ItemStack stack) {
-		if (stack.getItem() instanceof DyeItem item && (!this.isDyed() || this.getDyeColor() != item.getDyeColor().getId())) {
+		if (stack.getItem() instanceof DyeItem && stack.get(DataComponents.DYE) != null && (!this.isDyed() || this.getDyeColor() != stack.get(DataComponents.DYE).getId())) {
 			if (!this.isDyed()) {
 				this.setDyed(true);
 			}
-			this.setDyeColor(item.getDyeColor().getId());
+			this.setDyeColor(stack.get(DataComponents.DYE).getId());
 			for (int i = 0; i < 8; i++) {
 				double d0 = this.getRandom().nextGaussian() * 0.02D;
 				double d1 = this.getRandom().nextGaussian() * 0.02D;
 				double d2 = this.getRandom().nextGaussian() * 0.02D;
-				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
+				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
 			}
 			this.playSound(RatsSoundRegistry.ESSENCE_APPLIED.get(), this.getSoundVolume(), this.getVoicePitch());
 			stack.shrink(1);
@@ -1100,7 +1104,7 @@ public class TamedRat extends InventoryRat {
 				double d0 = this.getRandom().nextGaussian() * 0.02D;
 				double d1 = this.getRandom().nextGaussian() * 0.02D;
 				double d2 = this.getRandom().nextGaussian() * 0.02D;
-				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(RatsItemRegistry.RATBOW_ESSENCE.get())), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
+				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, RatsItemRegistry.RATBOW_ESSENCE.get()), this.getX() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), this.getY() + (double) (this.getRandom().nextFloat() * this.getBbHeight() * 2.0F) - (double) this.getBbHeight(), this.getZ() + (double) (this.getRandom().nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(), d0, d1, d2);
 			}
 			this.playSound(RatsSoundRegistry.ESSENCE_APPLIED.get(), this.getSoundVolume(), this.getVoicePitch());
 			stack.shrink(1);
@@ -1112,8 +1116,10 @@ public class TamedRat extends InventoryRat {
 	@Override
 	public void setTame(boolean tamed, boolean applyTamingSideEffects) {
 		if (tamed) {
-			Arrays.fill(this.armorDropChances, 1.1F);
-			Arrays.fill(this.handDropChances, 1.1F);
+			// 26.x: drop chances per slot (above 1: always dropped, unharmed)
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				this.setDropChance(slot, 1.1F);
+			}
 		}
 		super.setTame(tamed, true);
 	}
@@ -1124,8 +1130,8 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public boolean causeFallDamage(float dist, float mult, DamageSource source) {
-		if (!this.isInvulnerableTo(source) && !this.isPassenger()) {
+	public boolean causeFallDamage(double dist, float mult, DamageSource source) {
+		if (!(this.level() instanceof ServerLevel server && this.isInvulnerableTo(server, source)) && !this.isPassenger()) {
 			return super.causeFallDamage(dist, mult, source);
 		}
 		return false;
@@ -1182,7 +1188,7 @@ public class TamedRat extends InventoryRat {
 			return RatsSoundRegistry.RAT_SANTA.get();
 		}
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_idle"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.getValue(Identifier.fromNamespaceAndPath("iceandfire", "firedragon_child_idle"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1192,7 +1198,7 @@ public class TamedRat extends InventoryRat {
 
 	protected SoundEvent getDeathSound() {
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_death"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.getValue(Identifier.fromNamespaceAndPath("iceandfire", "firedragon_child_death"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1202,7 +1208,7 @@ public class TamedRat extends InventoryRat {
 
 	protected SoundEvent getHurtSound(DamageSource source) {
 		if (RatsMod.ICEANDFIRE_LOADED && RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_DRAGON.get())) {
-			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.fromNamespaceAndPath("iceandfire", "firedragon_child_hurt"));
+			SoundEvent possibleDragonSound = BuiltInRegistries.SOUND_EVENT.getValue(Identifier.fromNamespaceAndPath("iceandfire", "firedragon_child_hurt"));
 			if (possibleDragonSound != null) {
 				return possibleDragonSound;
 			}
@@ -1375,13 +1381,13 @@ public class TamedRat extends InventoryRat {
 
 	public void tryIncreaseStat(String itemName, Holder<Attribute> stat, double value) {
 		// 1.21: modifiers have ids; one per boost of this rat (two equal upgrades in a combined upgrade both count)
-		AttributeModifier modifier = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "upgrade_boost_" + this.attributeChanges.size()), value, AttributeModifier.Operation.ADD_VALUE);
+		AttributeModifier modifier = new AttributeModifier(Identifier.fromNamespaceAndPath(RatsMod.MODID, "upgrade_boost_" + this.attributeChanges.size()), value, AttributeModifier.Operation.ADD_VALUE);
 		Objects.requireNonNull(this.getAttribute(stat)).addTransientModifier(modifier);
 		this.attributeChanges.put(stat, modifier);
 	}
 
 	@Override
-	public boolean isInvulnerableTo(DamageSource source) {
+	public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
 		if (this.getRespawnCountdown() > 0) {
 			return true;
 		}
@@ -1395,7 +1401,7 @@ public class TamedRat extends InventoryRat {
 		if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_CREATIVE.get())) {
 			return source.getEntity() == null || source.getEntity() instanceof LivingEntity living && !this.isOwnedBy(living);
 		}
-		return upgradePrevented.get() || super.isInvulnerableTo(source);
+		return upgradePrevented.get() || super.isInvulnerableTo(level, source);
 	}
 
 	@Override
@@ -1441,7 +1447,7 @@ public class TamedRat extends InventoryRat {
 	}
 
 	@Override
-	public boolean isAlliedTo(Entity entity) {
+	protected boolean considersEntityAsAlly(Entity entity) {
 		LivingEntity livingentity = this.getOwner();
 		if (entity == livingentity) {
 			return true;
@@ -1450,7 +1456,7 @@ public class TamedRat extends InventoryRat {
 		} else if (livingentity != null && entity instanceof TamableAnimal animal) {
 			return animal.isOwnedBy(livingentity);
 		} else {
-			return livingentity != null ? livingentity.isAlliedTo(entity) : super.isAlliedTo(entity);
+			return livingentity != null ? livingentity.isAlliedTo(entity) : super.considersEntityAsAlly(entity);
 		}
 	}
 

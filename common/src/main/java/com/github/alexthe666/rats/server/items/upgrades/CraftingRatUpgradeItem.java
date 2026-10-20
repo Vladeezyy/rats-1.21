@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -32,20 +34,20 @@ public class CraftingRatUpgradeItem extends BaseRatUpgradeItem implements HoldsI
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, true, stack);
 		stack.mulPose(Axis.ZP.rotationDegrees(180F));
 		stack.translate(0.0F, -0.075F, -0.1F);
 		stack.scale(0.65F, 0.65F, 0.65F);
-		context.getItemRenderer().renderStatic(new ItemStack(Items.STONE_AXE), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, light, OverlayTexture.NO_OVERLAY, stack, buffer, null, rat.getId());
+		context.item(new ItemStack(Items.STONE_AXE), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);
 		stack.popPose();
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
 		stack.mulPose(Axis.ZP.rotationDegrees(180F));
 		stack.translate(0.0F, -0.075F, -0.1F);
 		stack.scale(0.65F, 0.65F, 0.65F);
-		context.getItemRenderer().renderStatic(new ItemStack(Items.STONE_PICKAXE), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, light, OverlayTexture.NO_OVERLAY, stack, buffer, null, rat.getId());
+		context.item(new ItemStack(Items.STONE_PICKAXE), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);
 		stack.popPose();
 	}
 
@@ -61,12 +63,12 @@ public class CraftingRatUpgradeItem extends BaseRatUpgradeItem implements HoldsI
 					rat.crafting = true;
 					rat.level().broadcastEntityEvent(rat, (byte) 85);
 					if (table.getRecipeUsed() != null) {
-						ItemStack stack = table.getRecipeUsed().value().getResultItem(rat.level().registryAccess());
+						ItemStack stack = table.recipeResult();
 						if (stack.isEmpty()) {
 							((ServerLevel) rat.level()).sendParticles(ParticleTypes.SMOKE, rat.getX() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), rat.getY() + (double) (rat.getRandom().nextFloat() * rat.getBbHeight()), rat.getZ() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), 1, d0, d1, d2, 0);
 						} else {
-							((ServerLevel) rat.level()).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack), rat.getX() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), rat.getY(), rat.getZ() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), 1, d0, d1, d2, 0);
-							((ServerLevel) rat.level()).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack), rat.getX() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), rat.getY(), rat.getZ() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), 1, d0, d1, d2, 0);
+							((ServerLevel) rat.level()).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()), rat.getX() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), rat.getY(), rat.getZ() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), 1, d0, d1, d2, 0);
+							((ServerLevel) rat.level()).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.getItem()), rat.getX() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), rat.getY(), rat.getZ() + (double) (rat.getRandom().nextFloat() * rat.getBbWidth() * 2.0F) - (double) rat.getBbWidth(), 1, d0, d1, d2, 0);
 						}
 					}
 					if (table.prevCookTime % 20 == 0) {

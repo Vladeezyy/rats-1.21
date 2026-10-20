@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.events;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ConversionParams;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.RatsMod;
@@ -23,14 +26,12 @@ import com.github.alexthe666.rats.server.misc.RatUpgradeUtils;
 import com.github.alexthe666.rats.server.misc.RatUtils;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import com.github.alexthe666.rats.server.world.PlagueDoctorSpawner;
-import com.google.common.collect.Multimap;
 import dev.vladeezyy.rats.platform.Platform;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,28 +47,25 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
-import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
+import net.minecraft.world.entity.monster.zombie.Husk;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.piglin.Piglin;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.CustomSpawner;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -97,14 +95,14 @@ public final class RatsEvents {
 				double d0 = sheep.getRandom().nextGaussian() * 0.02D;
 				double d1 = sheep.getRandom().nextGaussian() * 0.02D;
 				double d2 = sheep.getRandom().nextGaussian() * 0.02D;
-				sheep.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(RatsBlockRegistry.DYE_SPONGE.get())), sheep.getX() + (double) (sheep.getRandom().nextFloat() * sheep.getBbWidth() * 2.0F) - (double) sheep.getBbWidth(), sheep.getY() + (double) (sheep.getRandom().nextFloat() * sheep.getBbHeight() * 2.0F) - (double) sheep.getBbHeight(), sheep.getZ() + (double) (sheep.getRandom().nextFloat() * sheep.getBbWidth() * 2.0F) - (double) sheep.getBbWidth(), d0, d1, d2);
+				sheep.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, RatsBlockRegistry.DYE_SPONGE.get().asItem()), sheep.getX() + (double) (sheep.getRandom().nextFloat() * sheep.getBbWidth() * 2.0F) - (double) sheep.getBbWidth(), sheep.getY() + (double) (sheep.getRandom().nextFloat() * sheep.getBbHeight() * 2.0F) - (double) sheep.getBbHeight(), sheep.getZ() + (double) (sheep.getRandom().nextFloat() * sheep.getBbWidth() * 2.0F) - (double) sheep.getBbWidth(), d0, d1, d2);
 			}
 			sheep.playSound(RatsSoundRegistry.DYE_SPONGE_USED.get(), 1.0F, 1.0F);
 
 		}
 		if (heldItem.is(RatsItemRegistry.PLAGUE_DOCTORATE.get())) {
-			if (target instanceof Villager villager && !villager.isBaby() && (villager.getVillagerData().getProfession() == VillagerProfession.NITWIT || villager.getVillagerData().getProfession() == VillagerProfession.NONE)) {
-				PlagueDoctor doctor = villager.convertTo(RatsEntityRegistry.PLAGUE_DOCTOR.get(), true);
+			if (target instanceof Villager villager && !villager.isBaby() && (villager.getVillagerData().profession().is(VillagerProfession.NITWIT) || villager.getVillagerData().profession().is(VillagerProfession.NONE))) {
+				PlagueDoctor doctor = villager.convertTo(RatsEntityRegistry.PLAGUE_DOCTOR.get(), ConversionParams.single(villager, true, false), converted -> {});
 				if (doctor != null) {
 					doctor.setWillDespawn(false);
 					player.swing(hand);
@@ -201,7 +199,7 @@ public final class RatsEvents {
 
 		boolean cancelled = false;
 		if (entity instanceof Player) {
-			List<TamedRat> list = entity.level().getEntitiesOfClass(TamedRat.class, entity.getBoundingBox().inflate(RatConfig.ratVoodooDistance), rat -> rat.isTame() && rat.isOwnedBy(entity) && !rat.isInvulnerable() && !rat.isInvulnerableTo(source) && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_VOODOO.get()));
+			List<TamedRat> list = entity.level().getEntitiesOfClass(TamedRat.class, entity.getBoundingBox().inflate(RatConfig.ratVoodooDistance), rat -> rat.isTame() && rat.isOwnedBy(entity) && !rat.isInvulnerable() && !rat.isInvulnerableTo((net.minecraft.server.level.ServerLevel) rat.level(), source) && RatUpgradeUtils.hasUpgrade(rat, RatsItemRegistry.RAT_UPGRADE_VOODOO.get()));
 			if (!list.isEmpty()) {
 				float damage = amount / list.size();
 				cancelled = true;
@@ -215,7 +213,7 @@ public final class RatsEvents {
 
 	/** False if the effect must not be applied (the plague when it does not spread or the mob is immune) */
 	public static boolean canApplyEffect(LivingEntity entity, MobEffectInstance instance) {
-		return !(instance.getEffect().is(RatsEffectRegistry.PLAGUE.holder()) && (!RatConfig.plagueSpread || entity.getType().is(RatsEntityTags.PLAGUE_IMMUNE)));
+		return !(instance.getEffect().is(RatsEffectRegistry.PLAGUE.holder()) && (!RatConfig.plagueSpread || entity.is(RatsEntityTags.PLAGUE_IMMUNE)));
 	}
 
 	public static void onLevelLoad(ServerLevel server) {
@@ -228,9 +226,9 @@ public final class RatsEvents {
 
 	/** The mob griefing warning, once per player (kept as an entity tag: the same on both loaders) */
 	public static void onPlayerLoggedIn(Player player) {
-		if (!player.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
-			if (!player.getTags().contains(GRIEFING_WARNING_TAG)) {
-				player.displayClientMessage(Component.translatable(RatsLangConstants.MOB_GRIEFING_WARNING).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
+		if (player.level() instanceof ServerLevel serverLevel && !serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
+			if (!player.entityTags().contains(GRIEFING_WARNING_TAG)) {
+				player.sendSystemMessage(Component.translatable(RatsLangConstants.MOB_GRIEFING_WARNING).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 				player.addTag(GRIEFING_WARNING_TAG);
 			}
 		}
@@ -240,11 +238,11 @@ public final class RatsEvents {
 
 	public static void onEntityJoin(Entity entity) {
 		if (entity != null && entity instanceof IronGolem golem && RatConfig.golemsTargetRats) {
-			golem.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(golem, Rat.class, true, RatUtils.UNTAMED_RAT_SELECTOR));
+			golem.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(golem, Rat.class, true, (target, level) -> RatUtils.UNTAMED_RAT_SELECTOR.test(target)));
 		}
 
 		if (entity != null && RatUtils.isPredator(entity) && entity instanceof Animal animal) {
-			animal.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(animal, Rat.class, true, RatUtils.UNTAMED_RAT_SELECTOR));
+			animal.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(animal, Rat.class, true, (target, level) -> RatUtils.UNTAMED_RAT_SELECTOR.test(target)));
 		}
 
 		if (entity != null && entity instanceof Husk husk) {
@@ -262,19 +260,19 @@ public final class RatsEvents {
 	}
 
 	/** A mob was spawned naturally or by world generation: strider jockeys with demon rats */
-	public static void onFinalizeSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType) {
+	public static void onFinalizeSpawn(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType) {
 		//Carry On passes null into their difficulty when firing this event so we have to check this unfortunately. They shouldnt be doing this.
 		if (difficulty == null) return;
-		if (difficulty.getDifficulty() != Difficulty.PEACEFUL && (spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.NATURAL)) {
+		if (difficulty.getDifficulty() != Difficulty.PEACEFUL && (spawnType == EntitySpawnReason.CHUNK_GENERATION || spawnType == EntitySpawnReason.NATURAL)) {
 			if (mob instanceof Strider strider && mob.getType() == EntityType.STRIDER) {
 				if (!strider.isBaby() && !strider.isSaddled() && strider.getPassengers().isEmpty() && strider.getRandom().nextFloat() < 0.1F) {
-					DemonRat demonRat = RatsEntityRegistry.DEMON_RAT.get().create(level.getLevel());
+					DemonRat demonRat = RatsEntityRegistry.DEMON_RAT.get().create(level.getLevel(), EntitySpawnReason.CONVERSION);
 					if (demonRat != null) {
-						demonRat.moveTo(strider.getX(), strider.getY(), strider.getZ(), strider.getYRot(), 0.0F);
-						demonRat.finalizeSpawn(level, difficulty, MobSpawnType.JOCKEY, null);
-						demonRat.startRiding(strider, true);
+						demonRat.snapTo(strider.getX(), strider.getY(), strider.getZ(), strider.getYRot(), 0.0F);
+						demonRat.finalizeSpawn(level, difficulty, EntitySpawnReason.JOCKEY, null);
+						demonRat.startRiding(strider, true, true);
 						demonRat.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WARPED_FUNGUS_ON_A_STICK));
-						strider.equipSaddle(new ItemStack(Items.SADDLE), null);
+						strider.setItemSlot(EquipmentSlot.SADDLE, new ItemStack(Items.SADDLE));
 					}
 				}
 			}
@@ -309,7 +307,7 @@ public final class RatsEvents {
 					RatsNetworkHandler.toPlayer((ServerPlayer) player, new ManageRatStaffPacket(rat.getId(), hit.getBlockPos(), hit.getDirection().ordinal(), false, true, staff.getStaff(stack)));
 				}
 			} else {
-				player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_STAFF_NO_RAT).withStyle(ChatFormatting.RED), true);
+				player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_STAFF_NO_RAT).withStyle(ChatFormatting.RED));
 			}
 			return InteractionResult.FAIL;
 		}
@@ -344,39 +342,6 @@ public final class RatsEvents {
 	}
 
 	/** The pet shop owner's trades of one level (1-5) */
-	public static void addPetShopTrades(int tradeLevel, List<VillagerTrades.ItemListing> trades) {
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(Items.BONE, 12, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(Items.ROTTEN_FLESH, 11, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(Items.COD, 10, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(Items.STRING, 12, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(Items.EGG, 16, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.EmeraldForItems(RatsItemRegistry.RAW_RAT.get(), 11, 12, 1));
-			if (tradeLevel == 1) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.CHEESE.get(), 1, 5, 1));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.COOKED_RAT.get(), 1, 5, 5));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.ItemsAndEmeraldsToItems(RatsBlockRegistry.GARBAGE_PILE.get(), 10, 3, RatsItemRegistry.PLASTIC_WASTE.get(), 10, 12, 5, 0.05F));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.ItemsForEmeralds(RatsBlockRegistry.MARBLED_CHEESE_RAW.get().asItem(), 1, 8, 5));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.ItemsForEmeralds(RatsBlockRegistry.GARBAGE_PILE.get().asItem(), 1, 6, 5));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.EmeraldForItems(RatsItemRegistry.RAW_PLASTIC.get(), 5, 12, 5));
-			if (tradeLevel == 2) trades.add(new VillagerTrades.EmeraldForItems(RatsItemRegistry.RAT_FLUTE.get(), 1, 12, 5));
-			if (tradeLevel == 3) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.ARCHEOLOGIST_HAT.get(), 12, 1, 10));
-			if (tradeLevel == 3) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.SANTA_HAT.get(), 20, 1, 15));
-			if (tradeLevel == 3) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.PARTY_HAT.get(), 20, 1, 15));
-			if (tradeLevel == 3) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.HALO_HAT.get(), 8, 1, 10));
-			if (tradeLevel == 3) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.EXTERMINATOR_HAT.get(), 14, 1, 10));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_BASIC.get(), 5, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_JURY_RIGGED.get(), 16, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_BLACKLIST.get(), 8, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_WHITELIST.get(), 8, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_SPEED.get(), 10, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_HEALTH.get(), 10, 1, 20));
-			if (tradeLevel == 4) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_UPGRADE_ARMOR.get(), 10, 1, 20));
-			if (tradeLevel == 5) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.PLAGUE_DOCTORATE.get(), 10, 1, 30));
-			if (tradeLevel == 5) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.PLAGUE_TOME.get(), 32, 1, 30));
-			if (tradeLevel == 5) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.RAT_PAPERS.get(), 5, 1, 30));
-			if (tradeLevel == 5) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.CHARGED_CREEPER_CHUNK.get(), 3, 1, 30));
-			if (tradeLevel == 5) trades.add(new VillagerTrades.ItemsForEmeralds(RatsItemRegistry.TINY_COIN.get(), 1, 8, 30));
-	}
-
 	/** Left click into the air on the client: dismount rats from the shoulder, swing the plague scythe */
 	public static void onLeftClickEmpty(Player player, ItemStack stack) {
 		if (player.level().isClientSide()) {

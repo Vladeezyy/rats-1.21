@@ -25,7 +25,7 @@ public class RatMeleeAttackGoal extends MeleeAttackGoal implements RatWorkGoal {
 		// flies straight at the target (its navigation needs no path for that)
 		if (this.rat.getNavigation() instanceof RatFlightNavigation) {
 			LivingEntity target = this.rat.getTarget();
-			return target != null && target.isAlive() && this.rat.isWithinRestriction(target.blockPosition());
+			return target != null && target.isAlive() && this.rat.isWithinHome(target.blockPosition());
 		}
 		return super.canUse();
 	}

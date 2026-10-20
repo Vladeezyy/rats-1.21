@@ -12,9 +12,9 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.monster.ZombieVillager;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.monster.zombie.ZombieVillager;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,12 +33,12 @@ public class PurifyingLiquid extends ThrowableItemProjectile {
 	}
 
 	public PurifyingLiquid(Level level, LivingEntity thrower, boolean nether) {
-		super(RatsEntityRegistry.PURIFYING_LIQUID.get(), thrower, level);
+		super(RatsEntityRegistry.PURIFYING_LIQUID.get(), thrower, level, new ItemStack(nether ? RatsItemRegistry.CRIMSON_FLUID.get() : RatsItemRegistry.PURIFYING_LIQUID.get()));
 		this.getEntityData().set(NETHER, nether);
 	}
 
 	public PurifyingLiquid(Level level, double x, double y, double z, boolean nether) {
-		super(RatsEntityRegistry.PURIFYING_LIQUID.get(), x, y, z, level);
+		super(RatsEntityRegistry.PURIFYING_LIQUID.get(), x, y, z, level, new ItemStack(nether ? RatsItemRegistry.CRIMSON_FLUID.get() : RatsItemRegistry.PURIFYING_LIQUID.get()));
 		this.getEntityData().set(NETHER, nether);
 	}
 
@@ -63,10 +63,10 @@ public class PurifyingLiquid extends ThrowableItemProjectile {
 									Rat rat = new Rat(RatsEntityRegistry.RAT.get(), this.level());
 									rat.copyPosition(living);
 									if (!this.level().isClientSide()) {
-										Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevelAccessor) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.CONVERSION, null);
+										Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevelAccessor) this.level(), ((net.minecraft.world.level.ServerLevelAccessor) this.level()).getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.CONVERSION, null);
 									}
 									rat.setTame(false, true);
-									rat.setOwnerUUID(null);
+									rat.setOwnerReference(null);
 									this.level().addFreshEntity(rat);
 									living.discard();
 								}
@@ -77,7 +77,7 @@ public class PurifyingLiquid extends ThrowableItemProjectile {
 								if (living.hasEffect(RatsEffectRegistry.PLAGUE.holder())) {
 									living.removeEffect(RatsEffectRegistry.PLAGUE.holder());
 								}
-								if (living.getType().is(RatsEntityTags.PLAGUE_LEGION)) {
+								if (living.is(RatsEntityTags.PLAGUE_LEGION)) {
 									// #827: magic damage with the thrower as its cause (a plague mob killed by plain magic had no killer in its loot
 									// context, which crashed with mods that read it unchecked), and the thrower gets the kill
 									living.hurt(this.damageSources().indirectMagic(this, this.getOwner()), 10);

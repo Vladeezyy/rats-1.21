@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:rat_pelt"
-    },
-    {
-      "item": "minecraft:paper"
-    }
+    "rats:rat_pelt",
+    "minecraft:paper"
   ],
   "result": {
     "id": "rats:rat_banner_pattern"

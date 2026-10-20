@@ -40,7 +40,7 @@ public final class RatlantisPack {
 	/** Datapacks sent to one player (joining) or, with null, to everyone (after /reload) */
 	public static void onDatapackSync(@Nullable ServerPlayer player, PlayerList playerList) {
 		if (player != null) {
-			boolean enabled = isEnabled(player.serverLevel().getServer());
+			boolean enabled = isEnabled(player.level().getServer());
 			RatsMod.RATLANTIS_DATAPACK_ENABLED = enabled;
 			RatsNetworkHandler.toPlayer(player, new ChangeRatlantisStatusPacket(enabled));
 			RatsMod.LOGGER.debug("Ratlantis datapack flag has been set to {} for {} ({})", enabled, player.getDisplayName().getString(), player.getStringUUID());

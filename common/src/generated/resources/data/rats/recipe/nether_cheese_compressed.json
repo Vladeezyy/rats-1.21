@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "item": "rats:nether_cheese"
-    }
+    "C": "rats:nether_cheese"
   },
   "pattern": [
     "CC",

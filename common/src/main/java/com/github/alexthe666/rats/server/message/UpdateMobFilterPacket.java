@@ -2,7 +2,7 @@ package com.github.alexthe666.rats.server.message;
 
 import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.PacketContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public record UpdateMobFilterPacket(InteractionHand hand, boolean whitelist, List<String> mobs) implements CustomPacketPayload {
 
-	public static final Type<UpdateMobFilterPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "update_mob_filter"));
+	public static final Type<UpdateMobFilterPacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "update_mob_filter"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, UpdateMobFilterPacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), UpdateMobFilterPacket::decode);
 
 	@Override

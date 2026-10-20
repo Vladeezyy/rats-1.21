@@ -1,40 +1,28 @@
 package com.github.alexthe666.rats.client.gui;
 
-import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.inventory.RatCraftingTableMenu;
 import com.github.alexthe666.rats.server.message.CycleRatRecipePacket;
 import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.gui.navigation.ScreenPosition;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.Optional;
-
-public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingTableMenu> implements RecipeUpdateListener {
-	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/rat_crafting_table.png");
-	private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.parse("textures/gui/recipe_button.png");
+/** The rat crafting table: the grid the rat copies, its buffer, the recipe cycle buttons and vanilla's recipe book */
+public class RatCraftingTableScreen extends AbstractRecipeBookScreen<RatCraftingTableMenu> {
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/gui/container/rat_crafting_table.png");
 	private final Inventory playerInventory;
 	private final RatCraftingTableMenu table;
 
-	private final RatCraftingRecipeBookComponent recipeBook = new RatCraftingRecipeBookComponent();
-	private boolean widthTooNarrow;
-
 	public RatCraftingTableScreen(RatCraftingTableMenu container, Inventory inv, Component name) {
-		super(container, inv, name);
+		super(container, new RatCraftingRecipeBookComponent(container), inv, name);
 		this.playerInventory = inv;
 		this.table = container;
 		this.imageHeight = 211;
@@ -43,16 +31,6 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 	@Override
 	protected void init() {
 		super.init();
-		this.widthTooNarrow = this.width < 379;
-		this.recipeBook.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-		this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
-
-		this.renderables.clear();
-		this.addRenderableWidget(new ImageButton(this.leftPos + 128, this.topPos + 65, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, button -> {
-			this.recipeBook.toggleVisibility();
-			this.leftPos = this.recipeBook.updateScreenPosition(this.width, this.imageWidth);
-			this.init();
-		}));
 		this.addRenderableWidget(new CycleResultButton(this.leftPos + 100, this.topPos + 58, false, button -> {
 			this.table.incrementRecipeIndex(false);
 			RatsNetworkHandler.toServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), false));
@@ -61,127 +39,76 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 			this.table.incrementRecipeIndex(true);
 			RatsNetworkHandler.toServer(new CycleRatRecipePacket(this.table.getCraftingTable().getBlockPos().asLong(), true));
 		}));
-		this.addWidget(this.recipeBook);
 	}
 
 	@Override
-	protected void containerTick() {
-		super.containerTick();
-		this.recipeBook.tick();
+	protected ScreenPosition getRecipeBookButtonPosition() {
+		return new ScreenPosition(this.leftPos + 128, this.topPos + 65);
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		if (this.recipeBook.isVisible() && this.widthTooNarrow) {
-			this.renderBackground(graphics, mouseX, mouseY, partialTicks);
-			this.recipeBook.render(graphics, mouseX, mouseY, partialTicks);
-		} else {
-			this.recipeBook.render(graphics, mouseX, mouseY, partialTicks);
-			super.render(graphics, mouseX, mouseY, partialTicks);
-		}
-		this.renderTooltip(graphics, mouseX, mouseY);
-		this.recipeBook.renderTooltip(graphics, this.leftPos, this.topPos, mouseX, mouseY);
+	protected void onRecipeBookButtonClick() {
+		// the cycle buttons move with the screen
+		this.rebuildWidgets();
+	}
 
-		RenderSystem.disableDepthTest();
+	@Override
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+		// the grid only shows what the rat copies: greyed over the items
+		graphics.nextStratum();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-				int xPos = 36 + i * 18;
-				int yPos = 22 + j * 18;
-				graphics.pose().pushPose();
-				graphics.pose().translate(this.leftPos, this.topPos, 300.0D);
+				int xPos = this.leftPos + 36 + i * 18;
+				int yPos = this.topPos + 22 + j * 18;
 				graphics.fill(xPos, yPos, xPos + 16, yPos + 16, 0x9f8b8b8b);
-				graphics.pose().popPose();
 			}
 		}
-		RenderSystem.enableDepthTest();
-
-		Optional<RecipeHolder<CraftingRecipe>> recipe = this.table.getCraftingTable().getGuideRecipe();
-		if (recipe.isPresent() && !this.table.getSlot(0).hasItem()) {
-			graphics.renderItem(recipe.get().value().getResultItem(Minecraft.getInstance().level.registryAccess()), this.leftPos + 130, this.topPos + 40);
-			RenderSystem.disableDepthTest();
-			graphics.pose().pushPose();
-			graphics.pose().translate(this.leftPos, this.topPos, 300.0D);
-			graphics.fill(130, 40, 146, 56, 0x9f8b8b8b);
-			graphics.pose().popPose();
-			RenderSystem.enableDepthTest();
+		ItemStack guide = this.table.guideResult();
+		if (!guide.isEmpty() && !this.table.getSlot(0).hasItem()) {
+			graphics.item(guide, this.leftPos + 130, this.topPos + 40);
+			graphics.nextStratum();
+			graphics.fill(this.leftPos + 130, this.topPos + 40, this.leftPos + 146, this.topPos + 56, 0x9f8b8b8b);
 		}
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		graphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 		int l = this.table.getCookProgressionScaled();
-		graphics.blit(TEXTURE, this.leftPos + 96, this.topPos + 39, 0, 211, l, 16);
-		if (this.table.getCraftingTable().hasRat()) {
-			graphics.blit(TEXTURE, this.leftPos + 8, this.topPos + 20, 176, 0, 21, 21);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 96, this.topPos + 39, 0, 211, l, 16, 256, 256);
+		if (this.table.hasRat()) {
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 8, this.topPos + 20, 176, 0, 21, 21, 256, 256);
 		} else {
-			graphics.blit(TEXTURE, this.leftPos + 7, this.topPos + 40, 198, 0, 21, 21);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 7, this.topPos + 40, 198, 0, 21, 21, 256, 256);
 		}
-		if (this.table.getCraftingTable().getRecipeUsed() == null) {
-			graphics.blit(TEXTURE, this.leftPos + 95, this.topPos + 38, 220, 0, 21, 21);
+		if (!this.table.hasRecipe()) {
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.leftPos + 95, this.topPos + 38, 220, 0, 21, 21, 256, 256);
 		}
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-		Font font = this.font;
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		String s = this.getTitle().getString();
-		graphics.drawString(this.font, s, this.imageWidth / 2 - font.width(s) / 2, 5, 4210752, false);
-		graphics.drawString(this.font, this.playerInventory.getDisplayName().getString(), 8, this.imageHeight - 93, 4210752, false);
-		graphics.drawString(this.font, Component.translatable(RatsLangConstants.CRAFTING_INPUT), 8, this.imageHeight - 125, 4210752, false);
-		int screenW = (this.width - 248) / 2;
-		int screenH = (this.height - 166) / 2;
+		graphics.text(this.font, s, this.imageWidth / 2 - this.font.width(s) / 2, 5, 0xFF404040, false);
+		graphics.text(this.font, this.playerInventory.getDisplayName().getString(), 8, this.imageHeight - 93, 0xFF404040, false);
+		graphics.text(this.font, Component.translatable(RatsLangConstants.CRAFTING_INPUT), 8, this.imageHeight - 125, 0xFF404040, false);
+	}
 
-		if (!this.table.getCraftingTable().hasRat()) {
-			if (this.isHovering(6, 34, 25, 29, mouseX, mouseY)) {
-				Component ratDesc = Component.translatable(RatsLangConstants.CRAFTING_NEEDS_RAT);
-				graphics.renderTooltip(this.font, this.font.split(ratDesc, 200), mouseX - screenW - 40, mouseY - screenH + 10);
-			}
+	@Override
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		super.extractTooltip(graphics, mouseX, mouseY);
+		if (!this.table.hasRat() && this.isHovering(6, 34, 25, 29, mouseX, mouseY)) {
+			graphics.setTooltipForNextFrame(this.font, this.font.split(Component.translatable(RatsLangConstants.CRAFTING_NEEDS_RAT), 200), mouseX, mouseY + 10);
 		}
 	}
 
 	public boolean shouldRenderButtons() {
-		return this.table.getCraftingTable().getPossibleRecipes().size() > 1;
+		return this.table.recipeCount() > 1;
 	}
 
-	@Override
-	protected boolean isHovering(int slotX, int slotY, int width, int height, double mouseX, double mouseY) {
-		return (!this.widthTooNarrow || !this.recipeBook.isVisible()) && super.isHovering(slotX, slotY, width, height, mouseX, mouseY);
-	}
-
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		if (this.recipeBook.mouseClicked(mouseX, mouseY, button)) {
-			this.setFocused(this.recipeBook);
-			return true;
-		} else {
-			return this.widthTooNarrow && this.recipeBook.isVisible() || super.mouseClicked(mouseX, mouseY, button);
-		}
-	}
-
-	@Override
-	protected boolean hasClickedOutside(double mouseX, double mouseY, int leftPos, int topPos, int button) {
-		boolean flag = mouseX < (double) leftPos || mouseY < (double) topPos || mouseX >= (double) (leftPos + this.imageWidth) || mouseY >= (double) (topPos + this.imageHeight);
-		return this.recipeBook.hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, button) && flag;
-	}
-
-	@Override
-	protected void slotClicked(Slot slot, int slotIndex, int button, ClickType type) {
-		super.slotClicked(slot, slotIndex, button, type);
-		this.recipeBook.slotClicked(slot);
-	}
-
-	@Override
-	public void recipesUpdated() {
-		this.recipeBook.recipesUpdated();
-	}
-
-	@Override
-	public RecipeBookComponent getRecipeBookComponent() {
-		return this.recipeBook;
-	}
-
-	private static class CycleResultButton extends Button {
+	private class CycleResultButton extends Button {
 		private final boolean up;
 
 		public CycleResultButton(int x, int y, boolean up, OnPress onClick) {
@@ -190,21 +117,19 @@ public class RatCraftingTableScreen extends AbstractContainerScreen<RatCraftingT
 		}
 
 		@Override
-		public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-			if (Minecraft.getInstance().screen instanceof RatCraftingTableScreen table && !table.shouldRenderButtons())
+		protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+			if (!RatCraftingTableScreen.this.shouldRenderButtons()) {
 				return;
-			if (this.visible) {
-				this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
-
-				int textureX = 22;
-				int textureY = 211;
-
-				if (this.isHovered) textureX += this.width;
-
-				if (!this.up) textureY += this.height;
-
-				graphics.blit(TEXTURE, this.getX(), this.getY(), textureX, textureY, this.width, this.height);
 			}
+			int textureX = 22;
+			int textureY = 211;
+			if (this.isHovered()) {
+				textureX += this.width;
+			}
+			if (!this.up) {
+				textureY += this.height;
+			}
+			graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.getX(), this.getY(), textureX, textureY, this.width, this.height, 256, 256);
 		}
 	}
 }

@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.misc;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import com.github.alexthe666.rats.data.tags.CommonTags;
 import dev.vladeezyy.rats.platform.Platform;
@@ -15,10 +19,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.Cat;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.Fox;
-import net.minecraft.world.entity.animal.Ocelot;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.animal.feline.Ocelot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -59,10 +63,10 @@ public class RatUtils {
 		BlockPos pos;
 		BlockPos topY = BlockPos.containing(x, rat.getY(), z);
 		BlockPos bottomY = BlockPos.containing(x, rat.getY(), z);
-		while (level.getBlockState(topY).is(Blocks.WATER) && topY.getY() < level.getMaxBuildHeight()) {
+		while (level.getBlockState(topY).is(Blocks.WATER) && topY.getY() < level.getMaxY()) {
 			topY = topY.above();
 		}
-		while (level.getBlockState(bottomY).is(Blocks.WATER) && bottomY.getY() > level.getMinBuildHeight()) {
+		while (level.getBlockState(bottomY).is(Blocks.WATER) && bottomY.getY() > level.getMinY()) {
 			bottomY = bottomY.below();
 		}
 		for (int tries = 0; tries < 5; tries++) {
@@ -164,7 +168,7 @@ public class RatUtils {
 			BlockPos blockpos;
 			do {
 				blockpos = pos.below();
-			} while (blockpos.getY() > rat.level().getMinBuildHeight() && rat.level().getBlockState(blockpos).is(Blocks.WATER));
+			} while (blockpos.getY() > rat.level().getMinY() && rat.level().getBlockState(blockpos).is(Blocks.WATER));
 			return blockpos;
 		}
 	}
@@ -180,7 +184,7 @@ public class RatUtils {
 
 	/** Farmland that is wet (NeoForge's default Block.isFertile) */
 	public static boolean isFertile(BlockState state) {
-		return state.is(net.minecraft.world.level.block.Blocks.FARMLAND) && state.getValue(net.minecraft.world.level.block.FarmBlock.MOISTURE) > 0;
+		return state.is(net.minecraft.world.level.block.Blocks.FARMLAND) && state.getValue(net.minecraft.world.level.block.FarmlandBlock.MOISTURE) > 0;
 	}
 
 	public static boolean canRatPlaceBlock(Level level, BlockPos pos, DiggingRat rat) {
@@ -266,16 +270,17 @@ public class RatUtils {
 
 	public static TamedRat tameRat(Rat rat, Level level) {
 		TamedRat newRat = new TamedRat(RatsEntityRegistry.TAMED_RAT.get(), level);
-		CompoundTag tag = new CompoundTag();
-		rat.addAdditionalSaveData(tag);
+		TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());
+		rat.addAdditionalSaveData(output);
+		CompoundTag tag = output.buildResult();
 		newRat.setToga(rat.hasToga());
-		newRat.moveTo(rat.blockPosition(), rat.getYRot(), rat.getXRot());
+		newRat.snapTo(rat.blockPosition(), rat.getYRot(), rat.getXRot());
 		if (rat.getLeashHolder() != null) {
 			newRat.setLeashedTo(rat.getLeashHolder(), true);
 			rat.setLeashedTo(null, true);
 		}
-		Platform.INSTANCE.finalizeMobSpawn(newRat, (ServerLevelAccessor) level, level.getCurrentDifficultyAt(rat.blockPosition()), MobSpawnType.EVENT, null);
-		newRat.readAdditionalSaveData(tag);
+		Platform.INSTANCE.finalizeMobSpawn(newRat, (ServerLevelAccessor) level, ((net.minecraft.world.level.ServerLevelAccessor) level).getCurrentDifficultyAt(rat.blockPosition()), EntitySpawnReason.EVENT, null);
+		newRat.readAdditionalSaveData(Values.input(level.registryAccess(), tag));
 		newRat.setColorVariant(rat.getColorVariant());
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			// #838: the cheese the wild rat was fed is eaten while it is tamed, not kept in its paw

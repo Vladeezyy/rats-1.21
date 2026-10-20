@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "tag": "c:nuggets/iron"
-    },
-    "P": {
-      "tag": "c:plastics"
-    },
-    "W": {
-      "item": "minecraft:water_bucket"
-    }
+    "I": "#c:nuggets/iron",
+    "P": "#c:plastics",
+    "W": "minecraft:water_bucket"
   },
   "pattern": [
     "P",

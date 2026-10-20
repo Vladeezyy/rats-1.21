@@ -1,9 +1,10 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.server.level.ServerLevel;
 
 import dev.vladeezyy.rats.platform.Platform;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatCraftingTableBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -40,18 +41,10 @@ public class RatCraftingTableBlock extends BaseEntityBlock {
 		super(properties);
 	}
 
+	// 26.x: the block entity drops what it holds (preRemoveSideEffects); the block tells comparators
 	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		BlockEntity be = level.getBlockEntity(pos);
-		if (be instanceof RatCraftingTableBlockEntity table) {
-			table.bufferHandler.ifPresent(handler -> {
-				for (int i = 0; i < handler.getSlots(); i++) {
-					Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
-				}
-			});
-			level.updateNeighbourForOutputSignal(pos, this);
-		}
-		super.onRemove(state, level, pos, newState, isMoving);
+	protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+		Containers.updateNeighboursAfterDestroy(state, level, pos);
 	}
 
 	@Override
@@ -80,19 +73,19 @@ public class RatCraftingTableBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull InteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isCrouching()) {
 			if (level.isClientSide()) {
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else {
 				BlockEntity be = level.getBlockEntity(pos);
 				if (be instanceof RatCraftingTableBlockEntity table) {
 					Platform.INSTANCE.openMenu((net.minecraft.server.level.ServerPlayer) player, table, buf -> buf.writeBlockPos(pos));
 					player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
-					return ItemInteractionResult.CONSUME;
+					return InteractionResult.CONSUME;
 				}
 			}
 		}
-		return ItemInteractionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 }

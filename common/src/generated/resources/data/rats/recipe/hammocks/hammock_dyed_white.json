@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "rats:hammocks"
-    },
-    {
-      "tag": "c:dyes/white"
-    }
+    "#rats:hammocks",
+    "#c:dyes/white"
   ],
   "result": {
     "id": "rats:rat_hammock_white"

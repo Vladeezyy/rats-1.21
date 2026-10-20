@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:iron_bars"
-    },
-    "C": {
-      "tag": "c:cheese"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    }
+    "B": "minecraft:iron_bars",
+    "C": "#c:cheese",
+    "I": "#c:ingots/iron"
   },
   "pattern": [
     " B ",

@@ -14,9 +14,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "P": {
-      "item": "rats:raw_plastic"
-    }
+    "P": "rats:raw_plastic"
   },
   "pattern": [
     "PPP",

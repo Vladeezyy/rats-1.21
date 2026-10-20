@@ -1,7 +1,10 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
@@ -12,10 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +26,6 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class OreRatNuggetItem extends Item {
 
@@ -35,7 +34,7 @@ public class OreRatNuggetItem extends Item {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), RatsSoundRegistry.RAT_NUGGET_ORE.get(), SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 		ItemStack poopStack = getStoredItem(itemstack, new ItemStack(Items.IRON_INGOT));
@@ -45,15 +44,15 @@ public class OreRatNuggetItem extends Item {
 		if (!player.isCreative()) {
 			itemstack.shrink(1);
 		}
-		return InteractionResultHolder.success(itemstack);
+		return InteractionResult.SUCCESS;
 	}
 
 	public static ItemStack getStoredItem(ItemStack poopItem, ItemStack fallback) {
 		if (ItemNbt.view(poopItem).contains("OreItem")) {
 			// the ore by its id ("id" in 1.20.1's saved stack too); ores carry no other data
-			CompoundTag poopTag = ItemNbt.view(poopItem).getCompound("OreItem");
-			ResourceLocation id = ResourceLocation.tryParse(poopTag.getString("id"));
-			ItemStack oreItem = id == null ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.get(id));
+			CompoundTag poopTag = ItemNbt.view(poopItem).getCompoundOrEmpty("OreItem");
+			Identifier id = Identifier.tryParse(poopTag.getStringOr("id", ""));
+			ItemStack oreItem = id == null ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(id));
 			if (oreItem.isEmpty()) {
 				return fallback;
 			} else {
@@ -64,9 +63,9 @@ public class OreRatNuggetItem extends Item {
 	}
 
 	public static ItemStack getIngot(Level level, ItemStack stack) {
-		SmeltingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), level).map(RecipeHolder::value).orElse(null);
-		if (recipe != null && !recipe.getResultItem(level.registryAccess()).isEmpty()) {
-			return recipe.getResultItem(level.registryAccess()).copy();
+		if (level instanceof net.minecraft.server.level.ServerLevel server) {
+			SingleRecipeInput input = new SingleRecipeInput(stack);
+			return server.recipeAccess().getRecipeFor(RecipeType.SMELTING, input, level).map(holder -> holder.value().assemble(input)).orElse(ItemStack.EMPTY);
 		}
 		return ItemStack.EMPTY;
 	}
@@ -82,12 +81,12 @@ public class OreRatNuggetItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		if (flag.isCreative()) {
 			ItemStack ingot = getStoredItem(stack, new ItemStack(Items.AIR));
-			tooltip.add(Component.translatable(RatsLangConstants.ORE_NUGGET_CONTAINS, ingot.getDisplayName().getString()).withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable(RatsLangConstants.ORE_NUGGET_CONTAINS, ingot.getDisplayName().getString()).withStyle(ChatFormatting.GRAY));
 		} else {
-			tooltip.add(Component.translatable("item.rats.rat_nugget_ore.desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+			tooltip.accept(Component.translatable("item.rats.rat_nugget_ore.desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 		}
 	}
 }

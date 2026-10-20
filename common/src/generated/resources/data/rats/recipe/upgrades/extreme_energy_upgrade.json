@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "item": "rats:charged_creeper_chunk"
-    },
-    "F": {
-      "item": "minecraft:popped_chorus_fruit"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_elite_energy"
-    }
+    "C": "rats:charged_creeper_chunk",
+    "F": "minecraft:popped_chorus_fruit",
+    "U": "rats:rat_upgrade_elite_energy"
   },
   "pattern": [
     "FCF",

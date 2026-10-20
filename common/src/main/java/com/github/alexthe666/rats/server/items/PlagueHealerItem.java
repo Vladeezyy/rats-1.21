@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsEffectRegistry;
@@ -7,14 +10,12 @@ import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class PlagueHealerItem extends Item {
 
@@ -41,12 +42,12 @@ public class PlagueHealerItem extends Item {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		return ItemUtils.startUsingInstantly(level, player, hand);
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable(RatsLangConstants.PLAGUE_HEAL_CHANCE, (int) (this.healChance * 100F)).withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable(RatsLangConstants.PLAGUE_HEAL_CHANCE, (int) (this.healChance * 100F)).withStyle(ChatFormatting.GRAY));
 	}
 }

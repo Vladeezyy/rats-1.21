@@ -1,10 +1,10 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
 
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.RatlanteanFlame;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +18,7 @@ public class RatlanteanFlameItem extends LoreTagItem {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
 		if (!player.isCreative()) {
 			itemstack.shrink(1);
@@ -30,6 +30,6 @@ public class RatlanteanFlameItem extends LoreTagItem {
 			flame.shoot(player, player.getXRot(), player.getYRot(), 1.5F, 0F);
 			level.addFreshEntity(flame);
 		}
-		return InteractionResultHolder.success(itemstack);
+		return InteractionResult.SUCCESS;
 	}
 }

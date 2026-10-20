@@ -1,10 +1,13 @@
 package com.github.alexthe666.rats.server.entity.rat;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,7 +23,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -38,8 +41,8 @@ public class DemonRat extends AbstractRat implements Enemy {
 	public DemonRat(EntityType<? extends AbstractRat> type, Level level) {
 		super(type, level);
 		this.xpReward = 5;
-		this.setPathfindingMalus(PathType.DANGER_FIRE, 16.0F);
-		this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
+		this.setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 16.0F);
+		this.setPathfindingMalus(PathType.FIRE, -1.0F);
 	}
 
 	@Override
@@ -64,31 +67,31 @@ public class DemonRat extends AbstractRat implements Enemy {
 				.add(Attributes.FOLLOW_RANGE, 24.0D);
 	}
 
-	public static boolean canDemonRatSpawnOn(EntityType<? extends Mob> type, LevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+	public static boolean canDemonRatSpawnOn(EntityType<? extends Mob> type, LevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
 		BlockPos blockpos = pos.below();
-		return (level.getDifficulty() != Difficulty.PEACEFUL && !level.getBlockState(blockpos).is(Blocks.NETHER_WART_BLOCK) && level.getBlockState(blockpos).isValidSpawn(level, pos, type)) || reason == MobSpawnType.SPAWNER;
+		return (level.getDifficulty() != Difficulty.PEACEFUL && !level.getBlockState(blockpos).is(Blocks.NETHER_WART_BLOCK) && level.getBlockState(blockpos).isValidSpawn(level, pos, type)) || reason == EntitySpawnReason.SPAWNER;
 	}
 
 	@Override
-	public boolean checkSpawnRules(LevelAccessor accessor, MobSpawnType type) {
-		if (type == MobSpawnType.EVENT || type == MobSpawnType.SPAWNER) return super.checkSpawnRules(accessor, type);
+	public boolean checkSpawnRules(LevelAccessor accessor, EntitySpawnReason type) {
+		if (type == EntitySpawnReason.EVENT || type == EntitySpawnReason.SPAWNER) return super.checkSpawnRules(accessor, type);
 		return accessor.getRandom().nextInt(5) == 0;
 	}
 
 	@Override
-	public boolean isInvulnerableTo(DamageSource source) {
+	public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
 		if (source.is(DamageTypeTags.IS_FIRE)) {
 			return true;
 		}
-		return super.isInvulnerableTo(source);
+		return super.isInvulnerableTo(level, source);
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getRandom().nextInt(3) == 0) {
 			entity.igniteForSeconds(5);
 		}
-		return super.doHurtTarget(entity);
+		return super.doHurtTarget(level, entity);
 	}
 
 	@Override
@@ -103,18 +106,18 @@ public class DemonRat extends AbstractRat implements Enemy {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
 		tag.putBoolean("SoulVariant", this.isSoulVariant());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		this.setSoulVariant(tag.getBoolean("SoulVariant"));
+		this.setSoulVariant(tag.getBooleanOr("SoulVariant", false));
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return true;
 	}
@@ -126,7 +129,7 @@ public class DemonRat extends AbstractRat implements Enemy {
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType type, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason type, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(accessor, difficulty, type, data);
 		this.setSoulVariant(accessor.getBiome(this.blockPosition()).is(Biomes.SOUL_SAND_VALLEY) || accessor.getRandom().nextInt(100) == 0);
 		return data;
@@ -153,5 +156,14 @@ public class DemonRat extends AbstractRat implements Enemy {
 	@Override
 	public boolean isHoldingItemInHands() {
 		return this.getItemInHand(InteractionHand.MAIN_HAND).is(Items.WARPED_FUNGUS_ON_A_STICK);
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+			this.discard();
+		} else {
+			super.checkDespawn();
+		}
 	}
 }

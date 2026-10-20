@@ -55,14 +55,14 @@ public class EnchanterRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 							power += Platform.INSTANCE.enchantPowerBonus(rat.level().getBlockState(rat.blockPosition().offset(blockpos)), rat.level(), rat.blockPosition().offset(blockpos));
 						}
 					}
-					burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), rat.level().registryAccess(), rat.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getTag(net.minecraft.tags.EnchantmentTags.IN_ENCHANTING_TABLE));
+					burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), rat.level().registryAccess(), rat.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).get(net.minecraft.tags.EnchantmentTags.IN_ENCHANTING_TABLE));
 				}
 				if (heldItem.isEmpty()) {
 					rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);
 				} else {
 					if (!rat.tryDepositItemInContainers(burntItem)) {
 						if (!rat.level().isClientSide()) {
-							rat.spawnAtLocation(burntItem, 0.25F);
+							rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
 						}
 					}
 				}

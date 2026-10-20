@@ -2,33 +2,15 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    },
-    {
-      "tag": "c:vegetables"
-    }
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables",
+    "#c:vegetables"
   ],
   "result": {
     "id": "rats:assorted_vegetables"

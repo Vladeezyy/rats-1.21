@@ -1,18 +1,17 @@
 package com.github.alexthe666.rats.client.particle;
 
 import com.github.alexthe666.rats.client.model.entity.StaticRatModel;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 import com.github.alexthe666.rats.server.misc.RatVariant;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -22,15 +21,23 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A rat running to a point (the rat flute's effect). 26.x draws particles in fixed groups (quads, item pickups, elder
+ * guardians), so this particle is not drawn by the particle engine: the living ones are submitted with the world's
+ * other overlays ({@link #submitAll}).
+ */
 public class RunningRatParticle extends Particle {
-
+	private static final List<RunningRatParticle> LIVING = new ArrayList<>();
 	private final StaticRatModel<?> model = new StaticRatModel<>();
-	private final RenderType renderType = RenderType.entityCutoutNoCull(RatVariant.getRandomVariant(RandomSource.create(), false).getTexture());
+	private final RenderType renderType = RenderTypes.entityCutout(RatVariant.getRandomVariant(RandomSource.create(), false).getTexture());
 	private final Vec3 headingTo;
 	private int oldAge;
+	/** 1.21.1's stoppedByCollision (private in 26.x) */
+	private boolean blocked;
 
 	public RunningRatParticle(ClientLevel level, double x, double y, double z, double headingToX, double headingToY, double headingToZ) {
 		super(level, x, y, z, 0.0D, 0.0D, 0.0D);
@@ -40,6 +47,26 @@ public class RunningRatParticle extends Particle {
 		this.zo = z;
 		this.gravity = 0.0F;
 		this.lifetime = 600;
+		LIVING.add(this);
+	}
+
+	@Override
+	public void remove() {
+		super.remove();
+		LIVING.remove(this);
+	}
+
+	/** Draws the running rats (the world's overlays, after the particles; positions relative to the camera) */
+	public static void submitAll(PoseStack stack, SubmitNodeCollector collector, Vec3 camera, float partialTicks) {
+		LIVING.removeIf(particle -> !particle.isAlive());
+		for (RunningRatParticle particle : LIVING) {
+			particle.submit(stack, collector, camera, partialTicks);
+		}
+	}
+
+	/** The world was left: nothing to draw any more */
+	public static void clear() {
+		LIVING.clear();
 	}
 
 	@Override
@@ -55,9 +82,9 @@ public class RunningRatParticle extends Particle {
 		if (!this.onGround) {
 			this.move(0.0D, -0.1D, 0.0D);
 		} else {
-			if (this.stoppedByCollision) {
+			if (this.blocked) {
 				this.move(0.0D, 1.0D, 0.0D);
-				this.stoppedByCollision = false;
+				this.blocked = false;
 			}
 		}
 
@@ -72,7 +99,7 @@ public class RunningRatParticle extends Particle {
 
 	@Override
 	public void move(double p_107246_, double p_107247_, double p_107248_) {
-		if (!this.stoppedByCollision) {
+		if (!this.blocked) {
 			double d0 = p_107246_;
 			double d1 = p_107247_;
 			double d2 = p_107248_;
@@ -89,7 +116,7 @@ public class RunningRatParticle extends Particle {
 			}
 
 			if ((Math.abs(p_107246_) < (double) 1.0E-5F && Math.abs(d0) < (double) 1.0E-5F) || (Math.abs(p_107248_) < (double) 1.0E-5F && Math.abs(d2) < (double) 1.0E-5F)) {
-				this.stoppedByCollision = true;
+				this.blocked = true;
 			}
 
 			this.onGround = d1 != p_107247_ && d1 < 0.0D;
@@ -103,25 +130,20 @@ public class RunningRatParticle extends Particle {
 		}
 	}
 
-	@Override
-	public void render(VertexConsumer consumer, Camera camera, float partialTicks) {
-		Vec3 vec = camera.getPosition();
-		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - vec.x());
-		float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - vec.y());
-		float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - vec.z());
-
-		PoseStack posestack = new PoseStack();
-		posestack.pushPose();
-		posestack.translate(f, f1, f2);
-		posestack.translate(0.0D, 0.95D, 0.0D);
-		posestack.scale(0.6F, -0.6F, -0.6F);
-		this.getYRotD().ifPresent(aFloat -> posestack.mulPose(Axis.YP.rotationDegrees(aFloat)));
-		MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-		VertexConsumer vertexconsumer = source.getBuffer(this.renderType);
-		this.model.setupAnim(null, Mth.lerp(partialTicks, this.oldAge, this.age) * 0.35F, 1, Mth.lerp(partialTicks, this.oldAge, this.age), partialTicks, 0);
-		this.model.renderToBuffer(posestack, vertexconsumer, this.getLightColor(partialTicks), OverlayTexture.NO_OVERLAY, -1);
-		source.endBatch();
-		posestack.popPose();
+	private void submit(PoseStack stack, SubmitNodeCollector collector, Vec3 camera, float partialTicks) {
+		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - camera.x());
+		float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - camera.y());
+		float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - camera.z());
+		stack.pushPose();
+		stack.translate(f, f1, f2);
+		stack.translate(0.0D, 0.95D, 0.0D);
+		stack.scale(0.6F, -0.6F, -0.6F);
+		this.getYRotD().ifPresent(aFloat -> stack.mulPose(Axis.YP.rotationDegrees(aFloat)));
+		// the particle's own model: posed now, drawn later in the frame with this pose
+		float age = Mth.lerp(partialTicks, this.oldAge, this.age);
+		this.model.setupAnim(null, age * 0.35F, 1, age, partialTicks, 0);
+		collector.submitModel(this.model, SubmitHelper.NO_STATE, stack, this.renderType, this.getLightCoords(partialTicks), OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		stack.popPose();
 	}
 
 	protected Optional<Float> getYRotD() {
@@ -131,13 +153,13 @@ public class RunningRatParticle extends Particle {
 	}
 
 	@Override
-	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.CUSTOM;
+	public ParticleRenderType getGroup() {
+		return ParticleRenderType.NO_RENDER;
 	}
 
 	public static class Provider implements ParticleProvider<SimpleParticleType> {
 		@Override
-		public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+		public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
 			return new RunningRatParticle(level, x, y, z, xSpeed, ySpeed, zSpeed);
 		}
 	}

@@ -1,9 +1,7 @@
 {
   "type": "rats:archeologist",
   "count": 1,
-  "ingredient": {
-    "item": "minecraft:blaze_powder"
-  },
+  "ingredient": "minecraft:blaze_powder",
   "result": {
     "id": "rats:ratlantean_flame"
   }

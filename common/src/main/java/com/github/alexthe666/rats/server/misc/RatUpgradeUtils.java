@@ -1,13 +1,10 @@
 package com.github.alexthe666.rats.server.misc;
 
 import com.github.alexthe666.rats.server.misc.StoredItems;
-import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.CombinedUpgrade;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

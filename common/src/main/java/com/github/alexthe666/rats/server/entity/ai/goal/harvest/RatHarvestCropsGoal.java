@@ -11,16 +11,13 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 	private final TamedRat rat;
@@ -77,7 +74,7 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 				} else if (block.is(Blocks.SWEET_BERRY_BUSH)) {
 					//[VanillaCopy] of Fox.FoxEatBerriesGoal
 					int i = block.getValue(SweetBerryBushBlock.AGE);
-					int j = 1 + this.rat.level().random.nextInt(2) + (i == 3 ? 1 : 0);
+					int j = 1 + this.rat.getRandom().nextInt(2) + (i == 3 ? 1 : 0);
 					ItemStack itemstack = this.rat.getItemBySlot(EquipmentSlot.MAINHAND);
 					if (itemstack.isEmpty()) {
 						this.rat.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.SWEET_BERRIES));

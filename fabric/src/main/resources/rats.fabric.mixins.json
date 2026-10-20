@@ -20,7 +20,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.FogRendererMixin",
-    "client.GameRendererMixin",
+    "client.CameraMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin"
   ],

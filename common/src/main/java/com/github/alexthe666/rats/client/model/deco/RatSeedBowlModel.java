@@ -1,9 +1,9 @@
 package com.github.alexthe666.rats.client.model.deco;
 
-import net.minecraft.util.FastColor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -12,12 +12,12 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.entity.Entity;
 
-public class RatSeedBowlModel<T extends Entity> extends EntityModel<T> {
+/** A static decoration model (vanilla model parts) */
+public class RatSeedBowlModel extends Model.Simple {
 
-	private final ModelPart root;
 
 	public RatSeedBowlModel(ModelPart root) {
-		this.root = root;
+		super(root, RenderTypes::entityCutout);
 	}
 
 	public static LayerDefinition create() {
@@ -32,13 +32,5 @@ public class RatSeedBowlModel<T extends Entity> extends EntityModel<T> {
 		return LayerDefinition.create(mesh, 32, 16);
 	}
 
-	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-		this.root.render(stack, consumer, light, overlay, color);
-	}
 }

@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 @SuppressWarnings("deprecation")
 public class RatUpgradeBlock extends DirectionalBlock {
@@ -22,7 +22,7 @@ public class RatUpgradeBlock extends DirectionalBlock {
         return CODEC;
     }
 
-	public static final DirectionProperty FACING = DirectionalBlock.FACING;
+	public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
 
 	public RatUpgradeBlock(BlockBehaviour.Properties properties) {
 		super(properties);

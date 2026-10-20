@@ -1,20 +1,18 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import com.github.alexthe666.rats.registry.RatsItemRegistry;
-import com.github.alexthe666.rats.server.entity.monster.PiedPiper;
+import com.github.alexthe666.rats.client.render.entity.PiedPiperRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.ArmedModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
-import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class PiedPiperModel<T extends PiedPiper> extends HierarchicalModel<T> implements ArmedModel, HeadedModel {
-	private final ModelPart root;
+public class PiedPiperModel extends EntityModel<PiedPiperRenderer.State> implements ArmedModel<PiedPiperRenderer.State>, HeadedModel {
 	private final ModelPart head;
 	private final ModelPart nose;
 	private final ModelPart rightArm;
@@ -23,7 +21,7 @@ public class PiedPiperModel<T extends PiedPiper> extends HierarchicalModel<T> im
 	private final ModelPart leftLeg;
 
 	public PiedPiperModel(ModelPart root) {
-		this.root = root;
+		super(root);
 		this.head = root.getChild("head");
 		this.nose = this.head.getChild("nose");
 		this.rightArm = root.getChild("right_arm");
@@ -87,11 +85,6 @@ public class PiedPiperModel<T extends PiedPiper> extends HierarchicalModel<T> im
 		return LayerDefinition.create(mesh, 64, 64);
 	}
 
-	@Override
-	public ModelPart root() {
-		return this.root;
-	}
-
 	private ModelPart getArm(HumanoidArm arm) {
 		return arm == HumanoidArm.LEFT ? this.leftArm : this.rightArm;
 	}
@@ -101,16 +94,22 @@ public class PiedPiperModel<T extends PiedPiper> extends HierarchicalModel<T> im
 		return this.head;
 	}
 
-	public void translateToHand(HumanoidArm arm, PoseStack stack) {
+	@Override
+	public void translateToHand(PiedPiperRenderer.State state, HumanoidArm arm, PoseStack stack) {
+		this.root().translateAndRotate(stack);
 		this.getArm(arm).translateAndRotate(stack);
 		stack.translate(arm == HumanoidArm.RIGHT ? 0.25F : -0.25F, 0.2F, 0.1F);
 		stack.mulPose(Axis.ZP.rotationDegrees(arm == HumanoidArm.RIGHT ? 10 : -10));
 	}
 
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw * 0.017453292F;
-		this.head.xRot = headPitch * 0.017453292F;
-		if (this.riding) {
+	@Override
+	public void setupAnim(PiedPiperRenderer.State state) {
+		super.setupAnim(state);
+		float limbSwing = state.walkAnimationPos;
+		float limbSwingAmount = state.walkAnimationSpeed;
+		this.head.yRot = state.yRot * 0.017453292F;
+		this.head.xRot = state.xRot * 0.017453292F;
+		if (state.riding) {
 			this.rightArm.xRot = -0.62831855F;
 			this.rightArm.yRot = 0.0F;
 			this.rightArm.zRot = 0.0F;
@@ -137,12 +136,12 @@ public class PiedPiperModel<T extends PiedPiper> extends HierarchicalModel<T> im
 			this.leftLeg.yRot = 0.0F;
 			this.leftLeg.zRot = 0.0F;
 		}
-		if (entity.isHolding(RatsItemRegistry.RAT_FLUTE.get())) {
-			float f = 0.01F * (float) (entity.getId() % 10);
+		if (state.holdingFlute) {
+			float f = state.fluteSpeed;
 			this.nose.yRot = 0.0F;
-			this.nose.zRot = Mth.cos((float) entity.tickCount * f) * 2.5F * 0.017453292F;
+			this.nose.zRot = Mth.cos((float) state.tickCount * f) * 2.5F * 0.017453292F;
 			this.nose.xRot = -1.2F;
-			if (entity.isLeftHanded()) {
+			if (state.mainArm == HumanoidArm.LEFT) {
 				this.leftArm.yRot = 0.3F + this.head.yRot;
 				this.rightArm.yRot = -0.6F + this.head.yRot;
 				this.leftArm.xRot = -1.5707964F + this.head.xRot + 0.1F;

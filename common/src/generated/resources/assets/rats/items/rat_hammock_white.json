@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "rats:item/rat_hammock_white",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -986896
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -986896
+      }
+    ]
+  }
+}

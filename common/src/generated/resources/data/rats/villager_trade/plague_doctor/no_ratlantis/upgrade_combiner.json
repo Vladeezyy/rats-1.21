@@ -1,0 +1,17 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 40
+  },
+  "additional_wants": {
+    "id": "rats:rat_upgrade_god",
+    "count": 1
+  },
+  "gives": {
+    "id": "rats:upgrade_combiner",
+    "count": 1
+  },
+  "max_uses": 1,
+  "xp": 30,
+  "reputation_discount": 0.05
+}

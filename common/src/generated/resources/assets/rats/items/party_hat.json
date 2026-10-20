@@ -1,0 +1,15 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "rats:item/party_hat",
+    "tints": [
+      {
+        "type": "minecraft:dye",
+        "default": -14300697
+      },
+      {
+        "type": "rats:party_hat"
+      }
+    ]
+  }
+}

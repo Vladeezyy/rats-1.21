@@ -195,3 +195,69 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
   (wardens do not target rats with the sculked upgrade) sat in `common` but in no mixin config, so both upgrades did
   nothing. Now `rats.common.mixins.json`, loaded by NeoForge (`neoforge.mods.toml`) and Fabric (`fabric.mod.json`);
   two checks in `SelfTest`. Both loaders: `tools/selftest.sh` 43/43.
+
+## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
+
+Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,
+JEI 29.47. The common code went from 4459 compile errors to 0, then the loaders (NeoForge 76, Fabric ~40).
+
+### What changed (beyond renames)
+- **Rendering on render states and submits.** Every renderer extracts a state (`RatsMobRenderState`,
+  `RatRenderState`, Rampart's `RampartLivingRenderState`) and submits through `SubmitNodeCollector`. Models drawn
+  later read their pose from the state (Rampart) or are posed inside a custom-geometry submit (`PosedModels`: trap,
+  trash can, bell, wheel, protector rats); shared models that differ per entity got one instance per use (rat king
+  rats, idle and firing gun, Ratlantis armor per slot). Layers read the entity from the Rampart state
+  (`EntityLayer`). Items and blocks in renderers go through `ItemModelResolver` / `BlockModelResolver` (`SubmitHelper`).
+- Particles: `SingleQuadParticle` with fixed layers; the running rats are submitted from the world-overlay hook
+  (particle groups are fixed in 26.x). Shaders: the Ratlantis portal and the glowing translucent type as
+  `RenderPipeline`s, pride glints with their own texturing; the synesthesia effect is a `post_effect`.
+- GUI on the extract API; the rat crafting table is an `AbstractRecipeBookScreen` with its own recipe book component
+  modelled on vanilla's crafting one. 26.x clients have no recipes: the chef/archeologist/cauldron recipes are synced
+  (NeoForge `OnDatapackSyncEvent.sendRecipes`, Fabric `RecipeSynchronization`) and read by JEI from `ClientRecipes`;
+  the table's guide result comes through the menu's container data.
+- Items: `assets/rats/items` definitions (`tools/port/convert_26.py`): the overrides as `select` / `range_dispatch`
+  / `condition` on our properties (`rats:rat_count`, `rats:special`, `rats:soul`) and vanilla's (trims, bow), the item
+  colors as tints, the block entity items as `minecraft:special` models (`rats:block_entity`), spawn eggs with
+  textures made from the 1.21.1 template and the original's colors.
+- NeoForge capabilities are the transfer API: our item, fluid and energy handlers are exposed as transactional
+  `ResourceHandler`s (changes rolled back from a snapshot when a transaction aborts), other mods' handlers are used in
+  a root transaction per call (`NeoForgeTransfer`).
+- Data: recipes with string ingredients, global loot modifiers without the list file, trim materials without
+  ingredient/model index (the items provide them), the Ratlantis dimension type, noise router, biome and flower patch
+  in the 26.1 formats, game rule keys `gamerule.rats.*`, `minecraft:chain` → `iron_chain`, `c:music_discs`.
+
+### Bugs found and fixed
+- The original's **common mixins were not registered** in the 1.21.1 port either: the idol upgrade did not keep
+  piglins calm, wardens hunted rats with the sculked upgrade. Now `rats.common.mixins.json` on both loaders (also on
+  `main`), with tests.
+- Server crash in 26.x: two upgrade items passed client models as `Model` in their render methods, and the bytecode
+  verifier loaded client classes on the dedicated server. The submits moved to the client layers; all server classes
+  are checked with `tools/port/ServerLinkCheck.java` (links every class on the server jar).
+- NPEs in the Ratlantean automaton, the Flying Dutchrat, the rat beast mount and the feral Ratlantean: in 26.x the hit
+  can kill the target and clear it before the knockback; the target is kept in a local now.
+- The Ratlantis portal searched the ground with a worldgen heightmap that 26.x does not keep in loaded chunks (the
+  portal would land at the bottom of the world); now `WORLD_SURFACE`.
+- Client crashes and data errors found by the client scene: the Dutchrat bell ticked on the client with a cast to a
+  server level (also the rat, the laser portal, the sirens and the automaton head: they use the level's difficulty
+  now); the demon upgrade switch recipe could not be sent to clients (JEI syncs crafting recipes; its network codec
+  encoded one fixed instance); the humanoid `hat` part is a child of `head` in 26.x (black death, hats); the Ratlantis
+  trim materials moved from the Ratlantis pack to the mod's data (the gem and the ingot provide them, a missing
+  material stopped worlds without Ratlantis from loading); the pirat sign items take their block's name.
+
+### Tests
+- `tools/selftest.sh` (26.x dev servers pause after 60 s without players: the script sets
+  `pause-when-empty-seconds=0`; `-Ponly=<part>` runs chosen scenarios): **NeoForge 43/43, Fabric 43/43** (the three
+  regression scenarios from `main` and the two mixin checks included). The #848 scenario's target is unhurt by
+  resistance V instead of invulnerable: 26.x mobs drop invulnerable targets.
+- `tools/scenetest.sh` (dev client, new world, screenshots): Fabric 5/5; NeoForge 4/5 before the sign name fix (the
+  translation check is the same code on both loaders). All 28 mobs, the blocks and the inventory without missing
+  textures, JEI loads.
+
+### Stress test, NeoForge 26.1.2, dev server (Apple M-series), 2026-10-20
+`RATS=300 sh tools/stress.sh`: empty stage 4.88 ms, 300 wild wolves 8.67 ms, 300 working rats 10.02 ms mean tick (9463
+items carried). The 26.x dev server is much slower on the same machine than 1.21.1 (empty stage 0.99 ms there, wolves
++0.57 ms), so the versions are compared to vanilla within the run: the rats add 1.36× what the wolves add here (+5.14
+ms against +3.79 ms) (1.21.1: 3.9×, +2.24 ms against +0.57 ms). Rat phase profile: path searches 14 %, the rest the
+vanilla mob tick (movement 24 %, goal selection 22 %) and dropped items (17 %).
+`sh tools/scenetest.sh -Pscene=perf` (1600x900, no frame limit): empty stage 171 FPS, 100 tamed rats wandering 140 FPS,
+100 wild wolves 145 FPS (rats −3.5 % against wolves; 1.21.1: −10 %).

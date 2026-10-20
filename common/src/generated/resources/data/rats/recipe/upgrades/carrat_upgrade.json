@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "rats:assorted_vegetables"
-    },
-    "C": {
-      "item": "minecraft:carrot"
-    },
-    "G": {
-      "item": "minecraft:golden_carrot"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "A": "rats:assorted_vegetables",
+    "C": "minecraft:carrot",
+    "G": "minecraft:golden_carrot",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "GCG",

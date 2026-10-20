@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.entity.mount;
+import net.minecraft.world.entity.animal.chicken.ChickenSoundVariants;
+import net.minecraft.server.level.ServerLevel;
 
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -43,8 +45,8 @@ public class RatChickenMount extends RatMountBase {
 				.add(Attributes.MOVEMENT_SPEED, 0.3D);
 	}
 
-	public boolean doHurtTarget(Entity entity) {
-		return entity.hurt(this.damageSources().mobAttack(this), (float) (1 + this.getRandom().nextInt(2)));
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
+		return entity.hurtOrSimulate(this.damageSources().mobAttack(this), (float) (1 + this.getRandom().nextInt(2)));
 	}
 
 	public void aiStep() {
@@ -67,19 +69,19 @@ public class RatChickenMount extends RatMountBase {
 	}
 
 	protected SoundEvent getAmbientSound() {
-		return SoundEvents.CHICKEN_AMBIENT;
+		return SoundEvents.CHICKEN_SOUNDS.get(ChickenSoundVariants.SoundSet.CLASSIC).adultSounds().ambientSound().value();
 	}
 
 	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-		return SoundEvents.CHICKEN_HURT;
+		return SoundEvents.CHICKEN_SOUNDS.get(ChickenSoundVariants.SoundSet.CLASSIC).adultSounds().hurtSound().value();
 	}
 
 	protected SoundEvent getDeathSound() {
-		return SoundEvents.CHICKEN_DEATH;
+		return SoundEvents.CHICKEN_SOUNDS.get(ChickenSoundVariants.SoundSet.CLASSIC).adultSounds().deathSound().value();
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState state) {
-		this.playSound(SoundEvents.CHICKEN_STEP, 0.15F, 1.0F);
+		this.playSound(SoundEvents.CHICKEN_STEP.value(), 0.15F, 1.0F);
 	}
 
 	@Override

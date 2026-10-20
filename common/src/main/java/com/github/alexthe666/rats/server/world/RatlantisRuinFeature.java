@@ -3,7 +3,7 @@ package com.github.alexthe666.rats.server.world;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -37,10 +37,10 @@ public class RatlantisRuinFeature extends Feature<RatlantisRuinConfiguration> {
 		StructureTemplate structuretemplate = null;
 
 		//shuffle the map. This makes it so the last entries are actually used more often
-		List<ResourceLocation> shuffledList = new ArrayList<>(config.ruins().keySet());
+		List<Identifier> shuffledList = new ArrayList<>(config.ruins().keySet());
 		Collections.shuffle(shuffledList);
 
-		for (ResourceLocation entry : shuffledList) {
+		for (Identifier entry : shuffledList) {
 			if (random.nextFloat() < config.ruins().get(entry)) {
 				structuretemplate = structuretemplatemanager.getOrCreate(entry);
 				break;
@@ -48,14 +48,14 @@ public class RatlantisRuinFeature extends Feature<RatlantisRuinConfiguration> {
 		}
 		if (structuretemplate == null) structuretemplate = structuretemplatemanager.getOrCreate(config.defaultRuin());
 
-		ChunkPos chunkpos = new ChunkPos(blockpos);
-		BoundingBox boundingbox = new BoundingBox(chunkpos.getMinBlockX() - 16, level.getMinBuildHeight(), chunkpos.getMinBlockZ() - 16, chunkpos.getMaxBlockX() + 16, level.getMaxBuildHeight(), chunkpos.getMaxBlockZ() + 16);
+		ChunkPos chunkpos = ChunkPos.containing(blockpos);
+		BoundingBox boundingbox = new BoundingBox(chunkpos.getMinBlockX() - 16, level.getMinY(), chunkpos.getMinBlockZ() - 16, chunkpos.getMaxBlockX() + 16, level.getMaxY(), chunkpos.getMaxBlockZ() + 16);
 		StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(rotation).setBoundingBox(boundingbox).setRandom(random);
 		Vec3i vec3i = structuretemplate.getSize(rotation);
 		BlockPos blockpos1 = blockpos.offset(-vec3i.getX() / 2, 0, -vec3i.getZ() / 2);
 		BlockPos blockpos2 = structuretemplate.getZeroPositionWithTransform(blockpos1, Mirror.NONE, rotation);
 
-		if (!level.getBlockState(blockpos2.below()).isSolidRender(level, blockpos2)) return false;
+		if (!level.getBlockState(blockpos2.below()).isSolidRender()) return false;
 
 		structureplacesettings.clearProcessors();
 		config.processor().value().list().forEach(structureplacesettings::addProcessor);

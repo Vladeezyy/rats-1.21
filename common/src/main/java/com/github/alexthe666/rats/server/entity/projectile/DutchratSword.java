@@ -22,12 +22,14 @@ public class DutchratSword extends ThrowableProjectile {
 	}
 
 	public DutchratSword(EntityType<? extends ThrowableProjectile> type, Level level, LivingEntity creator) {
-		super(type, creator, level);
+		// 26.x: no owner constructor; 1.21.1's did this
+		super(type, creator.getX(), creator.getEyeY() - 0.1F, creator.getZ(), level);
+		this.setOwner(creator);
 	}
 
 	@Override
 	public boolean canCollideWith(Entity entity) {
-		if (!entity.isSpectator() && entity.isAlive() && entity.canBeCollidedWith()) {
+		if (!entity.isSpectator() && entity.isAlive() && entity.canBeCollidedWith(this)) {
 			Entity shooter = this.getOwner();
 			return shooter == null || !entity.isPassengerOfSameVehicle(shooter);
 		} else {

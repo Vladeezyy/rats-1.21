@@ -7,7 +7,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
-import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.transfer.IUniversalRecipeTransferHandler;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class RatCraftingTableTransferHandler implements IRecipeTransferHandler<RatCraftingTableMenu, Object> {
+public class RatCraftingTableTransferHandler implements IUniversalRecipeTransferHandler<RatCraftingTableMenu> {
 
 	public static final RatCraftingTableTransferHandler INSTANCE = new RatCraftingTableTransferHandler();
 
@@ -29,10 +29,6 @@ public class RatCraftingTableTransferHandler implements IRecipeTransferHandler<R
 		return Optional.of(RatsMenuRegistry.RAT_CRAFTING_TABLE_CONTAINER.get());
 	}
 
-	@Override
-	public RecipeType<Object> getRecipeType() {
-		return null;
-	}
 
 	@Override
 	public @Nullable IRecipeTransferError transferRecipe(RatCraftingTableMenu container, Object recipe, IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {

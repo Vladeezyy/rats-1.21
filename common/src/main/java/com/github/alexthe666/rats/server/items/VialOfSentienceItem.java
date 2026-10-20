@@ -1,10 +1,10 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
 
 import com.github.alexthe666.rats.server.entity.projectile.VialOfSentience;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ public class VialOfSentienceItem extends LoreTagItem {
 		return true;
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPLASH_POTION_THROW, SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 		VialOfSentience vial = new VialOfSentience(level, player);
@@ -31,6 +31,6 @@ public class VialOfSentienceItem extends LoreTagItem {
 		if (!player.isCreative()) {
 			itemstack.shrink(1);
 		}
-		return InteractionResultHolder.success(itemstack);
+		return InteractionResult.SUCCESS;
 	}
 }

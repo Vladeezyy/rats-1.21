@@ -15,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#minecraft:music_discs"
+            "items": "#c:music_discs"
           }
         ]
       },

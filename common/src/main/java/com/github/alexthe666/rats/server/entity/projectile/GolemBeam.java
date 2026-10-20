@@ -21,9 +21,7 @@ public class GolemBeam extends ArrowlikeProjectile {
 		float sqrt = (float) this.getDeltaMovement().length();
 		if (sqrt < 0.3F || this.inGround || this.horizontalCollision) {
 			this.discard();
-			Explosion explosion = this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
-			explosion.explode();
-			explosion.finalizeExplosion(true);
+			this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
 		}
 		super.tick();
 	}

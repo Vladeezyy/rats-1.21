@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "P": {
-      "tag": "c:plastics"
-    },
-    "S": {
-      "tag": "c:seeds"
-    }
+    "P": "#c:plastics",
+    "S": "#c:seeds"
   },
   "pattern": [
     "SSS",

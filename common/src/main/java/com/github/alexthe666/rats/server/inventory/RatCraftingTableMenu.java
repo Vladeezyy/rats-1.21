@@ -1,4 +1,13 @@
 package com.github.alexthe666.rats.server.inventory;
+import net.minecraft.world.inventory.RecipeBookType;
+import net.minecraft.world.inventory.RecipeBookMenu;
+import java.util.Optional;
+import java.util.List;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.recipebook.PlaceRecipeHelper;
+import net.minecraft.world.entity.player.StackedItemContents;
 
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -11,17 +20,15 @@ import com.github.alexthe666.rats.server.inventory.slot.ImprovedSlotItemHandler;
 import com.github.alexthe666.rats.server.inventory.slot.RatCraftingResultSlot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.Objects;
 
-public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
+public class RatCraftingTableMenu extends RecipeBookMenu {
 
 	private final RatCraftingTableBlockEntity table;
 	private final ContainerData data;
@@ -59,7 +66,7 @@ public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, Crafting
 	}
 
 	public RatCraftingTableMenu(int i, Inventory playerInventory, FriendlyByteBuf buf) {
-		this(i, playerInventory, (RatCraftingTableBlockEntity) Objects.requireNonNull(Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getBlockEntity(buf.readBlockPos()) : null), new SimpleContainerData(2));
+		this(i, playerInventory, (RatCraftingTableBlockEntity) Objects.requireNonNull(Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getBlockEntity(buf.readBlockPos()) : null), new SimpleContainerData(RatCraftingTableBlockEntity.DATA_COUNT));
 	}
 
 	public boolean stillValid(Player player) {
@@ -76,6 +83,39 @@ public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, Crafting
 		return i != 0 ? i * 23 / j : 0;
 	}
 
+	/** Whether a rat works the table (synced) */
+	public boolean hasRat() {
+		return this.data.get(2) != 0;
+	}
+
+	/** Whether the table has a recipe to craft (synced) */
+	public boolean hasRecipe() {
+		return this.data.get(3) != 0;
+	}
+
+	/** How many recipes match the grid (synced) */
+	public int recipeCount() {
+		return this.data.get(4);
+	}
+
+	/** The guide recipe's result (synced as item and count), or empty */
+	public ItemStack guideResult() {
+		int id = (this.data.get(5) & 0xFFFF) | (this.data.get(6) << 16);
+		if (id == 0) {
+			return ItemStack.EMPTY;
+		}
+		return new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(id - 1), Math.max(1, this.data.get(7)));
+	}
+
+	/** The result slot and the 3x3 grid (the recipe book's slots) */
+	public Slot getResultSlot() {
+		return this.slots.get(0);
+	}
+
+	public java.util.List<Slot> getInputGridSlots() {
+		return this.slots.subList(1, 10);
+	}
+
 	public void incrementRecipeIndex(boolean negative) {
 		this.table.incrementSelectedRecipe(negative);
 	}
@@ -90,7 +130,7 @@ public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, Crafting
 			itemstack = itemstack1.copy();
 
 			if (slotIndex == 0) {
-				itemstack1.getItem().onCraftedBy(itemstack1, player.level(), player);
+				itemstack1.getItem().onCraftedBy(itemstack1, player);
 
 				// Merge result slot to player inv
 				if (!this.moveItemStackTo(itemstack1, 19, 55, true)) {
@@ -139,7 +179,7 @@ public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, Crafting
 	}
 
 	@Override
-	public void clicked(int slotIndex, int mouseButton, ClickType type, Player player) {
+	public void clicked(int slotIndex, int mouseButton, ContainerInput type, Player player) {
 		if (slotIndex > 0 && slotIndex < 10) {
 			ItemStack stack = this.getCarried().copyWithCount(1);
 			this.slots.get(slotIndex).set(stack);
@@ -150,51 +190,42 @@ public class RatCraftingTableMenu extends RecipeBookMenu<CraftingInput, Crafting
 	}
 
 	@Override
-	public void fillCraftSlotsStackedContents(StackedContents contents) {
+	public void fillCraftSlotsStackedContents(StackedItemContents contents) {
 		this.table.bufferHandler.ifPresent(handler -> ((TableItemHandlers.BufferHandler) handler).fillStackedContents(contents));
 	}
 
+	/**
+	 * A recipe picked in the recipe book: the pattern grid gets one item of each ingredient (the table crafts from its
+	 * buffer; 1.20.1 did this on the client in its recipe book component, 26.x places recipes on the server)
+	 */
 	@Override
-	public void clearCraftingContent() {
-		this.table.matrixHandler.ifPresent(h -> {
-			for (int i = 0; i < h.getSlots(); i++) {
-				h.setStackInSlot(i, ItemStack.EMPTY);
+	public RecipeBookMenu.PostPlaceAction handlePlacement(boolean useMaxItems, boolean allowDroppingItemsToClear, RecipeHolder<?> recipe, ServerLevel level, Inventory inventory) {
+		if (!(recipe.value() instanceof CraftingRecipe crafting)) {
+			return RecipeBookMenu.PostPlaceAction.NOTHING;
+		}
+		this.table.matrixHandler.ifPresent(handler -> {
+			for (int i = 0; i < handler.getSlots(); i++) {
+				handler.setStackInSlot(i, ItemStack.EMPTY);
 			}
+			List<Optional<Ingredient>> ingredients = crafting instanceof ShapedRecipe shaped ? shaped.getIngredients()
+					: crafting.placementInfo().ingredients().stream().map(Optional::of).toList();
+			PlaceRecipeHelper.placeRecipe(this.getGridWidth(), this.getGridHeight(), crafting, ingredients, (ingredient, gridIndex, x, y) ->
+					ingredient.flatMap(i -> i.items().findFirst()).ifPresent(item -> handler.setStackInSlot(gridIndex, new ItemStack(item))));
 		});
+		this.table.setChanged();
+		return RecipeBookMenu.PostPlaceAction.NOTHING;
 	}
 
-	@Override
-	public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipe) {
-		return true;
-	}
-
-	@Override
-	public int getResultSlotIndex() {
-		return 0;
-	}
-
-	@Override
 	public int getGridWidth() {
 		return 3;
 	}
 
-	@Override
 	public int getGridHeight() {
 		return 3;
 	}
 
 	@Override
-	public int getSize() {
-		return 10;
-	}
-
-	@Override
 	public RecipeBookType getRecipeBookType() {
 		return RecipeBookType.CRAFTING;
-	}
-
-	@Override
-	public boolean shouldMoveToInventory(int index) {
-		return false;
 	}
 }

@@ -1,75 +1,100 @@
 package com.github.alexthe666.rats.client.render.entity;
 
-import net.minecraft.util.FastColor;
+import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.entity.PiratBoatModel;
 import com.github.alexthe666.rats.client.render.entity.layer.PiratBoatSailLayer;
 import com.github.alexthe666.rats.server.entity.misc.PiratBoat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Unit;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.Objects;
+/** The pirats' boat (a mob): drawn as a boat, with its sail (the pirat banner) and its cannon */
+public class PiratBoatRenderer extends MobRenderer<PiratBoat, PiratBoatRenderer.State, PiratBoatModel> {
+	private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/entity/boat/spruce.png");
+	private final Model.Simple waterPatch;
 
-public class PiratBoatRenderer<T extends PiratBoat, M extends PiratBoatModel<T>> extends MobRenderer<T, M> {
-
-	private static final ResourceLocation TEXTURE = ResourceLocation.parse("textures/entity/boat/spruce.png");
-
-	public PiratBoatRenderer(EntityRendererProvider.Context context, M model) {
-		super(context, model, 0.0F);
-		this.addLayer(new PiratBoatSailLayer<>(this));
+	public PiratBoatRenderer(EntityRendererProvider.Context context) {
+		super(context, new PiratBoatModel(context.bakeLayer(RatsModelLayers.PIRAT_BOAT)), 0.0F);
+		this.waterPatch = new Model.Simple(context.bakeLayer(RatsModelLayers.PIRAT_BOAT_WATER_PATCH), t -> RenderTypes.waterMask());
+		this.addLayer(new PiratBoatSailLayer(this, context));
 	}
 
 	@Override
-	protected boolean isShaking(T entity) {
-		return super.isShaking(entity);
+	public State createRenderState() {
+		return new State();
 	}
 
 	@Override
-	public void render(T entity, float yaw, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light) {
+	public void extractRenderState(PiratBoat entity, State state, float partialTicks) {
+		super.extractRenderState(entity, state, partialTicks);
+		state.boatYaw = entity.getYRot(partialTicks);
+		state.hurt = (float) entity.hurtTime - partialTicks;
+		state.damage = Mth.abs(entity.getHealth() - entity.getMaxHealth()) - partialTicks;
+		state.rowingTimeLeft = entity.getRowingTime(0, partialTicks);
+		state.rowingTimeRight = entity.getRowingTime(1, partialTicks);
+		state.banner = entity.banner;
+		state.firing = entity.isFiring();
+		state.spectator = entity.isSpectator();
+	}
+
+	@Override
+	public void submit(State state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
 		stack.pushPose();
-		stack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
+		stack.mulPose(Axis.YP.rotationDegrees(180.0F - state.boatYaw));
 		stack.scale(-1.0F, -1.0F, 1.0F);
 		stack.scale(1.2F, 1.2F, 1.2F);
 		stack.translate(0.0D, -1.501F, 0.0D);
 		stack.mulPose(Axis.YP.rotationDegrees(90.0F));
-		this.getModel().prepareMobModel(entity, 0.0F, 0.0F, partialTicks);
-		this.getModel().setupAnim(entity, 0.0F, 0.0F, entity.tickCount + partialTicks, 0.0F, 0.0F);
-		float f = (float) entity.hurtTime - partialTicks;
-		float f1 = Mth.abs(entity.getHealth() - entity.getMaxHealth()) - partialTicks;
-
-		if (f > 0.0F) {
-			stack.mulPose(Axis.YP.rotationDegrees(Mth.sin(f) * f * f1 / 10.0F));
+		if (state.hurt > 0.0F) {
+			stack.mulPose(Axis.YP.rotationDegrees(Mth.sin(state.hurt) * state.hurt * state.damage / 10.0F));
 		}
-		Minecraft minecraft = Minecraft.getInstance();
-		boolean flag = !entity.isInvisible();
-		boolean flag1 = !flag && !entity.isInvisibleTo(Objects.requireNonNull(minecraft.player));
-		boolean flag2 = minecraft.shouldEntityAppearGlowing(entity);
-		RenderType rendertype = this.getRenderType(entity, flag, flag1, flag2);
+		boolean visible = this.isBodyVisible(state);
+		boolean translucent = !visible && !state.isInvisibleToPlayer;
+		RenderType rendertype = this.getRenderType(state, visible, translucent, state.appearsGlowing());
 		if (rendertype != null) {
-			VertexConsumer vertexconsumer = buffer.getBuffer(rendertype);
-			this.getModel().renderToBuffer(stack, vertexconsumer, light, OverlayTexture.pack(entity.deathTime > 0 ? entity.deathTime + 1 : 0, false), FastColor.ARGB32.colorFromFloat(flag1 ? 0.15F : 1.0F, 1.0F, 1.0F, 1.0F));
+			collector.submitModel(this.model, state, stack, rendertype, state.lightCoords, overlay(state), ARGB.colorFromFloat(translucent ? 0.15F : 1.0F, 1.0F, 1.0F, 1.0F), null, state.outlineColor, null);
 		}
-		VertexConsumer vertexconsumer1 = buffer.getBuffer(RenderType.waterMask());
-		this.getModel().getWaterPatch().render(stack, vertexconsumer1, light, OverlayTexture.NO_OVERLAY);
-
-		if (!entity.isSpectator()) {
-			for (RenderLayer<T, M> renderlayer : this.layers) {
-				renderlayer.render(stack, buffer, light, entity, 0.0F, 0.0F, partialTicks, entity.tickCount + partialTicks, 0.0F, 0.0F);
+		collector.submitModel(this.waterPatch, Unit.INSTANCE, stack, RenderTypes.waterMask(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0, null);
+		if (!state.spectator) {
+			for (RenderLayer<State, PiratBoatModel> layer : this.layers) {
+				layer.submit(stack, collector, state.lightCoords, state, 0.0F, 0.0F);
 			}
 		}
 		stack.popPose();
 	}
 
-	public ResourceLocation getTextureLocation(PiratBoat entity) {
+	/** The red death flash of the boat */
+	public static int overlay(LivingEntityRenderState state) {
+		return OverlayTexture.pack(state.deathTime > 0 ? (int) state.deathTime + 1 : 0, false);
+	}
+
+	@Override
+	public Identifier getTextureLocation(State state) {
 		return TEXTURE;
+	}
+
+	public static class State extends LivingEntityRenderState {
+		public float boatYaw;
+		public float hurt;
+		public float damage;
+		public float rowingTimeLeft;
+		public float rowingTimeRight;
+		public ItemStack banner = ItemStack.EMPTY;
+		public boolean firing;
+		public boolean spectator;
 	}
 }

@@ -1,9 +1,7 @@
 {
   "type": "rats:archeologist",
   "count": 1,
-  "ingredient": {
-    "item": "minecraft:netherite_ingot"
-  },
+  "ingredient": "minecraft:netherite_ingot",
   "result": {
     "id": "rats:oratchalcum_ingot"
   }

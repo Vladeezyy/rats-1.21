@@ -24,7 +24,6 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -66,7 +65,7 @@ public class RatQuarryGoal extends BaseRatHarvestGoal {
 		if (quarryPos != null && this.rat.level().getBlockEntity(quarryPos.pos()) instanceof RatQuarryBlockEntity quarry) {
 			int RADIUS = quarry.getRadius();
 			// the last block by the quarry's order (the original sorted a list of the whole column, every 10 ticks)
-			BlockPos target = this.findTarget(quarryPos.pos().offset(-RADIUS, -1, -RADIUS), new BlockPos(quarryPos.pos().getX() + RADIUS, this.rat.level().getMinBuildHeight(), quarryPos.pos().getZ() + RADIUS),
+			BlockPos target = this.findTarget(quarryPos.pos().offset(-RADIUS, -1, -RADIUS), new BlockPos(quarryPos.pos().getX() + RADIUS, this.rat.level().getMinY(), quarryPos.pos().getZ() + RADIUS),
 					new QuarryBlockSorter(this.rat).reversed(), (pos, state) -> !state.isAir() && this.canMineBlock(pos));
 			if (target != null) {
 				this.setTargetBlock(target);
@@ -78,7 +77,7 @@ public class RatQuarryGoal extends BaseRatHarvestGoal {
 
 	private boolean doesListContainBlock(Level level, BlockPos pos) {
 		BlockState state = level.getBlockState(pos);
-		ItemStack getStack = state.getBlock().getCloneItemStack(level, pos, state);
+		ItemStack getStack = state.getCloneItemStack(level, pos, false);
 		return this.rat.canRatPickupItem(getStack);
 	}
 

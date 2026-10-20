@@ -1,6 +1,7 @@
 package com.github.alexthe666.rats.registry;
+import net.minecraft.core.cauldron.CauldronInteractions;
 
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -8,24 +9,23 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-import java.util.Map;
 
-public interface RatsCauldronRegistry extends CauldronInteraction {
+// 26.x: interactions are dispatchers (1.21.1: interaction maps); their put is opened by the access transformer/widener
+public interface RatsCauldronRegistry {
 
-	CauldronInteraction.InteractionMap MILK = CauldronInteraction.newInteractionMap("rats_milk");
-	CauldronInteraction.InteractionMap CHEESE = CauldronInteraction.newInteractionMap("rats_cheese");
-	CauldronInteraction.InteractionMap BLUE_CHEESE = CauldronInteraction.newInteractionMap("rats_blue_cheese");
-	CauldronInteraction.InteractionMap NETHER_CHEESE = CauldronInteraction.newInteractionMap("rats_nether_cheese");
+	CauldronInteraction.Dispatcher MILK = new CauldronInteraction.Dispatcher();
+	CauldronInteraction.Dispatcher CHEESE = new CauldronInteraction.Dispatcher();
+	CauldronInteraction.Dispatcher BLUE_CHEESE = new CauldronInteraction.Dispatcher();
+	CauldronInteraction.Dispatcher NETHER_CHEESE = new CauldronInteraction.Dispatcher();
 
 	static void init() {
-		EMPTY.map().put(Items.MILK_BUCKET, (state, level, pos, player, hand, stack) -> {
+		CauldronInteractions.EMPTY.put(Items.MILK_BUCKET, (state, level, pos, player, hand, stack) -> {
 			if (!level.isClientSide()) {
 				player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
 				player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.BUCKET)));
@@ -34,10 +34,10 @@ public interface RatsCauldronRegistry extends CauldronInteraction {
 				level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
 				level.gameEvent(null, GameEvent.FLUID_PLACE, pos);
 			}
-			return ItemInteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		});
 
-		MILK.map().put(Items.BUCKET, (state, level, pos, player, hand, stack) -> {
+		MILK.put(Items.BUCKET, (state, level, pos, player, hand, stack) -> {
 			if (!level.isClientSide()) {
 				player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
 				player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.MILK_BUCKET)));
@@ -46,10 +46,10 @@ public interface RatsCauldronRegistry extends CauldronInteraction {
 				level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
 				level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
 			}
-			return ItemInteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		});
 
-		CHEESE.map().put(Items.SUGAR, (state, level, pos, player, hand, stack) -> {
+		CHEESE.put(Items.SUGAR, (state, level, pos, player, hand, stack) -> {
 			if (!level.isClientSide()) {
 				player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
 				level.setBlockAndUpdate(pos, RatsBlockRegistry.BLUE_CHEESE_CAULDRON.get().defaultBlockState());
@@ -60,17 +60,17 @@ public interface RatsCauldronRegistry extends CauldronInteraction {
 				level.gameEvent(null, GameEvent.BLOCK_PLACE, pos);
 			} else {
 				for (int i = 0; i < 10; i++) {
-					level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Items.SUGAR)),
+					level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, Items.SUGAR),
 							pos.getX() + level.getRandom().nextFloat(),
 							pos.getY() + 0.9375D,
 							pos.getZ() + level.getRandom().nextFloat(),
 							0.0D, level.getRandom().nextFloat() * 0.25D + 0.1F, 0.0D);
 				}
 			}
-			return ItemInteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		});
 
-		CHEESE.map().put(Items.LAVA_BUCKET, (state, level, pos, player, hand, stack) -> {
+		CHEESE.put(Items.LAVA_BUCKET, (state, level, pos, player, hand, stack) -> {
 			if (!level.isClientSide()) {
 				player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
 				level.setBlockAndUpdate(pos, RatsBlockRegistry.NETHER_CHEESE_CAULDRON.get().defaultBlockState());
@@ -88,7 +88,7 @@ public interface RatsCauldronRegistry extends CauldronInteraction {
 							level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat());
 				}
 			}
-			return ItemInteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		});
 	}
 }

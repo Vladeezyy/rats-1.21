@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "E": {
-      "item": "rats:plague_essence"
-    },
-    "F": {
-      "item": "rats:filth"
-    },
-    "L": {
-      "item": "rats:plague_leech"
-    },
-    "S": {
-      "item": "rats:rat_skull"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic_mount"
-    }
+    "E": "rats:plague_essence",
+    "F": "rats:filth",
+    "L": "rats:plague_leech",
+    "S": "rats:rat_skull",
+    "U": "rats:rat_upgrade_basic_mount"
   },
   "pattern": [
     "LSL",

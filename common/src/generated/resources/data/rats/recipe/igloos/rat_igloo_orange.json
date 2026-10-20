@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "tag": "rats:igloos"
-    },
-    {
-      "tag": "c:dyes/orange"
-    }
+    "#rats:igloos",
+    "#c:dyes/orange"
   ],
   "result": {
     "id": "rats:rat_igloo_orange"

@@ -8,7 +8,7 @@ import com.github.alexthe666.rats.server.message.RatsNetworkHandler;
 import com.github.alexthe666.rats.server.message.SyncRatStaffPacket;
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -80,7 +80,7 @@ public class CheeseStaffScreen extends Screen {
 		if (this.pos != null) {
 			BlockState state = this.rat.level().getBlockState(this.pos);
 			List<Component> namelist = null;
-			ItemStack pick = state.getBlock().getCloneItemStack(this.rat.level(), this.pos, state);
+			ItemStack pick = state.getCloneItemStack(this.rat.level(), this.pos, false);
 			try {
 				namelist = pick.getTooltipLines(Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player, TooltipFlag.Default.NORMAL);
 			} catch (Throwable ignored) {
@@ -101,8 +101,8 @@ public class CheeseStaffScreen extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int x, int y, float partialTicks) {
-		super.render(graphics, x, y, partialTicks);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int x, int y, float partialTicks) {
+		super.extractRenderState(graphics, x, y, partialTicks);
 		int i = (this.width - 248) / 2 + 10;
 		int j = (this.height - 166) / 2 + 8;
 		if (this.rat != null) {

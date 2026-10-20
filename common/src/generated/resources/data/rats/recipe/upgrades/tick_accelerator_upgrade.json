@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "item": "minecraft:clock"
-    },
-    "L": {
-      "tag": "c:storage_blocks/lapis"
-    },
-    "T": {
-      "item": "rats:tangled_rat_tails"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "C": "minecraft:clock",
+    "L": "#c:storage_blocks/lapis",
+    "T": "rats:tangled_rat_tails",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "LTL",

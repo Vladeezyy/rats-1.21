@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "A": {
-      "item": "minecraft:netherite_leggings"
-    },
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    },
-    "W": {
-      "item": "rats:biplane_wing"
-    }
+    "A": "minecraft:netherite_leggings",
+    "I": "rats:oratchalcum_ingot",
+    "W": "rats:biplane_wing"
   },
   "pattern": [
     "IWI",

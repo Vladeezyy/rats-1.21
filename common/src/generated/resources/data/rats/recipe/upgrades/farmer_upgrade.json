@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:hay_block"
-    },
-    "F": {
-      "item": "rats:farmer_hat"
-    },
-    "H": {
-      "item": "minecraft:iron_hoe"
-    },
-    "S": {
-      "tag": "c:seeds"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_gardener"
-    }
+    "B": "minecraft:hay_block",
+    "F": "rats:farmer_hat",
+    "H": "minecraft:iron_hoe",
+    "S": "#c:seeds",
+    "U": "rats:rat_upgrade_gardener"
   },
   "pattern": [
     "BFB",

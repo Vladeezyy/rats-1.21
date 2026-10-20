@@ -1,6 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades.interfaces;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface ChangesTextureUpgrade {
 
@@ -10,7 +10,7 @@ public interface ChangesTextureUpgrade {
 	 *
 	 * @return the texture to apply to your rat
 	 */
-	ResourceLocation getTexture();
+	Identifier getTexture();
 
 	/**
 	 * Allows a rat's eyes to render fullbright all the time. Rat's eyes normally only glow if its nighttime, so setting this to true will make that happen all the time.

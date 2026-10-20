@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.server.entity.ai.goal.RatRangedAttackGoal;
@@ -31,10 +33,10 @@ public class RangedWeaponRatUpgradeItem extends BaseRatUpgradeItem implements Ho
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		this.translateToHand(model, false, stack);
 		stack.translate(0.01D, 0.1D, -0.02D);
 		stack.scale(0.5F, 0.5F, 0.5F);
-		context.getItemRenderer().renderStatic(new ItemStack(this.crossbow ? Items.CROSSBOW : Items.BOW), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, light, OverlayTexture.NO_OVERLAY, stack, buffer, null, rat.getId());
+		context.item(new ItemStack(this.crossbow ? Items.CROSSBOW : Items.BOW), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);
 	}
 }

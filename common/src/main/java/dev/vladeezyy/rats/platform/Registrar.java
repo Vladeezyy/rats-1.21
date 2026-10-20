@@ -1,8 +1,11 @@
 package dev.vladeezyy.rats.platform;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.Registries;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,15 +37,56 @@ public final class Registrar<R> {
     }
 
     public <T extends R> RegistryEntry<R, T> register(String name, Supplier<? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+        Identifier id = Identifier.fromNamespaceAndPath(this.modId, name);
         RegistryEntry<R, T> entry = new RegistryEntry<>(this.registryKey, id);
         this.entries.add(entry);
-        Platform.INSTANCE.register(this.registryKey, id, factory);
+        ResourceKey<R> key = ResourceKey.create(this.registryKey, id);
+        Platform.INSTANCE.register(this.registryKey, id, () -> {
+            // 26.x: blocks and items need their id in their properties (itemProps, blockProps)
+            ResourceKey<?> outer = CURRENT.get();
+            CURRENT.set(key);
+            try {
+                return factory.get();
+            } finally {
+                CURRENT.set(outer);
+            }
+        });
         return entry;
     }
 
-    public <T extends R> RegistryEntry<R, T> register(String name, Function<ResourceLocation, ? extends T> factory) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+    private static final ThreadLocal<ResourceKey<?>> CURRENT = new ThreadLocal<>();
+
+    /** New item properties with the id of the item being registered */
+    public static Item.Properties itemProps() {
+        return new Item.Properties().setId(current(Registries.ITEM));
+    }
+
+    /** New block properties with the id of the block being registered */
+    public static BlockBehaviour.Properties blockProps() {
+        return BlockBehaviour.Properties.of().setId(current(Registries.BLOCK));
+    }
+
+    /** The properties of another block, with the id of the block being registered */
+    public static BlockBehaviour.Properties blockCopy(BlockBehaviour block) {
+        return BlockBehaviour.Properties.ofFullCopy(block).setId(current(Registries.BLOCK));
+    }
+
+    /** The properties of another block (1.20 copy rules), with the id of the block being registered */
+    public static BlockBehaviour.Properties blockLegacyCopy(BlockBehaviour block) {
+        return BlockBehaviour.Properties.ofLegacyCopy(block).setId(current(Registries.BLOCK));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> current(ResourceKey<? extends Registry<T>> registry) {
+        ResourceKey<?> key = CURRENT.get();
+        if (key == null || !key.isFor(registry)) {
+            throw new IllegalStateException("Properties for " + registry.identifier() + " made outside their registration (" + key + ")");
+        }
+        return (ResourceKey<T>) key;
+    }
+
+    public <T extends R> RegistryEntry<R, T> register(String name, Function<Identifier, ? extends T> factory) {
+        Identifier id = Identifier.fromNamespaceAndPath(this.modId, name);
         return this.register(name, () -> factory.apply(id));
     }
 

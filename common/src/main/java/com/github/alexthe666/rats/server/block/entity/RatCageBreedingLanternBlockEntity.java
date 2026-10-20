@@ -1,14 +1,13 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
-import org.jetbrains.annotations.NotNull;
-import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,15 +38,15 @@ public class RatCageBreedingLanternBlockEntity extends DecoratedRatCageBlockEnti
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+	public void saveAdditional(ValueOutput compound) {
 		compound.putInt("BreedingCooldown", this.breedingCooldown);
-		super.saveAdditional(compound, registries);
+		super.saveAdditional(compound);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
-		this.breedingCooldown = compound.getInt("BreedingCooldown");
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		this.breedingCooldown = compound.getIntOr("BreedingCooldown", 0);
 	}
 
 

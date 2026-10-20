@@ -1,4 +1,10 @@
 package dev.vladeezyy.rats.platform.transfer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.ItemStackWithSlot;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -120,32 +126,35 @@ public class ItemStackHandler implements ModifiableItemHandler {
         return true;
     }
 
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        ListTag items = new ListTag();
+    /** Saves the stacks as NeoForge's ItemStackHandler did: "Items" (each with its "Slot") and "Size" */
+    public void save(ValueOutput output) {
+        ValueOutput.TypedOutputList<ItemStackWithSlot> items = output.list("Items", ItemStackWithSlot.CODEC);
         for (int i = 0; i < this.stacks.size(); i++) {
             if (!this.stacks.get(i).isEmpty()) {
-                CompoundTag item = new CompoundTag();
-                item.putInt("Slot", i);
-                items.add(this.stacks.get(i).save(provider, item));
+                items.add(new ItemStackWithSlot(i, this.stacks.get(i)));
             }
         }
-        CompoundTag tag = new CompoundTag();
-        tag.put("Items", items);
-        tag.putInt("Size", this.stacks.size());
-        return tag;
+        output.putInt("Size", this.stacks.size());
     }
 
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.setSize(tag.contains("Size", Tag.TAG_INT) ? tag.getInt("Size") : this.stacks.size());
-        ListTag items = tag.getList("Items", Tag.TAG_COMPOUND);
-        for (int i = 0; i < items.size(); i++) {
-            CompoundTag item = items.getCompound(i);
-            int slot = item.getInt("Slot");
-            if (slot >= 0 && slot < this.stacks.size()) {
-                ItemStack.parse(provider, item).ifPresent(stack -> this.stacks.set(slot, stack));
+    public void load(ValueInput input) {
+        this.setSize(input.getIntOr("Size", this.stacks.size()));
+        for (ItemStackWithSlot item : input.listOrEmpty("Items", ItemStackWithSlot.CODEC)) {
+            if (item.isValidInContainer(this.stacks.size())) {
+                this.stacks.set(item.slot(), item.stack());
             }
         }
         this.onLoad();
+    }
+
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
+        this.save(output);
+        return output.buildResult();
+    }
+
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        this.load(TagValueInput.create(ProblemReporter.DISCARDING, provider, tag));
     }
 
     protected void validateSlotIndex(int slot) {

@@ -1,0 +1,13 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 16
+  },
+  "gives": {
+    "id": "rats:rat_upgrade_jury_rigged",
+    "count": 1
+  },
+  "max_uses": 12,
+  "xp": 20,
+  "reputation_discount": 0.05
+}

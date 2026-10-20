@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:plague_scythe"
-    }
+    "rats:plague_scythe"
   ],
   "result": {
     "count": 5,

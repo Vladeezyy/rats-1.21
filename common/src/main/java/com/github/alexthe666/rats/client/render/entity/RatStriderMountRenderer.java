@@ -4,52 +4,55 @@ import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.entity.RatStriderMountModel;
 import com.github.alexthe666.rats.server.entity.mount.RatStriderMount;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.StriderRenderState;
+import net.minecraft.resources.Identifier;
 
-public class RatStriderMountRenderer extends MobRenderer<RatStriderMount, RatStriderMountModel<RatStriderMount>> {
-
-	private static final ResourceLocation STRIDER_LOCATION = ResourceLocation.parse("textures/entity/strider/strider.png");
-	private static final ResourceLocation COLD_LOCATION = ResourceLocation.parse("textures/entity/strider/strider_cold.png");
+public class RatStriderMountRenderer extends MobRenderer<RatStriderMount, StriderRenderState, RatStriderMountModel> {
+	private static final Identifier STRIDER_LOCATION = Identifier.withDefaultNamespace("textures/entity/strider/strider.png");
+	private static final Identifier COLD_LOCATION = Identifier.withDefaultNamespace("textures/entity/strider/strider_cold.png");
+	private static final Identifier SADDLE_LOCATION = Identifier.withDefaultNamespace("textures/entity/equipment/strider_saddle/saddle.png");
 
 	public RatStriderMountRenderer(EntityRendererProvider.Context context) {
-		super(context, new RatStriderMountModel<>(context.bakeLayer(RatsModelLayers.RAT_STRIDER_MOUNT)), 0.5F);
-		this.addLayer(new AlwaysSaddledLayer<>(this, new RatStriderMountModel<>(context.bakeLayer(RatsModelLayers.RAT_STRIDER_MOUNT)), ResourceLocation.parse("textures/entity/strider/strider_saddle.png")));
+		super(context, new RatStriderMountModel(context.bakeLayer(RatsModelLayers.RAT_STRIDER_MOUNT)), 0.5F);
+		this.addLayer(new AlwaysSaddledLayer(this));
 	}
 
-	public ResourceLocation getTextureLocation(RatStriderMount mount) {
-		return mount.isSuffocating() ? COLD_LOCATION : STRIDER_LOCATION;
+	@Override
+	public StriderRenderState createRenderState() {
+		return new StriderRenderState();
 	}
 
-	protected boolean isShaking(RatStriderMount mount) {
-		return super.isShaking(mount) || mount.isSuffocating();
+	@Override
+	public void extractRenderState(RatStriderMount entity, StriderRenderState state, float partialTicks) {
+		super.extractRenderState(entity, state, partialTicks);
+		state.isSuffocating = entity.isSuffocating();
+		state.isRidden = entity.isVehicle();
 	}
 
-	public static class AlwaysSaddledLayer<T extends Entity, M extends EntityModel<T>> extends RenderLayer<T, M> {
-		private final ResourceLocation textureLocation;
-		private final M model;
+	@Override
+	public Identifier getTextureLocation(StriderRenderState state) {
+		return state.isSuffocating ? COLD_LOCATION : STRIDER_LOCATION;
+	}
 
-		public AlwaysSaddledLayer(RenderLayerParent<T, M> parent, M model, ResourceLocation texture) {
+	@Override
+	protected boolean isShaking(StriderRenderState state) {
+		return super.isShaking(state) || state.isSuffocating;
+	}
+
+	/** The saddle, always on (the mount is ridden by its rat) */
+	public static class AlwaysSaddledLayer extends RenderLayer<StriderRenderState, RatStriderMountModel> {
+		public AlwaysSaddledLayer(RenderLayerParent<StriderRenderState, RatStriderMountModel> parent) {
 			super(parent);
-			this.model = model;
-			this.textureLocation = texture;
 		}
 
-		public void render(PoseStack stack, MultiBufferSource source, int light, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-			this.getParentModel().copyPropertiesTo(this.model);
-			this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
-			this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-			VertexConsumer vertexconsumer = source.getBuffer(RenderType.entityCutoutNoCull(this.textureLocation));
-			this.model.renderToBuffer(stack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, -1);
+		@Override
+		public void submit(PoseStack stack, SubmitNodeCollector collector, int light, StriderRenderState state, float yRot, float xRot) {
+			coloredCutoutModelCopyLayerRender(this.getParentModel(), SADDLE_LOCATION, stack, collector, light, state, -1, 1);
 		}
 	}
 }

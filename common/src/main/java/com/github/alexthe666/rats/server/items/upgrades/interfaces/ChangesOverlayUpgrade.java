@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades.interfaces;
 
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 

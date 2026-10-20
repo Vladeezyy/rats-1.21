@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.mount;
+import net.minecraft.server.level.ServerLevel;
 
 import dev.vladeezyy.rampart.animation.Animation;
 import dev.vladeezyy.rampart.animation.AnimationHandler;
@@ -70,7 +71,7 @@ public class RatAutomatonMount extends RatMountBase implements IAnimatedEntity {
 				.add(Attributes.KNOCKBACK_RESISTANCE, 0.75D);
 	}
 
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getAnimation() == NO_ANIMATION) {
 			this.setAnimation(this.useRangedAttack ? ANIMATION_MELEE : ANIMATION_RANGED);
 		}

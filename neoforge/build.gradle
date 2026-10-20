@@ -20,11 +20,6 @@ neoForge {
     // -Pneo_version=21.1.197 checks the oldest supported NeoForge
     version = project.findProperty('neo_version')
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     runs {
         configureEach {
             gameDirectory = project.file('run')
@@ -48,6 +43,8 @@ neoForge {
             server()
             programArgument '--nogui'
             systemProperty 'rats.selftest', 'true'
+            // -Ponly=<scenario name parts>: run only the matching gameplay scenarios
+            systemProperty 'rats.selftest.only', project.findProperty('only') ?: ''
         }
         // tools/nettest.sh: a dev client joins a dev dedicated server
         netServer {
@@ -91,7 +88,7 @@ dependencies {
     implementation "dev.vladeezyy.rampart:rampart-neoforge:${rampart_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-    compileOnly "maven.modrinth:jade:${jade_version}"
+    compileOnly "maven.modrinth:jade:${jade_version}+neoforge"
 
     if (project.hasProperty('with_compat')) {
         localRuntime "maven.modrinth:sodium:${compat_sodium}"

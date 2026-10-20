@@ -44,7 +44,7 @@ public class RatQuarryPlatformBlock extends Block {
 	}
 
 	@Override
-	public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDist) {
+	public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDist) {
 		if (!(entity instanceof TamedRat)) {
 			super.fallOn(level, state, pos, entity, fallDist);
 		}

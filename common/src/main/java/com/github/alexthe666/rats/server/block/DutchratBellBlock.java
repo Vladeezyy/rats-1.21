@@ -97,7 +97,7 @@ public class DutchratBellBlock extends BellBlock implements CustomItemRarity {
 
 	private void playRingSound(Level level, BlockPos pos, boolean alreadySummoning) {
 		if (!alreadySummoning) {
-			if (level.isDay() || level.getCurrentDifficultyAt(pos).getDifficulty() == Difficulty.PEACEFUL || (RatConfig.summonDutchratOnlyInRatlantis && !level.dimension().equals(RatlantisDimensionRegistry.DIMENSION_KEY))) {
+			if (level.isBrightOutside() || level.getDifficulty() == Difficulty.PEACEFUL || (RatConfig.summonDutchratOnlyInRatlantis && !level.dimension().equals(RatlantisDimensionRegistry.DIMENSION_KEY))) {
 				level.playSound(null, pos, SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 2.0F, 1.0F);
 			} else {
 				level.playSound(null, pos, RatsSoundRegistry.DUTCHRAT_BELL.get(), SoundSource.BLOCKS, 2.0F, 1.0F);

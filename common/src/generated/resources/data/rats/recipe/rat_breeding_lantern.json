@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "L": {
-      "item": "minecraft:redstone_lamp"
-    },
-    "R": {
-      "tag": "c:dyes/red"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "L": "minecraft:redstone_lamp",
+    "R": "#c:dyes/red",
+    "S": "#c:strings"
   },
   "pattern": [
     " S ",

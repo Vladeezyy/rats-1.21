@@ -2,33 +2,15 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    },
-    {
-      "item": "rats:ratglove_flower"
-    }
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower",
+    "rats:ratglove_flower"
   ],
   "result": {
     "id": "rats:ratglove_petals"

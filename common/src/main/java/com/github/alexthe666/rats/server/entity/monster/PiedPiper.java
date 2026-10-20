@@ -1,4 +1,9 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatConfig;
@@ -13,7 +18,6 @@ import com.github.alexthe666.rats.server.entity.rat.Rat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -32,8 +36,8 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.item.ItemStack;
@@ -93,9 +97,9 @@ public class PiedPiper extends Raider implements RatSummoner {
 	}
 
 	@Override
-	public boolean checkSpawnRules(LevelAccessor accessor, MobSpawnType type) {
-		if (!accessor.getLevelData().getGameRules().getBoolean(RatsMod.SPAWN_PIPERS)) return false;
-		if (type == MobSpawnType.EVENT || type == MobSpawnType.SPAWNER) return super.checkSpawnRules(accessor, type);
+	public boolean checkSpawnRules(LevelAccessor accessor, EntitySpawnReason type) {
+		if (!RatsMod.spawnRule(accessor, RatsMod.SPAWN_PIPERS)) return false;
+		if (type == EntitySpawnReason.EVENT || type == EntitySpawnReason.SPAWNER) return super.checkSpawnRules(accessor, type);
 		int spawnRoll = RatConfig.piperSpawnDecrease;
 		if (spawnRoll == 0 || accessor.getRandom().nextInt(spawnRoll) == 0) {
 			return super.checkSpawnRules(accessor, type);
@@ -110,7 +114,7 @@ public class PiedPiper extends Raider implements RatSummoner {
 			for (Rat rat : this.level().getEntitiesOfClass(Rat.class, new AABB(this.getX() - dist, this.getY() - dist, this.getZ() - dist, this.getX() + dist, this.getY() + dist, this.getZ() + dist))) {
 				if (rat.isOwnedBy(this)) {
 					rat.setTame(false, true);
-					rat.setOwnerUUID(null);
+					rat.setOwnerReference(null);
 					rat.setFleePos(rat.blockPosition());
 					rat.setTarget(null);
 					rat.setLastHurtByMob(null);
@@ -121,15 +125,15 @@ public class PiedPiper extends Raider implements RatSummoner {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putInt("RatsSummoned", this.getRatsSummoned());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setRatsSummoned(compound.getInt("RatsSummoned"));
+		this.setRatsSummoned(compound.getIntOr("RatsSummoned", 0));
 	}
 
 	@Override
@@ -158,7 +162,7 @@ public class PiedPiper extends Raider implements RatSummoner {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData) {
 		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
 		this.populateDefaultEquipmentEnchantments(level, level.getRandom(), difficulty);
@@ -180,12 +184,12 @@ public class PiedPiper extends Raider implements RatSummoner {
 			if (this.getRatsSummoned() < 6 && this.ratCooldown == 0) {
 				this.level().broadcastEntityEvent(this, (byte) 82);
 				Rat rat = new Rat(RatsEntityRegistry.RAT.get(), this.level());
-				Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevel) this.level(), this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null);
+				Platform.INSTANCE.finalizeMobSpawn(rat, (ServerLevel) this.level(), ((net.minecraft.world.level.ServerLevelAccessor) this.level()).getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.MOB_SUMMONED, null);
 				rat.copyPosition(this);
 				this.level().addFreshEntity(rat);
 				rat.setPlagued(false);
 				rat.setTame(false, true);
-				rat.setOwnerUUID(this.getUUID());
+				rat.setOwnerReference(EntityReference.of(this.getUUID()));
 				if (this.getTarget() != null) {
 					rat.setTarget(this.getTarget());
 				}
@@ -221,10 +225,10 @@ public class PiedPiper extends Raider implements RatSummoner {
 		return level.getDifficulty() != Difficulty.PEACEFUL && isDarkEnoughToSpawn((ServerLevelAccessor) level, pos, randomIn);
 	}
 
-	public static boolean checkPiperSpawnRules(EntityType<? extends Mob> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+	public static boolean checkPiperSpawnRules(EntityType<? extends Mob> type, ServerLevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
 		BlockPos blockpos = pos.below();
 		boolean light = canPiperSpawnInLight(level, pos, random);
-		return reason == MobSpawnType.SPAWNER || light && level.getBlockState(blockpos).isValidSpawn(level, blockpos, type) && random.nextFloat() < 0.25F;
+		return reason == EntitySpawnReason.SPAWNER || light && level.getBlockState(blockpos).isValidSpawn(level, blockpos, type) && random.nextFloat() < 0.25F;
 	}
 
 	@Override
@@ -256,9 +260,9 @@ public class PiedPiper extends Raider implements RatSummoner {
 		super.dropCustomDeathLoot(level, source, playerKill);
 		if (source.getEntity() instanceof AbstractRat) {
 			if (this.getRandom().nextBoolean()) {
-				this.spawnAtLocation(RatsItemRegistry.MUSIC_DISC_MICE_ON_VENUS.get(), 1);
+				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), RatsItemRegistry.MUSIC_DISC_MICE_ON_VENUS.get());
 			} else {
-				this.spawnAtLocation(RatsItemRegistry.MUSIC_DISC_LIVING_MICE.get(), 1);
+				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), RatsItemRegistry.MUSIC_DISC_LIVING_MICE.get());
 			}
 		}
 	}

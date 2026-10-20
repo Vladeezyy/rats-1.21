@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "rats:ghost_pirat_hat"
-    }
+    "rats:ghost_pirat_hat"
   ],
   "result": {
     "count": 4,

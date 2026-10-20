@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.HolderLookup;
@@ -28,27 +30,23 @@ public class RatHoleBlockEntity extends BlockEntity {
 		return ClientboundBlockEntityDataPacket.create(this, BlockEntity::getUpdateTag);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.@NotNull Provider registries) {
-		this.loadWithComponents(packet.getTag(), registries);
-	}
 
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-		return this.saveWithId(registries);
+		return this.saveWithoutMetadata(registries);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag tag, HolderLookup.@NotNull Provider registries) {
-		super.saveAdditional(tag, registries);
-		ContainerHelper.saveAllItems(tag, this.imitationStack, registries);
+	public void saveAdditional(ValueOutput tag) {
+		super.saveAdditional(tag);
+		ContainerHelper.saveAllItems(tag, this.imitationStack);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag tag, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(tag, registries);
+	protected void loadAdditional(ValueInput tag) {
+		super.loadAdditional(tag);
 		this.imitationStack = NonNullList.withSize(1, ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(tag, this.imitationStack, registries);
+		ContainerHelper.loadAllItems(tag, this.imitationStack);
 	}
 
 	public BlockState getImitatedBlockState() {

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "S": {
-      "tag": "c:strings"
-    },
-    "W": {
-      "item": "minecraft:purple_wool"
-    }
+    "C": "#c:cheese",
+    "S": "#c:strings",
+    "W": "minecraft:purple_wool"
   },
   "pattern": [
     "SCS",

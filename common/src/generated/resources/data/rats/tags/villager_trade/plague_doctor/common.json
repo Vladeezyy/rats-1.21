@@ -1,0 +1,21 @@
+{
+  "values": [
+    "rats:plague_doctor/common/raw_rat",
+    "rats:plague_doctor/common/bone",
+    "rats:plague_doctor/common/rotten_flesh",
+    "rats:plague_doctor/common/spider_eye",
+    "rats:plague_doctor/common/ghast_tear",
+    "rats:plague_doctor/common/phantom_membrane",
+    "rats:plague_doctor/common/poisonous_potato",
+    "rats:plague_doctor/common/contaminated_food",
+    "rats:plague_doctor/common/cooked_rat",
+    "rats:plague_doctor/common/herb_bundle",
+    "rats:plague_doctor/common/treacle",
+    "rats:plague_doctor/common/garbage_pile",
+    "rats:plague_doctor/common/cursed_garbage",
+    "rats:plague_doctor/common/purified_garbage",
+    "rats:plague_doctor/common/pied_wool",
+    "rats:plague_doctor/common/plague_doctor_mask",
+    "rats:plague_doctor/common/rat_skull"
+  ]
+}

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "S": {
-      "tag": "c:seeds"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "S": "#c:seeds",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "SSS",

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "C": {
-      "item": "minecraft:chicken"
-    },
-    "F": {
-      "item": "minecraft:feather"
-    }
+    "C": "minecraft:chicken",
+    "F": "minecraft:feather"
   },
   "pattern": [
     "CFF",

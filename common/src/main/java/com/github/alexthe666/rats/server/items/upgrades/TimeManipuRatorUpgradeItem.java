@@ -1,13 +1,14 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.ChangesOverlayUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
 import com.github.alexthe666.rats.server.misc.RatUtils;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +20,7 @@ public class TimeManipuRatorUpgradeItem extends BaseRatUpgradeItem implements Ti
 	@Override
 	public @Nullable RenderType getOverlayTexture(ItemStack stack, TamedRat rat, float partialTicks) {
 		float f = (float) rat.tickCount + partialTicks;
-		return RenderType.energySwirl(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/psychic.png"), f * 0.01F, f * 0.01F);
+		return RenderTypes.energySwirl(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/psychic.png"), f * 0.01F, f * 0.01F);
 	}
 
 	@Override

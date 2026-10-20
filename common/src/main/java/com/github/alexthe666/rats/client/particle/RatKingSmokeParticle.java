@@ -1,5 +1,7 @@
 package com.github.alexthe666.rats.client.particle;
 
+import net.minecraft.util.RandomSource;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -24,7 +26,7 @@ public class RatKingSmokeParticle extends SmokeParticle {
 			this.sprites = p_107696_;
 		}
 
-		public Particle createParticle(SimpleParticleType p_107707_, ClientLevel p_107708_, double p_107709_, double p_107710_, double p_107711_, double p_107712_, double p_107713_, double p_107714_) {
+		public Particle createParticle(SimpleParticleType p_107707_, ClientLevel p_107708_, double p_107709_, double p_107710_, double p_107711_, double p_107712_, double p_107713_, double p_107714_, RandomSource random) {
 			return new RatKingSmokeParticle(p_107708_, p_107709_, p_107710_, p_107711_, p_107712_, p_107713_, p_107714_, 1.0F, this.sprites);
 		}
 	}

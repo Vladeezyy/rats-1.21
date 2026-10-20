@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "E": {
-      "item": "rats:ghost_pirat_ectoplasm"
-    },
-    "F": {
-      "item": "rats:pirat_fence"
-    },
-    "G": {
-      "tag": "c:ingots/ratlantis_gem"
-    },
-    "L": {
-      "tag": "rats:pirat_logs"
-    }
+    "E": "rats:ghost_pirat_ectoplasm",
+    "F": "rats:pirat_fence",
+    "G": "#c:ingots/ratlantis_gem",
+    "L": "#rats:pirat_logs"
   },
   "pattern": [
     "LLL",

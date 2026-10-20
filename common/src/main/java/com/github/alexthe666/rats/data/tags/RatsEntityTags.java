@@ -2,8 +2,7 @@ package com.github.alexthe666.rats.data.tags;
 
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
@@ -19,6 +18,6 @@ public final class RatsEntityTags {
 	}
 
 	public static TagKey<EntityType<?>> create(String name) {
-		return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name));
+		return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(RatsMod.MODID, name));
 	}
 }

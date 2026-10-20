@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
 import dev.vladeezyy.rampart.animation.Animation;
@@ -10,7 +12,6 @@ import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.GolemBeam;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,7 +44,7 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 
 	public static final Animation ANIMATION_MELEE = Animation.create(15);
 	public static final Animation ANIMATION_RANGED = Animation.create(15);
-	private final ServerBossEvent bossInfo = (new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS));
+	private final ServerBossEvent bossInfo = (new ServerBossEvent(java.util.UUID.randomUUID(), this.getDisplayName(), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS));
 	private int blockBreakCounter;
 	private int animationTick;
 	private boolean useRangedAttack = false;
@@ -94,8 +95,8 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 	}
 
 	@Override
-	protected void customServerAiStep() {
-		super.customServerAiStep();
+	protected void customServerAiStep(ServerLevel level) {
+		super.customServerAiStep(level);
 		this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 		if (this.blockBreakCounter > 0) {
 			--this.blockBreakCounter;
@@ -130,12 +131,12 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		if (this.getAnimation() == NO_ANIMATION) {
 			this.setAnimation(this.useRangedAttack ? ANIMATION_MELEE : ANIMATION_RANGED);
 		}
@@ -143,14 +144,14 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 	}
 
 	@Override
-	public boolean hurt(DamageSource source, float amount) {
-		if (this.isInvulnerableTo(source)) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		if (this.isInvulnerableTo((net.minecraft.server.level.ServerLevel) this.level(), source)) {
 			return false;
 		} else if (!(source.getEntity() instanceof RatlanteanAutomaton)) {
 			if (this.blockBreakCounter <= 0) {
 				this.blockBreakCounter = 20;
 			}
-			return super.hurt(source, amount);
+			return super.hurtServer(level, source, amount);
 		} else {
 			return false;
 		}
@@ -208,8 +209,10 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 			}
 			this.lookAt(this.getTarget(), 360, 80);
 			if (this.getAnimation() == ANIMATION_MELEE && this.getAnimationTick() == 10) {
-				this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-				this.getTarget().knockback(1.5F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
+				LivingEntity target = this.getTarget();
+				target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ());
 				this.useRangedAttack = this.getRandom().nextInt(RatConfig.automatonShootChance) == 0;
 			}
 		}
@@ -272,7 +275,7 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
 		if (this.hasCustomName()) {
 			this.bossInfo.setName(this.getDisplayName());

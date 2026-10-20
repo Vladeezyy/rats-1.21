@@ -6,15 +6,13 @@ import com.github.alexthe666.rats.client.render.entity.layer.RatKingLayer;
 import com.github.alexthe666.rats.server.entity.monster.boss.RatKing;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 
-public class RatKingRenderer extends MobRenderer<RatKing, EmptyModel<RatKing>> {
-
-	private static final ResourceLocation TEXTURE_1 = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/black.png");
+/** The rat king: no body of its own, its rats are drawn by {@link RatKingLayer} */
+public class RatKingRenderer extends RatsMobRenderer<RatKing, EmptyModel<RatKing>> {
+	private static final Identifier TEXTURE_1 = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/black.png");
 
 	public RatKingRenderer(EntityRendererProvider.Context context) {
 		super(context, new EmptyModel<>(), 1.0F);
@@ -22,23 +20,21 @@ public class RatKingRenderer extends MobRenderer<RatKing, EmptyModel<RatKing>> {
 	}
 
 	@Override
-	public Vec3 getRenderOffset(RatKing king, float partialTicks) {
-		return new Vec3(0.0F, 0.0F, 0.0F);
+	public Vec3 getRenderOffset(RatsMobRenderState state) {
+		return Vec3.ZERO;
 	}
 
 	@Override
-	protected void setupRotations(RatKing king, PoseStack stack, float ageInTicks, float yRot, float partialTicks, float scale) {
-		if (king.hasCustomName()) {
-			String s = ChatFormatting.stripFormatting(king.getName().getString());
-			if (("Dinnerbone".equals(s) || "Grumm".equals(s))) {
-				stack.translate(0.0D, king.getBbHeight() + 0.1F, 0.0D);
-				stack.mulPose(Axis.ZP.rotationDegrees(180.0F));
-			}
+	protected void setupRotations(RatsMobRenderState state, PoseStack stack, float bodyRot, float scale) {
+		// the rats are placed around the king, which does not turn (only Dinnerbone and Grumm flip it)
+		if (state.isUpsideDown) {
+			stack.translate(0.0D, state.boundingBoxHeight + 0.1F, 0.0D);
+			stack.mulPose(Axis.ZP.rotationDegrees(180.0F));
 		}
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(RatKing entity) {
+	protected Identifier getTexture(RatKing entity) {
 		return TEXTURE_1;
 	}
 }

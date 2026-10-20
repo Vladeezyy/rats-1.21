@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "P": {
-      "item": "minecraft:carved_pumpkin"
-    },
-    "R": {
-      "item": "rats:raw_rat"
-    },
-    "T": {
-      "item": "minecraft:torch"
-    }
+    "P": "minecraft:carved_pumpkin",
+    "R": "rats:raw_rat",
+    "T": "minecraft:torch"
   },
   "pattern": [
     "P",

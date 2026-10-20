@@ -2,15 +2,13 @@ package com.github.alexthe666.rats.server.message;
 
 import com.github.alexthe666.rats.registry.RatsEffectRegistry;
 import net.minecraft.core.Holder;
-import net.minecraft.server.level.ServerPlayer;
 import com.github.alexthe666.rats.RatsMod;
 import dev.vladeezyy.rats.platform.PacketContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 public record SyncPlaguePacket(int entityId, byte effectId, byte amplifier, int duration, byte flags) implements CustomPacketPayload {
 
-	public static final Type<SyncPlaguePacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "sync_plague"));
+	public static final Type<SyncPlaguePacket> TYPE = new Type<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "sync_plague"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, SyncPlaguePacket> CODEC = StreamCodec.of((buf, packet) -> encode(packet, buf), SyncPlaguePacket::decode);
 
 	@Override

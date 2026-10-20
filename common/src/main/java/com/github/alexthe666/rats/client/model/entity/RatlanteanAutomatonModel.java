@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import net.minecraft.util.FastColor;
 import dev.vladeezyy.rampart.animation.IAnimatedEntity;
 import dev.vladeezyy.rampart.client.model.AdvancedEntityModel;
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;

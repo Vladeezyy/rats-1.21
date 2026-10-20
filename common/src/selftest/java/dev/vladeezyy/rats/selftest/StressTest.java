@@ -11,8 +11,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -125,7 +125,7 @@ final class StressTest {
   private static void spawnWolves(ServerLevel level) {
     for (int i = 0; i < COUNT; i++) {
       // wild: a tamed wolf whose owner is not online sits (vanilla's sit goal), so it would cost nothing
-      Wolf wolf = EntityType.WOLF.spawn(level, cell(i).offset(2, 0, 2), MobSpawnType.COMMAND);
+      Wolf wolf = EntityType.WOLF.spawn(level, cell(i).offset(2, 0, 2), EntitySpawnReason.COMMAND);
       if (wolf != null) {
         mobs.add(wolf);
       }
@@ -135,7 +135,7 @@ final class StressTest {
   private static void spawnRats(ServerLevel level) {
     for (int i = 0; i < COUNT; i++) {
       BlockPos cell = cell(i);
-      TamedRat rat = RatsEntityRegistry.TAMED_RAT.get().spawn(level, cell.offset(2, 0, 2), MobSpawnType.COMMAND);
+      TamedRat rat = RatsEntityRegistry.TAMED_RAT.get().spawn(level, cell.offset(2, 0, 2), EntitySpawnReason.COMMAND);
       if (rat == null) {
         continue;
       }

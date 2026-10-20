@@ -2,7 +2,7 @@ package com.github.alexthe666.rats.data.tags;
 
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.entity.BannerPattern;
 
@@ -18,6 +18,6 @@ public final class RatsBannerPatternTags {
 	}
 
 	private static TagKey<BannerPattern> create(String name) {
-		return TagKey.create(Registries.BANNER_PATTERN, ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name));
+		return TagKey.create(Registries.BANNER_PATTERN, Identifier.fromNamespaceAndPath(RatsMod.MODID, name));
 	}
 }

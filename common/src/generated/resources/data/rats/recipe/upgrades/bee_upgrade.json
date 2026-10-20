@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:honey_bottle"
-    },
-    "C": {
-      "item": "minecraft:honeycomb_block"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_flight"
-    }
+    "B": "minecraft:honey_bottle",
+    "C": "minecraft:honeycomb_block",
+    "U": "rats:rat_upgrade_flight"
   },
   "pattern": [
     "BCB",

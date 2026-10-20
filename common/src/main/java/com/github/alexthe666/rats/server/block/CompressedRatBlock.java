@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
@@ -9,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -17,9 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
-public class CompressedRatBlock extends HorizontalDirectionalBlock {
+public class CompressedRatBlock extends HorizontalDirectionalBlock implements BlockTooltip {
     public static final MapCodec<CompressedRatBlock> CODEC = simpleCodec(CompressedRatBlock::new);
 
     @Override
@@ -44,9 +44,8 @@ public class CompressedRatBlock extends HorizontalDirectionalBlock {
 		builder.add(FACING);
 	}
 
-	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext getter, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("block.rats.compressed_rat.desc").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext getter, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("block.rats.compressed_rat.desc").withStyle(ChatFormatting.GRAY));
 	}
 
 }

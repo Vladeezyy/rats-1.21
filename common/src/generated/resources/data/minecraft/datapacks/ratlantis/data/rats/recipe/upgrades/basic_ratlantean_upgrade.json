@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "G": {
-      "tag": "c:ingots/ratlantis_gem"
-    },
-    "M": {
-      "tag": "rats:marbled_cheese"
-    }
+    "G": "#c:ingots/ratlantis_gem",
+    "M": "#rats:marbled_cheese"
   },
   "pattern": [
     "GMG",

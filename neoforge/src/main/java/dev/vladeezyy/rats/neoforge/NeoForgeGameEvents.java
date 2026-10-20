@@ -8,7 +8,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Mob;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
+import net.minecraft.util.TriState;
+import com.github.alexthe666.rats.registry.RatsRecipeRegistry;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.VanillaGameEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -24,7 +25,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
 /** The game events of Rats on NeoForge, passed to the common handlers ({@link RatsEvents}, {@link RatlantisPack}) */
 final class NeoForgeGameEvents {
@@ -66,7 +66,11 @@ final class NeoForgeGameEvents {
                 RatlantisPack.onLevelLoad(level);
             }
         });
-        bus.addListener((OnDatapackSyncEvent event) -> RatlantisPack.onDatapackSync(event.getPlayer(), event.getPlayerList()));
+        bus.addListener((OnDatapackSyncEvent event) -> {
+            RatlantisPack.onDatapackSync(event.getPlayer(), event.getPlayerList());
+            // 26.x clients have no recipes: the cauldron and JEI read these (ClientRecipes)
+            event.sendRecipes(RatsRecipeRegistry.CHEF.get(), RatsRecipeRegistry.ARCHEOLOGIST.get());
+        });
         bus.addListener((PlayerEvent.PlayerLoggedInEvent event) -> RatsEvents.onPlayerLoggedIn(event.getEntity()));
         bus.addListener((EntityJoinLevelEvent event) -> RatsEvents.onEntityJoin(event.getEntity()));
         bus.addListener((FinalizeSpawnEvent event) -> {
@@ -83,13 +87,6 @@ final class NeoForgeGameEvents {
             }
         });
         bus.addListener((ItemFishedEvent event) -> RatsEvents.onItemFished(event.getEntity(), event.getHookEntity(), event.getDrops()));
-        bus.addListener((VillagerTradesEvent event) -> {
-            if (event.getType() == RatsVillagerRegistry.PET_SHOP_OWNER.get()) {
-                for (int level = 1; level <= 5; level++) {
-                    RatsEvents.addPetShopTrades(level, event.getTrades().get(level));
-                }
-            }
-        });
         bus.addListener((PlayerInteractEvent.LeftClickEmpty event) -> RatsEvents.onLeftClickEmpty(event.getEntity(), event.getItemStack()));
         bus.addListener((LivingHealEvent event) -> {
             if (RatsEvents.cancelHeal(event.getEntity())) {

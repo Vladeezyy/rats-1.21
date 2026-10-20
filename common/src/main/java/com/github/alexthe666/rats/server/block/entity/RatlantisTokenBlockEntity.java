@@ -1,13 +1,12 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatlantisBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatlantisBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -26,14 +25,14 @@ public class RatlantisTokenBlockEntity extends BlockEntity {
 		super(RatlantisBlockEntityRegistry.TOKEN.get(), pos, state);
 	}
 
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+	public void saveAdditional(ValueOutput compound) {
 		compound.putInt("TicksExisted", tickCount);
-		super.saveAdditional(compound, registries);
+		super.saveAdditional(compound);
 	}
 
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
-		tickCount = compound.getInt("TicksExisted");
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		tickCount = compound.getIntOr("TicksExisted", 0);
 	}
 
 	public AABB getRenderBoundingBox() {

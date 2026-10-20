@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "rats:item/ratlantis_portal",
+    "model": {
+      "type": "rats:block_entity",
+      "block": "ratlantis_portal"
+    }
+  }
+}

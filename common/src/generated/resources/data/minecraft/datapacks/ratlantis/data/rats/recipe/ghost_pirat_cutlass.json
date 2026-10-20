@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "item": "rats:pirat_cutlass"
-    },
-    "E": {
-      "item": "rats:ghost_pirat_ectoplasm"
-    }
+    "C": "rats:pirat_cutlass",
+    "E": "rats:ghost_pirat_ectoplasm"
   },
   "pattern": [
     " E ",

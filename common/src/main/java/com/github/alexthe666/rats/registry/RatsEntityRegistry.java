@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatsMod;
@@ -16,12 +18,11 @@ import com.github.alexthe666.rats.server.entity.projectile.*;
 import com.github.alexthe666.rats.server.entity.rat.DemonRat;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.item.Item;
 import dev.vladeezyy.rats.platform.Registrar;
 import net.minecraft.core.registries.BuiltInRegistries;
 import dev.vladeezyy.rats.platform.RegistryEntry;
@@ -53,13 +54,13 @@ public class RatsEntityRegistry {
 	public static final RegistryEntry<EntityType<?>, EntityType<SmallArrow>> SMALL_ARROW = registerEntityNoEgg("small_arrow", EntityType.Builder.<SmallArrow>of(SmallArrow::new, MobCategory.MISC).sized(0.39F, 0.39F));
 
 	private static <E extends Mob> RegistryEntry<EntityType<?>, EntityType<E>> registerEntity(String entityName, EntityType.Builder<E> builder, int baseEggColor, int overlayEggColor) {
-		ResourceLocation nameLoc = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, entityName);
-		RegistryEntry<EntityType<?>, EntityType<E>> ret = ENTITIES.register(entityName, () -> builder.build(nameLoc.toString()));
-		RatsItemRegistry.ITEMS.register(entityName + "_spawn_egg", () -> Platform.INSTANCE.spawnEgg(ret, baseEggColor, overlayEggColor, new Item.Properties()));
+		Identifier nameLoc = Identifier.fromNamespaceAndPath(RatsMod.MODID, entityName);
+		RegistryEntry<EntityType<?>, EntityType<E>> ret = ENTITIES.register(entityName, () -> builder.build(ResourceKey.create(Registries.ENTITY_TYPE, nameLoc)));
+		RatsItemRegistry.ITEMS.register(entityName + "_spawn_egg", () -> Platform.INSTANCE.spawnEgg(ret, baseEggColor, overlayEggColor, Registrar.itemProps()));
 		return ret;
 	}
 
 	private static <E extends Entity> RegistryEntry<EntityType<?>, EntityType<E>> registerEntityNoEgg(String entityName, EntityType.Builder<E> builder) {
-		return ENTITIES.register(entityName, () -> builder.build(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, entityName).toString()));
+		return ENTITIES.register(entityName, () -> builder.build(ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(RatsMod.MODID, entityName))));
 	}
 }

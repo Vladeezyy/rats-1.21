@@ -20,8 +20,9 @@ public class ArcheologistHatModel extends AbstractHatModel {
 				.texOffs(0, 15).addBox(-3.5F, -13.0F, -3.5F, 7.0F, 4.0F, 7.0F)
 				.texOffs(0, 0).addBox(-5.0F, -9.0F, -7.0F, 10.0F, 1.0F, 14.0F), PartPose.offset(0.0F, 32.0F, 0.0F));
 
-		partDefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
+		// 26.x: the humanoid hat part is a child of the head
+		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

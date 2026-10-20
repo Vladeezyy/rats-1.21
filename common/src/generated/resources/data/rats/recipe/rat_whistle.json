@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    }
+    "C": "#c:cheese",
+    "I": "#c:ingots/iron"
   },
   "pattern": [
     "ICI",

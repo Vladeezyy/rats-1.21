@@ -1,8 +1,9 @@
 package com.github.alexthe666.rats.server.block.entity;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
-import java.util.Optional;
 import com.github.alexthe666.rats.server.misc.RatsCaps;
-import net.minecraft.core.HolderLookup;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsBlockRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
@@ -12,7 +13,6 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatUpgradeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import dev.vladeezyy.rats.platform.transfer.EnergyBuffer;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,21 +47,21 @@ public class RatCageWheelBlockEntity extends DecoratedRatCageBlockEntity {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
+	public void saveAdditional(ValueOutput compound) {
 		compound.putInt("UseTicks", this.useTicks);
-		compound.put("Energy", this.energyStorage.serializeNBT(registries));
+		Values.put(compound, "Energy", this.energyStorage.serializeNBT());
 
 		compound.putInt("DismountCooldown", this.dismountCooldown);
-		super.saveAdditional(compound, registries);
+		super.saveAdditional(compound);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compound, HolderLookup.@NotNull Provider registries) {
-		super.loadAdditional(compound, registries);
-		this.useTicks = compound.getInt("UseTicks");
-		this.dismountCooldown = compound.getInt("DismountCooldown");
-		if (compound.contains("Energy")) {
-			this.energyStorage.deserializeNBT(registries, compound.get("Energy"));
+	protected void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		this.useTicks = compound.getIntOr("UseTicks", 0);
+		this.dismountCooldown = compound.getIntOr("DismountCooldown", 0);
+		if (Values.contains(compound, "Energy")) {
+			this.energyStorage.deserializeNBT(compound.lookup(), Values.get(compound, "Energy"));
 		}
 	}
 

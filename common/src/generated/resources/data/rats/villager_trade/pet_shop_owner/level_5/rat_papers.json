@@ -1,0 +1,13 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 5
+  },
+  "gives": {
+    "id": "rats:rat_papers",
+    "count": 1
+  },
+  "max_uses": 12,
+  "xp": 30,
+  "reputation_discount": 0.05
+}

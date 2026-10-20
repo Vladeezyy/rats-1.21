@@ -3,9 +3,7 @@
   "category": "misc",
   "cookingtime": 200,
   "experience": 1.0,
-  "ingredient": {
-    "item": "rats:oratchalcum_ore"
-  },
+  "ingredient": "rats:oratchalcum_ore",
   "result": {
     "id": "rats:oratchalcum_ingot"
   }

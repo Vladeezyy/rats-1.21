@@ -1,9 +1,12 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.server.level.ServerLevel;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import dev.vladeezyy.rats.platform.Platform;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity;
@@ -32,7 +35,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -42,10 +45,9 @@ import dev.vladeezyy.rats.platform.transfer.FluidHandler;
 import dev.vladeezyy.rats.platform.transfer.ItemFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class AutoCurdlerBlock extends BaseEntityBlock {
+public class AutoCurdlerBlock extends BaseEntityBlock implements BlockTooltip {
     public static final MapCodec<AutoCurdlerBlock> CODEC = simpleCodec(AutoCurdlerBlock::new);
 
     @Override
@@ -54,7 +56,7 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
     }
 
 
-	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
+	public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
 	private static final VoxelShape AABB_BASE = Block.box(1, 0, 1, 15, 8, 15);
 	private static final VoxelShape AABB_TANK = Block.box(3, 8, 3, 13, 18, 13);
 	private static final VoxelShape AABB = Shapes.or(AABB_BASE, AABB_TANK);
@@ -64,20 +66,15 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 		this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
 	}
 
-	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("block.rats.auto_curdler.desc0").withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable("block.rats.auto_curdler.desc1").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("block.rats.auto_curdler.desc0").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("block.rats.auto_curdler.desc1").withStyle(ChatFormatting.GRAY));
 	}
 
+	// 26.x: the block entity drops what it holds (preRemoveSideEffects); the block tells comparators
 	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		BlockEntity be = level.getBlockEntity(pos);
-		if (be instanceof AutoCurdlerBlockEntity curdler) {
-			Containers.dropContents(level, pos, curdler);
-			level.updateNeighbourForOutputSignal(pos, this);
-		}
-		super.onRemove(state, level, pos, newState, isMoving);
+	protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+		Containers.updateNeighboursAfterDestroy(state, level, pos);
 	}
 
 	@Override
@@ -86,7 +83,7 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull InteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!player.isShiftKeyDown()) {
 			ItemStack stack = player.getItemInHand(hand);
 			if (AutoCurdlerBlockEntity.isMilk(stack) && level.getBlockEntity(pos) instanceof AutoCurdlerBlockEntity te) {
@@ -114,16 +111,16 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 						}
 					}
 				}
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			if (level.isClientSide()) {
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else {
 				player.openMenu(this.getMenuProvider(state, level, pos));
-				return ItemInteractionResult.CONSUME;
+				return InteractionResult.CONSUME;
 			}
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
@@ -143,7 +140,7 @@ public class AutoCurdlerBlock extends BaseEntityBlock {
 
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
-		return RenderShape.ENTITYBLOCK_ANIMATED;
+		return RenderShape.INVISIBLE;
 	}
 
 	@Override

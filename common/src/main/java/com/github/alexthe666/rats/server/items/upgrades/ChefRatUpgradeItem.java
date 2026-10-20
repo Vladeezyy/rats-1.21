@@ -7,7 +7,6 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -51,7 +50,7 @@ public class ChefRatUpgradeItem extends BaseRatUpgradeItem implements TickRatUpg
 				} else {
 					if (!rat.tryDepositItemInContainers(burntItem)) {
 						if (!rat.level().isClientSide()) {
-							rat.spawnAtLocation(burntItem, 0.25F);
+							rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
 						}
 					}
 				}
@@ -66,9 +65,10 @@ public class ChefRatUpgradeItem extends BaseRatUpgradeItem implements TickRatUpg
 			return specialChefRecipe.copy();
 		}
 
-		Optional<SmeltingRecipe> optional = rat.level().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), rat.level()).map(RecipeHolder::value);
+		SingleRecipeInput input = new SingleRecipeInput(stack);
+		Optional<SmeltingRecipe> optional = rat.level() instanceof net.minecraft.server.level.ServerLevel server ? server.recipeAccess().getRecipeFor(RecipeType.SMELTING, input, server).map(RecipeHolder::value) : Optional.empty();
 		if (optional.isPresent()) {
-			ItemStack itemstack = optional.get().getResultItem(rat.level().registryAccess());
+			ItemStack itemstack = optional.get().assemble(input);
 			if (!itemstack.isEmpty()) {
 				ItemStack itemstack1 = itemstack.copy();
 				itemstack1.setCount(stack.getCount() * itemstack.getCount());

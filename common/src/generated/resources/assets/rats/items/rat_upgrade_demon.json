@@ -1,0 +1,14 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "rats:soul",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "rats:item/rat_upgrade_soul_demon"
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "rats:item/rat_upgrade_demon"
+    }
+  }
+}

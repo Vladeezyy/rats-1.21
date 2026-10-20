@@ -1,16 +1,13 @@
 package com.github.alexthe666.rats.registry;
 
 import dev.vladeezyy.rats.platform.Platform;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.core.registries.Registries;
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +30,6 @@ public class RatsDataSerializerRegistry {
 
 	/** NeoForge: its serializer registry; Fabric: vanilla's list (both sides register in the same order) */
 	public static void register() {
-		Platform.INSTANCE.registerDataSerializer(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "global_pos_list"), GLOBAL_POS_LIST);
+		Platform.INSTANCE.registerDataSerializer(Identifier.fromNamespaceAndPath(RatsMod.MODID, "global_pos_list"), GLOBAL_POS_LIST);
 	}
 }

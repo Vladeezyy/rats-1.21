@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.server.misc;
 
 import com.github.alexthe666.rats.registry.RatVariantRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
@@ -10,19 +10,19 @@ import java.util.Optional;
 
 public class RatVariant {
 
-	private final ResourceLocation texture;
+	private final Identifier texture;
 	private final boolean breedingExclusive;
 
 	public RatVariant(RatVariant.Properties properties) {
 		this(properties.texture, properties.breedingExclusive);
 	}
 
-	private RatVariant(ResourceLocation texture, boolean breedingExclusive) {
+	private RatVariant(Identifier texture, boolean breedingExclusive) {
 		this.texture = texture;
 		this.breedingExclusive = breedingExclusive;
 	}
 
-	public ResourceLocation getTexture() {
+	public Identifier getTexture() {
 		return this.texture;
 	}
 
@@ -31,10 +31,10 @@ public class RatVariant {
 	}
 
 	public static class Properties {
-		private final ResourceLocation texture;
+		private final Identifier texture;
 		private boolean breedingExclusive = false;
 
-		public Properties(ResourceLocation texture) {
+		public Properties(Identifier texture) {
 			this.texture = texture;
 		}
 
@@ -57,7 +57,7 @@ public class RatVariant {
 	}
 
 	public static RatVariant getVariant(String id) {
-		return Optional.ofNullable(RatVariantRegistry.RAT_VARIANT_REGISTRY.get(ResourceLocation.parse(id))).orElse(RatVariantRegistry.BLUE.get());
+		return Optional.ofNullable(RatVariantRegistry.RAT_VARIANT_REGISTRY.getValue(Identifier.parse(id))).orElse(RatVariantRegistry.BLUE.get());
 	}
 
 	public static String getVariantId(RatVariant variant) {

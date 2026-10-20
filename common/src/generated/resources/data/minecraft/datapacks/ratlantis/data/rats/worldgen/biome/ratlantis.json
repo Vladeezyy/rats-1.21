@@ -1,22 +1,26 @@
 {
-  "carvers": {
-    "air": "rats:ratlantis_caves"
+  "attributes": {
+    "minecraft:audio/ambient_sounds": {
+      "mood": {
+        "block_search_extent": 8,
+        "offset": 2.0,
+        "sound": "minecraft:ambient.cave",
+        "tick_delay": 6000
+      }
+    },
+    "minecraft:visual/fog_color": "#ffda7f",
+    "minecraft:visual/sky_color": "#ffc62a",
+    "minecraft:visual/water_fog_color": "#041f33"
   },
+  "carvers": [
+    "rats:ratlantis_caves"
+  ],
   "creature_spawn_probability": 0.4,
   "downfall": 0.5,
   "effects": {
-    "fog_color": 16767615,
-    "foliage_color": 2546944,
-    "grass_color": 8177920,
-    "mood_sound": {
-      "block_search_extent": 8,
-      "offset": 2.0,
-      "sound": "minecraft:ambient.cave",
-      "tick_delay": 6000
-    },
-    "sky_color": 16762410,
-    "water_color": 4445678,
-    "water_fog_color": 270131
+    "foliage_color": "#26dd00",
+    "grass_color": "#7cc900",
+    "water_color": "#43d5ee"
   },
   "features": [
     [],

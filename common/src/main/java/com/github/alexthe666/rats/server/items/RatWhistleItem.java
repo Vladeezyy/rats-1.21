@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
 
 import com.github.alexthe666.rats.RatConfig;
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
@@ -9,11 +10,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
@@ -26,14 +26,14 @@ public class RatWhistleItem extends LoreTagItem {
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack stack) {
-		return UseAnim.BOW;
+	public ItemUseAnimation getUseAnimation(ItemStack stack) {
+		return ItemUseAnimation.BOW;
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
-		player.getCooldowns().addCooldown(this, 5);
+		player.getCooldowns().addCooldown(stack, 5);
 		float chunksize = 48 * RatConfig.ratFluteDistance;
 		List<TamedRat> list = level.getEntitiesOfClass(TamedRat.class, (new AABB(player.getX(), player.getY(), player.getZ(), player.getX() + 1.0D, player.getY() + 1.0D, player.getZ() + 1.0D)).inflate(chunksize, level.getHeight(), chunksize), rat -> rat.getHomePoint().isPresent());
 		int ratCount = 0;
@@ -49,9 +49,9 @@ public class RatWhistleItem extends LoreTagItem {
 			}
 		}
 		player.swing(hand);
-		player.displayClientMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COUNT, ratCount).withStyle(ChatFormatting.GRAY), true);
+		player.sendOverlayMessage(Component.translatable(RatsLangConstants.RAT_FLUTE_COUNT, ratCount).withStyle(ChatFormatting.GRAY));
 		level.playSound(player, player.blockPosition(), RatsSoundRegistry.RAT_WHISTLE.get(), SoundSource.PLAYERS, 1, 1.25F);
 
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 }

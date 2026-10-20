@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "tag": "c:cheese"
-    },
-    "Q": {
-      "tag": "c:gems/quartz"
-    }
+    "C": "#c:cheese",
+    "Q": "#c:gems/quartz"
   },
   "pattern": [
     "QC",

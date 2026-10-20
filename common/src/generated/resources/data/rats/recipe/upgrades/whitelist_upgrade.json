@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "D": {
-      "tag": "c:dyes/white"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "D": "#c:dyes/white",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "DDD",

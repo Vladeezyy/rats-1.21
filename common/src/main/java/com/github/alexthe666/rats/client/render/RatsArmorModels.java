@@ -3,7 +3,6 @@ package com.github.alexthe666.rats.client.render;
 import com.github.alexthe666.rats.client.model.RatsModelLayers;
 import com.github.alexthe666.rats.client.model.hats.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -19,16 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * with its armor renderers.
  */
 public final class RatsArmorModels {
-	private static final Map<Item, HumanoidModel<?>> HATS = new ConcurrentHashMap<>();
-	private static final Map<EquipmentSlot, HumanoidModel<?>> RATLANTIS = new ConcurrentHashMap<>();
+	private static final Map<Item, AbstractHatModel> HATS = new ConcurrentHashMap<>();
+	private static final Map<EquipmentSlot, AbstractHatModel> RATLANTIS = new ConcurrentHashMap<>();
 
 	private RatsArmorModels() {
 	}
 
 	/** The model of a hat, or null for an item without its own model */
 	@Nullable
-	public static HumanoidModel<?> hatModel(Item item) {
-		HumanoidModel<?> model = HATS.get(item);
+	public static AbstractHatModel hatModel(Item item) {
+		AbstractHatModel model = HATS.get(item);
 		if (model == null) {
 			model = createHatModel(item, Minecraft.getInstance().getEntityModels());
 			if (model != null) {
@@ -39,7 +38,7 @@ public final class RatsArmorModels {
 	}
 
 	@Nullable
-	private static HumanoidModel<?> createHatModel(Item item, EntityModelSet models) {
+	private static AbstractHatModel createHatModel(Item item, EntityModelSet models) {
 		return switch (BuiltInRegistries.ITEM.getKey(item).getPath()) {
 					case "chef_toque" ->
 							new ChefToqueModel(models.bakeLayer(RatsModelLayers.CHEF_TOQUE));
@@ -75,9 +74,23 @@ public final class RatsArmorModels {
 		};
 	}
 
-	public static HumanoidModel<?> ratlantisArmorModel(EquipmentSlot slot) {
-		return RATLANTIS.computeIfAbsent(slot == EquipmentSlot.LEGS ? EquipmentSlot.LEGS : EquipmentSlot.CHEST, s -> new RatlantisArmorModel(
-			Minecraft.getInstance().getEntityModels().bakeLayer(s == EquipmentSlot.LEGS ? RatsModelLayers.RATLANTIS_ARMOR_INNER : RatsModelLayers.RATLANTIS_ARMOR_OUTER)));
+	/**
+	 * The Ratlantis armor model of one slot. One instance per slot, with only that slot's parts visible (26.x draws the
+	 * models later in the frame, so a shared model's visibility cannot be switched per piece; vanilla bakes one model
+	 * per slot too).
+	 */
+	public static AbstractHatModel ratlantisArmorModel(EquipmentSlot slot) {
+		return RATLANTIS.computeIfAbsent(slot, s -> {
+			RatlantisArmorModel model = new RatlantisArmorModel(Minecraft.getInstance().getEntityModels().bakeLayer(s == EquipmentSlot.LEGS ? RatsModelLayers.RATLANTIS_ARMOR_INNER : RatsModelLayers.RATLANTIS_ARMOR_OUTER));
+			model.head.visible = s == EquipmentSlot.HEAD;
+			model.hat.visible = s == EquipmentSlot.HEAD;
+			model.body.visible = s == EquipmentSlot.CHEST || s == EquipmentSlot.LEGS;
+			model.rightArm.visible = s == EquipmentSlot.CHEST;
+			model.leftArm.visible = s == EquipmentSlot.CHEST;
+			model.rightLeg.visible = s == EquipmentSlot.LEGS || s == EquipmentSlot.FEET;
+			model.leftLeg.visible = s == EquipmentSlot.LEGS || s == EquipmentSlot.FEET;
+			return model;
+		});
 	}
 
 	/** After a resource reload the model layers are baked again */

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    }
+    "I": "rats:oratchalcum_ingot"
   },
   "pattern": [
     "III",

@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import com.github.alexthe666.rats.server.entity.mount.RatStriderMount;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.state.StriderRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -10,8 +10,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public class RatStriderMountModel<T extends RatStriderMount> extends HierarchicalModel<T> {
-	private final ModelPart root;
+public class RatStriderMountModel extends EntityModel<StriderRenderState> {
 	private final ModelPart rightLeg;
 	private final ModelPart leftLeg;
 	private final ModelPart body;
@@ -23,7 +22,7 @@ public class RatStriderMountModel<T extends RatStriderMount> extends Hierarchica
 	private final ModelPart leftBottomBristle;
 
 	public RatStriderMountModel(ModelPart root) {
-		this.root = root;
+		super(root);
 		this.rightLeg = root.getChild("right_leg");
 		this.leftLeg = root.getChild("left_leg");
 		this.body = root.getChild("body");
@@ -50,9 +49,15 @@ public class RatStriderMountModel<T extends RatStriderMount> extends Hierarchica
 		return LayerDefinition.create(meshdefinition, 64, 128);
 	}
 
-	public void setupAnim(RatStriderMount mount, float limbSwing, float limbSwingAmount, float ageInTicks, float headYaw, float headPitch) {
-		limbSwingAmount = Math.min(0.25F, limbSwingAmount);
-		if (!mount.isVehicle()) {
+	@Override
+	public void setupAnim(StriderRenderState state) {
+		super.setupAnim(state);
+		float limbSwing = state.walkAnimationPos;
+		float limbSwingAmount = Math.min(0.25F, state.walkAnimationSpeed);
+		float ageInTicks = state.ageInTicks;
+		float headYaw = state.yRot;
+		float headPitch = state.xRot;
+		if (!state.isRidden) {
 			this.body.xRot = headPitch * ((float) Math.PI / 180F);
 			this.body.yRot = headYaw * ((float) Math.PI / 180F);
 		} else {
@@ -90,7 +95,4 @@ public class RatStriderMountModel<T extends RatStriderMount> extends Hierarchica
 		this.leftBottomBristle.zRot += 0.05F * Mth.sin(ageInTicks * 1.0F * -0.4F);
 	}
 
-	public ModelPart root() {
-		return this.root;
-	}
 }

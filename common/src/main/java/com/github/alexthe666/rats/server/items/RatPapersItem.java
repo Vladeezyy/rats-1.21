@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.core.UUIDUtil;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.RatsMod;
@@ -18,10 +21,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.UUID;
 
 public class RatPapersItem extends Item {
@@ -35,29 +36,29 @@ public class RatPapersItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		if (!isEntityBound(stack)) {
-			tooltip.add(Component.translatable("item.rats.rat_papers.desc0").withStyle(ChatFormatting.GRAY));
-			tooltip.add(Component.translatable("item.rats.rat_papers.desc1").withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("item.rats.rat_papers.desc0").withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("item.rats.rat_papers.desc1").withStyle(ChatFormatting.GRAY));
 		}
-		tooltip.add(Component.translatable("item.rats.rat_papers.desc2").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("item.rats.rat_papers.desc2").withStyle(ChatFormatting.GRAY));
 		if (ItemNbt.hasTag(stack) && !ItemNbt.view(stack).isEmpty()) {
 			String ratName = I18n.get("entity.rats.tamed_rat");
-			String entity = ItemNbt.view(stack).getString("RatName");
+			String entity = ItemNbt.view(stack).getStringOr("RatName", "");
 			Component rat = Component.empty();
-			if (ItemNbt.view(stack).hasUUID("RatUUID")) {
+			if (ItemNbt.view(stack).read("RatUUID", UUIDUtil.CODEC).isPresent()) {
 				if (entity.isEmpty()) {
-					rat = Component.literal(ratName + " (" + ItemNbt.view(stack).getUUID("RatUUID") + ")").withStyle(ChatFormatting.GRAY);
+					rat = Component.literal(ratName + " (" + ItemNbt.view(stack).read("RatUUID", UUIDUtil.CODEC).orElseThrow() + ")").withStyle(ChatFormatting.GRAY);
 				} else {
 					rat = Component.literal(entity).withStyle(ChatFormatting.GRAY);
 				}
 			}
-			tooltip.add(Component.translatable(RatsLangConstants.RAT_PAPERS_BOUND_RAT, rat.getString()).withStyle(ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable(RatsLangConstants.RAT_PAPERS_BOUND_RAT, rat.getString()).withStyle(ChatFormatting.GRAY));
 		}
 	}
 
 	public static boolean isEntityBound(ItemStack stack) {
-		return ItemNbt.view(stack).hasUUID("RatUUID");
+		return ItemNbt.view(stack).read("RatUUID", UUIDUtil.CODEC).isPresent();
 	}
 
 	@Override
@@ -65,8 +66,8 @@ public class RatPapersItem extends Item {
 		CompoundTag nbt = ItemNbt.getOrEmpty(stack);
 		if (target instanceof Player transferTo) {
 			try {
-				if (nbt.hasUUID("RatUUID")) {
-					UUID ratUUID = nbt.getUUID("RatUUID");
+				if (nbt.read("RatUUID", UUIDUtil.CODEC).isPresent()) {
+					UUID ratUUID = nbt.read("RatUUID", UUIDUtil.CODEC).orElseThrow();
 					if (!target.level().isClientSide()) {
 						Entity entity = target.level().getServer().getLevel(target.level().dimension()).getEntity(ratUUID);
 						if (entity instanceof TamedRat rat) {
@@ -77,10 +78,10 @@ public class RatPapersItem extends Item {
 							}
 						}
 					}
-					return InteractionResult.sidedSuccess(player.level().isClientSide());
+					return InteractionResult.SUCCESS;
 				}
 			} catch (Exception e) {
-				player.displayClientMessage(Component.literal("Couldnt transfer ownership! Check the log and report this!").withStyle(ChatFormatting.RED), true);
+				player.sendOverlayMessage(Component.literal("Couldnt transfer ownership! Check the log and report this!").withStyle(ChatFormatting.RED));
 				RatsMod.LOGGER.error("Couldnt transfer rat ownership to {}!", transferTo.getStringUUID(), e);
 			}
 			return InteractionResult.PASS;
@@ -90,10 +91,10 @@ public class RatPapersItem extends Item {
 			if (rat.hasCustomName()) {
 				nbt.putString("RatName", rat.getCustomName().getString());
 			}
-			nbt.putUUID("RatUUID", rat.getUUID());
+			nbt.store("RatUUID", UUIDUtil.CODEC, rat.getUUID());
 			ItemNbt.setTag(stack, nbt);
 
-			return InteractionResult.sidedSuccess(player.level().isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}

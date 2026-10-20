@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "A": {
-      "item": "minecraft:netherite_helmet"
-    },
-    "B": {
-      "item": "rats:psionic_rat_brain"
-    },
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    }
+    "A": "minecraft:netherite_helmet",
+    "B": "rats:psionic_rat_brain",
+    "I": "rats:oratchalcum_ingot"
   },
   "pattern": [
     "IBI",

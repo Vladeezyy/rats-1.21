@@ -9,7 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.Fireball;
+import net.minecraft.world.entity.projectile.hurtingprojectile.Fireball;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -71,7 +71,7 @@ public class RatlanteanFlame extends Fireball {
 			if (!result.getEntity().fireImmune()) {
 				result.getEntity().igniteForSeconds(10);
 			}
-			boolean flag = result.getEntity().hurt(this.damageSources().fireball(this, this.getOwner()), 2.0F);
+			boolean flag = result.getEntity().hurtOrSimulate(this.damageSources().fireball(this, this.getOwner()), 2.0F);
 			if (flag) {
 				if (this.level() instanceof ServerLevel serverLevel) {
 					EnchantmentHelper.doPostAttackEffects(serverLevel, result.getEntity(), this.damageSources().fireball(this, this.getOwner()));

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "rats:item/marbled_cheese_rat_head",
+    "model": {
+      "type": "rats:block_entity",
+      "block": "marbled_cheese_rat_head"
+    }
+  }
+}

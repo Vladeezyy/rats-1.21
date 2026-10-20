@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "category": "misc",
+  "dye": "#minecraft:dyes",
+  "result": {
+    "id": "rats:party_hat"
+  },
+  "target": "rats:party_hat"
+}

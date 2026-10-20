@@ -64,12 +64,12 @@ public final class StoredItems {
 		}
 		NonNullList<ItemStack> items = NonNullList.withSize(Math.max(27, list.size()), ItemStack.EMPTY);
 		for (int i = 0; i < list.size(); i++) {
-			CompoundTag entry = list.getCompound(i);
-			int slot = entry.getByte("Slot") & 255;
+			CompoundTag entry = list.getCompoundOrEmpty(i);
+			int slot = entry.getByteOr("Slot", (byte) 0) & 255;
 			if (slot < items.size()) {
 				// the entry is a 1.20.1 stack ("Count", "tag"): vanilla's item fixers bring it to this version first
-				Dynamic<Tag> fixed = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, entry), LEGACY_DATA_VERSION, SharedConstants.getCurrentVersion().getDataVersion().getVersion());
-				items.set(slot, ItemStack.parseOptional(registries, (CompoundTag) fixed.getValue()));
+				Dynamic<Tag> fixed = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, entry), LEGACY_DATA_VERSION, SharedConstants.getCurrentVersion().dataVersion().version());
+				items.set(slot, ItemStack.OPTIONAL_CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), fixed.getValue()).result().orElse(ItemStack.EMPTY));
 			}
 		}
 		set(holder, items);
@@ -78,6 +78,6 @@ public final class StoredItems {
 
 	private static ListTag legacyList(ItemStack holder) {
 		CompoundTag tag = ItemNbt.view(holder);
-		return tag.contains("Items", Tag.TAG_LIST) ? tag.getList("Items", Tag.TAG_COMPOUND) : null;
+		return tag.get("Items") instanceof ListTag list ? list : null;
 	}
 }

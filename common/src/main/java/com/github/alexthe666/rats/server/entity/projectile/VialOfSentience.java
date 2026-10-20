@@ -13,7 +13,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,7 +29,7 @@ public class VialOfSentience extends ThrowableItemProjectile {
 	}
 
 	public VialOfSentience(Level level, LivingEntity thrower) {
-		super(RatlantisEntityRegistry.VIAL_OF_SENTIENCE.get(), thrower, level);
+		super(RatlantisEntityRegistry.VIAL_OF_SENTIENCE.get(), thrower, level, new ItemStack(RatlantisItemRegistry.VIAL_OF_SENTIENCE.get()));
 	}
 
 	protected void onHit(HitResult result) {
@@ -45,7 +45,7 @@ public class VialOfSentience extends ThrowableItemProjectile {
 							if (living instanceof FeralRatlantean) {
 								if (RatConfig.summonNeoOnlyInRatlantis && !this.level().dimension().equals(RatlantisDimensionRegistry.DIMENSION_KEY)) {
 									if (this.getOwner() instanceof Player player) {
-										player.displayClientMessage(Component.translatable(RatsLangConstants.NEO_RATLANTIS_ONLY), true);
+										player.sendOverlayMessage(Component.translatable(RatsLangConstants.NEO_RATLANTIS_ONLY));
 									}
 								} else {
 									NeoRatlantean ratlantean = new NeoRatlantean(RatlantisEntityRegistry.NEO_RATLANTEAN.get(), this.level());
@@ -57,7 +57,7 @@ public class VialOfSentience extends ThrowableItemProjectile {
 									}
 								}
 							} else {
-								living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 600, 4));
+								living.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 600, 4));
 								living.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 600));
 								living.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 600));
 							}

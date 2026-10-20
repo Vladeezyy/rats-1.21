@@ -21,11 +21,11 @@ import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.core.dispenser.EquipmentDispenseItemBehavior;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +43,7 @@ public class RatsDispenserRegistry {
 	public static void init() {
 		DispenseItemBehavior hatDispense = new OptionalDispenseItemBehavior() {
 			protected ItemStack execute(BlockSource source, ItemStack stack) {
-				this.setSuccess(ArmorItem.dispenseArmor(source, stack));
+				this.setSuccess(EquipmentDispenseItemBehavior.dispenseEquipment(source, stack));
 				return stack;
 			}
 		};
@@ -79,7 +79,7 @@ public class RatsDispenserRegistry {
 					stack.shrink(1);
 					this.setSuccess(true);
 				} else {
-					this.setSuccess(ArmorItem.dispenseArmor(source, stack));
+					this.setSuccess(EquipmentDispenseItemBehavior.dispenseEquipment(source, stack));
 				}
 
 				return stack;
@@ -174,12 +174,12 @@ public class RatsDispenserRegistry {
 			protected ItemStack execute(BlockSource source, ItemStack stack) {
 				BlockPos blockpos = source.pos().relative(source.state().getValue(DispenserBlock.FACING));
 
-				for (Villager villager : source.level().getEntitiesOfClass(Villager.class, new AABB(blockpos), villager -> villager.isAlive() && !villager.isBaby() && (villager.getVillagerData().getProfession() == VillagerProfession.NITWIT || villager.getVillagerData().getProfession() == VillagerProfession.NONE))) {
+				for (Villager villager : source.level().getEntitiesOfClass(Villager.class, new AABB(blockpos), villager -> villager.isAlive() && !villager.isBaby() && (villager.getVillagerData().profession().is(VillagerProfession.NITWIT) || villager.getVillagerData().profession().is(VillagerProfession.NONE)))) {
 					PlagueDoctor doctor = new PlagueDoctor(RatsEntityRegistry.PLAGUE_DOCTOR.get(), source.level());
 					doctor.copyPosition(villager);
 					villager.discard();
 					doctor.setWillDespawn(false);
-					Platform.INSTANCE.finalizeMobSpawn(doctor, source.level(), source.level().getCurrentDifficultyAt(source.pos()), MobSpawnType.CONVERSION, null);
+					Platform.INSTANCE.finalizeMobSpawn(doctor, source.level(), source.level().getCurrentDifficultyAt(source.pos()), EntitySpawnReason.CONVERSION, null);
 					source.level().addFreshEntity(doctor);
 					doctor.setNoAi(villager.isNoAi());
 					if (villager.hasCustomName()) {
@@ -209,7 +209,7 @@ public class RatsDispenserRegistry {
 					BlackDeath death = new BlackDeath(RatsEntityRegistry.BLACK_DEATH.get(), source.level());
 					death.copyPosition(doctor);
 					doctor.discard();
-					Platform.INSTANCE.finalizeMobSpawn(death, source.level(), source.level().getCurrentDifficultyAt(source.pos()), MobSpawnType.CONVERSION, null);
+					Platform.INSTANCE.finalizeMobSpawn(death, source.level(), source.level().getCurrentDifficultyAt(source.pos()), EntitySpawnReason.CONVERSION, null);
 					source.level().addFreshEntity(death);
 					death.setNoAi(doctor.isNoAi());
 					if (doctor.hasCustomName()) {

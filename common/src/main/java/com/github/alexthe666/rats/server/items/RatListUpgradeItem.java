@@ -1,17 +1,15 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import com.github.alexthe666.rats.server.misc.StoredItems;
-import com.github.alexthe666.rats.server.misc.ItemNbt;
 import com.github.alexthe666.rats.server.inventory.RatUpgradeMenu;
 import com.github.alexthe666.rats.server.inventory.container.RatUpgradeContainer;
 import com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +20,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class RatListUpgradeItem extends BaseRatUpgradeItem {
 
@@ -31,7 +28,7 @@ public class RatListUpgradeItem extends BaseRatUpgradeItem {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 		if (!player.isShiftKeyDown()) {
 			if (!level.isClientSide()) {
@@ -48,12 +45,12 @@ public class RatListUpgradeItem extends BaseRatUpgradeItem {
 				});
 			}
 		}
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		super.appendHoverText(stack, level, tooltip, flag);
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, display, tooltip, flag);
 		if (StoredItems.has(stack)) {
 			NonNullList<ItemStack> nonnulllist = StoredItems.view(stack, 27);
 			int i = 0;
@@ -61,7 +58,7 @@ public class RatListUpgradeItem extends BaseRatUpgradeItem {
 				if (!itemstack.isEmpty()) {
 					if (i <= 4) {
 						++i;
-						tooltip.add(Component.literal(String.format("%s", itemstack.getDisplayName().getString())));
+						tooltip.accept(Component.literal(String.format("%s", itemstack.getDisplayName().getString())));
 					}
 				}
 			}

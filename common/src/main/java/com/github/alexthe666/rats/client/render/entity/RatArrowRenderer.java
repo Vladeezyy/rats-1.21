@@ -4,18 +4,23 @@ import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.server.entity.projectile.RatArrow;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.ArrowRenderState;
+import net.minecraft.resources.Identifier;
 
-public class RatArrowRenderer extends ArrowRenderer<RatArrow> {
-
-	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat_arrow.png");
+public class RatArrowRenderer extends ArrowRenderer<RatArrow, ArrowRenderState> {
+	private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat_arrow.png");
 
 	public RatArrowRenderer(EntityRendererProvider.Context context) {
 		super(context);
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(RatArrow entity) {
+	public ArrowRenderState createRenderState() {
+		return new ArrowRenderState();
+	}
+
+	@Override
+	protected Identifier getTextureLocation(ArrowRenderState state) {
 		return TEXTURE;
 	}
 }

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "rats:assorted_vegetables"
-    },
-    "F": {
-      "tag": "minecraft:flowers"
-    }
+    "A": "rats:assorted_vegetables",
+    "F": "#minecraft:flowers"
   },
   "pattern": [
     "FFF",

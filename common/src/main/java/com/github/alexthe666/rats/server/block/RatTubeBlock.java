@@ -1,9 +1,11 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ScheduledTickAccess;
 
 import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatTubeBlockEntity;
@@ -44,7 +46,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -287,9 +288,9 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected @NotNull InteractionResult useItemOn(@NotNull ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (player.isCrouching() || player.getItemInHand(hand).getItem() instanceof BlockItem || player.getItemInHand(hand).getItem() instanceof RatTubeItem) {
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		} else {
 			Direction side = hit.getDirection();
 			BooleanProperty changing;
@@ -321,7 +322,7 @@ public class RatTubeBlock extends BaseEntityBlock {
 						.setValue(OPEN_DOWN, false));
 				updateTEOpening(level, pos, side, false);
 			}
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 	}
 
@@ -375,7 +376,7 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
 		BooleanProperty notOpen;
 		BooleanProperty connect;
 		switch (facing) {

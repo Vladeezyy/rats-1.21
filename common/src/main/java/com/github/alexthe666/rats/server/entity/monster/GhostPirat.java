@@ -1,10 +1,12 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
 
 import com.github.alexthe666.rats.data.ratlantis.tags.RatlantisBlockTags;
 import com.github.alexthe666.rats.registry.RatlantisItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -34,8 +36,8 @@ public class GhostPirat extends AbstractRat implements Enemy {
 				.add(Attributes.FOLLOW_RANGE, 16.0D);
 	}
 
-	public static boolean checkGhostPiratSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor world, MobSpawnType reason, BlockPos pos, RandomSource rand) {
-		return canSpawnAtPos(world, pos) || reason == MobSpawnType.SPAWNER;
+	public static boolean checkGhostPiratSpawnRules(EntityType<? extends Mob> entityType, LevelAccessor world, EntitySpawnReason reason, BlockPos pos, RandomSource rand) {
+		return canSpawnAtPos(world, pos) || reason == EntitySpawnReason.SPAWNER;
 	}
 
 	private static boolean canSpawnAtPos(LevelAccessor world, BlockPos pos) {
@@ -47,7 +49,7 @@ public class GhostPirat extends AbstractRat implements Enemy {
 		this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return true;
 	}
@@ -57,7 +59,7 @@ public class GhostPirat extends AbstractRat implements Enemy {
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData data) {
 		data = super.finalizeSpawn(level, difficulty, reason, data);
 		this.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_CUTLASS.get()));
 		this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(RatlantisItemRegistry.GHOST_PIRAT_HAT.get()));
@@ -66,5 +68,14 @@ public class GhostPirat extends AbstractRat implements Enemy {
 
 	public boolean isTame() {
 		return false;
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+			this.discard();
+		} else {
+			super.checkDespawn();
+		}
 	}
 }

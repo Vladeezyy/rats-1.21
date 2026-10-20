@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "B": {
-      "item": "minecraft:iron_bars"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "W": {
-      "tag": "c:crops/wheat"
-    }
+    "B": "minecraft:iron_bars",
+    "I": "#c:ingots/iron",
+    "W": "#c:crops/wheat"
   },
   "pattern": [
     "BBB",

@@ -2,6 +2,8 @@ package dev.vladeezyy.rats.platform.transfer;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.function.Predicate;
 
@@ -21,8 +23,18 @@ public class FluidTank implements FluidHandler {
     }
 
     public FluidTank readFromNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.fluid = FluidStack.parseOptional(provider, tag.getCompound("Fluid"));
+        this.fluid = FluidStack.parseOptional(provider, tag.getCompoundOrEmpty("Fluid"));
         return this;
+    }
+
+    public void load(ValueInput input) {
+        this.fluid = input.read("Fluid", FluidStack.CODEC).orElse(FluidStack.EMPTY);
+    }
+
+    public void save(ValueOutput output) {
+        if (!this.fluid.isEmpty()) {
+            output.store("Fluid", FluidStack.CODEC, this.fluid);
+        }
     }
 
     public CompoundTag writeToNBT(HolderLookup.Provider provider, CompoundTag tag) {

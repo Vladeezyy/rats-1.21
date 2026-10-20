@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "rats:item/rat_igloo_cyan",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -14125417
+      },
+      {
+        "type": "minecraft:constant",
+        "value": -14125417
+      }
+    ]
+  }
+}

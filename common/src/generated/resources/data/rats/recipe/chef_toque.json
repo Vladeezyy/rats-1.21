@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "S": {
-      "tag": "c:strings"
-    },
-    "W": {
-      "item": "minecraft:white_wool"
-    }
+    "S": "#c:strings",
+    "W": "minecraft:white_wool"
   },
   "pattern": [
     "WW",

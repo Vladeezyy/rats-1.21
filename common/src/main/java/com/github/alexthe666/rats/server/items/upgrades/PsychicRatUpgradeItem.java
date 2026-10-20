@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatConfig;
@@ -36,7 +38,7 @@ public class PsychicRatUpgradeItem extends StatBoostingRatUpgradeItem implements
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		if (!rat.hasItemInSlot(EquipmentSlot.HEAD)) {
 			stack.pushPose();
 			this.translateToHead(model, stack);
@@ -44,7 +46,7 @@ public class PsychicRatUpgradeItem extends StatBoostingRatUpgradeItem implements
 			stack.mulPose(Axis.XP.rotationDegrees(180F));
 			stack.mulPose(Axis.YP.rotationDegrees(180F));
 			stack.scale(0.9F, 0.9F, 0.9F);
-			context.getItemRenderer().renderStatic(new ItemStack(RatlantisBlockRegistry.BRAIN_BLOCK.get()), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, null, rat.getId());
+			context.item(new ItemStack(RatlantisBlockRegistry.BRAIN_BLOCK.get()), ItemDisplayContext.GROUND, rat, stack, buffer, light);
 			stack.popPose();
 		}
 	}

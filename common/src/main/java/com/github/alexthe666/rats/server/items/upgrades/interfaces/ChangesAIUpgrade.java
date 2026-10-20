@@ -1,6 +1,5 @@
 package com.github.alexthe666.rats.server.items.upgrades.interfaces;
 
-import com.github.alexthe666.rats.server.entity.ai.goal.RatWorkGoal;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import net.minecraft.world.entity.ai.goal.Goal;
 

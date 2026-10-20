@@ -1,0 +1,82 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "rats:special",
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "rats:item/ratbow_essence"
+    },
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_agender"
+        },
+        "threshold": 1.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_aro"
+        },
+        "threshold": 2.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_ace"
+        },
+        "threshold": 3.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_bi"
+        },
+        "threshold": 4.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_gay"
+        },
+        "threshold": 5.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_genderfluid"
+        },
+        "threshold": 6.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_enby"
+        },
+        "threshold": 7.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_lesbian"
+        },
+        "threshold": 8.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_pan"
+        },
+        "threshold": 9.0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "rats:item/ratbow_essence_trans"
+        },
+        "threshold": 10.0
+      }
+    ]
+  }
+}

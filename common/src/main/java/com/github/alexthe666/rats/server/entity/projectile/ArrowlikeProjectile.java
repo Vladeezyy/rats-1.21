@@ -1,14 +1,15 @@
 package com.github.alexthe666.rats.server.entity.projectile;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import dev.vladeezyy.rats.platform.Platform;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -66,8 +67,8 @@ public abstract class ArrowlikeProjectile extends Projectile {
 	}
 
 	@Override
-	public void lerpMotion(double xMotion, double yMotion, double zMotion) {
-		super.lerpMotion(xMotion, yMotion, zMotion);
+	public void lerpMotion(Vec3 movement) {
+		super.lerpMotion(movement);
 		this.life = 0;
 	}
 
@@ -155,7 +156,7 @@ public abstract class ArrowlikeProjectile extends Projectile {
 			}
 
 			this.setPos(d7, d2, d3);
-			this.checkInsideBlocks();
+			this.applyEffectsFromBlocks();
 		}
 	}
 
@@ -210,7 +211,7 @@ public abstract class ArrowlikeProjectile extends Projectile {
 			entity.igniteForSeconds(5);
 		}
 
-		if (entity.hurt(damagesource, (float) i)) {
+		if (entity.hurtOrSimulate(damagesource, (float) i)) {
 			if (flag) {
 				return;
 			}
@@ -244,18 +245,16 @@ public abstract class ArrowlikeProjectile extends Projectile {
 	protected void onHitBlock(BlockHitResult result) {
 		this.discard();
 		if (this.explodesOnHit()) {
-			Explosion explosion = this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
-			explosion.explode();
-			explosion.finalizeExplosion(true);
+			this.level().explode(this.getOwner(), this.getX(), this.getY(), this.getZ(), 0.0F, Level.ExplosionInteraction.MOB);
 		}
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag tag) {
+	public void addAdditionalSaveData(ValueOutput tag) {
 		super.addAdditionalSaveData(tag);
 		tag.putShort("life", (short) this.life);
 		if (this.lastState != null) {
-			tag.put("inBlockState", NbtUtils.writeBlockState(this.lastState));
+			Values.put(tag, "inBlockState", NbtUtils.writeBlockState(this.lastState));
 		}
 
 		tag.putByte("shake", (byte) this.shakeTime);
@@ -264,17 +263,17 @@ public abstract class ArrowlikeProjectile extends Projectile {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag tag) {
+	public void readAdditionalSaveData(ValueInput tag) {
 		super.readAdditionalSaveData(tag);
-		this.life = tag.getShort("life");
-		if (tag.contains("inBlockState", 10)) {
-			this.lastState = NbtUtils.readBlockState(this.level().holderLookup(Registries.BLOCK), tag.getCompound("inBlockState"));
+		this.life = tag.getShortOr("life", (short) 0);
+		if (Values.contains(tag, "inBlockState")) {
+			this.lastState = NbtUtils.readBlockState(this.level().holderLookup(Registries.BLOCK), Values.compound(tag, "inBlockState"));
 		}
 
-		this.shakeTime = tag.getByte("shake") & 255;
-		this.inGround = tag.getBoolean("inGround");
-		if (tag.contains("damage", 99)) {
-			this.baseDamage = tag.getDouble("damage");
+		this.shakeTime = tag.getByteOr("shake", (byte) 0) & 255;
+		this.inGround = tag.getBooleanOr("inGround", false);
+		if (Values.contains(tag, "damage")) {
+			this.baseDamage = tag.getDoubleOr("damage", 0.0D);
 		}
 	}
 

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "F": {
-      "tag": "minecraft:flowers"
-    },
-    "S": {
-      "tag": "c:seeds"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "F": "#minecraft:flowers",
+    "S": "#c:seeds",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "SFS",

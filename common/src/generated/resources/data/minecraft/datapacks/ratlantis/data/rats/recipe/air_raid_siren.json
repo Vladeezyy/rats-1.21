@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "rats:ratbot_barrel"
-    },
-    "I": {
-      "item": "rats:oratchalcum_ingot"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "B": "rats:ratbot_barrel",
+    "I": "rats:oratchalcum_ingot",
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     " S ",

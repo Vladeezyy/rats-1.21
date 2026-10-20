@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ScheduledTickAccess;
 
 import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
@@ -142,7 +144,7 @@ public class RatHoleBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
 		BooleanProperty connect = switch (facing) {
 			case NORTH -> NORTH;
 			case SOUTH -> SOUTH;

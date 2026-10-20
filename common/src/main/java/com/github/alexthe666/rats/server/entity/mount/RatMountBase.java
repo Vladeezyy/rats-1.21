@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.mount;
+import net.minecraft.server.level.ServerLevel;
 
 import com.github.alexthe666.rats.server.entity.AdjustsRatTail;
 import com.github.alexthe666.rats.server.entity.RatMount;
@@ -15,10 +16,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.boat.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,13 +79,13 @@ public abstract class RatMountBase extends PathfinderMob implements RatMount, Ad
 		return null;
 	}
 
-	public boolean isInvulnerableTo(DamageSource source) {
+	public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
 		if (source.is(DamageTypes.IN_WALL)) return true;
 		TamedRat rat = this.getRat();
 		if (rat != null) {
-			return rat.isInvulnerableTo(source);
+			return rat.isInvulnerableTo((net.minecraft.server.level.ServerLevel) rat.level(), source);
 		}
-		return super.isInvulnerableTo(source);
+		return super.isInvulnerableTo(level, source);
 	}
 
 	public double getPassengersRidingOffset() {
@@ -164,8 +164,8 @@ public abstract class RatMountBase extends PathfinderMob implements RatMount, Ad
 		super.remove(reason);
 	}
 
-	public boolean isAlliedTo(Entity entity) {
-		return super.isAlliedTo(entity) || this.getRat() != null && this.getRat().isAlliedTo(entity);
+	protected boolean considersEntityAsAlly(Entity entity) {
+		return super.considersEntityAsAlly(entity) || this.getRat() != null && this.getRat().isAlliedTo(entity);
 	}
 
 	@Override

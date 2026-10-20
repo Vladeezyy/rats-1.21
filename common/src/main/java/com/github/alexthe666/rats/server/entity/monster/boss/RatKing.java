@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.entity.monster.boss;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.RatConfig;
@@ -8,7 +11,6 @@ import com.github.alexthe666.rats.server.entity.RatSummoner;
 import com.github.alexthe666.rats.server.entity.projectile.RatShot;
 import com.github.alexthe666.rats.server.misc.RatVariant;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -124,14 +126,14 @@ public class RatKing extends Monster implements RatSummoner {
 		if (!this.isRemoved() && !this.dead) {
 			Entity entity = source.getEntity();
 			LivingEntity livingentity = this.getKillCredit();
-			if (this.deathScore >= 0 && livingentity != null) {
-				livingentity.awardKillScore(this, this.deathScore, source);
+			if (livingentity != null) {
+				livingentity.awardKillScore(this, source);
 			}
 
 			this.dead = true;
 			this.getCombatTracker().recheckStatus();
 			if (this.level() instanceof ServerLevel server) {
-				if (entity == null || entity.killedEntity(server, this)) {
+				if (entity == null || entity.killedEntity(server, this, source)) {
 					this.gameEvent(GameEvent.ENTITY_DIE);
 					//this.dropAllDeathLoot(source);
 					this.createWitherRose(livingentity);
@@ -192,7 +194,7 @@ public class RatKing extends Monster implements RatSummoner {
 
 	@Override
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData) {
 		spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData);
 		for (int i = 0; i < RAT_COUNT; i++) {
 			int color = this.getRandom().nextInt(4);
@@ -207,17 +209,17 @@ public class RatKing extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putString("RatColors", this.getRatColorsString());
 		compound.putInt("RatsSummoned", this.getRatsSummoned());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setRatsSummoned(compound.getInt("RatsSummoned"));
-		this.setRatColorsString(compound.getString("RatColors"));
+		this.setRatsSummoned(compound.getIntOr("RatsSummoned", 0));
+		this.setRatColorsString(compound.getStringOr("RatColors", ""));
 	}
 
 	private void setRatColorsString(String str) {
@@ -249,7 +251,7 @@ public class RatKing extends Monster implements RatSummoner {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level from, Level to) {
+	public boolean canTeleport(Level from, Level to) {
 		return false;
 	}
 

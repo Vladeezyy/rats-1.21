@@ -64,7 +64,7 @@ public class RatRaidChestsGoal extends RatMoveToBlockGoal {
 						ItemStack duplicate = stack.copy();
 						duplicate.setCount(1);
 						if (!this.rat.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
-							this.rat.spawnAtLocation(this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
+							this.rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.rat.level(), this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
 						}
 						this.rat.setItemInHand(InteractionHand.MAIN_HAND, duplicate);
 						stack.shrink(1);

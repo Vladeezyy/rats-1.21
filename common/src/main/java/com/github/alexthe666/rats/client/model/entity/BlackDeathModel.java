@@ -1,16 +1,18 @@
 package com.github.alexthe666.rats.client.model.entity;
 
-import com.github.alexthe666.rats.server.entity.monster.boss.BlackDeath;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import com.github.alexthe666.rats.client.render.entity.BlackDeathRenderer;
 import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public class BlackDeathModel<T extends BlackDeath> extends HumanoidModel<T> {
+public class BlackDeathModel extends HumanoidModel<BlackDeathRenderer.State> {
 	public final ModelPart arms;
 
 	public BlackDeathModel(ModelPart root) {
@@ -29,7 +31,6 @@ public class BlackDeathModel<T extends BlackDeath> extends HumanoidModel<T> {
 						.addBox(-7.0F, -7.0F, -7.0F, 14.0F, 0.0F, 14.0F),
 				PartPose.offset(0.0F, 0.0F, 0.0F));
 
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		PartDefinition nose = head.addOrReplaceChild("nose", CubeListBuilder.create()
 						.texOffs(28, 42)
@@ -77,40 +78,38 @@ public class BlackDeathModel<T extends BlackDeath> extends HumanoidModel<T> {
 						.addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F),
 				PartPose.offset(-2.0F, 12.0F, 0.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(meshdefinition, 64, 64);
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw * Mth.DEG_TO_RAD;
-		this.head.xRot = headPitch * Mth.DEG_TO_RAD;
+	public void setupAnim(BlackDeathRenderer.State state) {
+		this.resetPose();
+		float limbSwing = state.walkAnimationPos;
+		float limbSwingAmount = state.walkAnimationSpeed;
+		this.head.yRot = state.yRot * Mth.DEG_TO_RAD;
+		this.head.xRot = state.xRot * Mth.DEG_TO_RAD;
 		this.rightLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
 		this.leftLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount * 0.5F;
 		this.rightLeg.yRot = 0.0F;
 		this.leftLeg.yRot = 0.0F;
-		if (entity.isSummoning()) {
-			this.rightArm.xRot = Mth.cos(ageInTicks * 0.6662F) * 0.25F;
-			this.leftArm.xRot = Mth.cos(ageInTicks * 0.6662F) * 0.25F;
+		if (state.summoning) {
+			this.rightArm.xRot = Mth.cos(state.ageInTicks * 0.6662F) * 0.25F;
+			this.leftArm.xRot = Mth.cos(state.ageInTicks * 0.6662F) * 0.25F;
 			this.rightArm.zRot = 135.0F * Mth.DEG_TO_RAD;
 			this.leftArm.zRot = -135.0F * Mth.DEG_TO_RAD;
 			this.rightArm.yRot = Mth.PI;
 			this.leftArm.yRot = Mth.PI;
+		} else if (state.meleeAttacking) {
+			AnimationUtils.swingWeaponDown(this.rightArm, this.leftArm, state.mainArm, state.attackTime, state.ageInTicks);
 		} else {
-			if (entity.isMeleeAttacking()) {
-				AnimationUtils.swingWeaponDown(this.rightArm, this.leftArm, entity, this.attackTime, ageInTicks);
-			} else {
-				this.rightArm.setRotation(0.0F, 0.0F, 0.0F);
-				this.leftArm.setRotation(0.0F, 0.0F, 0.0F);
-			}
+			this.rightArm.setRotation(0.0F, 0.0F, 0.0F);
+			this.leftArm.setRotation(0.0F, 0.0F, 0.0F);
 		}
-		boolean flag = entity.isSummoning() || entity.isMeleeAttacking();
+		boolean flag = state.summoning || state.meleeAttacking;
 		this.arms.visible = !flag;
 		this.leftArm.visible = flag;
 		this.rightArm.visible = flag;
-	}
-
-	@Override
-	protected Iterable<ModelPart> bodyParts() {
-		return Iterables.concat(super.bodyParts(), ImmutableList.of(this.arms));
 	}
 }

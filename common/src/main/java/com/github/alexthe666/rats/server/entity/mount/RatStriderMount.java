@@ -1,7 +1,7 @@
 package com.github.alexthe666.rats.server.entity.mount;
 
 import com.github.alexthe666.rats.RatsMod;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import dev.vladeezyy.rampart.client.model.AdvancedModelBox;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
@@ -35,11 +35,10 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
-import java.util.UUID;
 
 public class RatStriderMount extends RatMountBase {
 
-	private static final ResourceLocation SUFFOCATING_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "strider_suffocating");
+	private static final Identifier SUFFOCATING_MODIFIER_ID = Identifier.fromNamespaceAndPath(RatsMod.MODID, "strider_suffocating");
 	private static final AttributeModifier SUFFOCATING_MODIFIER = new AttributeModifier(SUFFOCATING_MODIFIER_ID, -0.34F, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 	private static final EntityDataAccessor<Boolean> DATA_SUFFOCATING = SynchedEntityData.defineId(RatStriderMount.class, EntityDataSerializers.BOOLEAN);
 
@@ -47,8 +46,8 @@ public class RatStriderMount extends RatMountBase {
 		super(type, level);
 		this.setPathfindingMalus(PathType.WATER, -1.0F);
 		this.setPathfindingMalus(PathType.LAVA, 0.0F);
-		this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
-		this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
+		this.setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 0.0F);
+		this.setPathfindingMalus(PathType.FIRE, 0.0F);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -106,7 +105,7 @@ public class RatStriderMount extends RatMountBase {
 
 	@Override
 	protected void checkFallDamage(double yDistance, boolean onGround, BlockState state, BlockPos pos) {
-		this.checkInsideBlocks();
+		this.applyEffectsFromBlocks();
 		if (this.isInLava()) {
 			this.resetFallDistance();
 		} else {
@@ -126,13 +125,13 @@ public class RatStriderMount extends RatMountBase {
 
 		super.tick();
 		this.floatStrider();
-		this.checkInsideBlocks();
+		this.applyEffectsFromBlocks();
 	}
 
 	private void floatStrider() {
 		if (this.isInLava()) {
 			CollisionContext collisioncontext = CollisionContext.of(this);
-			if (collisioncontext.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+			if (collisioncontext.isAbove(this.getLiquidCollisionShape(), this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
 				this.setOnGround(true);
 			} else {
 				this.setDeltaMovement(this.getDeltaMovement().scale(0.5D).add(0.0D, 0.05D, 0.0D));
@@ -197,7 +196,7 @@ public class RatStriderMount extends RatMountBase {
 		}
 
 		protected boolean hasValidPathType(PathType types) {
-			return types == PathType.LAVA || types == PathType.DAMAGE_FIRE || types == PathType.DANGER_FIRE || super.hasValidPathType(types);
+			return types == PathType.LAVA || types == PathType.FIRE || types == PathType.FIRE_IN_NEIGHBOR || super.hasValidPathType(types);
 		}
 
 		public boolean isStableDestination(BlockPos pos) {

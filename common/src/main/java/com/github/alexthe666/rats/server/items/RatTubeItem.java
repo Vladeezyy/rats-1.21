@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import net.minecraft.world.item.BlockItem;
 import com.github.alexthe666.rats.server.misc.ItemNbt;
@@ -8,7 +10,6 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -22,13 +23,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class RatTubeItem extends Item {
 	public final DyeColor color;
@@ -38,16 +37,16 @@ public class RatTubeItem extends Item {
 		this.color = color;
 	}
 
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip, TooltipFlag flagIn) {
-		tooltip.add(Component.translatable("block.rats.rat_tube.desc0").withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable("block.rats.rat_tube.desc1").withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable("block.rats.rat_tube.desc2").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
+		tooltip.accept(Component.translatable("block.rats.rat_tube.desc0").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("block.rats.rat_tube.desc1").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("block.rats.rat_tube.desc2").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		InteractionResult actionresulttype = this.tryPlace(new BlockPlaceContext(context));
-		return actionresulttype != InteractionResult.SUCCESS && this.components().has(net.minecraft.core.component.DataComponents.FOOD) ? this.use(context.getLevel(), context.getPlayer(), context.getHand()).getResult() : actionresulttype;
+		return actionresulttype != InteractionResult.SUCCESS && this.components().has(net.minecraft.core.component.DataComponents.FOOD) ? this.use(context.getLevel(), context.getPlayer(), context.getHand()) : actionresulttype;
 	}
 
 	public InteractionResult tryPlace(BlockPlaceContext context) {
@@ -94,13 +93,13 @@ public class RatTubeItem extends Item {
 		BlockState blockstate = state;
 		CompoundTag compoundnbt = ItemNbt.getTag(stack);
 		if (compoundnbt != null) {
-			CompoundTag compoundnbt1 = compoundnbt.getCompound("BlockStateTag");
+			CompoundTag compoundnbt1 = compoundnbt.getCompoundOrEmpty("BlockStateTag");
 			StateDefinition<Block, BlockState> statecontainer = state.getBlock().getStateDefinition();
 
-			for (String s : compoundnbt1.getAllKeys()) {
+			for (String s : compoundnbt1.keySet()) {
 				Property<?> iproperty = statecontainer.getProperty(s);
 				if (iproperty != null) {
-					String s1 = compoundnbt1.get(s).getAsString();
+					String s1 = compoundnbt1.getStringOr(s, "");
 					blockstate = remapProperties(blockstate, iproperty, s1);
 				}
 			}

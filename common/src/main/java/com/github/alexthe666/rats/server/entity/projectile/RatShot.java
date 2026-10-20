@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.entity.projectile;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.registry.RatsEntityRegistry;
@@ -12,7 +16,6 @@ import com.github.alexthe666.rats.server.misc.RatVariant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -20,7 +23,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.EntityHitResult;
@@ -41,23 +43,25 @@ public class RatShot extends ThrowableProjectile {
 	}
 
 	public RatShot(EntityType<? extends ThrowableProjectile> type, Level level, LivingEntity thrower) {
-		super(type, thrower, level);
+		// 26.x: no owner constructor; 1.21.1's did this
+		super(type, thrower.getX(), thrower.getEyeY() - 0.1F, thrower.getZ(), level);
+		this.setOwner(thrower);
 	}
 
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		compound.putString("RatColor", RatVariant.getVariantId(this.getColorVariant()));
 	}
 
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
-		this.setColorVariant(RatVariant.getVariant(compound.getString("RatColor")));
+		this.setColorVariant(RatVariant.getVariant(compound.getStringOr("RatColor", "")));
 	}
 
 	public void handleEntityEvent(byte id) {
 		if (id == 3) {
 			for (int i = 0; i < 18; ++i) {
-				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(RatsItemRegistry.CHEESE.get())), this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
+				this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, RatsItemRegistry.CHEESE.get()), this.getX(), this.getY(), this.getZ(), ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D, ((double) this.random.nextFloat() - 0.5D) * 0.08D);
 			}
 		}
 	}
@@ -100,13 +104,13 @@ public class RatShot extends ThrowableProjectile {
 				} else if (thrower instanceof Mob mob) {
 					rat.setTarget(mob.getTarget());
 					rat.setTame(false, true);
-					rat.setOwnerUUID(mob.getUUID());
+					rat.setOwnerReference(EntityReference.of(mob.getUUID()));
 				}
 				if (thrower instanceof RatSummoner ratter) {
 					ratter.setRatsSummoned(ratter.getRatsSummoned() + 1);
 				}
 				if (this.level() instanceof ServerLevelAccessor accessor) {
-					Platform.INSTANCE.finalizeMobSpawn(rat, accessor, this.level().getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.REINFORCEMENT, null);
+					Platform.INSTANCE.finalizeMobSpawn(rat, accessor, ((net.minecraft.world.level.ServerLevelAccessor) this.level()).getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.REINFORCEMENT, null);
 				}
 				rat.setColorVariant(this.getColorVariant());
 				if (rat instanceof Rat plagueable) {

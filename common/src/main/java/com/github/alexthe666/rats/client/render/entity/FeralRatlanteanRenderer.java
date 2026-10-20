@@ -7,16 +7,15 @@ import com.github.alexthe666.rats.client.render.entity.layer.GlowingOverlayLayer
 import com.github.alexthe666.rats.server.entity.monster.FeralRatlantean;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public class FeralRatlanteanRenderer extends MobRenderer<FeralRatlantean, FeralRatlanteanModel<FeralRatlantean>> {
-	private static final ResourceLocation BLUE_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_blue.png");
-	private static final ResourceLocation BLACK_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_black.png");
-	private static final ResourceLocation BROWN_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_brown.png");
-	private static final ResourceLocation GREEN_TEXTURE = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_green.png");
-	private static final ResourceLocation CLOTHES = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_clothes.png");
-	private static final ResourceLocation EYES = ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_eyes.png");
+public class FeralRatlanteanRenderer extends RatsMobRenderer<FeralRatlantean, FeralRatlanteanModel<FeralRatlantean>> {
+	private static final Identifier BLUE_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_blue.png");
+	private static final Identifier BLACK_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_black.png");
+	private static final Identifier BROWN_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_brown.png");
+	private static final Identifier GREEN_TEXTURE = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_green.png");
+	private static final Identifier CLOTHES = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_clothes.png");
+	private static final Identifier EYES = Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/beasts/feral_ratlantean_eyes.png");
 
 	public FeralRatlanteanRenderer(EntityRendererProvider.Context context) {
 		super(context, new FeralRatlanteanModel<>(), 0.5F);
@@ -24,11 +23,13 @@ public class FeralRatlanteanRenderer extends MobRenderer<FeralRatlantean, FeralR
 		this.addLayer(new GlowingOverlayLayer<>(this, EYES));
 	}
 
-	protected void scale(FeralRatlantean rat, PoseStack stack, float partialTickTime) {
+	@Override
+	protected void scale(RatsMobRenderState state, PoseStack stack) {
 		stack.scale(1.2F, 1.2F, 1.2F);
 	}
 
-	public ResourceLocation getTextureLocation(FeralRatlantean entity) {
+	@Override
+	protected Identifier getTexture(FeralRatlantean entity) {
 		return switch (entity.getColorVariant()) {
 			case 1 -> BLACK_TEXTURE;
 			case 2 -> BROWN_TEXTURE;

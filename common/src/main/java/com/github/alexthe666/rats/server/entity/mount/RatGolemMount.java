@@ -68,9 +68,9 @@ public class RatGolemMount extends RatMountBase {
 		}
 	}
 
-	public boolean hurt(DamageSource source, float amount) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		Cracks irongolementity$cracks = this.getCracks();
-		boolean flag = super.hurt(source, amount);
+		boolean flag = super.hurtOrSimulate(source, amount);
 		if (flag && this.getCracks() != irongolementity$cracks) {
 			this.playSound(SoundEvents.IRON_GOLEM_DAMAGE, 1.0F, 1.0F);
 		}
@@ -101,10 +101,10 @@ public class RatGolemMount extends RatMountBase {
 		return RatGolemMount.Cracks.byFraction(this.getHealth() / this.getMaxHealth());
 	}
 
-	public boolean doHurtTarget(Entity entity) {
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
 		this.attackTimer = 10;
 		this.level().broadcastEntityEvent(this, (byte) 4);
-		boolean flag = entity.hurt(this.damageSources().mobAttack(this), (float) (7 + this.getRandom().nextInt(15)));
+		boolean flag = entity.hurtOrSimulate(this.damageSources().mobAttack(this), (float) (7 + this.getRandom().nextInt(15)));
 		if (flag) {
 			entity.setDeltaMovement(entity.getDeltaMovement().add(0.0D, 0.4F, 0.0D));
 			if (this.level() instanceof ServerLevel serverLevel) {

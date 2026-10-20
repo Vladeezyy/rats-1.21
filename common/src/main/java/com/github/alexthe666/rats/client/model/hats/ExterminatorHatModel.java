@@ -15,7 +15,6 @@ public class ExterminatorHatModel extends AbstractHatModel {
 		PartDefinition partdefinition = meshdefinition.getRoot();
 
 		partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
 		PartDefinition hat = partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create()
 				.texOffs(0, 0).addBox(-3.5F, -35.5F, -3.0F, 7.0F, 3.0F, 8.0F)
@@ -24,6 +23,8 @@ public class ExterminatorHatModel extends AbstractHatModel {
 
 		hat.addOrReplaceChild("cig", CubeListBuilder.create().texOffs(54, 0).addBox(-0.5F, -24.5F, 0.0F, 1.0F, 1.0F, 4.0F), PartPose.offsetAndRotation(-1.5F, -1.0F, -4.0F, 0.1745F, 0.2618F, 0.0F));
 
+		// 26.x: the humanoid hat part is a child of the head
+		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}
 }

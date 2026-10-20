@@ -13,7 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -66,7 +66,7 @@ public class RatRaidCropsGoal extends RatMoveToBlockGoal {
 							ItemStack duplicate = stack.copy();
 							duplicate.setCount(1);
 							if (!this.rat.getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && !this.rat.level().isClientSide()) {
-								this.rat.spawnAtLocation(this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
+								this.rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.rat.level(), this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
 							}
 							this.rat.setItemInHand(InteractionHand.MAIN_HAND, duplicate);
 							drops.remove(stack);
@@ -74,7 +74,7 @@ public class RatRaidCropsGoal extends RatMoveToBlockGoal {
 						count++;
 					}
 					this.rat.level().destroyBlock(cropsPos, false);
-					drops.forEach(stack -> this.rat.spawnAtLocation(stack, 0.0F));
+					drops.forEach(stack -> this.rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.rat.level(), stack, 0.0F));
 				}
 				this.rat.setFleePos(cropsPos);
 				this.rat.raidCooldown = 200;
@@ -86,7 +86,7 @@ public class RatRaidCropsGoal extends RatMoveToBlockGoal {
 	protected boolean isValidTarget(LevelReader reader, BlockPos pos) {
 		BlockState state = reader.getBlockState(pos);
 		BlockState cropState = reader.getBlockState(pos.above());
-		if (state.getBlock() instanceof FarmBlock) {
+		if (state.getBlock() instanceof FarmlandBlock) {
 			if (!RatPathingHelper.canSeeOrDigToBlock(this.rat, pos.above())) return false;
 			if (cropState.getBlock() instanceof CropBlock crop) return crop.isMaxAge(cropState);
 			return cropState.is(BlockTags.CROPS) && !(cropState.getBlock() instanceof StemBlock) && RatUtils.canRatBreakBlock(this.rat.level(), pos.above(), this.rat);

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "tag": "c:storage_blocks/redstone"
-    },
-    "D": {
-      "tag": "c:dusts/redstone"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "#c:storage_blocks/redstone",
+    "D": "#c:dusts/redstone",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "DBD",

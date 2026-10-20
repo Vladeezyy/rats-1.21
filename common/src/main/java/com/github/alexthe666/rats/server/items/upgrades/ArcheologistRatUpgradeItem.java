@@ -46,7 +46,7 @@ public class ArcheologistRatUpgradeItem extends BaseRatUpgradeItem implements Ti
 				} else {
 					if (!rat.tryDepositItemInContainers(burntItem)) {
 						if (!rat.level().isClientSide()) {
-							rat.spawnAtLocation(burntItem, 0.25F);
+							rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
 						}
 					}
 				}

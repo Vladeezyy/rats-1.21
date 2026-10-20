@@ -20,7 +20,7 @@ public class MarbledCheeseGrassBlock extends GrassBlock implements BonemealableB
 	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
 		if (!level.isClientSide()) {
 			if (!level.hasChunksAt(pos.offset(-3, -3, -3), pos.offset(3, 3, 3))) return;
-			if (level.getMaxLocalRawBrightness(pos.above()) < 4 && level.getBlockState(pos.above()).getLightBlock(level, pos.above()) > 2) {
+			if (level.getMaxLocalRawBrightness(pos.above()) < 4 && level.getBlockState(pos.above()).getLightDampening() > 2) {
 				level.setBlockAndUpdate(pos, RatlantisBlockRegistry.MARBLED_CHEESE_DIRT.get().defaultBlockState());
 			} else {
 				if (level.getMaxLocalRawBrightness(pos.above()) >= 9) {
@@ -32,7 +32,7 @@ public class MarbledCheeseGrassBlock extends GrassBlock implements BonemealableB
 						}
 
 						// spreads onto marbled cheese dirt (the original turned vanilla dirt blocks into a grass plant)
-						if (level.getBlockState(blockpos).is(RatlantisBlockRegistry.MARBLED_CHEESE_DIRT.get()) && level.getMaxLocalRawBrightness(blockpos.above()) >= 4 && level.getBlockState(blockpos.above()).getLightBlock(level, pos.above()) <= 2) {
+						if (level.getBlockState(blockpos).is(RatlantisBlockRegistry.MARBLED_CHEESE_DIRT.get()) && level.getMaxLocalRawBrightness(blockpos.above()) >= 4 && level.getBlockState(blockpos.above()).getLightDampening() <= 2) {
 							level.setBlockAndUpdate(blockpos, this.defaultBlockState());
 						}
 					}

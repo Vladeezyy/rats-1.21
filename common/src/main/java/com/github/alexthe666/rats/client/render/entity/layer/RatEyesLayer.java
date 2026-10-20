@@ -2,46 +2,40 @@ package com.github.alexthe666.rats.client.render.entity.layer;
 
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.model.entity.AbstractRatModel;
+import com.github.alexthe666.rats.client.render.EntityLayer;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import com.github.alexthe666.rats.server.entity.rat.Rat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import dev.vladeezyy.rampart.client.render.RampartLivingRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LightLayer;
 
-public class RatEyesLayer<T extends AbstractRat, M extends AbstractRatModel<T>> extends RenderLayer<T, M> {
-	protected static final RenderType EYES = RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/glow.png"));
-	protected static final RenderType PLAGUE_EYES = RenderType.eyes(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/plague.png"));
+/** Eyes that glow in the dark (or the plague eyes) */
+public class RatEyesLayer<T extends AbstractRat, S extends RampartLivingRenderState, M extends AbstractRatModel<T>> extends EntityLayer<T, S, M> {
+	protected static final RenderType EYES = RenderTypes.eyes(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/glow.png"));
+	protected static final RenderType PLAGUE_EYES = RenderTypes.eyes(Identifier.fromNamespaceAndPath(RatsMod.MODID, "textures/entity/rat/eyes/plague.png"));
 
-	public RatEyesLayer(RenderLayerParent<T, M> parent) {
+	public RatEyesLayer(RenderLayerParent<S, M> parent) {
 		super(parent);
 	}
 
 	@Override
-	public void render(PoseStack stack, MultiBufferSource buffer, int light, T rat, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-		long roundedTime = rat.level().getDayTime() % 24000;
+	protected void submit(PoseStack stack, SubmitNodeCollector collector, int light, S state, T rat) {
+		long roundedTime = rat.level().getDefaultClockTime() % 24000;
 		boolean night = roundedTime >= 13000 && roundedTime <= 23000;
 		BlockPos ratPos = rat.getLightPosition();
 		int i = rat.level().getBrightness(LightLayer.SKY, ratPos);
 		int j = rat.level().getBrightness(LightLayer.BLOCK, ratPos);
-		int brightness;
-		if (night) {
-			brightness = j;
-		} else {
-			brightness = Math.max(i, j);
-		}
+		int brightness = night ? j : Math.max(i, j);
 		if (rat instanceof Rat plagueable && plagueable.hasPlague()) {
-			VertexConsumer consumer = buffer.getBuffer(PLAGUE_EYES);
-			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+			this.submitParent(stack, collector, state, PLAGUE_EYES, light);
 		} else if (brightness < 7) {
-			VertexConsumer consumer = buffer.getBuffer(EYES);
-			this.getParentModel().renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+			this.submitParent(stack, collector, state, EYES, light);
 		}
 	}
 }

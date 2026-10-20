@@ -1,4 +1,7 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.client.render.entity.layer.PiratBoatSailLayer;
@@ -9,9 +12,8 @@ import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.HoldsItemUpgrade;
 import com.github.alexthe666.rats.server.items.upgrades.interfaces.TickRatUpgrade;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
@@ -22,16 +24,14 @@ public class BuccaneerRatUpgradeItem extends BaseRatUpgradeItem implements Holds
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		model.body1.translateRotate(stack);
 		stack.pushPose();
 		stack.translate(0, -0.925F, 0.2F);
 		stack.scale(0.5F, 0.5F, 0.5F);
-		PiratBoatSailLayer.MODEL_PIRAT_CANNON.renderToBuffer(stack, buffer.getBuffer(RenderType.entityCutoutNoCull(PiratBoatSailLayer.TEXTURE_PIRATE_CANNON)), light, OverlayTexture.NO_OVERLAY, -1);
-		if (rat.getVisualFlag()) {
-			PiratBoatSailLayer.MODEL_PIRAT_CANNON.renderToBuffer(stack, buffer.getBuffer(RenderType.eyes(PiratBoatSailLayer.TEXTURE_PIRATE_CANNON_FIRE)), light, OverlayTexture.NO_OVERLAY, -1);
-		}
+		// in the layer: passing the client model types here would make the dedicated server load them (bytecode verification)
+		PiratBoatSailLayer.submitRatCannon(stack, buffer, light, rat.getVisualFlag());
 		stack.popPose();
 		stack.popPose();
 	}

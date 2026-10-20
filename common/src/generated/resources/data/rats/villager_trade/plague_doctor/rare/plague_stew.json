@@ -1,0 +1,13 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 5
+  },
+  "gives": {
+    "id": "rats:plague_stew",
+    "count": 1
+  },
+  "max_uses": 12,
+  "xp": 7,
+  "reputation_discount": 0.05
+}

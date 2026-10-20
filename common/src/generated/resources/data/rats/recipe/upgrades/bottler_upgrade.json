@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "tag": "c:strings"
-    },
-    "S": {
-      "item": "minecraft:glass_bottle"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "#c:strings",
+    "S": "minecraft:glass_bottle",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "SBS",

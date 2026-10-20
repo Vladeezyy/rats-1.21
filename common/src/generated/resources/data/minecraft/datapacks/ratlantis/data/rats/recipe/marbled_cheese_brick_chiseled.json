@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "M": {
-      "item": "rats:marbled_cheese_brick_slab"
-    }
+    "M": "rats:marbled_cheese_brick_slab"
   },
   "pattern": [
     "M",

@@ -3,10 +3,8 @@ package com.github.alexthe666.rats.server.inventory.slot;
 import dev.vladeezyy.rats.platform.Platform;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import com.github.alexthe666.rats.server.block.entity.RatCraftingTableBlockEntity;
-import com.google.common.collect.Lists;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import dev.vladeezyy.rats.platform.transfer.ItemHandler;
 import dev.vladeezyy.rats.platform.transfer.HandlerSlot;
 
@@ -70,7 +68,7 @@ public class RatCraftingResultSlot extends HandlerSlot {
 	@Override
 	protected void checkTakeAchievements(ItemStack stack) {
 		if (this.amountCrafted > 0) {
-			stack.onCraftedBy(this.player.level(), this.player, this.amountCrafted);
+			stack.onCraftedBy(this.player, this.amountCrafted);
 			this.table.matrixWrapper.ifPresent(h -> Platform.INSTANCE.firePlayerCraftingEvent(this.player, stack, h));
 		}
 		this.amountCrafted = 0;

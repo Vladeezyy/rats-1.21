@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.block;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import org.jetbrains.annotations.NotNull;
 import com.mojang.serialization.MapCodec;
@@ -26,10 +28,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomItemRarity {
+public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomItemRarity, BlockTooltip {
     public static final MapCodec<ChunkyCheeseTokenBlock> CODEC = simpleCodec(ChunkyCheeseTokenBlock::new);
 
     @Override
@@ -44,10 +45,9 @@ public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomIte
 		super(properties);
 	}
 
-	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext getter, List<Component> tooltip, TooltipFlag flag) {
-		tooltip.add(Component.translatable("block.rats.chunky_cheese_token.desc0").withStyle(ChatFormatting.GRAY));
-		tooltip.add(Component.translatable("block.rats.chunky_cheese_token.desc1").withStyle(ChatFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext getter, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+		tooltip.accept(Component.translatable("block.rats.chunky_cheese_token.desc0").withStyle(ChatFormatting.GRAY));
+		tooltip.accept(Component.translatable("block.rats.chunky_cheese_token.desc1").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ChunkyCheeseTokenBlock extends BaseEntityBlock implements CustomIte
 
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
-		return RenderShape.ENTITYBLOCK_ANIMATED;
+		return RenderShape.INVISIBLE;
 	}
 
 	@Nullable

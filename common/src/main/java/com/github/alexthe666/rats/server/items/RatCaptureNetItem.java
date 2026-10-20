@@ -1,10 +1,10 @@
 package com.github.alexthe666.rats.server.items;
+import net.minecraft.world.InteractionResult;
 
 import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.RatCaptureNet;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +18,7 @@ public class RatCaptureNetItem extends LoreTagItem {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
 		level.playSound(null, player.getX(), player.getY(), player.getZ(), RatsSoundRegistry.RAT_NET_THROW.get(), SoundSource.PLAYERS, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 		RatCaptureNet net = new RatCaptureNet(level, player);
@@ -29,7 +29,7 @@ public class RatCaptureNetItem extends LoreTagItem {
 		if (!player.isCreative()) {
 			itemstack.shrink(1);
 		}
-		return InteractionResultHolder.success(itemstack);
+		return InteractionResult.SUCCESS;
 	}
 }
 

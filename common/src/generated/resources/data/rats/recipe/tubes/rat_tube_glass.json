@@ -14,9 +14,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "P": {
-      "tag": "c:glass_blocks/colorless"
-    }
+    "P": "#c:glass_blocks/colorless"
   },
   "pattern": [
     "PPP",

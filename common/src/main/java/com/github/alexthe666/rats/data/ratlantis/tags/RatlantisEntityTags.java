@@ -1,8 +1,6 @@
 package com.github.alexthe666.rats.data.ratlantis.tags;
 
 import com.github.alexthe666.rats.data.tags.RatsEntityTags;
-import com.github.alexthe666.rats.RatsMod;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 

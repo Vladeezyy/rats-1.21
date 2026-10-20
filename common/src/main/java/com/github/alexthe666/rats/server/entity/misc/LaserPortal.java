@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.entity.misc;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.network.syncher.SynchedEntityData;
 import com.github.alexthe666.rats.registry.RatlantisEntityRegistry;
@@ -7,7 +11,6 @@ import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.projectile.LaserBeam;
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
@@ -46,7 +49,7 @@ public class LaserPortal extends Entity {
 
 	public void tick() {
 		super.tick();
-		if (this.tickCount > 300 || this.level().getCurrentDifficultyAt(this.blockPosition()).getDifficulty() == Difficulty.PEACEFUL) {
+		if (this.tickCount > 300 || this.level().getDifficulty() == Difficulty.PEACEFUL) {
 			this.discard();
 		}
 		if (this.tickCount < 250 && this.scaleOfPortal < 1.0F) {
@@ -140,18 +143,18 @@ public class LaserPortal extends Entity {
 		this.ownerUniqueId = entity == null ? null : entity.getUUID();
 	}
 
-	protected void readAdditionalSaveData(CompoundTag compound) {
-		this.tickCount = compound.getInt("Age");
-		if (compound.hasUUID("OwnerUUID")) {
-			this.ownerUniqueId = compound.getUUID("OwnerUUID");
+	protected void readAdditionalSaveData(ValueInput compound) {
+		this.tickCount = compound.getIntOr("Age", 0);
+		if (compound.read("OwnerUUID", UUIDUtil.CODEC).isPresent()) {
+			this.ownerUniqueId = compound.read("OwnerUUID", UUIDUtil.CODEC).orElseThrow();
 		}
 	}
 
-	protected void addAdditionalSaveData(CompoundTag compound) {
+	protected void addAdditionalSaveData(ValueOutput compound) {
 		compound.putInt("Age", this.tickCount);
 
 		if (this.ownerUniqueId != null) {
-			compound.putUUID("OwnerUUID", this.ownerUniqueId);
+			compound.store("OwnerUUID", UUIDUtil.CODEC, this.ownerUniqueId);
 		}
 	}
 
@@ -162,5 +165,10 @@ public class LaserPortal extends Entity {
 	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
+	}
+
+	@Override
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		return false;
 	}
 }

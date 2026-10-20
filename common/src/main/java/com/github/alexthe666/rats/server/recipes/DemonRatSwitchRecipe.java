@@ -5,9 +5,6 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.registry.RatsRecipeRegistry;
 import com.github.alexthe666.rats.server.items.upgrades.DemonRatUpgradeItem;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
@@ -15,8 +12,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class DemonRatSwitchRecipe extends CustomRecipe {
-	public DemonRatSwitchRecipe(CraftingBookCategory category) {
-		super(category);
+	public DemonRatSwitchRecipe() {
 	}
 
 	@Override
@@ -40,7 +36,7 @@ public class DemonRatSwitchRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput container, HolderLookup.Provider access) {
+	public ItemStack assemble(CraftingInput container) {
 		for (int i = 0; i < container.size(); ++i) {
 			ItemStack stack = container.getItem(i);
 			if (!stack.isEmpty() && stack.is(RatsItemRegistry.RAT_UPGRADE_DEMON.get())) {
@@ -50,13 +46,9 @@ public class DemonRatSwitchRecipe extends CustomRecipe {
 		return ItemStack.EMPTY;
 	}
 
-	@Override
-	public boolean canCraftInDimensions(int width, int height) {
-		return width * height >= 1;
-	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<DemonRatSwitchRecipe> getSerializer() {
 		return RatsRecipeRegistry.SWITCH_DEMON.get();
 	}
 }

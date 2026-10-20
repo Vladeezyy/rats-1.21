@@ -10,7 +10,6 @@ import com.github.alexthe666.rats.server.message.UpdateRatFluidPacket;
 import com.github.alexthe666.rats.server.misc.RatUpgradeUtils;
 import com.github.alexthe666.rats.server.misc.RatUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -160,7 +159,7 @@ public class RatPickupGoal extends Goal implements RatWorkGoal {
 				if (slot != -1 && stack != ItemStack.EMPTY) {
 					ItemStack duplicate = stack.copy();
 					if (!this.rat.getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && !this.rat.level().isClientSide()) {
-						this.rat.spawnAtLocation(this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
+						this.rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.rat.level(), this.rat.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
 					}
 					this.rat.setItemInHand(InteractionHand.MAIN_HAND, duplicate);
 				}

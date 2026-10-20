@@ -51,6 +51,11 @@ public class EnergyBuffer implements EnergyHandler {
         return this.capacity;
     }
 
+    /** Puts the stored energy back (rollback of an aborted transfer) */
+    public void setEnergyStored(int energy) {
+        this.energy = Math.max(0, Math.min(this.capacity, energy));
+    }
+
     @Override
     public boolean canExtract() {
         return this.maxExtract > 0;
@@ -75,7 +80,7 @@ public class EnergyBuffer implements EnergyHandler {
 
     public void deserializeNBT(Tag tag) {
         if (tag instanceof IntTag intTag) {
-            this.energy = intTag.getAsInt();
+            this.energy = intTag.value();
         }
     }
 }

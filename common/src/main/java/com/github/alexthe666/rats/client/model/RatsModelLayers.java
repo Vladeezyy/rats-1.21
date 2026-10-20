@@ -2,13 +2,16 @@ package com.github.alexthe666.rats.client.model;
 
 import com.github.alexthe666.rats.RatsMod;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class RatsModelLayers {
 
 	public static final ModelLayerLocation BLACK_DEATH = register("black_death");
 	public static final ModelLayerLocation PIPER = register("pied_piper");
 	public static final ModelLayerLocation PIRAT_BOAT = register("pirat_boat");
+	public static final ModelLayerLocation PIRAT_BOAT_WATER_PATCH = register("pirat_boat_water_patch");
+	public static final ModelLayerLocation PIRAT_WOOD_BOAT = register("boat/pirat");
+	public static final ModelLayerLocation PIRAT_WOOD_CHEST_BOAT = register("chest_boat/pirat");
 	public static final ModelLayerLocation PLAGUE_DOCTOR = register("plague_doctor");
 	public static final ModelLayerLocation RAT_STRIDER_MOUNT = register("rat_strider_mount");
 	public static final ModelLayerLocation THROWN_BLOCK = register("thrown_block");
@@ -38,11 +41,11 @@ public class RatsModelLayers {
 	public static final ModelLayerLocation RATLANTIS_ARMOR_OUTER = register("ratlantis_armor", "outer");
 
 	private static ModelLayerLocation register(String name, String type) {
-		return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name), type);
+		return new ModelLayerLocation(Identifier.fromNamespaceAndPath(RatsMod.MODID, name), type);
 	}
 
 	private static ModelLayerLocation register(String name) {
-		return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, name), "main");
+		return new ModelLayerLocation(Identifier.fromNamespaceAndPath(RatsMod.MODID, name), "main");
 	}
 
 }

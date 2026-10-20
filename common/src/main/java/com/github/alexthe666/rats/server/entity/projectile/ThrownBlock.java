@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.entity.projectile;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.github.alexthe666.rats.server.misc.Values;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -15,7 +19,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -72,7 +76,7 @@ public class ThrownBlock extends Entity {
 
 	@Override
 	public boolean canCollideWith(Entity entity) {
-		if (!entity.isSpectator() && entity.isAlive() && entity.canBeCollidedWith()) {
+		if (!entity.isSpectator() && entity.isAlive() && entity.canBeCollidedWith(this)) {
 			Entity shooter = this.shootingEntity;
 			return shooter == null || !entity.isPassengerOfSameVehicle(entity);
 		} else {
@@ -141,23 +145,26 @@ public class ThrownBlock extends Entity {
 					BlockEntity tileentity = this.level().getBlockEntity(blockpos1);
 
 					if (tileentity != null) {
-						CompoundTag CompoundTag = tileentity.saveWithoutMetadata(this.registryAccess());
-
-						for (String s : this.tileEntityData.getAllKeys()) {
-							Tag nbtbase = this.tileEntityData.get(s);
-
-							if (!"x".equals(s) && !"y".equals(s) && !"z".equals(s)) {
-								CompoundTag.put(s, nbtbase.copy());
-							}
+						// as vanilla's falling block: the thrown block entity data over the new one (the original built the tag and dropped it)
+						try (net.minecraft.util.ProblemReporter.ScopedCollector reporter = new net.minecraft.util.ProblemReporter.ScopedCollector(tileentity.problemPath(), com.mojang.logging.LogUtils.getLogger())) {
+							net.minecraft.world.level.storage.TagValueOutput output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(reporter, this.registryAccess());
+							tileentity.saveWithoutMetadata(output);
+							CompoundTag merged = output.buildResult();
+							this.tileEntityData.forEach((name, tag) -> {
+								if (!"x".equals(name) && !"y".equals(name) && !"z".equals(name)) {
+									merged.put(name, tag.copy());
+								}
+							});
+							tileentity.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(reporter, this.registryAccess(), merged));
 						}
 						tileentity.setChanged();
 					}
 				}
 				this.discard();
 
-				if (this.level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
-					if (!level().isClientSide() && this.dropBlock) {
-						this.spawnAtLocation(new ItemStack(block, 1), 0.0F);
+				if (this.level() instanceof ServerLevel server && server.getGameRules().get(GameRules.MOB_DROPS)) {
+					if (this.dropBlock) {
+						this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), new ItemStack(block, 1), 0.0F);
 					}
 					this.discard();
 				}
@@ -168,34 +175,34 @@ public class ThrownBlock extends Entity {
 	/**
 	 * (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public void addAdditionalSaveData(CompoundTag compound) {
-		compound.put("direction", this.newDoubleList(this.getDeltaMovement().x, this.getDeltaMovement().y, this.getDeltaMovement().z));
+	public void addAdditionalSaveData(ValueOutput compound) {
+		compound.store("direction", Vec3.CODEC, this.getDeltaMovement());
 		compound.putInt("life", this.ticksAlive);
 		BlockState blockstate = this.getHeldBlockState();
 		if (blockstate != null) {
-			compound.put("carriedBlockState", NbtUtils.writeBlockState(blockstate));
+			Values.put(compound, "carriedBlockState", NbtUtils.writeBlockState(blockstate));
 		}
 		if (this.tileEntityData != null) {
-			compound.put("TileEntityData", this.tileEntityData);
+			Values.put(compound, "TileEntityData", this.tileEntityData);
 		}
 	}
 
 	/**
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
-	public void readAdditionalSaveData(CompoundTag compound) {
-		this.ticksAlive = compound.getInt("life");
+	public void readAdditionalSaveData(ValueInput compound) {
+		this.ticksAlive = compound.getIntOr("life", 0);
 
-		if (compound.contains("direction", 9) && compound.getList("direction", 6).size() == 3) {
-			ListTag nbttaglist1 = compound.getList("direction", 6);
-			this.setDeltaMovement(nbttaglist1.getDouble(0), nbttaglist1.getDouble(1), nbttaglist1.getDouble(2));
+		Optional<Vec3> direction = compound.read("direction", Vec3.CODEC);
+		if (direction.isPresent()) {
+			this.setDeltaMovement(direction.get());
 		} else {
 			this.discard();
 		}
 
 		BlockState blockstate = null;
-		if (compound.contains("carriedBlockState", 10)) {
-			blockstate = NbtUtils.readBlockState(this.level().registryAccess().lookupOrThrow(Registries.BLOCK), compound.getCompound("carriedBlockState"));
+		if (Values.contains(compound, "carriedBlockState")) {
+			blockstate = NbtUtils.readBlockState(this.level().registryAccess().lookupOrThrow(Registries.BLOCK), Values.compound(compound, "carriedBlockState"));
 			if (blockstate.isAir()) {
 				blockstate = null;
 			}
@@ -203,8 +210,8 @@ public class ThrownBlock extends Entity {
 		if (blockstate != null) {
 			this.setHeldBlockState(blockstate);
 		}
-		if (compound.contains("TileEntityData", 10)) {
-			this.tileEntityData = compound.getCompound("TileEntityData");
+		if (Values.contains(compound, "TileEntityData")) {
+			this.tileEntityData = Values.compound(compound, "TileEntityData");
 		}
 	}
 
@@ -218,8 +225,8 @@ public class ThrownBlock extends Entity {
 	/**
 	 * Called when the entity is attacked.
 	 */
-	public boolean hurt(DamageSource source, float amount) {
-		if (this.isInvulnerableTo(source)) {
+	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+		if (this.isInvulnerableToBase(source)) {
 			return false;
 		} else {
 			this.markHurt();

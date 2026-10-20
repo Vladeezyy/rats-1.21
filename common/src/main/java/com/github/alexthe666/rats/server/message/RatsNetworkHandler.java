@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
 /**
@@ -86,7 +85,7 @@ public final class RatsNetworkHandler {
 	@org.jetbrains.annotations.Nullable
 	public static com.github.alexthe666.rats.server.entity.rat.TamedRat ownedRat(net.minecraft.world.entity.player.Player player, int id) {
 		Entity entity = player.level().getEntity(id);
-		if (entity instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat && (rat.isOwnedBy(player) || player.hasPermissions(2))) {
+		if (entity instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat && (rat.isOwnedBy(player) || player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))) {
 			return rat;
 		}
 		return null;

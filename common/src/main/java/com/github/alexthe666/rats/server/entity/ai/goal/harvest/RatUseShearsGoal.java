@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.ai.goal.harvest;
+import net.minecraft.server.level.ServerLevel;
 
 import dev.vladeezyy.rats.platform.Platform;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
@@ -8,7 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
@@ -59,7 +59,7 @@ public class RatUseShearsGoal extends BaseRatHarvestGoal {
 					List<ItemStack> drops = Platform.INSTANCE.shear(this.getTargetEntity(), SHEAR_STACK);
 					this.rat.gameEvent(GameEvent.ENTITY_INTERACT);
 					for (ItemStack stack : drops) {
-						this.getTargetEntity().spawnAtLocation(stack, 0.0F);
+						this.getTargetEntity().spawnAtLocation((net.minecraft.server.level.ServerLevel) this.getTargetEntity().level(), stack, 0.0F);
 					}
 				}
 				this.stop();
@@ -69,7 +69,7 @@ public class RatUseShearsGoal extends BaseRatHarvestGoal {
 			if (this.rat.getRatDistanceCenterSq(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ()) < this.rat.getRatHarvestDistance(0.0D)) {
 				BlockState state = this.rat.level().getBlockState(this.getTargetBlock());
 				this.rat.level().playSound(null, this.rat.blockPosition(), SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
-				BeehiveBlock.dropHoneycomb(this.rat.level(), this.getTargetBlock());
+				if (this.rat.level() instanceof ServerLevel serverLevel) BeehiveBlock.dropHoneycomb(serverLevel, new ItemStack(Items.SHEARS), this.rat.level().getBlockState(this.getTargetBlock()), this.rat.level().getBlockEntity(this.getTargetBlock()), this.rat, this.getTargetBlock());
 				this.rat.gameEvent(GameEvent.SHEAR);
 
 				if (!CampfireBlock.isSmokeyPos(this.rat.level(), this.getTargetBlock())) {

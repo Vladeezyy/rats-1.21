@@ -3,9 +3,7 @@
   "category": "building",
   "group": "planks",
   "ingredients": [
-    {
-      "tag": "rats:pirat_logs"
-    }
+    "#rats:pirat_logs"
   ],
   "result": {
     "count": 4,

@@ -1,4 +1,5 @@
 package com.github.alexthe666.rats.server.entity.misc;
+import net.minecraft.world.Difficulty;
 
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
@@ -10,8 +11,6 @@ import com.github.alexthe666.rats.server.entity.ai.navigation.navigation.PiratNa
 import com.github.alexthe666.rats.server.entity.monster.Pirat;
 import com.github.alexthe666.rats.server.entity.projectile.CheeseCannonball;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -27,13 +26,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.boat.Boat;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.WaterlilyBlock;
-import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.LilyPadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -68,8 +66,7 @@ public class PiratBoat extends Mob {
 
 	private ItemStack generateBanner() {
 		ItemStack itemstack = new ItemStack(Items.BLACK_BANNER);
-		this.level().registryAccess().registry(Registries.BANNER_PATTERN)
-				.flatMap(patterns -> patterns.getHolder(RatsBannerPatternRegistry.RAT_AND_CROSSBONES_BANNER))
+		this.level().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).get(RatsBannerPatternRegistry.RAT_AND_CROSSBONES_BANNER)
 				.ifPresent(pattern -> itemstack.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().add(pattern, DyeColor.WHITE).build()));
 		return itemstack;
 	}
@@ -79,7 +76,7 @@ public class PiratBoat extends Mob {
 		return true;
 	}
 
-	@Override
+	// 26.x: despawning in peaceful is a flag of the entity type; checkDespawn asks this
 	protected boolean shouldDespawnInPeaceful() {
 		return true;
 	}
@@ -387,7 +384,7 @@ public class PiratBoat extends Mob {
 						if (j2 <= 0 || k2 != k && k2 != l - 1) {
 							blockpos$mutableblockpos.set(l1, k2, i2);
 							BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
-							if (!(blockstate.getBlock() instanceof WaterlilyBlock) && Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level(), blockpos$mutableblockpos).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
+							if (!(blockstate.getBlock() instanceof LilyPadBlock) && Shapes.joinIsNotEmpty(blockstate.getCollisionShape(this.level(), blockpos$mutableblockpos).move(l1, k2, i2), voxelshape, BooleanOp.AND)) {
 								f += blockstate.getBlock().getFriction();
 								++k1;
 							}
@@ -429,6 +426,15 @@ public class PiratBoat extends Mob {
 			} else {
 				this.boat.setSpeed(0.0F);
 			}
+		}
+	}
+
+	@Override
+	public void checkDespawn() {
+		if (this.level().getDifficulty() == Difficulty.PEACEFUL && this.shouldDespawnInPeaceful()) {
+			this.discard();
+		} else {
+			super.checkDespawn();
 		}
 	}
 }

@@ -1,17 +1,29 @@
 package com.github.alexthe666.rats.server.world;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import com.github.alexthe666.rats.RatsMod;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
+/** The plague doctor's spawn timer of a level (data/rats/world_data.dat; keys of the original's rats_world_data.dat) */
 public class PlagueDoctorWorldData extends SavedData {
-	private static final String IDENTIFIER = "rats_world_data";
+	private static final Codec<PlagueDoctorWorldData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		Codec.INT.optionalFieldOf("PlagueDoctorSpawnDelay", 0).forGetter(data -> data.doctorSpawnDelay),
+		Codec.INT.optionalFieldOf("PlagueDoctorSpawnChance", 0).forGetter(data -> data.doctorSpawnChance),
+		UUIDUtil.STRING_CODEC.optionalFieldOf("PlagueDoctorId").forGetter(data -> Optional.ofNullable(data.doctorID))
+	).apply(instance, PlagueDoctorWorldData::new));
+	// the wandering trader's fix type: the closest vanilla data, and no fixer touches these keys
+	private static final SavedDataType<PlagueDoctorWorldData> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(RatsMod.MODID, "world_data"), PlagueDoctorWorldData::new, CODEC, DataFixTypes.SAVED_DATA_WANDERING_TRADER);
 	private int doctorSpawnDelay;
 	private int doctorSpawnChance;
 	private UUID doctorID;
@@ -20,14 +32,15 @@ public class PlagueDoctorWorldData extends SavedData {
 		this.setDirty();
 	}
 
+	private PlagueDoctorWorldData(int delay, int chance, Optional<UUID> id) {
+		this.doctorSpawnDelay = delay;
+		this.doctorSpawnChance = chance;
+		this.doctorID = id.orElse(null);
+	}
+
 	@Nullable
 	public static PlagueDoctorWorldData get(Level level) {
-		if (level instanceof ServerLevel) {
-			ServerLevel server = level.getServer().getLevel(level.dimension());
-			DimensionDataStorage storage = server.getDataStorage();
-			return storage.computeIfAbsent(new SavedData.Factory<>(PlagueDoctorWorldData::new, PlagueDoctorWorldData::read, null), IDENTIFIER);
-		}
-		return null;
+		return level instanceof ServerLevel server ? server.getDataStorage().computeIfAbsent(TYPE) : null;
 	}
 
 	public int getDoctorSpawnDelay() {
@@ -51,32 +64,5 @@ public class PlagueDoctorWorldData extends SavedData {
 	public void setPlagueDoctorID(UUID id) {
 		this.doctorID = id;
 		this.setDirty();
-	}
-
-	public static PlagueDoctorWorldData read(CompoundTag tag, HolderLookup.Provider registries) {
-		PlagueDoctorWorldData data = new PlagueDoctorWorldData();
-		if (tag.contains("PlagueDoctorSpawnDelay", 99)) {
-			data.doctorSpawnDelay = tag.getInt("PlagueDoctorSpawnDelay");
-		}
-
-		if (tag.contains("PlagueDoctorSpawnChance", 99)) {
-			data.doctorSpawnChance = tag.getInt("PlagueDoctorSpawnChance");
-		}
-
-		if (tag.contains("PlagueDoctorId", 8)) {
-			data.doctorID = UUID.fromString(tag.getString("PlagueDoctorId"));
-		}
-
-		return data;
-	}
-
-	@Override
-	public CompoundTag save(CompoundTag compound, HolderLookup.Provider registries) {
-		compound.putInt("PlagueDoctorSpawnDelay", this.doctorSpawnDelay);
-		compound.putInt("PlagueDoctorSpawnChance", this.doctorSpawnChance);
-		if (this.doctorID != null) {
-			compound.putString("PlagueDoctorId", this.doctorID.toString());
-		}
-		return compound;
 	}
 }

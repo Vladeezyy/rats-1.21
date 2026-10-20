@@ -1,4 +1,8 @@
 package com.github.alexthe666.rats.server.entity.monster;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import net.minecraft.core.particles.ColorParticleOption;
 import com.github.alexthe666.rats.RatConfig;
@@ -9,7 +13,6 @@ import com.github.alexthe666.rats.registry.RatsSoundRegistry;
 import com.github.alexthe666.rats.server.entity.monster.boss.BlackDeath;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,6 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -43,7 +47,7 @@ import java.util.UUID;
 
 public class PlagueCloud extends Monster {
 
-	protected static final EntityDataAccessor<Optional<UUID>> OWNER_UNIQUE_ID = SynchedEntityData.defineId(PlagueCloud.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> OWNER_UNIQUE_ID = SynchedEntityData.defineId(PlagueCloud.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
 	public PlagueCloud(EntityType<? extends Monster> type, Level level) {
 		super(type, level);
@@ -132,8 +136,8 @@ public class PlagueCloud extends Monster {
 		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, false));
 	}
 
-	public boolean doHurtTarget(Entity entity) {
-		boolean flag = super.doHurtTarget(entity);
+	public boolean doHurtTarget(ServerLevel level, Entity entity) {
+		boolean flag = super.doHurtTarget(level, entity);
 		if (flag && entity instanceof LivingEntity living) {
 			living.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 600));
 		}
@@ -145,11 +149,11 @@ public class PlagueCloud extends Monster {
 	}
 
 	@Override
-	public boolean causeFallDamage(float dist, float mult, DamageSource source) {
+	public boolean causeFallDamage(double dist, float mult, DamageSource source) {
 		return false;
 	}
 
-	public void addAdditionalSaveData(CompoundTag compound) {
+	public void addAdditionalSaveData(ValueOutput compound) {
 		super.addAdditionalSaveData(compound);
 		if (this.getOwnerId() == null) {
 			compound.putString("OwnerUUID", "");
@@ -158,12 +162,12 @@ public class PlagueCloud extends Monster {
 		}
 	}
 
-	public void readAdditionalSaveData(CompoundTag compound) {
+	public void readAdditionalSaveData(ValueInput compound) {
 		super.readAdditionalSaveData(compound);
 		UUID uuid;
 		// saved as "OwnerUUID" (the original read "Owner" back, so the owner was lost on reload)
-		String s = compound.contains("OwnerUUID") ? compound.getString("OwnerUUID") : compound.getString("Owner");
-		uuid = s.isEmpty() ? null : OldUsersConverter.convertMobOwnerIfNecessary(this.getServer(), s);
+		String s = compound.getStringOr("OwnerUUID", compound.getStringOr("Owner", ""));
+		uuid = s.isEmpty() ? null : OldUsersConverter.convertMobOwnerIfNecessary(this.level().getServer(), s);
 
 		if (uuid != null) {
 			try {
@@ -175,11 +179,11 @@ public class PlagueCloud extends Monster {
 
 	@Nullable
 	public UUID getOwnerId() {
-		return this.getEntityData().get(OWNER_UNIQUE_ID).orElse(null);
+		return this.getEntityData().get(OWNER_UNIQUE_ID).map(EntityReference::getUUID).orElse(null);
 	}
 
 	public void setOwnerId(@Nullable UUID uuid) {
-		this.getEntityData().set(OWNER_UNIQUE_ID, Optional.ofNullable(uuid));
+		this.getEntityData().set(OWNER_UNIQUE_ID, Optional.ofNullable(uuid).map(EntityReference::<LivingEntity>of));
 	}
 
 	@Nullable
@@ -289,7 +293,7 @@ public class PlagueCloud extends Monster {
 			if (living.distanceToSqr(this.parentEntity) < 5.0D) {
 				++this.attackTimer;
 				if (this.attackTimer == 5) {
-					this.parentEntity.doHurtTarget(living);
+					this.parentEntity.doHurtTarget((net.minecraft.server.level.ServerLevel) this.parentEntity.level(), living);
 					this.attackTimer = -10;
 				}
 			} else if (this.attackTimer > 0) {
@@ -298,7 +302,7 @@ public class PlagueCloud extends Monster {
 		}
 	}
 
-	public boolean isAlliedTo(Entity entity) {
-		return super.isAlliedTo(entity) || entity.getType().is(RatsEntityTags.PLAGUE_LEGION);
+	protected boolean considersEntityAsAlly(Entity entity) {
+		return super.considersEntityAsAlly(entity) || entity.is(RatsEntityTags.PLAGUE_LEGION);
 	}
 }

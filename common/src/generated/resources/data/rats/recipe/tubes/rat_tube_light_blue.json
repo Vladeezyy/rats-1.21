@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "D": {
-      "tag": "c:dyes/light_blue"
-    },
-    "T": {
-      "tag": "rats:tubes"
-    }
+    "D": "#c:dyes/light_blue",
+    "T": "#rats:tubes"
   },
   "pattern": [
     "TTT",

@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "tag": "c:bones"
-    },
-    "F": {
-      "item": "minecraft:rotten_flesh"
-    },
-    "S": {
-      "item": "rats:rat_skull"
-    },
-    "U": {
-      "item": "rats:rat_upgrade_basic"
-    }
+    "B": "#c:bones",
+    "F": "minecraft:rotten_flesh",
+    "S": "rats:rat_skull",
+    "U": "rats:rat_upgrade_basic"
   },
   "pattern": [
     "FBF",

@@ -1,54 +1,56 @@
 package com.github.alexthe666.rats.client.render.entity.layer;
 
-import dev.vladeezyy.rats.platform.ClientPlatform;
-import net.minecraft.world.item.ArmorMaterial;
 import com.github.alexthe666.rats.client.model.entity.FlyingDutchratModel;
+import com.github.alexthe666.rats.client.render.EntityLayer;
+import com.github.alexthe666.rats.client.render.HatRendering;
+import com.github.alexthe666.rats.client.render.entity.RatsMobRenderState;
 import com.github.alexthe666.rats.server.entity.monster.boss.Dutchrat;
-import com.google.common.collect.Maps;
+import com.github.alexthe666.rats.server.items.HatItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.Model;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.ArmorModelSet;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
 
-import java.util.Map;
+/** The Dutchrat's helmet (its pirat hat), on a head-only armor model at rest that its head moves */
+public class DutchratHelmetLayer extends EntityLayer<Dutchrat, RatsMobRenderState, FlyingDutchratModel<Dutchrat>> {
+	private final HumanoidModel<HumanoidRenderState> helmetModel;
+	private final EquipmentLayerRenderer equipment;
 
-public class DutchratHelmetLayer<T extends Dutchrat, M extends FlyingDutchratModel<T>> extends RenderLayer<T, M> {
-	private final HumanoidModel<?> backup;
-
-	public DutchratHelmetLayer(RenderLayerParent<T, M> parent, HumanoidModel<?> armorModel) {
+	public DutchratHelmetLayer(RenderLayerParent<RatsMobRenderState, FlyingDutchratModel<Dutchrat>> parent, EntityRendererProvider.Context context) {
 		super(parent);
-		this.backup = armorModel;
+		this.helmetModel = ArmorModelSet.bake(ModelLayers.PLAYER_ARMOR, context.getModelSet(), HumanoidModel::new).head();
+		this.equipment = context.getEquipmentRenderer();
 	}
 
 	@Override
-	public void render(PoseStack stack, MultiBufferSource buffer, int light, T rat, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	protected void submit(PoseStack stack, SubmitNodeCollector collector, int light, RatsMobRenderState state, Dutchrat rat) {
 		if (rat.getBellSummonTicks() <= 0) {
+			ItemStack itemstack = rat.getItemBySlot(EquipmentSlot.HEAD);
+			Equippable equippable = itemstack.get(DataComponents.EQUIPPABLE);
+			if (equippable == null || equippable.slot() != EquipmentSlot.HEAD) {
+				return;
+			}
 			stack.pushPose();
 			this.getParentModel().body1.translateRotate(stack);
 			this.getParentModel().neck.translateRotate(stack);
 			this.getParentModel().head.translateRotate(stack);
 			stack.translate(0, -0.77F, 0);
-			ItemStack itemstack = rat.getItemBySlot(EquipmentSlot.HEAD);
-			if (itemstack.getItem() instanceof ArmorItem) {
-				Model model = ClientPlatform.INSTANCE.armorModel(rat, itemstack, EquipmentSlot.HEAD, this.backup);
-				ArmorMaterial.Layer layer = ((ArmorItem) itemstack.getItem()).getMaterial().value().layers().getFirst();
-				ResourceLocation tex = ClientPlatform.INSTANCE.armorTexture(rat, itemstack, layer, false, EquipmentSlot.HEAD);
-				VertexConsumer consumer = ItemRenderer.getFoilBuffer(buffer, RenderType.entityCutoutNoCull(tex), false, false);
-				model.renderToBuffer(stack, consumer, light, OverlayTexture.NO_OVERLAY, -1);
+			if (itemstack.getItem() instanceof HatItem) {
+				HatRendering.submitHat(itemstack, HatRendering.REST, stack, collector, light, state.outlineColor);
+			} else if (equippable.assetId().isPresent()) {
+				this.equipment.renderLayers(EquipmentClientInfo.LayerType.HUMANOID, equippable.assetId().get(), this.helmetModel, HatRendering.REST, itemstack, stack, collector, light, state.outlineColor);
 			}
 			stack.popPose();
 		}
 	}
-
 }

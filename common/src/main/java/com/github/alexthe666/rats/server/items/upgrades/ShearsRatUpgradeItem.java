@@ -1,4 +1,6 @@
 package com.github.alexthe666.rats.server.items.upgrades;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import com.github.alexthe666.rats.client.render.SubmitHelper;
 
 import com.github.alexthe666.rats.client.model.entity.RatModel;
 import com.github.alexthe666.rats.server.entity.ai.goal.harvest.RatUseShearsGoal;
@@ -33,14 +35,14 @@ public class ShearsRatUpgradeItem extends BaseRatUpgradeItem implements HoldsIte
 	}
 
 	@Override
-	public void renderHeldItem(EntityRendererProvider.Context context, TamedRat rat, RatModel<?> model, PoseStack stack, MultiBufferSource buffer, int light, float ageInTicks) {
+	public void renderHeldItem(SubmitHelper context, TamedRat rat, RatModel<?> model, PoseStack stack, SubmitNodeCollector buffer, int light, float ageInTicks) {
 		stack.pushPose();
 		this.translateToHand(model, false, stack);
 		stack.mulPose(Axis.ZN.rotationDegrees(90.0F));
 		stack.mulPose(Axis.YP.rotationDegrees(15.0F));
 		stack.mulPose(Axis.XN.rotationDegrees(90.0F));
 		stack.translate(0.1F, 0.0F, -0.075F);
-		context.getItemRenderer().renderStatic(new ItemStack(Items.SHEARS), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, light, OverlayTexture.NO_OVERLAY, stack, buffer, null, rat.getId());
+		context.item(new ItemStack(Items.SHEARS), ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, rat, stack, buffer, light);
 		stack.popPose();
 	}
 }
