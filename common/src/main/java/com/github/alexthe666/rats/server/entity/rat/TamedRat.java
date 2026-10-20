@@ -79,6 +79,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
 import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.DyeItem;
@@ -201,7 +202,7 @@ public class TamedRat extends InventoryRat {
 		this.goalSelector.addGoal(6, new SitWhenOrderedToGoal(this) {
 			@Override
 			public boolean canUse() {
-				return TamedRat.this.isTame() && !TamedRat.this.isInWaterOrBubble() && TamedRat.this.onGround() && TamedRat.this.isOrderedToSit();
+				return TamedRat.this.isTame() && !TamedRat.this.isInWaterOrBubble() && (TamedRat.this.onGround() || TamedRat.this.noPhysics) && TamedRat.this.isOrderedToSit();
 			}
 		});
 		this.goalSelector.addGoal(7, new RatWanderGoal(this, 1.25D));
@@ -271,15 +272,7 @@ public class TamedRat extends InventoryRat {
 
 			this.targetSelector.addGoal(1, this.targetGoal);
 
-			if (this.hasFlightUpgrade()) {
-				this.switchNavigator(1);
-			} else if (RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get())) {
-				this.switchNavigator(3);
-			} else if (RatUpgradeUtils.hasUpgrade(this, RatlantisItemRegistry.RAT_UPGRADE_ETHEREAL.get())) {
-				this.switchNavigator(4);
-			} else {
-				this.switchNavigator(this.isInCage() ? 5 : this.isInTube() ? 2 : 0);
-			}
+			this.switchNavigator(this.wantedNavigator());
 		}
 	}
 
@@ -302,10 +295,33 @@ public class TamedRat extends InventoryRat {
 		builder.define(MOUNT_RESPAWN_COOLDOWN, 20);
 	}
 
+	/** The navigator for where the rat is and its upgrades; an ethereal rat phases through cages and tubes too */
+	private int wantedNavigator() {
+		int upgrade = this.hasFlightUpgrade() ? 1
+				: RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()) ? 3
+				: RatUpgradeUtils.hasUpgrade(this, RatlantisItemRegistry.RAT_UPGRADE_ETHEREAL.get()) ? 4 : 0;
+		if (upgrade == 4) {
+			return 4;
+		}
+		return this.isInCage() ? 5 : this.isInTube() ? 2 : upgrade;
+	}
+
+	// the rat's own navigation from the start (navigator 0); the original got it from the navigation check after 5 s
+	// and walked with the vanilla one (no tubes, holes or cages) until then
+	@Override
+	protected PathNavigation createNavigation(Level level) {
+		return new RatNavigation(this, level);
+	}
+
+	/** The walking navigation, kept with the path it follows when the rat goes into or out of a tube or a cage */
+	private RatNavigation walkingNavigation() {
+		return this.navigation instanceof RatNavigation walking ? walking : new RatNavigation(this, this.level());
+	}
+
 	public void switchNavigator(int type) {
 		if (type == 0) { //tamed
 			this.moveControl = new RatMoveControl(this);
-			this.navigation = new RatNavigation(this, this.level());
+			this.navigation = this.walkingNavigation();
 			this.navigatorType = 0;
 		} else if (type == 1) { //flying
 			this.moveControl = new RatFlightMoveControl(this, 1.0F);
@@ -313,7 +329,7 @@ public class TamedRat extends InventoryRat {
 			this.navigatorType = 1;
 		} else if (type == 2) { //tube
 			this.moveControl = new RatTubeMoveControl(this);
-			this.navigation = new RatNavigation(this, this.level());
+			this.navigation = this.walkingNavigation();
 			this.navigatorType = 2;
 		} else if (type == 3) { //aquatic
 			this.moveControl = new SmoothSwimmingMoveControl(this, 360, 360, 10.0F, 1.0F, true);
@@ -325,7 +341,7 @@ public class TamedRat extends InventoryRat {
 			this.navigatorType = 4;
 		} else if (type == 5) { //cage
 			this.moveControl = new RatCageMoveControl(this);
-			this.navigation = new RatNavigation(this, this.level());
+			this.navigation = this.walkingNavigation();
 			this.navigatorType = 5;
 		}
 	}
@@ -554,21 +570,42 @@ public class TamedRat extends InventoryRat {
 			});
 		}
 
-		if (this.updateNavigationCooldown-- == 0) {
-			this.updateNavigationCooldown = 60;
-			int savedNav = this.navigatorType;
-			if (this.isInCage()) {
-				this.switchNavigator(5);
-			} else if (this.isInTube()) {
-				this.switchNavigator(2);
-			} else if (this.hasFlightUpgrade()) {
-				this.switchNavigator(1);
-			} else {
-				this.switchNavigator(savedNav);
+		if (this.updateNavigationCooldown-- <= 0) {
+			this.updateNavigationCooldown = 10;
+			// only on a change: re-creating the navigation every 3 s dropped the rat's current path, and the cage or
+			// tube navigator stayed after the rat left the cage or tube; checked twice a second, so a rat entering a
+			// tube climbs in it right away (#907)
+			int type = this.wantedNavigator();
+			if (type != this.navigatorType) {
+				this.switchNavigator(type);
 			}
 		}
 
-		this.setNoGravity(this.isFlying());
+		// #907: up tube shafts and slowly down them, as in 1.12 (1.19+ kept only onClimbable, which climbs only while the
+		// rat pushes against a wall, so a rat in the middle of a shaft never went up)
+		if (this.climbingTube || this.navigatorType == 2) {
+			if (this.isInTube()) {
+				Vec3 motion = this.getDeltaMovement();
+				if (this.climbingTube) {
+					this.setDeltaMovement(motion.x, Math.min(motion.y + 0.1D, 0.2D), motion.z);
+				} else if (!this.onGround() && motion.y < 0.0D) {
+					this.setDeltaMovement(motion.x, motion.y * 0.6D, motion.z);
+				}
+			} else {
+				this.climbingTube = false;
+			}
+		}
+
+		// #871: the ethereal rat phases through blocks and floats (1.15 had noClip; since 1.19 the gravity was put
+		// back here every tick and nothing let it through walls)
+		boolean ethereal = this.navigatorType == 4 && !this.isPassenger();
+		if (!this.level().isClientSide()) {
+			this.noPhysics = ethereal;
+			if (ethereal) {
+				this.setOnGround(false);
+			}
+		}
+		this.setNoGravity(this.isFlying() || ethereal);
 		if (this.isFlying()) {
 			if (this.isOrderedToSit() || this.verticalCollisionBelow || this.onGround()) {
 				this.setFlying(false);

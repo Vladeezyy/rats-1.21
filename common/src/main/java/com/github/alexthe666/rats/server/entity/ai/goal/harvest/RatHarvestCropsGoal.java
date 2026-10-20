@@ -42,18 +42,7 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			BlockState state = this.rat.level().getBlockState(pos);
-			if (this.canHarvestBlock(this.rat.level(), pos, state)) {
-				allBlocks.add(pos);
-			}
-		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> this.canHarvestBlock(this.rat.level(), pos, state));
 	}
 
 	@Override
@@ -111,9 +100,11 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 	}
 
 	private boolean canHarvestBlock(Level level, BlockPos pos, BlockState state) {
-		if (!RatUtils.canRatBreakBlock(this.rat.level(), pos, this.rat)) {
-			return false;
-		}
+		// the block checks first: the break check (block entity, hardness, the loader's event) only for ripe plants
+		return this.isRipe(level, pos, state) && RatUtils.canRatBreakBlock(level, pos, this.rat);
+	}
+
+	private boolean isRipe(Level level, BlockPos pos, BlockState state) {
 		if (state.is(BlockTags.CROPS)) {
 			if (state.getBlock() instanceof CropBlock crop && !crop.isMaxAge(state)) return false;
 			if (!(state.getBlock() instanceof StemBlock) && !(state.getBlock() instanceof AttachedStemBlock)) {

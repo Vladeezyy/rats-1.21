@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RatTreeUtils {
@@ -216,40 +219,36 @@ public class RatTreeUtils {
 		return block.is(BlockTags.LEAVES) || block.is(BlockTags.WART_BLOCKS) || block.is(Blocks.SHROOMLIGHT);
 	}
 
-	private static final HashMap<BlockPos, Integer> rgnbmcount = new HashMap<>();
-
+	// the step counter is per call (the original kept it in a static map, one entry per start position, never removed)
+	// and the visited blocks are sets (lists made every check linear)
 	public static List<BlockPos> getBlocksNextToEachOtherMaterial(Level level, BlockPos startpos, int maxDistance) {
-		List<BlockPos> checkedblocks = new ArrayList<>();
-		List<BlockPos> theblocksaround = new ArrayList<>();
+		Set<BlockPos> checkedblocks = new HashSet<>();
+		Set<BlockPos> theblocksaround = new LinkedHashSet<>();
 		if (level.getBlockState(startpos).is(BlockTags.LOGS) || level.getBlockState(startpos).is(BlockTags.LEAVES)) {
-			theblocksaround.add(startpos);
-			checkedblocks.add(startpos);
+			theblocksaround.add(startpos.immutable());
+			checkedblocks.add(startpos.immutable());
 		}
 
-		rgnbmcount.put(startpos.immutable(), 0);
-		recursiveGetNextBlocksMaterial(level, startpos, startpos, theblocksaround, checkedblocks, maxDistance);
-		return theblocksaround;
+		recursiveGetNextBlocksMaterial(level, startpos.immutable(), startpos.immutable(), theblocksaround, checkedblocks, maxDistance, new int[1]);
+		return new ArrayList<>(theblocksaround);
 	}
 
-	private static void recursiveGetNextBlocksMaterial(Level level, BlockPos startpos, BlockPos pos, List<BlockPos> theblocksaround, List<BlockPos> checkedblocks, int maxDistance) {
-		int rgnbmc = rgnbmcount.get(startpos);
-		if (rgnbmc > 100) {
+	private static void recursiveGetNextBlocksMaterial(Level level, BlockPos startpos, BlockPos pos, Set<BlockPos> theblocksaround, Set<BlockPos> checkedblocks, int maxDistance, int[] steps) {
+		if (steps[0] > 100) {
 			return;
 		}
-		rgnbmcount.put(startpos, rgnbmc + 1);
+		steps[0]++;
 
 		for (Direction dir : Direction.values()) {
 			BlockPos pba = pos.relative(dir);
-			if (checkedblocks.contains(pba)) {
+			if (!checkedblocks.add(pba)) {
 				continue;
 			}
-			checkedblocks.add(pba);
 
 			if (level.getBlockState(pba).is(BlockTags.LOGS) || level.getBlockState(pba).is(BlockTags.LEAVES)) {
-				if (!theblocksaround.contains(pba)) {
-					theblocksaround.add(pba);
+				if (theblocksaround.add(pba)) {
 					if (startpos.closerThan(pba, maxDistance)) {
-						recursiveGetNextBlocksMaterial(level, startpos, pba, theblocksaround, checkedblocks, maxDistance);
+						recursiveGetNextBlocksMaterial(level, startpos, pba, theblocksaround, checkedblocks, maxDistance, steps);
 					}
 				}
 			}

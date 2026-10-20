@@ -7,7 +7,7 @@ import net.minecraft.world.ItemInteractionResult;
 import com.github.alexthe666.rats.registry.RatsBlockEntityRegistry;
 import com.github.alexthe666.rats.registry.RatsItemRegistry;
 import com.github.alexthe666.rats.server.block.entity.RatTubeBlockEntity;
-import com.github.alexthe666.rats.server.entity.rat.TamedRat;
+import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import com.github.alexthe666.rats.server.items.RatTubeItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,7 +16,6 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -35,16 +34,18 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -80,12 +81,11 @@ public class RatTubeBlock extends BaseEntityBlock {
 	private static final VoxelShape UP_AABB_CONNECT_4 = Block.box(3, 13, 12, 13, 16, 13);
 
 	//AABB maps to stop mem leaks
-	private static final Map<Direction, VoxelShape> AABB_MAP = new HashMap<>();
-	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_1_MAP = new HashMap<>();
-	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_2_MAP = new HashMap<>();
-	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_3_MAP = new HashMap<>();
-	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_4_MAP = new HashMap<>();
-	private static final Map<String, VoxelShape> OVERALL_AABB_MAP = new HashMap<>();
+	private static final Map<Direction, VoxelShape> AABB_MAP = new ConcurrentHashMap<>();
+	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_1_MAP = new ConcurrentHashMap<>();
+	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_2_MAP = new ConcurrentHashMap<>();
+	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_3_MAP = new ConcurrentHashMap<>();
+	private static final Map<Direction, VoxelShape> AABB_CONNECTOR_4_MAP = new ConcurrentHashMap<>();
 
 	public RatTubeBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -125,22 +125,50 @@ public class RatTubeBlock extends BaseEntityBlock {
 		return Shapes.create(x1, y1, z1, x2, y2, z2);
 	}
 
+	// the shape of each state is made once; keyed by the state itself (the original built a long string key for every
+	// shape query, i.e. for every collision check near a tube) in a map that render and server threads share
+	private static final Map<BlockState, VoxelShape> SHAPES = new ConcurrentHashMap<>();
+	private static final Map<BlockState, VoxelShape> RAT_SHAPES = new ConcurrentHashMap<>();
+	// #907: rats get the inside of the 1.12 tube, 10 pixels across (walls a pixel further out). The walls of the model
+	// leave 8 pixels for a rat 0.49 blocks wide: it caught on their edges, jumped and walked on top of the tube instead
+	private static final VoxelShape RAT_WALL_UP = Block.box(2, 13, 2, 14, 14, 14);
+
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		if (state.getBlock() instanceof RatTubeBlock) {
-			String key = "up:" + state.getValue(UP) + " down: " + state.getValue(DOWN) + " north: " + state.getValue(NORTH) +
-					" east: " + state.getValue(EAST) + " south: " + state.getValue(SOUTH) + " west: " + state.getValue(WEST) +
-					"up_open:" + state.getValue(OPEN_UP) + " down_open: " + state.getValue(OPEN_DOWN) + " north_open: " + state.getValue(OPEN_NORTH) +
-					" east_open: " + state.getValue(OPEN_EAST) + " south_open: " + state.getValue(OPEN_SOUTH) + " west_open: " + state.getValue(OPEN_WEST);
-			if (OVERALL_AABB_MAP.get(key) == null) {
-				VoxelShape shape = generateRatTubeState(state);
-				OVERALL_AABB_MAP.put(key, shape);
-				return shape;
-			} else {
-				return OVERALL_AABB_MAP.get(key);
-			}
+			return SHAPES.computeIfAbsent(state, this::generateRatTubeState);
 		}
 		return super.getShape(state, level, pos, context);
+	}
+
+	@Override
+	protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		if (context instanceof EntityCollisionContext entityContext && entityContext.getEntity() instanceof AbstractRat) {
+			return RAT_SHAPES.computeIfAbsent(state, RatTubeBlock::generateRatShape);
+		}
+		return super.getCollisionShape(state, level, pos, context);
+	}
+
+	private static VoxelShape generateRatShape(BlockState state) {
+		VoxelShape shape = Shapes.empty();
+		for (Direction side : Direction.values()) {
+			if (!isPassable(state, side)) {
+				shape = Shapes.or(shape, rotateAABB(RAT_WALL_UP, side));
+			}
+		}
+		return shape.optimize();
+	}
+
+	/** True if this side of the tube is open or joined to the next tube or cage, so a rat can go through it */
+	public static boolean isPassable(BlockState state, Direction side) {
+		return switch (side) {
+			case UP -> state.getValue(UP) || state.getValue(OPEN_UP);
+			case DOWN -> state.getValue(DOWN) || state.getValue(OPEN_DOWN);
+			case NORTH -> state.getValue(NORTH) || state.getValue(OPEN_NORTH);
+			case SOUTH -> state.getValue(SOUTH) || state.getValue(OPEN_SOUTH);
+			case WEST -> state.getValue(WEST) || state.getValue(OPEN_WEST);
+			case EAST -> state.getValue(EAST) || state.getValue(OPEN_EAST);
+		};
 	}
 
 	public VoxelShape generateRatTubeState(BlockState state) {
@@ -388,11 +416,10 @@ public class RatTubeBlock extends BaseEntityBlock {
 		return createTickerHelper(type, RatsBlockEntityRegistry.RAT_TUBE.get(), RatTubeBlockEntity::tick);
 	}
 
-	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public @Nullable PathType getBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob) {
-		if (mob instanceof TamedRat rat) {
-			return rat.isInTube() || rat.isInCage() ? PathType.WALKABLE : PathType.BLOCKED;
-		}
-		return PathType.BLOCKED;
+	// #907: blocked for every mob on both loaders (the NeoForge-only getBlockPathType of 1.20.1 was asked with no mob, so
+	// it blocked tamed rats too); RatNodeEvaluator opens tubes to tamed rats through their open and connected sides
+	@Override
+	protected boolean isPathfindable(BlockState state, PathComputationType type) {
+		return false;
 	}
 }

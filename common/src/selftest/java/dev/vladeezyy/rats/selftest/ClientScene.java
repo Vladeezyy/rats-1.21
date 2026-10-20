@@ -42,7 +42,9 @@ import java.util.function.Consumer;
  */
 public final class ClientScene {
   private static final String MODE = System.getProperty("rats.scene", "");
-  private static final boolean ENABLED = MODE.equals("main");
+  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf");
+  /** -Pscene=perf: FPS with this many mobs in view (-Drats.scene.mobs) */
+  private static final int PERF_MOBS = Integer.getInteger("rats.scene.mobs", 100);
   static final String LANG = System.getProperty("rats.scene.lang", "en_us");
   private static final String WORLD = RatsMod.MODID + "_scene";
   private static final List<Pair<Integer, Consumer<Minecraft>>> STEPS = new ArrayList<>();
@@ -86,6 +88,84 @@ public final class ClientScene {
   }
 
   static {
+    if (MODE.equals("perf")) {
+      perfSteps();
+    } else {
+      mainSteps();
+    }
+  }
+
+  // FPS of the client: the stage in a glass pen, empty, then with PERF_MOBS rats wandering in it, then as many wolves;
+  // each measured for 10 s (one sample a second), "[scene] PERF" lines
+  private static final List<Integer> fps = new ArrayList<>();
+  private static final List<String> perf = new ArrayList<>();
+  private static final List<net.minecraft.world.entity.Entity> perfMobs = new ArrayList<>();
+
+  private static void measure(int from, String what) {
+    for (int t = from + 20; t <= from + 200; t += 20) {
+      at(t, mc -> fps.add(mc.getFps()));
+    }
+    at(from + 201, mc -> {
+      double mean = fps.stream().mapToInt(Integer::intValue).average().orElse(0);
+      int min = fps.stream().mapToInt(Integer::intValue).min().orElse(0);
+      String line = String.format("%s: %.0f FPS mean, %d lowest second (%d samples)", what, mean, min, fps.size());
+      perf.add(line);
+      RatsMod.LOGGER.info("[scene] PERF " + line);
+      fps.clear();
+    });
+  }
+
+  private static void perfMobs(ServerPlayer player, boolean rats) {
+    ServerLevel level = player.serverLevel();
+    perfMobs.forEach(net.minecraft.world.entity.Entity::discard);
+    perfMobs.clear();
+    for (int i = 0; i < PERF_MOBS; i++) {
+      Mob mob = rats ? com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level) : EntityType.WOLF.create(level);
+      mob.moveTo(stage.getX() - 4 + (i % 10) * 1.5, stage.getY(), stage.getZ() - 4 + (i / 10) * 1.5, i * 37, 0);
+      mob.setPersistenceRequired();
+      if (mob instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat) {
+        rat.tame(player);
+        rat.setCommand(com.github.alexthe666.rats.server.entity.rat.RatCommand.WANDER);
+      }
+      level.addFreshEntity(mob);
+      perfMobs.add(mob);
+    }
+  }
+
+  private static void perfSteps() {
+    int t = 40;
+    at(t, mc -> {
+      mc.options.framerateLimit().set(260);
+      mc.options.enableVsync().set(false);
+      server(mc, ClientScene::build);
+    });
+    at(t += 40, mc -> server(mc, p -> {
+      ServerLevel level = p.serverLevel();
+      // a glass pen over the stage, so the mobs stay in view; the blocks of the main scene are cleared
+      for (BlockPos pos : BlockPos.betweenClosed(stage.offset(-6, 0, -6), stage.offset(12, 6, 12))) {
+        boolean edge = pos.getX() == stage.getX() - 6 || pos.getX() == stage.getX() + 12 || pos.getZ() == stage.getZ() - 6 || pos.getZ() == stage.getZ() + 12;
+        level.setBlock(pos, edge && pos.getY() <= stage.getY() + 1 ? Blocks.GLASS.defaultBlockState() : Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+      }
+      p.setGameMode(GameType.SPECTATOR);
+      lookAt(p, 3, 9, -12, 3, 0, 3);
+    }));
+    measure(t += 40, "empty stage");
+    at(t += 210, mc -> server(mc, p -> perfMobs(p, true)));
+    measure(t += 60, PERF_MOBS + " rats wandering");
+    at(t + 205, mc -> shot(mc, "perf_rats"));
+    at(t += 210, mc -> server(mc, p -> perfMobs(p, false)));
+    measure(t += 60, PERF_MOBS + " wolves wandering");
+    at(t += 210, mc -> {
+      shot(mc, "perf");
+      RatsMod.LOGGER.info("[scene] PERF DONE " + String.join(" | ", perf));
+      RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
+      mc.level.disconnect();
+      mc.disconnect(new TitleScreen());
+      mc.stop();
+    });
+  }
+
+  private static void mainSteps() {
     int t = 40;
     at(t, mc -> server(mc, ClientScene::build));
     at(t += 60, mc -> server(mc, p -> lookAt(p, 3.5, 0, 3.5, 3.5, 0, 7)));

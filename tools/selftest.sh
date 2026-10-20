@@ -22,7 +22,7 @@ else
 fi
 ./gradlew :$LOADER:runSelftest --console=plain "$@" > build-selftest.log 2>&1 &
 i=0
-until grep -qE 'Rats selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND|Failed to load registries|Exception in server tick loop' build-selftest.log 2>/dev/null || [ $i -gt 450 ]; do sleep 2; i=$((i+1)); done
+until grep -qE 'Rats selftest\] (PASS|FAILED)|Minecraft Crash Report|crash report has been saved|Failed to start|BUILD FAILED|FAILED TO BIND|Failed to load registries|Exception in server tick loop|Could not create the Java Virtual Machine' build-selftest.log 2>/dev/null || [ $i -gt 450 ]; do sleep 2; i=$((i+1)); done
 sleep 5
 pkill -f "$PROC" 2>/dev/null; sleep 2; pkill -9 -f "$PROC" 2>/dev/null
 wait 2>/dev/null

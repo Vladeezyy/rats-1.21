@@ -25,20 +25,7 @@ public class RatGardenerGoal extends BaseRatHarvestGoal {
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			BlockState state = this.rat.level().getBlockState(pos);
-			if (RatUtils.canRatBreakBlock(this.rat.level(), pos, this.rat)) {
-				if (state.canBeReplaced() || state.is(BlockTags.FLOWERS)) {
-					allBlocks.add(pos);
-				}
-			}
-		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> (state.canBeReplaced() || state.is(BlockTags.FLOWERS)) && RatUtils.canRatBreakBlock(this.rat.level(), pos, this.rat));
 	}
 
 	@Override

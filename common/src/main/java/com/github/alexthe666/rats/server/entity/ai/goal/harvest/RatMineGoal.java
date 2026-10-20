@@ -26,18 +26,15 @@ public class RatMineGoal {
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
-		NonNullList<ItemStack> mining = this.getMiningList();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			if (this.doesListContainBlock(this.rat.level(), mining, pos)) {
-				allBlocks.add(pos);
-			}
+		// the upgrades once per search and the block checks first; the protection check (the loader's event) only for
+		// the blocks the rat wants (the original asked it, and made a stack, for every block of the area)
+		NonNullList<ItemStack> list = RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER.get()) ? this.getMiningList() : null;
+		NonNullList<ItemStack> mining = list != null && !list.isEmpty() ? list : null;
+		boolean ores = RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER_ORE.get());
+		if (mining == null && !ores) {
+			return;
 		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> !state.isAir() && this.isWanted(this.rat.level(), mining, ores, pos, state) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat));
 	}
 
 	@Nullable
@@ -49,22 +46,18 @@ public class RatMineGoal {
 		}
 	}
 
-	private boolean doesListContainBlock(Level world, @Nullable NonNullList<ItemStack> list, BlockPos pos) {
-		if (RatUtils.isBlockProtected(world, pos, this.rat)) return false;
-		BlockState state = world.getBlockState(pos);
-		ItemStack stack = state.getBlock().getCloneItemStack(world, pos, state);
-		if (RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER.get()) && list != null && !list.isEmpty()) {
+	private boolean isWanted(Level level, @Nullable NonNullList<ItemStack> list, boolean ores, BlockPos pos, BlockState state) {
+		if (list != null) {
+			ItemStack stack = state.getBlock().getCloneItemStack(level, pos, state);
 			for (ItemStack currentStack : list) {
 				if (currentStack.sameItem(stack)) {
 					return true;
 				}
 			}
 		}
-		if (RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_MINER_ORE.get())) {
-			return state.is(CommonTags.ORE_BLOCKS);
-		}
-		return false;
+		return ores && state.is(CommonTags.ORE_BLOCKS);
 	}
+
 
 	@Override
 	public boolean canContinueToUse() {

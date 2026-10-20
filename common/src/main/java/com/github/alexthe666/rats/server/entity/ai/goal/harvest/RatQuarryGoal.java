@@ -57,26 +57,21 @@ public class RatQuarryGoal extends BaseRatHarvestGoal {
 			this.nextStartTick--;
 			return false;
 		}
-		this.nextStartTick = this.adjustedTickDelay(RatConfig.ratHarvestDelay / 2);
+		this.nextStartTick = this.searchDelay(RatConfig.ratHarvestDelay / 2);
 		return true;
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
 		GlobalPos quarryPos = this.rat.getDepositPos().orElse(null);
 		if (quarryPos != null && this.rat.level().getBlockEntity(quarryPos.pos()) instanceof RatQuarryBlockEntity quarry) {
 			int RADIUS = quarry.getRadius();
-			for (BlockPos pos : BlockPos.betweenClosedStream(quarryPos.pos().offset(-RADIUS, -1, -RADIUS), new BlockPos(quarryPos.pos().getX() + RADIUS, this.rat.level().getMinBuildHeight(), quarryPos.pos().getZ() + RADIUS)).map(BlockPos::immutable).toList()) {
-				if ((!this.rat.level().isEmptyBlock(pos) && this.doesListContainBlock(this.rat.level(), pos))) {
-					if (this.canMineBlock(pos)) {
-						allBlocks.add(pos);
-					}
-				}
+			// the last block by the quarry's order (the original sorted a list of the whole column, every 10 ticks)
+			BlockPos target = this.findTarget(quarryPos.pos().offset(-RADIUS, -1, -RADIUS), new BlockPos(quarryPos.pos().getX() + RADIUS, this.rat.level().getMinBuildHeight(), quarryPos.pos().getZ() + RADIUS),
+					new QuarryBlockSorter(this.rat).reversed(), (pos, state) -> !state.isAir() && this.canMineBlock(pos));
+			if (target != null) {
+				this.setTargetBlock(target);
 			}
-			if (!allBlocks.isEmpty()) {
-				allBlocks.sort(new QuarryBlockSorter(this.rat));
-				this.setTargetBlock(allBlocks.get(allBlocks.size() - 1));
-			}
+			this.searched(target != null);
 		}
 
 	}

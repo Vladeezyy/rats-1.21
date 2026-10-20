@@ -470,10 +470,13 @@ public class Dutchrat extends Monster implements IAnimatedEntity {
 					if (Dutchrat.this.hasRestriction()) {
 						blockpos = Dutchrat.this.getRestrictCenter();
 					}
-					BlockPos blockpos1 = blockpos.offset(Dutchrat.this.getRandom().nextInt(6) - 12, 0, Dutchrat.this.getRandom().nextInt(6) - 12);
+					// as in 1.16: a random point around; 1.19 made it nextInt(6) - 12, always off to the north-west
+					BlockPos blockpos1 = blockpos.offset(Dutchrat.this.getRandom().nextInt(15) - 7, 0, Dutchrat.this.getRandom().nextInt(15) - 7);
 					Dutchrat.this.getMoveControl().setWantedPosition(blockpos1.getX(), blockpos1.getY(), blockpos1.getZ(), 1.0D);
 				} else {
-					Dutchrat.this.getMoveControl().setWantedPosition(living.getX(), living.getY() + 4, living.getZ(), 1.0D);
+					// #848: as in 1.16, one block above the target; 1.19 made it 4, where the boss hung out of the
+					// player's reach and never came in to melee
+					Dutchrat.this.getMoveControl().setWantedPosition(living.getX(), living.getY() + 1, living.getZ(), 1.0D);
 				}
 			}
 		}

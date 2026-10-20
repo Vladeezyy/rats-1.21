@@ -51,19 +51,36 @@ public class RatHarvestTreesGoal extends BaseRatHarvestGoal {
 	private void resetTarget() {
 		Level level = this.rat.level();
 		this.unreachable.values().removeIf(until -> until <= this.rat.tickCount);
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			if (RatTreeUtils.isTreeLog(level.getBlockState(pos)) && level.getBlockState(pos.below()).is(BlockTags.DIRT) && this.unreachable.getOrDefault(pos, 0) <= this.rat.tickCount
-				&& (this.treeSize = RatTreeUtils.calculateLogAmount(level, pos)) > 0) {
+		int radius = this.rat.getRadius();
+		BlockPos center = this.rat.getSearchCenter();
+		// the tree bases in one cheap pass, then the nearest first (the original took them in scan order and searched a
+		// path to each until one was reachable)
+		List<BlockPos> bases = new ArrayList<>();
+		for (BlockPos pos : BlockPos.betweenClosed(center.offset(-radius, -radius, -radius), center.offset(radius, radius, radius))) {
+			if (RatTreeUtils.isTreeLog(level.getBlockState(pos)) && level.getBlockState(pos.below()).is(BlockTags.DIRT) && this.unreachable.getOrDefault(pos, 0) <= this.rat.tickCount) {
+				bases.add(pos.immutable());
+			}
+		}
+		bases.sort(this.getTargetSorter());
+		for (BlockPos pos : bases) {
+			this.treeSize = RatTreeUtils.calculateLogAmount(level, pos);
+			// the top of the canopy stays with this goal: the shared map of the original only lost the trees that were
+			// felled (it grew with every trunk looked at) and another rat could remove the entry this one needed
+			Integer top = RatTreeUtils.highestleaf.remove(pos);
+			if (this.treeSize > 0 && top != null) {
 				Path path = this.rat.getNavigation().createPath(this.getOffsetToAirPos(pos), 1);
-				if (path != null && path.canReach() && RatUtils.canRatBreakBlock(this.rat.level(), pos, this.rat)) {
+				if (path != null && path.canReach() && RatUtils.canRatBreakBlock(level, pos, this.rat)) {
+					this.highestLeaf = top;
 					this.setTargetBlock(pos);
-					break;
+					this.searched(true);
+					return;
 				}
 			}
 		}
+		this.searched(false);
 	}
 
+	private int highestLeaf;
 	private final com.github.alexthe666.rats.server.entity.ai.goal.ProgressWatch progress = new com.github.alexthe666.rats.server.entity.ai.goal.ProgressWatch();
 	/** trees given up on, until the rat's tick count */
 	private final java.util.Map<BlockPos, Integer> unreachable = new java.util.HashMap<>();
@@ -175,7 +192,7 @@ public class RatHarvestTreesGoal extends BaseRatHarvestGoal {
 				highestlog = logpos.immutable();
 			}
 
-			for (BlockPos next : BlockPos.betweenClosed(base.getX() - 8, base.getY(), base.getZ() - 8, base.getX() + 8, RatTreeUtils.highestleaf.get(base), base.getZ() + 8)) {
+			for (BlockPos next : BlockPos.betweenClosed(base.getX() - 8, base.getY(), base.getZ() - 8, base.getX() + 8, this.highestLeaf, base.getZ() + 8)) {
 				BlockState nextblock = level.getBlockState(next);
 				if (RatTreeUtils.isTreeLog(nextblock)) {
 					if (nextblock.is(baseBlock.getBlock()) || RatTreeUtils.areEqualLogTypes(baseBlock, nextblock)) {
@@ -190,7 +207,7 @@ public class RatHarvestTreesGoal extends BaseRatHarvestGoal {
 			CopyOnWriteArrayList<BlockPos> leftoverleaves = new CopyOnWriteArrayList<>();
 
 			BlockState leafblock = level.getBlockState(highestlog.above());
-			for (BlockPos next : BlockPos.betweenClosed(base.getX() - h, base.getY(), base.getZ() - h, base.getX() + h, RatTreeUtils.highestleaf.get(base), base.getZ() + h)) {
+			for (BlockPos next : BlockPos.betweenClosed(base.getX() - h, base.getY(), base.getZ() - h, base.getX() + h, this.highestLeaf, base.getZ() + h)) {
 				BlockState nextblock = level.getBlockState(next);
 
 				if (!leafblock.is(nextblock.getBlock())) {
@@ -245,6 +262,5 @@ public class RatHarvestTreesGoal extends BaseRatHarvestGoal {
 			}
 		}
 
-		RatTreeUtils.highestleaf.remove(base);
 	}
 }

@@ -143,16 +143,6 @@ public class RatUseShearsGoal extends BaseRatHarvestGoal {
 			return;
 		}
 
-		List<BlockPos> allBlocks = new ArrayList<>();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			if ((this.rat.level().getBlockState(pos).getBlock() instanceof BeehiveBlock && this.rat.level().getBlockState(pos).getValue(BeehiveBlock.HONEY_LEVEL) == 5)) {
-				allBlocks.add(pos);
-			}
-		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> state.getBlock() instanceof BeehiveBlock && state.getValue(BeehiveBlock.HONEY_LEVEL) == 5);
 	}
 }

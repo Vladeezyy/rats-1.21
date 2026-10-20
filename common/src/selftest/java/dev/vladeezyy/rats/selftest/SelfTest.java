@@ -73,6 +73,12 @@ public final class SelfTest {
     }
     player = TestHooks.fakePlayer.apply(level, TestHooks.TESTER);
     player.setPos(origin.getX() + 0.5, origin.getY(), origin.getZ() - 2.5);
+    if (StressTest.enabled()) {
+      // -Drats.stress=<rats>: the load measurement instead of the checks
+      StressTest.start(level, player, origin.offset(16, 0, 16));
+      tick = 0;
+      return;
+    }
     GameplayTest.start(level, player, origin);
     try {
       checks(server, level);
@@ -89,6 +95,15 @@ public final class SelfTest {
       return;
     }
     tick++;
+    if (StressTest.enabled()) {
+      if (StressTest.tick(server)) {
+        // the end line tools/selftest.sh waits for
+        RatsMod.LOGGER.info(PREFIX + "PASS stress run");
+        tick = -1;
+        server.halt(false);
+      }
+      return;
+    }
     GameplayTest.tick(server.overworld());
     if (tick == 10) {
       try {

@@ -126,19 +126,7 @@ public class RatBottlerGoal extends BaseRatHarvestGoal {
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			BlockState state = this.rat.level().getBlockState(pos);
-			if (state.getBlock() instanceof BeehiveBlock && state.getValue(BeehiveBlock.HONEY_LEVEL) == 5) {
-				allBlocks.add(pos);
-			} else if (state.is(Blocks.WATER_CAULDRON) && state.getValue(LayeredCauldronBlock.LEVEL) > 0) {
-				allBlocks.add(pos);
-			}
-		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> state.getBlock() instanceof BeehiveBlock && state.getValue(BeehiveBlock.HONEY_LEVEL) == 5
+				|| state.is(Blocks.WATER_CAULDRON) && state.getValue(LayeredCauldronBlock.LEVEL) > 0);
 	}
 }

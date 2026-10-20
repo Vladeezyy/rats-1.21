@@ -105,29 +105,10 @@ public class RatFarmGoal extends BaseRatHarvestGoal {
 	}
 
 	private void resetTarget() {
-		int RADIUS = this.rat.getRadius();
 		if (this.holdingBonemeal()) {
-			List<BlockPos> allBlocks = new ArrayList<>();
-			for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-				if (this.canPlantBeBonemealed(pos, this.rat.level().getBlockState(pos)) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat)) {
-					allBlocks.add(pos);
-				}
-			}
-			if (!allBlocks.isEmpty()) {
-				allBlocks.sort(this.getTargetSorter());
-				this.setTargetBlock(allBlocks.get(0));
-			}
+			this.findTarget((pos, state) -> this.canPlantBeBonemealed(pos, state) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat));
 		} else if (this.holdingSeeds()) {
-			List<BlockPos> allBlocks = new ArrayList<>();
-			for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-				if (this.canPlantAt(pos, this.rat.level().getBlockState(pos)) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat)) {
-					allBlocks.add(pos);
-				}
-			}
-			if (!allBlocks.isEmpty()) {
-				allBlocks.sort(this.getTargetSorter());
-				this.setTargetBlock(allBlocks.get(0));
-			}
+			this.findTarget((pos, state) -> this.canPlantAt(pos, state) && !RatUtils.isBlockProtected(this.rat.level(), pos, this.rat));
 		}
 	}
 

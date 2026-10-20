@@ -41,6 +41,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -136,8 +137,16 @@ final class GameplayTest {
     SCENARIOS.add(new Scenario("a wild rat is tamed by cheese a player threw", 3600) {
       @Override
       boolean start(ServerLevel level) {
+        // a glass pen: a wild rat wanders off between two bites and stops seeing food further than its search range
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(-5, 0, -5), this.base.offset(5, 1, 5))) {
+          if (Math.abs(pos.getX() - this.base.getX()) == 5 || Math.abs(pos.getZ() - this.base.getZ()) == 5) {
+            level.setBlock(pos, Blocks.GLASS.defaultBlockState(), Block.UPDATE_CLIENTS);
+          }
+        }
         Rat rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, MobSpawnType.COMMAND);
         rat.setPlagued(false);
+        // a baby rat does not move (canMove)
+        rat.setBaby(false);
         ItemEntity cheese = new ItemEntity(level, this.base.getX() + 3.5, this.base.getY(), this.base.getZ() + 0.5, new ItemStack(RatsItemRegistry.CHEESE.get(), 32));
         cheese.setThrower(player);
         level.addFreshEntity(cheese);
@@ -152,7 +161,9 @@ final class GameplayTest {
 
       @Override
       String detail(ServerLevel level) {
-        return "tamed: " + around(level, TamedRat.class, this.base).stream().map(r -> "hand " + r.getMainHandItem()).toList() + ", wild rats: " + around(level, Rat.class, this.base).stream().map(r -> "trust " + r.wildTrust + " fed " + r.cheeseFeedings).toList();
+        return "tamed: " + around(level, TamedRat.class, this.base).stream().map(r -> "hand " + r.getMainHandItem()).toList() + ", wild rats: " + around(level, Rat.class, this.base).stream().map(r -> "trust " + r.wildTrust + " fed " + r.cheeseFeedings
+          + " baby " + r.isBaby() + " ticks " + r.tickCount + " at " + r.position().subtract(Vec3.atLowerCornerOf(this.base)) + " hand " + r.getMainHandItem()).toList()
+          + ", cheese on the ground: " + around(level, ItemEntity.class, this.base).stream().map(item -> item.getItem() + " at " + item.position().subtract(Vec3.atLowerCornerOf(this.base))).toList();
       }
     });
     SCENARIOS.add(new Scenario("creative cheese tames a wild rat at once", 20) {
@@ -214,6 +225,41 @@ final class GameplayTest {
         return false;
       }
     });
+    SCENARIOS.add(new Scenario("#844: a lumberjack rat fells a tree across its work area, 15 blocks away", 1800) {
+      BlockPos tree;
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.tree = this.base.offset(7, 0, 0);
+        level.setBlock(this.tree.below(), Blocks.DIRT.defaultBlockState(), Block.UPDATE_CLIENTS);
+        BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
+        for (BlockPos pos : BlockPos.betweenClosed(this.tree.offset(-2, 3, -2), this.tree.offset(2, 5, 2))) {
+          level.setBlock(pos, leaves, Block.UPDATE_CLIENTS);
+        }
+        for (int y = 0; y < 5; y++) {
+          level.setBlock(this.tree.above(y), Blocks.OAK_LOG.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        chest(level, this.base.offset(-8, 0, 2));
+        this.rat = tamedRat(level, this.base.offset(-8, 0, 0), RatCommand.HARVEST);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_LUMBERJACK.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(-8, 0, 2)));
+        this.rat.setRadiusCenter(GlobalPos.of(level.dimension(), this.base));
+        this.rat.setRadius(9);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return !level.getBlockState(this.tree).is(Blocks.OAK_LOG);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position() + ", tree at " + this.tree;
+      }
+    });
     SCENARIOS.add(new Scenario("#787: a patrol path survives saving and reaches joining players", 1) {
       @Override
       boolean start(ServerLevel level) {
@@ -249,6 +295,162 @@ final class GameplayTest {
       @Override
       boolean done(ServerLevel level) {
         return count(this.to, Items.COBBLESTONE) > 0;
+      }
+    });
+    SCENARIOS.add(new Scenario("#871: an ethereal rat carries items through stone into a walled-in chest", 1800) {
+      ChestBlockEntity to;
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        if (!RatsMod.RATLANTIS_DATAPACK_ENABLED) {
+          return false;
+        }
+        ChestBlockEntity from = chest(level, this.base.offset(-3, 0, 0));
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 32));
+        BlockPos box = this.base.offset(4, 1, 0);
+        for (BlockPos pos : BlockPos.betweenClosed(box.offset(-2, -2, -2), box.offset(2, 2, 2))) {
+          level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        this.to = chest(level, box);
+        this.rat = tamedRat(level, this.base, RatCommand.TRANSPORT);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RAT_UPGRADE_ETHEREAL.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setPickupPos(GlobalPos.of(level.dimension(), this.base.offset(-3, 0, 0)));
+        this.rat.setDepositPos(GlobalPos.of(level.dimension(), box));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.COBBLESTONE) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position() + ", noPhysics " + this.rat.noPhysics + ", noGravity " + this.rat.isNoGravity() + ", holds " + this.rat.getMainHandItem();
+      }
+    });
+    SCENARIOS.add(new Scenario("#907: a rat carries items through a rat tube into a walled-in room", 600) {
+      ChestBlockEntity to;
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        ChestBlockEntity from = chest(level, this.base.offset(-3, 0, 0));
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 32));
+        // a stone room (inside x 4..6, z -1..1, two high) whose only way in is a tube through its west wall
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(3, 0, -2), this.base.offset(7, 2, 2))) {
+          level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(4, 0, -1), this.base.offset(6, 1, 1))) {
+          level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        BlockState tube = RatsBlockRegistry.RAT_TUBE_COLOR.get().defaultBlockState();
+        level.setBlock(this.base.offset(2, 0, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.OPEN_WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.EAST, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(3, 0, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.EAST, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(4, 0, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.OPEN_EAST, true), Block.UPDATE_CLIENTS);
+        this.to = chest(level, this.base.offset(6, 0, 0));
+        this.rat = tamedRat(level, this.base, RatCommand.TRANSPORT);
+        this.rat.setPickupPos(GlobalPos.of(level.dimension(), this.base.offset(-3, 0, 0)));
+        this.rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(6, 0, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.COBBLESTONE) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        StringBuilder text = new StringBuilder("rat at " + this.rat.position() + ", holds " + this.rat.getMainHandItem() + ", path " + (this.rat.getNavigation().getPath() == null ? "none" : this.rat.getNavigation().getPath().getTarget() + " reach " + this.rat.getNavigation().getPath().canReach()));
+        for (int x = 2; x <= 4; x++) {
+          text.append("\n  tube ").append(x).append(": ").append(level.getBlockState(this.base.offset(x, 0, 0)));
+        }
+        TamedRat probe = RatsEntityRegistry.TAMED_RAT.get().spawn(level, this.base.offset(1, 0, 0), MobSpawnType.COMMAND);
+        probe.tame(player);
+        probe.setOnGround(true);
+        net.minecraft.world.level.pathfinder.Path path = probe.getNavigation().createPath(this.base.offset(5, 0, 0), 0);
+        text.append("\n  probe from the entrance: ").append(path == null ? "no path" : "reach " + path.canReach());
+        if (path != null) {
+          for (int i = 0; i < path.getNodeCount(); i++) {
+            text.append(" ").append(path.getNode(i).asBlockPos().subtract(this.base).toShortString()).append(path.getNode(i).type);
+          }
+        }
+        var evaluator = probe.getNavigation().getNodeEvaluator();
+        text.append("\n  evaluator ").append(evaluator.getClass().getSimpleName());
+        var region = new net.minecraft.world.level.PathNavigationRegion(level, this.base.offset(-10, -2, -10), this.base.offset(10, 4, 10));
+        evaluator.prepare(region, probe);
+        for (int x = 1; x <= 5; x++) {
+          BlockPos at = this.base.offset(x, 0, 0);
+          text.append("\n  ").append(x).append(": ").append(evaluator.getPathTypeOfMob(new net.minecraft.world.level.pathfinder.PathfindingContext(region, probe), at.getX(), at.getY(), at.getZ(), probe));
+          net.minecraft.world.level.pathfinder.Node[] out = new net.minecraft.world.level.pathfinder.Node[32];
+          int n = evaluator.getNeighbors(out, new net.minecraft.world.level.pathfinder.Node(at.getX(), at.getY(), at.getZ()));
+          text.append(" ->");
+          for (int i = 0; i < n; i++) {
+            text.append(" ").append(out[i].asBlockPos().subtract(this.base).toShortString()).append(out[i].type);
+          }
+        }
+        evaluator.done();
+        probe.discard();
+        net.minecraft.world.level.pathfinder.Path own = this.rat.getNavigation().getPath();
+        if (own != null) {
+          text.append("\n  the rat's path:");
+          for (int i = 0; i < own.getNodeCount(); i++) {
+            text.append(" ").append(own.getNode(i).asBlockPos().subtract(this.base).toShortString());
+          }
+        }
+        return text.toString();
+      }
+    });
+    SCENARIOS.add(new Scenario("#907: a rat climbs a rat tube shaft into a room three blocks up", 1200) {
+      ChestBlockEntity to;
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        ChestBlockEntity from = chest(level, this.base.offset(-3, 0, 0));
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 32));
+        // a stone room on stone pillars (inside x 4..6, z -1..1, y 3..4); the way in: a tube up from the ground at x 2,
+        // then east through the room's west wall
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(3, 0, -2), this.base.offset(7, 5, 2))) {
+          level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(4, 3, -1), this.base.offset(6, 4, 1))) {
+          level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        BlockState tube = RatsBlockRegistry.RAT_TUBE_COLOR.get().defaultBlockState();
+        level.setBlock(this.base.offset(2, 0, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.OPEN_WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.UP, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(2, 1, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.DOWN, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.UP, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(2, 2, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.DOWN, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.UP, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(2, 3, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.DOWN, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.EAST, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(3, 3, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.EAST, true), Block.UPDATE_CLIENTS);
+        level.setBlock(this.base.offset(4, 3, 0), tube.setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.WEST, true).setValue(com.github.alexthe666.rats.server.block.RatTubeBlock.OPEN_EAST, true), Block.UPDATE_CLIENTS);
+        this.to = chest(level, this.base.offset(6, 3, 0));
+        this.rat = tamedRat(level, this.base, RatCommand.TRANSPORT);
+        this.rat.setPickupPos(GlobalPos.of(level.dimension(), this.base.offset(-3, 0, 0)));
+        this.rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(6, 3, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.COBBLESTONE) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        StringBuilder text = new StringBuilder("rat at " + this.rat.position().subtract(Vec3.atLowerCornerOf(this.base)) + ", holds " + this.rat.getMainHandItem());
+        net.minecraft.world.level.pathfinder.Path own = this.rat.getNavigation().getPath();
+        text.append(", path:");
+        if (own != null) {
+          for (int i = 0; i < own.getNodeCount(); i++) {
+            text.append(" ").append(own.getNode(i).asBlockPos().subtract(this.base).toShortString());
+          }
+          text.append(" reach ").append(own.canReach()).append(" next ").append(own.getNextNodeIndex());
+        }
+        return text.toString();
       }
     });
     SCENARIOS.add(new Scenario("a rat gathers items from the ground into a chest", 1800) {
@@ -376,6 +578,60 @@ final class GameplayTest {
         return "health " + this.healthBeforeHeal + " -> " + this.sick.getHealth() + ", victim plagued " + this.victim.hasEffect(RatsEffectRegistry.PLAGUE.holder());
       }
     });
+    SCENARIOS.add(new Scenario("#822: a bee rat in the air flies down and bites its target", 400) {
+      TamedRat rat;
+      Mob pig;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), MobSpawnType.COMMAND);
+        this.pig.setNoAi(true);
+        // hunting rats do not wander, so it stays in the air as a following one does (wandering, it lands and paths)
+        this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_BEE.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setFlying(true);
+        this.rat.setNoGravity(true);
+        this.rat.setTarget(this.pig);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        if (this.rat.getTarget() == null && this.pig.isAlive()) {
+          this.rat.setTarget(this.pig);
+        }
+        return this.pig.getLastHurtByMob() == this.rat;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position() + " flying " + this.rat.isFlying() + ", target " + this.rat.getTarget() + ", pig at " + this.pig.position();
+      }
+    });
+    SCENARIOS.add(new Scenario("#822: a winged rat hovering by its owner may start a melee attack", 1) {
+      boolean canAttack;
+
+      @Override
+      boolean start(ServerLevel level) {
+        // as a following rat: in the air, where its navigation has no path (owners cannot be fake players here)
+        Mob pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), MobSpawnType.COMMAND);
+        pig.setNoAi(true);
+        TamedRat rat = tamedRat(level, this.base.above(4), RatCommand.FOLLOW);
+        rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
+        rat.onUpgradeChanged();
+        rat.setFlying(true);
+        rat.setNoGravity(true);
+        rat.setTarget(pig);
+        this.canAttack = new com.github.alexthe666.rats.server.entity.ai.goal.RatMeleeAttackGoal(rat, 1.45D, true).canUse();
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return this.canAttack;
+      }
+    });
     SCENARIOS.add(new Scenario("health and armor upgrades raise the rat's stats", 40) {
       TamedRat rat;
 
@@ -497,6 +753,55 @@ final class GameplayTest {
           + " enabled " + RatsMod.RATLANTIS_DATAPACK_ENABLED;
       }
     });
+    SCENARIOS.add(new Scenario("#848: the Flying Dutchrat stays within a player's reach while it fights in melee", 1000) {
+      Mob dutchrat;
+      Mob target;
+      int inReach;
+      int counted;
+      Boolean verdict;
+      int throwChance;
+
+      @Override
+      boolean start(ServerLevel level) {
+        if (!RatsMod.RATLANTIS_DATAPACK_ENABLED) {
+          return false;
+        }
+        this.target = EntityType.ZOMBIE.spawn(level, this.base, MobSpawnType.COMMAND);
+        this.target.setNoAi(true);
+        this.target.setInvulnerable(true);
+        // melee only: the sword throws (1 in 5 hits) send the boss off for 5 s on purpose and made the share random
+        this.throwChance = com.github.alexthe666.rats.RatConfig.dutchratSwordThrowChance;
+        com.github.alexthe666.rats.RatConfig.dutchratSwordThrowChance = Integer.MAX_VALUE;
+        this.dutchrat = com.github.alexthe666.rats.registry.RatlantisEntityRegistry.DUTCHRAT.get().spawn(level, this.base.offset(8, 6, 0), MobSpawnType.COMMAND);
+        this.dutchrat.setTarget(this.target);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        this.dutchrat.setTarget(this.target);
+        // its own ticks (a busy test server ticks the boss's chunk late), and the melee part of the fight: after a sword
+        // throw the boss flies off for 5 s on purpose
+        if (this.dutchrat.tickCount > 60 && !((com.github.alexthe666.rats.server.entity.monster.boss.Dutchrat) this.dutchrat).hasThrownSword()) {
+          // a player standing there reaches 3 blocks from the eyes; 1.20 hung about 4 blocks over the head
+          this.counted++;
+          if (this.dutchrat.getBoundingBox().distanceToSqr(this.target.getEyePosition()) < 9.0D) {
+            this.inReach++;
+          }
+        }
+        // judged once, over the first 300 melee ticks
+        if (this.counted == 300 && this.verdict == null) {
+          this.verdict = this.inReach * 2 >= this.counted;
+          com.github.alexthe666.rats.RatConfig.dutchratSwordThrowChance = this.throwChance;
+        }
+        return Boolean.TRUE.equals(this.verdict);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "in reach " + this.inReach + " of " + this.counted + " melee ticks, boss at " + this.dutchrat.position() + ", target at " + this.target.position();
+      }
+    });
     SCENARIOS.add(new Scenario("bosses and Ratlantis mobs fight for 10 seconds without errors", 200) {
       final List<Mob> mobs = new ArrayList<>();
 
@@ -526,9 +831,10 @@ final class GameplayTest {
         return this.mobs.size() + " mobs spawned";
       }
     });
-    // -Drats.selftest.only=<part of a name> runs only the matching scenarios (JAVA_TOOL_OPTIONS reaches the dev run)
-    String only = System.getProperty("rats.selftest.only", "");
-    SCENARIOS.removeIf(scenario -> !scenario.name.contains(only));
+    // -Drats.selftest.only=<part of a name>[,<part>...] runs only the matching scenarios (JAVA_TOOL_OPTIONS reaches the
+    // dev run; it splits on spaces, so the parts have none)
+    List<String> only = List.of(System.getProperty("rats.selftest.only", "").split(","));
+    SCENARIOS.removeIf(scenario -> only.stream().noneMatch(scenario.name::contains));
     int i = 0;
     for (Scenario scenario : SCENARIOS) {
       scenario.base = origin.offset(40 * (i % 5) - 80, 0, 40 + 40 * (i / 5));

@@ -4,10 +4,16 @@ import com.github.alexthe666.rats.server.entity.ai.navigation.evaluator.RatNodeE
 import com.github.alexthe666.rats.server.entity.rat.AbstractRat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.PathNavigationRegion;
+import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathFinder;
+
+import java.util.List;
+import java.util.Set;
 
 public class EtherealRatNavigation extends FlyingPathNavigation {
 
@@ -22,7 +28,23 @@ public class EtherealRatNavigation extends FlyingPathNavigation {
 		this.nodeEvaluator = new RatNodeEvaluator();
 		this.nodeEvaluator.setCanPassDoors(true);
 		this.nodeEvaluator.setCanFloat(true);
-		return new PathFinder(this.nodeEvaluator, nodes);
+		// #871: an ethereal rat phases through blocks (as in 1.15, where it had noClip), so its path is the straight
+		// line to the nearest target: no search around walls, which also spares the server the pathfinding
+		return new PathFinder(this.nodeEvaluator, nodes) {
+			@Override
+			public Path findPath(PathNavigationRegion region, Mob mob, Set<BlockPos> targets, float maxRange, int accuracy, float searchDepthMultiplier) {
+				BlockPos nearest = null;
+				double nearestDistance = Double.MAX_VALUE;
+				for (BlockPos target : targets) {
+					double distance = target.distToCenterSqr(mob.position());
+					if (distance < nearestDistance) {
+						nearest = target;
+						nearestDistance = distance;
+					}
+				}
+				return nearest == null ? null : new Path(List.of(new Node(nearest.getX(), nearest.getY(), nearest.getZ())), nearest, true);
+			}
+		};
 	}
 
 	@Override

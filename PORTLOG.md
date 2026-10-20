@@ -26,24 +26,24 @@ every player of the server) and renders model boxes without per-vertex allocatio
 
 Open issues of `AlexModGuy/Rats` (72 open, 2026-10-19), the ones about 1.19–1.20 behaviour:
 
-| Issue | Problem | Plan |
+| Issue | Problem | Status in the port |
 |---|---|---|
-| [#838](https://github.com/AlexModGuy/Rats/issues/838) (17 comments) | Tamed rat stuck holding cheese, does nothing | Find the held-item/food state that never clears |
-| [#818](https://github.com/AlexModGuy/Rats/issues/818), [#844](https://github.com/AlexModGuy/Rats/issues/844) | Lumberjack rat stops working; breaks only near trees, picks up one item | Lumberjack goal: target search and drop pickup |
-| [#887](https://github.com/AlexModGuy/Rats/issues/887), [#920](https://github.com/AlexModGuy/Rats/issues/920), [#902](https://github.com/AlexModGuy/Rats/issues/902) | Rats stop interacting with chests/crops after a while; planter does nothing | Harvest/deposit goals and their cooldowns |
-| [#850](https://github.com/AlexModGuy/Rats/issues/850), [#945](https://github.com/AlexModGuy/Rats/issues/945) | Rats stop working when the owner is offline / world opened to LAN | Goals must not need the owner entity |
-| [#907](https://github.com/AlexModGuy/Rats/issues/907) | Rat tubes do nothing | Tube pathing |
-| [#871](https://github.com/AlexModGuy/Rats/issues/871) | Ethereal transport rat does not phase through blocks | Navigation of ethereal rats in transport mode |
-| [#787](https://github.com/AlexModGuy/Rats/issues/787) | Patrol paths cleared on restart | Save the patrol path with the rat |
-| [#827](https://github.com/AlexModGuy/Rats/issues/827) | Crash `NoSuchElementException` while ticking (Plague Doctor) | Guard the empty collection |
-| [#913](https://github.com/AlexModGuy/Rats/issues/913) | Crash when taming | Read the crash, guard |
-| [#885](https://github.com/AlexModGuy/Rats/issues/885) | `StackOverflowError` with plague beast / mounts (1.16) | Check the mount code for recursion |
-| [#822](https://github.com/AlexModGuy/Rats/issues/822) | Bee-upgrade rat on Follow Me does not attack the owner's target | Target goal of flying rats |
-| [#848](https://github.com/AlexModGuy/Rats/issues/848) | Flying Dutchrat never melees | Boss attack goal |
-| [#847](https://github.com/AlexModGuy/Rats/issues/847) | Rat "fell from a great height" after the owner teleports | Reset fall distance on teleport to owner |
-| [#870](https://github.com/AlexModGuy/Rats/issues/870) | Bucket upgrade works every tick (sound spam) | Cooldown |
-| [#864](https://github.com/AlexModGuy/Rats/issues/864) | The "disable plastic" config option is gone | Bring it back (recipe condition) |
-| [#867](https://github.com/AlexModGuy/Rats/issues/867) | Server lag with rats (1.20.1) | Profile with the stress test (MSPT vs vanilla) |
+| [#838](https://github.com/AlexModGuy/Rats/issues/838) (17 comments) | Tamed rat stuck holding cheese, does nothing | Fixed: taming no longer copies the cheese into the hand; a working rat drops food it may not eat (test) |
+| [#818](https://github.com/AlexModGuy/Rats/issues/818), [#844](https://github.com/AlexModGuy/Rats/issues/844) | Lumberjack rat stops working; breaks only near trees, picks up one item | Fixed: unreachable trees skipped for a minute; paths cover the whole radius-staff area (they ended at the follow range, 12 blocks) (test). One item per trip without the Platter is the upgrade's design |
+| [#887](https://github.com/AlexModGuy/Rats/issues/887), [#920](https://github.com/AlexModGuy/Rats/issues/920), [#902](https://github.com/AlexModGuy/Rats/issues/902) | Rats stop interacting with chests/crops after a while; planter does nothing | Fixed: pickup/deposit give up on a chest they cannot reach and retry later; the farmer plants any seed on dry farmland (test) |
+| [#850](https://github.com/AlexModGuy/Rats/issues/850), [#945](https://github.com/AlexModGuy/Rats/issues/945) | Rats stop working when the owner is offline / world opened to LAN | Fixed: vanilla's sit goal sat every pet with an offline owner; the rats' own sit goal only sits on command (test) |
+| [#907](https://github.com/AlexModGuy/Rats/issues/907) | Rat tubes do nothing | Fixed (broken since 1.14): tamed rats path through tube networks (any tube, only through open or joined sides, up and down shafts), climb shafts, and get the 1.12 tube inside (10 px; the 8 px of the model caught a 0.49 rat on the edges) (tests: a sealed room behind a tube, a room 3 blocks up a shaft) |
+| [#871](https://github.com/AlexModGuy/Rats/issues/871) | Ethereal transport rat does not phase through blocks | Fixed: noPhysics and no gravity back (lost in 1.19), straight paths (test) |
+| [#787](https://github.com/AlexModGuy/Rats/issues/787) | Patrol paths cleared on restart | Fixed: the loaded path is a new list, so it is synced (test) |
+| [#827](https://github.com/AlexModGuy/Rats/issues/827) | Crash `NoSuchElementException` while ticking (Plague Doctor) | Fixed: purifying liquid / Dutchrat sword damage sources take the owner (null-safe) |
+| [#913](https://github.com/AlexModGuy/Rats/issues/913) | Crash when taming | Log expired (mclo.gs 404); taming by thrown and creative cheese tested, no crash |
+| [#885](https://github.com/AlexModGuy/Rats/issues/885) | `StackOverflowError` with plague beast / mounts (1.16) | 1.16 code; mounts and bosses tested for 10 s without errors |
+| [#822](https://github.com/AlexModGuy/Rats/issues/822) | Bee-upgrade rat on Follow Me does not attack the owner's target | Fixed: a flying rat in the air had no path, so its melee goal never started (test) |
+| [#848](https://github.com/AlexModGuy/Rats/issues/848) | Flying Dutchrat never melees | Fixed: 1.19 made it hover 4 blocks over the target (1.16: 1) and flee to the north-west after a throw (test) |
+| [#847](https://github.com/AlexModGuy/Rats/issues/847) | Rat "fell from a great height" after the owner teleports | Fixed: fall distance reset on teleport to owner |
+| [#870](https://github.com/AlexModGuy/Rats/issues/870) | Bucket upgrade works every tick (sound spam) | Fixed: fluid sounds at most once a second |
+| [#864](https://github.com/AlexModGuy/Rats/issues/864) | The "disable plastic" config option is gone | Fixed: "Plastic in Recipes" config, glass recipes when off (both loaders' recipe conditions) (test) |
+| [#867](https://github.com/AlexModGuy/Rats/issues/867) | Server lag with rats (1.20.1) | Measured (`tools/stress.sh`, below): 300 working rats +2.2 ms per tick (7.5 µs per rat), 4.4× a wild wolf. Fixed: area scans (expensive check first for every block), item search every 2 ticks, static maps that grew, navigation re-created every 3 s, stuck rats re-pathing forever (#887) |
 
 ## 2026-10-19 — NeoForge 1.21.1: the code compiles (2457 compile errors → 0)
 
@@ -123,3 +123,60 @@ The game code lives in `common/` (compiled against vanilla 1.21.1 / NeoForm) and
   world's enabled packs for `ratlantis` (the original's id), so `RATLANTIS_DATAPACK_ENABLED` stayed false (Ratlantis
   items with the "disabled" tooltip, no Ratlantis fishing loot). The pack id is `ratlantis` again (1.20.1 worlds keep it
   enabled); the check also accepts Fabric's `rats:ratlantis`.
+
+## 2026-10-20 — gameplay checks and the original's issues
+
+`GameplayTest` (selftest, both loaders): scenarios on the dev server, each on its own patch of ground, with a timeout and
+a line of detail when it fails. Every scenario of a bug was run once against the old code too (two of them passed there
+and were rewritten: a bee rat that landed found a path; "came within reach once").
+
+### Bugs of the port fixed
+- The rat sack kept only its first rat (1.21 `custom_data` is a copy: the other rats were written into the copy).
+- Ratlantis data: 1.20.5 number providers (`{"type": "uniform", "value": {...}}` → flat), the mob category in the biome
+  spawners (`rats:rats`), `#c:tools/shear` in the pirat leaves loot, prismarine shards in the psychic upgrade recipe.
+- Fabric: `MobCategory` / `Rarity` values missing from their codecs (mixin now adds them right after `$VALUES` in
+  `<clinit>`); custom signs had no block entity data (vanilla's `isValidBlockState`).
+- Packets checked who sends them: commands, upgrade visibility, rat tags and staff only for the rat's owner (or ops),
+  dismount only for the rat's vehicle, dancing within 64 blocks, the crafting table only with its menu open.
+- Tamed rats had the vanilla navigation until their first navigator check (5 s), and every check re-created it (the
+  current path was dropped every 3 s). Now their own from the start, switched only when the kind changes.
+- Tube shapes: built once per block state (a long string key per collision query before) in thread-safe maps.
+
+### The original's bugs fixed (see the table above for the issues)
+- #850/#945, #787, #838, #887/#818/#920/#902, #827, #870, #864, #871, #822, #848, #844, #907 — in the table.
+- The ethereal rat's gravity came back every tick (`setNoGravity(isFlying())`), so it never floated either.
+- The Flying Dutchrat fled to the north-west after every sword throw (`nextInt(6) - 12`; 1.16: `nextInt(15) - 7`).
+- `RatMeleeAttackGoal.getAttackReachSqr` was dead since 1.20.2 (vanilla reach now counts the vehicle).
+- Tube climbing: 1.19+ only had `onClimbable`, which climbs while the rat pushes against a wall; 1.12's lift is back.
+
+### Tests
+`tools/selftest.sh` (both loaders): 31 → 38 checks. `JAVA_TOOL_OPTIONS=-Drats.selftest.only=a,b` runs the scenarios
+whose names contain one of the parts. `tools/stress.sh` (server load, below), `tools/scenetest.sh -Pscene=perf`
+(client FPS with 100 rats in view).
+
+### Stress test (#867), NeoForge 1.21.1, dev server (Apple M-series), 2026-10-20
+`tools/stress.sh` (`RATS=n`, `StressTest`): a stage of n cells, each with a carrier (two chests, refilled every 20 s),
+a farmer (3x3 wheat around water) or a wanderer; mean tick time (`getAverageTickTimeNanos`, one value per 100 ticks)
+with the stage empty, with n wild wolves, then with n tamed rats at work; JFR over the run, `tools/jfr_hot.py` lists
+the Rats methods in the server thread's samples of the rat phase.
+
+| Run | Empty stage | n wild wolves | n working rats | Items carried in 70 s |
+|---|---|---|---|---|
+| 100, before | 0.54 ms | (tamed: sitting, 0.53) | 1.22 ms | (not counted) |
+| 100, after the scans | 0.50 ms | (tamed: sitting, 0.55) | 1.16 ms | 2848 |
+| 300, after the scans | 0.91 ms | 1.42 ms | 3.31 ms | 8596 |
+| 300, after the throttles | 0.99 ms | 1.56 ms | 3.23 ms | 8532 |
+
+Rat phase in the profile (300 rats): path searches 31 % → 19 % of the server thread (the item search of gathering rats
+every 2 ticks, 7 %, is gone), crop scans 8 % → 5 %; the rest is the vanilla mob tick (movement, collisions, goal
+selection) and the carriers' two path searches per trip (one item per trip without the Platter, by design).
+What changed: one pass over the search area with the cheap block checks first (crops, mining, bottler, shears,
+fisherman, gardener, farm, quarry: the original listed every position and ran the break/protection check, an event,
+for each block), searches back off 1→2→4→8× the harvest delay while they find nothing, the lumberjack tries trees
+nearest first and keeps its canopy height itself (the static map grew with every trunk looked at), the tree flood fill
+counts per call (another static map), tube shapes keyed by state (a string per collision query), the item search
+throttled like vanilla's target goals.
+
+Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a glass pen in view): empty stage
+230 FPS, 100 tamed rats wandering 207 FPS (0.48 ms a frame, ~5 µs a rat), 100 wild wolves 232 FPS.
+

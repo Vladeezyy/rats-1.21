@@ -101,17 +101,7 @@ public class RatFishermanGoal extends BaseRatHarvestGoal {
 	}
 
 	private void resetTarget() {
-		List<BlockPos> allBlocks = new ArrayList<>();
-		int RADIUS = this.rat.getRadius();
-		for (BlockPos pos : BlockPos.betweenClosedStream(this.rat.getSearchCenter().offset(-RADIUS, -RADIUS, -RADIUS), this.rat.getSearchCenter().offset(RADIUS, RADIUS, RADIUS)).map(BlockPos::immutable).toList()) {
-			if (this.isShore(pos, this.rat.level())) {
-				allBlocks.add(pos);
-			}
-		}
-		if (!allBlocks.isEmpty()) {
-			allBlocks.sort(this.getTargetSorter());
-			this.setTargetBlock(allBlocks.get(0));
-		}
+		this.findTarget((pos, state) -> this.isShore(pos, this.rat.level()));
 	}
 
 	private boolean isShore(BlockPos pos, Level world) {

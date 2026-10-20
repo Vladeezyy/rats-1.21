@@ -7,6 +7,8 @@ import com.github.alexthe666.rats.server.entity.rat.RatCommand;
 import com.github.alexthe666.rats.server.entity.rat.TamedRat;
 import com.github.alexthe666.rats.server.misc.RatUpgradeUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.function.BiPredicate;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -55,8 +58,24 @@ public abstract class BaseRatHarvestGoal extends Goal implements RatWorkGoal {
 			this.nextStartTick--;
 			return false;
 		}
-		this.nextStartTick = this.adjustedTickDelay(RatConfig.ratHarvestDelay);
+		this.nextStartTick = this.searchDelay(RatConfig.ratHarvestDelay);
 		return true;
+	}
+
+	/** The wait before the next search: the given delay, longer after searches that found nothing */
+	protected int searchDelay(int delay) {
+		return this.adjustedTickDelay(delay << Math.min(this.emptySearches, 3));
+	}
+
+	private int emptySearches;
+
+	/**
+	 * After a search of the area: while it finds nothing, the next ones wait longer (the harvest delay, then 2, 4 and 8
+	 * times it); a found target resets it. An idle farmer scanned its whole area every second (8 % of the server tick
+	 * with 75 farmers in the stress test)
+	 */
+	protected void searched(boolean found) {
+		this.emptySearches = found ? 0 : this.emptySearches + 1;
 	}
 
 	protected boolean checkIfItemCanBeHeld() {
@@ -112,6 +131,35 @@ public abstract class BaseRatHarvestGoal extends Goal implements RatWorkGoal {
 		this.rat.getNavigation().stop();
 		this.setTargetBlock(null);
 		this.setTargetEntity(null);
+	}
+
+	/**
+	 * The first block of the rat's search area by the sorter (the nearest, by default) that passes the test, in one pass
+	 * over the area. The original listed every position of the area, tested each with the expensive checks first and
+	 * sorted the list: once a second for every working rat, over up to 33 x 33 x 33 blocks with a radius staff. Tests
+	 * put the cheap block checks first; the position they get is mutable (copy it to keep it).
+	 */
+	@Nullable
+	protected BlockPos findTarget(BlockPos from, BlockPos to, Comparator<BlockPos> sorter, BiPredicate<BlockPos, BlockState> test) {
+		Level level = this.rat.level();
+		BlockPos best = null;
+		for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
+			if ((best == null || sorter.compare(pos, best) < 0) && test.test(pos, level.getBlockState(pos))) {
+				best = pos.immutable();
+			}
+		}
+		return best;
+	}
+
+	/** {@link #findTarget(BlockPos, BlockPos, Comparator, BiPredicate)} over the rat's search area, nearest first */
+	protected void findTarget(BiPredicate<BlockPos, BlockState> test) {
+		int radius = this.rat.getRadius();
+		BlockPos center = this.rat.getSearchCenter();
+		BlockPos target = this.findTarget(center.offset(-radius, -radius, -radius), center.offset(radius, radius, radius), this.getTargetSorter(), test);
+		if (target != null) {
+			this.setTargetBlock(target);
+		}
+		this.searched(target != null);
 	}
 
 	public BlockSorter getTargetSorter() {

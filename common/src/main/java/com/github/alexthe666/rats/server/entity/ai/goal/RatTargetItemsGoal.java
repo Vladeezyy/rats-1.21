@@ -35,6 +35,10 @@ public class RatTargetItemsGoal extends Goal {
 
 		if (!this.rat.isTargetCommand() || this.rat.getDepositPos().isEmpty()) return false;
 
+		// about twice a second, as vanilla's target goals: every check looks for items and searches a path to each until
+		// one is reachable (the stress test had it at 7 % of the server tick with a field of dropped crops)
+		if (this.rat.getRandom().nextInt(this.reducedTickDelay(10)) != 0) return false;
+
 		if (this.checkIfRatCanHold()) {
 			//sort through items we can grab, get the closest one
 			List<ItemEntity> items = this.rat.level().getEntitiesOfClass(ItemEntity.class, this.getTargetableArea(), item ->
