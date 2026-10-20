@@ -54,7 +54,7 @@ public class PatrolStaffScreen extends Screen {
 				this.nodes.add(GlobalPos.of(Minecraft.getInstance().player.level().dimension(), this.pos));
 				this.rat.getPatrolNodes().add(GlobalPos.of(Minecraft.getInstance().player.level().dimension(), this.pos));
 				RatsNetworkHandler.toServer(new SyncRatTagPacket(this.rat.getId(), this.nodes));
-				Minecraft.getInstance().setScreen(null);
+				Minecraft.getInstance().gui.setScreen(null);
 				this.init();
 			}).bounds(i - maxLength / 2, j + 60, maxLength, 20).build());
 		} else {
@@ -62,7 +62,7 @@ public class PatrolStaffScreen extends Screen {
 				this.nodes.remove(GlobalPos.of(Minecraft.getInstance().player.level().dimension(), this.pos));
 				this.rat.getPatrolNodes().remove(GlobalPos.of(Minecraft.getInstance().player.level().dimension(), this.pos));
 				RatsNetworkHandler.toServer(new SyncRatTagPacket(this.rat.getId(), this.nodes));
-				Minecraft.getInstance().setScreen(null);
+				Minecraft.getInstance().gui.setScreen(null);
 				this.init();
 			}).bounds(i - maxLength / 2, j + 60, maxLength, 20).build());
 		}
@@ -72,7 +72,7 @@ public class PatrolStaffScreen extends Screen {
 				this.nodes.clear();
 				this.rat.getPatrolNodes().clear();
 				RatsNetworkHandler.toServer(new SyncRatTagPacket(this.rat.getId(), this.nodes));
-				Minecraft.getInstance().setScreen(null);
+				Minecraft.getInstance().gui.setScreen(null);
 				this.init();
 			}).bounds(i - maxLength / 2, j + 110, maxLength, 20).build());
 		}

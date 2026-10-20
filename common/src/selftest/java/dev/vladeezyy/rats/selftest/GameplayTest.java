@@ -558,8 +558,8 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        this.sick = EntityType.COW.spawn(level, this.base, EntitySpawnReason.COMMAND);
-        this.victim = EntityType.COW.spawn(level, this.base.offset(1, 0, 0), EntitySpawnReason.COMMAND);
+        this.sick = net.minecraft.world.entity.EntityTypes.COW.spawn(level, this.base, EntitySpawnReason.COMMAND);
+        this.victim = net.minecraft.world.entity.EntityTypes.COW.spawn(level, this.base.offset(1, 0, 0), EntitySpawnReason.COMMAND);
         this.sick.addEffect(new MobEffectInstance(RatsEffectRegistry.PLAGUE.holder(), 6000));
         this.sick.setHealth(5);
         this.healthBeforeHeal = this.sick.getHealth();
@@ -584,7 +584,7 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
+        this.pig = net.minecraft.world.entity.EntityTypes.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
         this.pig.setNoAi(true);
         // hunting rats do not wander, so it stays in the air as a following one does (wandering, it lands and paths)
         this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
@@ -615,7 +615,7 @@ final class GameplayTest {
       @Override
       boolean start(ServerLevel level) {
         // as a following rat: in the air, where its navigation has no path (owners cannot be fake players here)
-        Mob pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
+        Mob pig = net.minecraft.world.entity.EntityTypes.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
         pig.setNoAi(true);
         TamedRat rat = tamedRat(level, this.base.above(4), RatCommand.FOLLOW);
         rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
@@ -655,14 +655,14 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        Creeper creeper = EntityType.CREEPER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        Creeper creeper = net.minecraft.world.entity.EntityTypes.CREEPER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         creeper.setPos(Vec3.atCenterOf(this.base));
         net.minecraft.world.level.storage.TagValueOutput out = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess());
         creeper.saveWithoutId(out);
         net.minecraft.nbt.CompoundTag powered = out.buildResult();
         powered.putBoolean("powered", true);
         creeper.load(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, level.registryAccess(), powered));
-        LootTable creeperLoot = level.getServer().reloadableRegistries().getLootTable(EntityType.CREEPER.getDefaultLootTable().orElseThrow());
+        LootTable creeperLoot = level.getServer().reloadableRegistries().getLootTable(net.minecraft.world.entity.EntityTypes.CREEPER.getDefaultLootTable().orElseThrow());
         LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.THIS_ENTITY, creeper)
           .withParameter(LootContextParams.ORIGIN, creeper.position()).withParameter(LootContextParams.DAMAGE_SOURCE, level.damageSources().generic())
           .create(LootContextParamSets.ENTITY);
@@ -745,7 +745,7 @@ final class GameplayTest {
         level.setBlock(this.base.above(2), RatsBlockRegistry.MARBLED_CHEESE_RAW.get().defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(this.base, RatlantisBlockRegistry.RATLANTIS_PORTAL.get().defaultBlockState(), Block.UPDATE_CLIENTS);
         level.setBlock(this.base.above(), RatlantisBlockRegistry.RATLANTIS_PORTAL.get().defaultBlockState(), Block.UPDATE_CLIENTS);
-        this.pig = EntityType.PIG.spawn(level, this.base, EntitySpawnReason.COMMAND);
+        this.pig = net.minecraft.world.entity.EntityTypes.PIG.spawn(level, this.base, EntitySpawnReason.COMMAND);
         return true;
       }
 
@@ -775,7 +775,7 @@ final class GameplayTest {
         if (!RatsMod.RATLANTIS_DATAPACK_ENABLED) {
           return false;
         }
-        this.target = EntityType.ZOMBIE.spawn(level, this.base, EntitySpawnReason.COMMAND);
+        this.target = net.minecraft.world.entity.EntityTypes.ZOMBIE.spawn(level, this.base, EntitySpawnReason.COMMAND);
         this.target.setNoAi(true);
         // 26.x mobs drop invulnerable targets (Mob.getTarget -> canAttack -> canBeSeenAsEnemy): unhurt by resistance V instead
         this.target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.RESISTANCE, -1, 4));
@@ -820,7 +820,7 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        Mob target = EntityType.IRON_GOLEM.spawn(level, this.base.offset(0, 0, 6), EntitySpawnReason.COMMAND);
+        Mob target = net.minecraft.world.entity.EntityTypes.IRON_GOLEM.spawn(level, this.base.offset(0, 0, 6), EntitySpawnReason.COMMAND);
         for (EntityType<? extends Mob> type : List.of(RatsEntityRegistry.RAT_KING.get(), RatsEntityRegistry.BLACK_DEATH.get(), RatsEntityRegistry.PLAGUE_BEAST.get(),
           com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RATLANTEAN_AUTOMATON.get(), com.github.alexthe666.rats.registry.RatlantisEntityRegistry.DUTCHRAT.get(),
           com.github.alexthe666.rats.registry.RatlantisEntityRegistry.NEO_RATLANTEAN.get(), com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RAT_BARON.get(),

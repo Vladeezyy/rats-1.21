@@ -94,7 +94,7 @@ public class FeralRatlantean extends Monster implements IAnimatedEntity {
 					}
 					this.lookAt(target, 360, 80);
 					this.doExtraEffect(target);
-					target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
+					target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack(this), 0.0F);
 				}
 			}
 			if (!this.isNoAi()) {

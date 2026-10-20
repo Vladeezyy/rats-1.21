@@ -212,7 +212,7 @@ public class RatlanteanAutomaton extends Monster implements IAnimatedEntity, Ran
 				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
 				LivingEntity target = this.getTarget();
 				target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ());
+				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack(this), 0.0F);
 				this.useRangedAttack = this.getRandom().nextInt(RatConfig.automatonShootChance) == 0;
 			}
 		}

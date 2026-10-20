@@ -76,7 +76,7 @@ public abstract class DiggingRat extends AbstractRat {
 	private void digTarget() {
 		if (this.diggingPos != null) {
 			++this.breakingTime;
-			this.getLookControl().setLookAt(this.diggingPos.getCenter());
+			this.getLookControl().setLookAt(net.minecraft.world.phys.Vec3.atCenterOf(this.diggingPos));
 			int i = (int) ((float) this.breakingTime / 160.0F * 10.0F);
 			if (this.getNavigation().getPath() != null) {
 				this.getNavigation().stop();

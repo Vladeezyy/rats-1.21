@@ -3,7 +3,7 @@
     {
       "enum": "net/minecraft/world/entity/MobCategory",
       "name": "RATS_RATS",
-      "constructor": "(Ljava/lang/String;IZZI)V",
+      "constructor": "(Ljava/lang/String;Ljava/lang/String;IZZI)V",
       "parameters": {
         "class": "com/github/alexthe666/rats/RatsEnums",
         "field": "RATS_CATEGORY"

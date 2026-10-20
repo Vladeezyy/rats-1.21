@@ -97,7 +97,7 @@ public class RatAutomatonMount extends RatMountBase implements IAnimatedEntity {
 			this.lookAt(target, 360, 80);
 			if (this.getAnimation() == ANIMATION_MELEE && this.getAnimationTick() == 10) {
 				target.hurt(this.damageSources().mobAttack(this), 6.0F);
-				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ());
+				target.knockback(1.5F, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack(this), 0.0F);
 				this.useRangedAttack = this.getRandom().nextBoolean();
 			}
 		}

@@ -8,7 +8,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:plague_doctor"
+              "minecraft:entity_type": "rats:plague_doctor"
             }
           }
         ],

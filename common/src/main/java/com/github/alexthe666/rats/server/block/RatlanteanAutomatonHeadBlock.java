@@ -14,7 +14,7 @@ import com.github.alexthe666.rats.server.entity.monster.boss.RatlanteanAutomaton
 import com.github.alexthe666.rats.server.misc.RatsLangConstants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;

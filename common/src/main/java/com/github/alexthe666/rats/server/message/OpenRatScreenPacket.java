@@ -48,7 +48,7 @@ public record OpenRatScreenPacket(int containerId, int entityId) implements Cust
 						SimpleContainer container = new SimpleContainer(6);
 						RatMenu menu = new RatMenu(packet.containerId(), container, localplayer.getInventory());
 						localplayer.containerMenu = menu;
-						Minecraft.getInstance().setScreen(new RatScreen(menu, localplayer.getInventory(), rat));
+						Minecraft.getInstance().gui.setScreen(new RatScreen(menu, localplayer.getInventory(), rat));
 					}
 				}
 			});

@@ -264,7 +264,7 @@ public final class RatsEvents {
 		//Carry On passes null into their difficulty when firing this event so we have to check this unfortunately. They shouldnt be doing this.
 		if (difficulty == null) return;
 		if (difficulty.getDifficulty() != Difficulty.PEACEFUL && (spawnType == EntitySpawnReason.CHUNK_GENERATION || spawnType == EntitySpawnReason.NATURAL)) {
-			if (mob instanceof Strider strider && mob.getType() == EntityType.STRIDER) {
+			if (mob instanceof Strider strider && mob.getType() == net.minecraft.world.entity.EntityTypes.STRIDER) {
 				if (!strider.isBaby() && !strider.isSaddled() && strider.getPassengers().isEmpty() && strider.getRandom().nextFloat() < 0.1F) {
 					DemonRat demonRat = RatsEntityRegistry.DEMON_RAT.get().create(level.getLevel(), EntitySpawnReason.CONVERSION);
 					if (demonRat != null) {

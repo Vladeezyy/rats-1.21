@@ -77,7 +77,7 @@ public final class ClientScene {
   }
 
   static void shot(Minecraft mc, String name) {
-    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, c -> RatsMod.LOGGER.info("[scene] " + c.getString()));
+    Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1, c -> RatsMod.LOGGER.info("[scene] " + c.getString()));
   }
 
   static void lookAt(ServerPlayer player, double x, double y, double z, double tx, double ty, double tz) {
@@ -120,7 +120,7 @@ public final class ClientScene {
     perfMobs.forEach(net.minecraft.world.entity.Entity::discard);
     perfMobs.clear();
     for (int i = 0; i < PERF_MOBS; i++) {
-      Mob mob = rats ? com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND) : EntityType.WOLF.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      Mob mob = rats ? com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND) : net.minecraft.world.entity.EntityTypes.WOLF.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       mob.snapTo(stage.getX() - 4 + (i % 10) * 1.5, stage.getY(), stage.getZ() - 4 + (i / 10) * 1.5, i * 37, 0);
       mob.setPersistenceRequired();
       if (mob instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat rat) {
@@ -189,11 +189,11 @@ public final class ClientScene {
         }
       }
     }));
-    at(t += 10, mc -> mc.setScreen(new InventoryScreen(mc.player)));
+    at(t += 10, mc -> mc.gui.setScreen(new InventoryScreen(mc.player)));
     at(t += 15, mc -> {
       shot(mc, "inventory");
       checkNoMissingTexture(mc, "inventory");
-      mc.setScreen(null);
+      mc.gui.setScreen(null);
     });
     at(t += 5, ClientScene::checkTranslations);
     at(t += 10, mc -> {
@@ -209,16 +209,16 @@ public final class ClientScene {
       return;
     }
     Minecraft mc = Minecraft.getInstance();
-    if (!opened && mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
+    if (!opened && mc.gui.screen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
       mc.options.onboardAccessibility = false;
       mc.options.save();
-      mc.setScreen(new TitleScreen());
+      mc.gui.setScreen(new TitleScreen());
       return;
     }
-    if (!opened && mc.getOverlay() != null) {
+    if (!opened && mc.gui.overlay() != null) {
       return;
     }
-    if (!opened && mc.screen instanceof TitleScreen) {
+    if (!opened && mc.gui.screen() instanceof TitleScreen) {
       if (!mc.options.languageCode.equals(LANG)) {
         mc.options.languageCode = LANG;
         mc.getLanguageManager().setSelected(LANG);
@@ -241,9 +241,9 @@ public final class ClientScene {
     }
     mc.options.pauseOnLostFocus = false;
     mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
-    mc.getToastManager().clear();
-    if (mc.screen instanceof PauseScreen) {
-      mc.setScreen(null);
+    mc.gui.toastManager().clear();
+    if (mc.gui.screen() instanceof PauseScreen) {
+      mc.gui.setScreen(null);
     }
     tick++;
     for (Pair<Integer, Consumer<Minecraft>> step : STEPS) {
@@ -337,7 +337,7 @@ public final class ClientScene {
 
   private static void checkNoMissingTexture(Minecraft mc, String name) {
     // the screenshot is read back from the GPU asynchronously in 26.x
-    Screenshot.takeScreenshot(mc.getMainRenderTarget(), image -> {
+    Screenshot.takeScreenshot(mc.gameRenderer.mainRenderTarget(), image -> {
       int magenta = 0;
       try (image) {
         for (int pixel : image.getPixelsABGR()) {

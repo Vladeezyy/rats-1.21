@@ -37,7 +37,7 @@ public class EntityRenderingUtil {
 			EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(entityName);
 			if (type != null) {
 				Entity entity;
-				if (type == EntityType.PLAYER) {
+				if (type == net.minecraft.world.entity.EntityTypes.PLAYER) {
 					entity = Minecraft.getInstance().player;
 				} else {
 					entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.getValue(t).create(level, net.minecraft.world.entity.EntitySpawnReason.LOAD));

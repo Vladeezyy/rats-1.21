@@ -261,3 +261,32 @@ ms against +3.79 ms) (1.21.1: 3.9×, +2.24 ms against +0.57 ms). Rat phase profi
 vanilla mob tick (movement 24 %, goal selection 22 %) and dropped items (17 %).
 `sh tools/scenetest.sh -Pscene=perf` (1600x900, no frame limit): empty stage 171 FPS, 100 tamed rats wandering 140 FPS,
 100 wild wolves 145 FPS (rats −3.5 % against wolves; 1.21.1: −10 %).
+
+## 2026-10-20 — 26.2 (branch `mc/26.2`, on `mc/26.1.2`)
+
+NeoForge 26.2.0.93, Fabric API 0.161.0, JEI 30.47, Rampart `1.0.0+26.2`. 115 compile errors in common, 1 in NeoForge,
+none in Fabric.
+
+### What changed
+- Structure processors are an interface with `codec()`; the processor registry holds their `MapCodec`s
+  (`CopyInputStateRuleProcessor`: the rule reads the world state itself, the template state comes from the processed
+  block info).
+- Advancement triggers and predicates moved (`advancements.triggers`, `advancements.predicates`); entity type
+  constants are in `EntityTypes`; `knockback(power, x, z, source, damage)`; `isBaby` is final (the demon rat's
+  override went: it is never a baby); the strider navigation's lava path type check is vanilla's now.
+- Screens, toasts and the HUD are under `Minecraft.gui` (`gui.screen()`, `gui.setScreen`, `gui.hud`); the plague hearts
+  read the heart state from `Hud` (access transformer / widener moved).
+- Render pipelines take bind group layouts (`BindGroupLayouts.*`, vertex bindings, primitive topology); the shaders
+  are unchanged. `MobCategory` has a debug abbreviation (`RAT` for the rats' category). NeoForge has no name tag
+  distance hook any more.
+- Data: entity predicates are maps of registered sub-predicates (`minecraft:entity_type`, `minecraft:flags`,
+  `minecraft:type_specific/fishing_hook`, ...); tree configurations need `below_trunk_provider` (the Ratlantis trees get
+  vanilla's rule: dirt unless the block is in `#cannot_replace_below_tree_trunk`). Both in `tools/port/convert_26.py`.
+
+### Tests
+- `tools/selftest.sh`: NeoForge 43/43, Fabric 43/43. `tools/scenetest.sh`: NeoForge 5/5, Fabric 5/5 (all 28 mobs, blocks,
+  inventory, 488 translations). `tools/port/ServerLinkCheck.java` on the 26.2 server jar: no server class needs a
+  client class.
+- Stress, NeoForge 26.2 dev server, `RATS=300 sh tools/stress.sh`: empty stage 2.87 ms, 300 wild wolves 7.95 ms, 300
+  working rats 9.61 ms mean tick (9494 items carried); the rats add 1.33× what the wolves add (+6.74 ms against +5.08
+  ms; 26.1.2: 1.36×).

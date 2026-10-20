@@ -34,13 +34,15 @@ public class RatlantisConfiguredFeatureRegistry {
 			new ThickBranchingTrunkPlacer(5, 1, 1, 1, 1, 2),
 			BlockStateProvider.simple(RatlantisBlockRegistry.PIRAT_LEAVES.get()),
 			new CherryFoliagePlacer(ConstantInt.of(4), ConstantInt.of(0), ConstantInt.of(5), 0.25F, 0.5F, 0.5F, 0.75F),
-			new TwoLayersFeatureSize(1, 0, 2)).ignoreVines().build();
+			new TwoLayersFeatureSize(1, 0, 2),
+			TreeConfiguration.defaultPlaceBelowTreeTrunkProvider(null)).ignoreVines().build();
 
 	public static final TreeConfiguration LARGE_GHOST_PIRAT_TREE_CONFIG = new TreeConfiguration.TreeConfigurationBuilder(
 			BlockStateProvider.simple(RatlantisBlockRegistry.PIRAT_LOG.get()),
 			new ThickBranchingTrunkPlacer(8, 1, 1, 2, 2, 4),
 			BlockStateProvider.simple(RatlantisBlockRegistry.PIRAT_LEAVES.get()),
 			new CherryFoliagePlacer(ConstantInt.of(4), ConstantInt.of(0), ConstantInt.of(5), 0.25F, 0.5F, 0.5F, 0.75F),
-			new TwoLayersFeatureSize(1, 0, 2)).ignoreVines().build();
+			new TwoLayersFeatureSize(1, 0, 2),
+			TreeConfiguration.defaultPlaceBelowTreeTrunkProvider(null)).ignoreVines().build();
 
 }

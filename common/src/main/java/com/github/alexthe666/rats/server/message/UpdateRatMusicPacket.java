@@ -49,7 +49,7 @@ public record UpdateRatMusicPacket(int id, Item record) implements CustomPacketP
 							// 1.21: discs play jukebox songs
 							JukeboxSong.fromStack(new ItemStack(packet.record())).ifPresent(song -> {
 								Minecraft.getInstance().getSoundManager().queueTickingSound(new RatRecordSoundInstance(rat, packet.record(), song.value().soundEvent().value()));
-								Minecraft.getInstance().gui.setNowPlaying(song.value().description());
+								Minecraft.getInstance().gui.hud.setNowPlaying(song.value().description());
 							});
 						}
 					}

@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 
 import java.util.List;
 
-public class CopyInputStateRuleProcessor extends StructureProcessor {
+public class CopyInputStateRuleProcessor implements StructureProcessor {
 
 	public static final MapCodec<CopyInputStateRuleProcessor> CODEC = ProcessorRule.CODEC.listOf().fieldOf("rules").xmap(CopyInputStateRuleProcessor::new, config -> config.rules);
 
@@ -23,13 +23,13 @@ public class CopyInputStateRuleProcessor extends StructureProcessor {
 	}
 
 	@Override
-	public StructureTemplate.StructureBlockInfo processBlock(LevelReader reader, BlockPos oldPos, BlockPos newPos, StructureTemplate.StructureBlockInfo oldInfo, StructureTemplate.StructureBlockInfo newInfo, StructurePlaceSettings settings) {
+	public StructureTemplate.StructureBlockInfo processBlock(LevelReader reader, BlockPos targetPos, BlockPos referencePos, BlockPos templateRelativePos, StructureTemplate.StructureBlockInfo newInfo, StructurePlaceSettings settings) {
 		RandomSource randomsource = RandomSource.create(Mth.getSeed(newInfo.pos()));
-		BlockState blockstate = reader.getBlockState(newInfo.pos());
 
 		for (ProcessorRule processorrule : this.rules) {
-			if (processorrule.test(newInfo.state(), blockstate, oldInfo.pos(), newInfo.pos(), newPos, randomsource)) {
-				return new StructureTemplate.StructureBlockInfo(newInfo.pos(), processorrule.getOutputState().getBlock().withPropertiesOf(oldInfo.state()), processorrule.getOutputTag(randomsource, newInfo.nbt()));
+			// 26.2: the rule reads the world state itself; the template's own state is the processed info's (no earlier processor changes it)
+			if (processorrule.test(reader, newInfo.state(), templateRelativePos, newInfo.pos(), referencePos, randomsource)) {
+				return new StructureTemplate.StructureBlockInfo(newInfo.pos(), processorrule.getOutputState().getBlock().withPropertiesOf(newInfo.state()), processorrule.getOutputTag(randomsource, newInfo.nbt()));
 			}
 		}
 
@@ -37,7 +37,7 @@ public class CopyInputStateRuleProcessor extends StructureProcessor {
 	}
 
 	@Override
-	protected StructureProcessorType<?> getType() {
-		return RatlantisFeatureRegistry.COPY_STATE.get();
+	public MapCodec<CopyInputStateRuleProcessor> codec() {
+		return CODEC;
 	}
 }

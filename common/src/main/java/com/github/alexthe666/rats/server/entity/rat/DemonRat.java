@@ -144,11 +144,6 @@ public class DemonRat extends AbstractRat implements Enemy {
 	}
 
 	@Override
-	public boolean isBaby() {
-		return false;
-	}
-
-	@Override
 	public boolean isTame() {
 		return false;
 	}

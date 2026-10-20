@@ -26,7 +26,7 @@ public class EctoplasmItem extends Item {
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-		if (state.is(BlockTags.SAPLINGS) && !state.is(RatlantisBlockRegistry.PIRAT_SAPLING.get())) {
+		if (state.is(net.minecraft.tags.BlockItemTags.SAPLINGS.block()) && !state.is(RatlantisBlockRegistry.PIRAT_SAPLING.get())) {
 			context.getLevel().setBlockAndUpdate(context.getClickedPos(), RatlantisBlockRegistry.PIRAT_SAPLING.get().defaultBlockState());
 			context.getLevel().playSound(null, context.getClickedPos(), RatsSoundRegistry.SAPLING_TRANSFORM.get(), SoundSource.BLOCKS);
 			if (!context.getPlayer().isCreative()) {

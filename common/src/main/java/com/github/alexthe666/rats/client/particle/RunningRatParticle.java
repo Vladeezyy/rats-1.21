@@ -104,7 +104,7 @@ public class RunningRatParticle extends Particle {
 			double d1 = p_107247_;
 			double d2 = p_107248_;
 			if (this.hasPhysics && (p_107246_ != 0.0D || p_107247_ != 0.0D || p_107248_ != 0.0D) && p_107246_ * p_107246_ + p_107247_ * p_107247_ + p_107248_ * p_107248_ < Mth.square(100.0D)) {
-				Vec3 vec3 = Entity.collideBoundingBox(null, new Vec3(p_107246_, p_107247_, p_107248_), this.getBoundingBox(), this.level, List.of());
+				Vec3 vec3 = Entity.collideBoundingBox((Entity) null, new Vec3(p_107246_, p_107247_, p_107248_), this.getBoundingBox(), this.level, List.of());
 				p_107246_ = vec3.x;
 				p_107247_ = vec3.y;
 				p_107248_ = vec3.z;

@@ -195,10 +195,6 @@ public class RatStriderMount extends RatMountBase {
 			super(strider, level);
 		}
 
-		protected boolean hasValidPathType(PathType types) {
-			return types == PathType.LAVA || types == PathType.FIRE || types == PathType.FIRE_IN_NEIGHBOR || super.hasValidPathType(types);
-		}
-
 		public boolean isStableDestination(BlockPos pos) {
 			return this.level.getBlockState(pos).is(Blocks.LAVA) || super.isStableDestination(pos);
 		}

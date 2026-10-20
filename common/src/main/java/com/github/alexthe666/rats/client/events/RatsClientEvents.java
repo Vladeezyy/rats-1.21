@@ -32,7 +32,7 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import com.github.alexthe666.rats.client.particle.RunningRatParticle;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
@@ -40,7 +40,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -198,7 +197,7 @@ public final class RatsClientEvents {
 		int height = Minecraft.getInstance().getWindow().getGuiScaledHeight();
 		int leftHeight = 39;
 		int health = Mth.ceil(player.getHealth());
-		Gui gui = Minecraft.getInstance().gui;
+		Hud gui = Minecraft.getInstance().gui.hud;
 		boolean highlight = gui.healthBlinkTime > (long) gui.getGuiTicks() && (gui.healthBlinkTime - (long) gui.getGuiTicks()) / 3L % 2L == 1L;
 
 		long j = Util.getMillis();

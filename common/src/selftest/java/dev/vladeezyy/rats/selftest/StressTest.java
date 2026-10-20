@@ -125,7 +125,7 @@ final class StressTest {
   private static void spawnWolves(ServerLevel level) {
     for (int i = 0; i < COUNT; i++) {
       // wild: a tamed wolf whose owner is not online sits (vanilla's sit goal), so it would cost nothing
-      Wolf wolf = EntityType.WOLF.spawn(level, cell(i).offset(2, 0, 2), EntitySpawnReason.COMMAND);
+      Wolf wolf = net.minecraft.world.entity.EntityTypes.WOLF.spawn(level, cell(i).offset(2, 0, 2), EntitySpawnReason.COMMAND);
       if (wolf != null) {
         mobs.add(wolf);
       }

@@ -5,7 +5,7 @@
       "condition": "minecraft:entity_properties",
       "entity": "this",
       "predicate": {
-        "nbt": "{powered:1b}"
+        "minecraft:nbt": "{powered:1b}"
       }
     },
     {

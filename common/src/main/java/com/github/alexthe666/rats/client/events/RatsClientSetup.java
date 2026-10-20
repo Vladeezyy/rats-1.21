@@ -98,7 +98,7 @@ public final class RatsClientSetup {
 	}
 
 	public static boolean shouldRenderNameplates() {
-		return Minecraft.getInstance().screen == null || !(Minecraft.getInstance().screen instanceof RatScreen) && !(Minecraft.getInstance().screen instanceof CheeseStaffScreen);
+		return Minecraft.getInstance().gui.screen() == null || !(Minecraft.getInstance().gui.screen() instanceof RatScreen) && !(Minecraft.getInstance().gui.screen() instanceof CheeseStaffScreen);
 	}
 
 	@Nullable
@@ -107,7 +107,7 @@ public final class RatsClientSetup {
 	}
 
 	public static void openMobFilterScreen(InteractionHand hand) {
-		Minecraft.getInstance().setScreen(new MobFilterScreen(hand));
+		Minecraft.getInstance().gui.setScreen(new MobFilterScreen(hand));
 	}
 
 	/** What the item definitions (assets/rats/items/*.json) use beyond vanilla: properties, tints, special models */

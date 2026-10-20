@@ -8,7 +8,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:pied_piper"
+              "minecraft:entity_type": "rats:pied_piper"
             }
           }
         ]
@@ -22,7 +22,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:pied_piper"
+              "minecraft:entity_type": "rats:pied_piper"
             }
           }
         ]

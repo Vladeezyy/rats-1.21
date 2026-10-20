@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(MobCategory.class)
 public interface MobCategoryAccessor {
     @Invoker("<init>")
-    static MobCategory rats$create(String internalName, int ordinal, String name, int max, boolean isFriendly, boolean isPersistent, int despawnDistance) {
+    static MobCategory rats$create(String internalName, int ordinal, String name, String debugAbbreviation, int max, boolean isFriendly, boolean isPersistent, int despawnDistance) {
         throw new AssertionError();
     }
 }

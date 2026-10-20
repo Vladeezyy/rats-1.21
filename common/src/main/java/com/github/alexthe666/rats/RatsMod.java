@@ -209,7 +209,7 @@ public final class RatsMod {
 			for (var entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
 				try {
 					Entity entity = entry.getValue().create(level, EntitySpawnReason.MOB_SUMMONED);
-					if (entry.getValue() == EntityType.PLAYER || entity instanceof Mob) {
+					if (entry.getValue() == net.minecraft.world.entity.EntityTypes.PLAYER || entity instanceof Mob) {
 						unsortedCache.add(Pair.of(entry.getKey().identifier().toString(), entry.getValue().getDescription()));
 					}
 				} catch (RuntimeException e) {

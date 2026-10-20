@@ -120,7 +120,7 @@ public class RatHarvestTreesGoal extends BaseRatHarvestGoal {
 	@Override
 	public void tick() {
 		BlockPos offsetToAirPos = this.getOffsetToAirPos(this.getTargetBlock());
-		this.rat.getLookControl().setLookAt(this.getTargetBlock().getCenter());
+		this.rat.getLookControl().setLookAt(net.minecraft.world.phys.Vec3.atCenterOf(this.getTargetBlock()));
 		this.rat.getNavigation().moveTo(offsetToAirPos.getX() + 0.5D, offsetToAirPos.getY(), offsetToAirPos.getZ() + 0.5D, 1.25D);
 		if (RatTreeUtils.isTreeLog(this.rat.level().getBlockState(this.getTargetBlock()))) {
 			double distance = this.rat.getRatDistanceCenterSq(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ());

@@ -65,7 +65,7 @@ public class PiratBoat extends Mob {
 	}
 
 	private ItemStack generateBanner() {
-		ItemStack itemstack = new ItemStack(Items.BLACK_BANNER);
+		ItemStack itemstack = new ItemStack(Items.BANNER.black());
 		this.level().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).get(RatsBannerPatternRegistry.RAT_AND_CROSSBONES_BANNER)
 				.ifPresent(pattern -> itemstack.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().add(pattern, DyeColor.WHITE).build()));
 		return itemstack;

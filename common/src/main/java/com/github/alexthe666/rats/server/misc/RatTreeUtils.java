@@ -211,7 +211,7 @@ public class RatTreeUtils {
 	}
 
 	public static boolean isMangroveRootOrLog(BlockState block) {
-		return block.getBlock() instanceof MangroveRootsBlock || block.is(BlockTags.MANGROVE_LOGS);
+		return block.getBlock() instanceof MangroveRootsBlock || block.is(net.minecraft.tags.BlockItemTags.MANGROVE_LOGS.block());
 	}
 
 	public static boolean isTreeLeaf(BlockState block) {

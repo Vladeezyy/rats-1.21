@@ -5,7 +5,7 @@
       "conditions": {
         "damage": {
           "source_entity": {
-            "type": "rats:feral_ratlantean"
+            "minecraft:entity_type": "rats:feral_ratlantean"
           }
         }
       },
@@ -18,7 +18,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:feral_ratlantean"
+              "minecraft:entity_type": "rats:feral_ratlantean"
             }
           }
         ]
@@ -32,7 +32,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:feral_ratlantean"
+              "minecraft:entity_type": "rats:feral_ratlantean"
             }
           }
         ]
@@ -46,7 +46,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:feral_ratlantean"
+              "minecraft:entity_type": "rats:feral_ratlantean"
             }
           }
         ]

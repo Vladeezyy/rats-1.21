@@ -1,14 +1,14 @@
 package com.github.alexthe666.rats.client.render;
 
+import net.minecraft.client.renderer.BindGroupLayouts;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.github.alexthe666.rats.RatsMod;
 import com.github.alexthe666.rats.client.render.block.RatlantisPortalRenderer;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -30,25 +30,20 @@ import java.util.function.Function;
 public final class RatsRenderType {
 
 	/** The Ratlantis portal: two projected layers, assets/rats/shaders/core/rendertype_ratlantis_portal.* */
-	private static final RenderPipeline RATLANTIS_PORTAL_PIPELINE = RenderPipeline.builder()
-		.withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-		.withUniform("Projection", UniformType.UNIFORM_BUFFER)
-		.withUniform("Globals", UniformType.UNIFORM_BUFFER)
+	private static final RenderPipeline RATLANTIS_PORTAL_PIPELINE = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+		.withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
 		.withLocation(id("pipeline/ratlantis_portal"))
 		.withVertexShader(id("core/rendertype_ratlantis_portal"))
 		.withFragmentShader(id("core/rendertype_ratlantis_portal"))
 		.withShaderDefine("PORTAL_LAYERS", 5)
-		.withSampler("Sampler0")
-		.withSampler("Sampler1")
+		.withBindGroupLayout(BindGroupLayouts.SAMPLER0_SAMPLER1)
 		.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-		.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+		.withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+		.withPrimitiveTopology(PrimitiveTopology.QUADS)
 		.withDepthStencilState(DepthStencilState.DEFAULT)
 		.build();
 	/** Vanilla's energy swirl (emissive, no shading) with translucent instead of additive blending */
-	private static final RenderPipeline GLOWING_TRANSLUCENT_PIPELINE = RenderPipeline.builder()
-		.withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
-		.withUniform("Projection", UniformType.UNIFORM_BUFFER)
-		.withUniform("Fog", UniformType.UNIFORM_BUFFER)
+	private static final RenderPipeline GLOWING_TRANSLUCENT_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
 		.withLocation(id("pipeline/glowing_translucent"))
 		.withVertexShader("core/entity")
 		.withFragmentShader("core/entity")
@@ -57,10 +52,11 @@ public final class RatsRenderType {
 		.withShaderDefine("NO_OVERLAY")
 		.withShaderDefine("NO_CARDINAL_LIGHTING")
 		.withShaderDefine("APPLY_TEXTURE_MATRIX")
-		.withSampler("Sampler0")
+		.withBindGroupLayout(BindGroupLayouts.SAMPLER0)
 		.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
 		.withCull(false)
-		.withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
+		.withVertexBinding(0, DefaultVertexFormat.ENTITY)
+		.withPrimitiveTopology(PrimitiveTopology.QUADS)
 		.withDepthStencilState(DepthStencilState.DEFAULT)
 		.build();
 

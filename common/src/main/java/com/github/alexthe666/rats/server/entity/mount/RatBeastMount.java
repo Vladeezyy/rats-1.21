@@ -92,13 +92,13 @@ public class RatBeastMount extends RatMountBase implements IAnimatedEntity {
 				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
 				LivingEntity target = this.getTarget();
 				target.hurt(this.damageSources().mobAttack(this), 5);
-				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
+				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack(this), 0.0F);
 			}
 			if (this.getAnimation() == ANIMATION_SLASH && (this.getAnimationTick() == 8 || this.getAnimationTick() == 16)) {
 				// the hit can kill the target and clear it (26.x), so knock back the one that was hit
 				LivingEntity target = this.getTarget();
 				target.hurt(this.damageSources().mobAttack(this), 5);
-				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ());
+				target.knockback(0.25F, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack(this), 0.0F);
 			}
 		}
 		if (!this.level().isClientSide() && this.getTarget() == null && this.getRandom().nextInt(150) == 0 && this.getAnimation() == NO_ANIMATION) {

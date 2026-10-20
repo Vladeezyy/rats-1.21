@@ -205,7 +205,7 @@ public abstract class ArrowlikeProjectile extends Projectile {
 			}
 		}
 
-		boolean flag = entity.getType() == EntityType.ENDERMAN;
+		boolean flag = entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN;
 		int k = entity.getRemainingFireTicks();
 		if (this.isOnFire() && !flag) {
 			entity.igniteForSeconds(5);

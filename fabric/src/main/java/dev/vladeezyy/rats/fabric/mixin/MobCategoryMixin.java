@@ -27,7 +27,7 @@ public abstract class MobCategoryMixin {
     @Inject(method = "<clinit>", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/MobCategory;$VALUES:[Lnet/minecraft/world/entity/MobCategory;", opcode = Opcodes.PUTSTATIC, shift = At.Shift.AFTER))
     private static void rats$addCategory(CallbackInfo ci) {
         MobCategory[] values = $VALUES;
-        MobCategory rats = MobCategoryAccessor.rats$create("RATS_RATS", values.length, "rats:rats", 25, true, false, 128);
+        MobCategory rats = MobCategoryAccessor.rats$create("RATS_RATS", values.length, "rats:rats", "RAT", 25, true, false, 128);
         MobCategory[] extended = Arrays.copyOf(values, values.length + 1);
         extended[values.length] = rats;
         $VALUES = extended;

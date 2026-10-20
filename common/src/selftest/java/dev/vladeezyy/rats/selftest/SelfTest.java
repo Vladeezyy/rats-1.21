@@ -173,10 +173,10 @@ public final class SelfTest {
       return tamed.isTame() && com.github.alexthe666.rats.server.misc.RatUpgradeUtils.hasUpgrade(tamed, com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get());
     });
     check("piglins see a mob carrying a rat with the idol upgrade as wearing gold (common mixin)", () -> {
-      net.minecraft.world.entity.monster.zombie.Zombie carrier = net.minecraft.world.entity.EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      net.minecraft.world.entity.monster.zombie.Zombie carrier = net.minecraft.world.entity.EntityTypes.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       com.github.alexthe666.rats.server.entity.rat.TamedRat rider = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-      carrier.setPos(at(-3, 0, 3).getCenter());
-      rider.setPos(at(-3, 0, 3).getCenter());
+      carrier.setPos(net.minecraft.world.phys.Vec3.atCenterOf(at(-3, 0, 3)));
+      rider.setPos(net.minecraft.world.phys.Vec3.atCenterOf(at(-3, 0, 3)));
       level.addFreshEntity(carrier);
       level.addFreshEntity(rider);
       boolean before = net.minecraft.world.entity.monster.piglin.PiglinAi.isWearingSafeArmor(carrier);
@@ -188,10 +188,10 @@ public final class SelfTest {
       return !before && after;
     });
     check("wardens ignore rats with the sculked upgrade (common mixin)", () -> {
-      net.minecraft.world.entity.monster.warden.Warden warden = net.minecraft.world.entity.EntityType.WARDEN.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      net.minecraft.world.entity.monster.warden.Warden warden = net.minecraft.world.entity.EntityTypes.WARDEN.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       com.github.alexthe666.rats.server.entity.rat.TamedRat rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-      warden.setPos(at(-5, 0, 3).getCenter());
-      rat.setPos(at(-6, 0, 3).getCenter());
+      warden.setPos(net.minecraft.world.phys.Vec3.atCenterOf(at(-5, 0, 3)));
+      rat.setPos(net.minecraft.world.phys.Vec3.atCenterOf(at(-6, 0, 3)));
       level.addFreshEntity(warden);
       level.addFreshEntity(rat);
       boolean before = warden.canTargetEntity(rat);

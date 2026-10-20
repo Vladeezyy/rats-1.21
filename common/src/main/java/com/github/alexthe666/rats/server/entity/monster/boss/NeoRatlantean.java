@@ -193,12 +193,12 @@ public class NeoRatlantean extends Monster {
 			if (RatConfig.neoratlanteanSummonFakeLightning && this.attackSelection == 1 && this.summonCooldown == 0) {
 				int bounds = 20;
 				if (!this.level().isClientSide()) {
-					LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
+					LightningBolt bolt = net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
 					bolt.snapTo(entity.position());
 					bolt.setVisualOnly(true);
 					this.level().addFreshEntity(bolt);
 					for (int i = 0; i < this.getRandom().nextInt(3) + 2; i++) {
-						LightningBolt boltAgain = EntityType.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
+						LightningBolt boltAgain = net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT.create(this.level(), EntitySpawnReason.MOB_SUMMONED);
 						boltAgain.snapTo(new Vec3(entity.getX() + this.getRandom().nextInt(bounds * 2) - bounds, entity.getY(), entity.getZ() + this.getRandom().nextInt(bounds * 2) - bounds));
 						boltAgain.setVisualOnly(true);
 						this.level().addFreshEntity(boltAgain);

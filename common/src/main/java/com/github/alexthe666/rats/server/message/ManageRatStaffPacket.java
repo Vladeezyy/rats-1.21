@@ -61,11 +61,11 @@ public record ManageRatStaffPacket(int entityId, BlockPos pos, int dirOrd, boole
 							if (packet.openGUI()) {
 								switch (packet.staffToOpen()) {
 									case 1 ->
-											Minecraft.getInstance().setScreen(new RadiusStaffScreen(rat, packet.pos()));
+											Minecraft.getInstance().gui.setScreen(new RadiusStaffScreen(rat, packet.pos()));
 									case 2 ->
-											Minecraft.getInstance().setScreen(new PatrolStaffScreen(rat, packet.pos()));
+											Minecraft.getInstance().gui.setScreen(new PatrolStaffScreen(rat, packet.pos()));
 									default ->
-											Minecraft.getInstance().setScreen(new CheeseStaffScreen(rat, packet.pos(), Direction.values()[packet.dirOrd()]));
+											Minecraft.getInstance().gui.setScreen(new CheeseStaffScreen(rat, packet.pos(), Direction.values()[packet.dirOrd()]));
 								}
 							}
 						}

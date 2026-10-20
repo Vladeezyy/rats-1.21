@@ -8,7 +8,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:black_death"
+              "minecraft:entity_type": "rats:black_death"
             }
           }
         ]
@@ -22,7 +22,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:black_death"
+              "minecraft:entity_type": "rats:black_death"
             }
           }
         ]

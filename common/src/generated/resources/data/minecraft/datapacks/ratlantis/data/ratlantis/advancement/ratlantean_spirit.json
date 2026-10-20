@@ -5,7 +5,7 @@
       "conditions": {
         "damage": {
           "source_entity": {
-            "type": "rats:ratlantean_spirit"
+            "minecraft:entity_type": "rats:ratlantean_spirit"
           }
         }
       },
@@ -18,7 +18,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:ratlantean_spirit"
+              "minecraft:entity_type": "rats:ratlantean_spirit"
             }
           }
         ]
@@ -32,7 +32,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:ratlantean_spirit"
+              "minecraft:entity_type": "rats:ratlantean_spirit"
             }
           }
         ]
@@ -46,7 +46,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:ratlantean_spirit"
+              "minecraft:entity_type": "rats:ratlantean_spirit"
             }
           }
         ]

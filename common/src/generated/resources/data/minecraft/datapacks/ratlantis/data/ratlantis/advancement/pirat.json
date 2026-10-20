@@ -5,7 +5,7 @@
       "conditions": {
         "damage": {
           "source_entity": {
-            "type": "rats:pirat"
+            "minecraft:entity_type": "rats:pirat"
           }
         }
       },
@@ -18,7 +18,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:pirat"
+              "minecraft:entity_type": "rats:pirat"
             }
           }
         ]
@@ -32,7 +32,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:pirat"
+              "minecraft:entity_type": "rats:pirat"
             }
           }
         ]
@@ -46,7 +46,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "rats:pirat"
+              "minecraft:entity_type": "rats:pirat"
             }
           }
         ]
