@@ -348,7 +348,8 @@ public class RatTubeBlock extends BaseEntityBlock {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader getter, BlockPos pos, Player player) {
+	@Override
+	public ItemStack getCloneItemStack(LevelReader getter, BlockPos pos, BlockState state) {
 		return getTubeItem(getter, pos);
 	}
 

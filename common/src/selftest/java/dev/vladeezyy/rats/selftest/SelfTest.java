@@ -201,6 +201,13 @@ public final class SelfTest {
       warden.discard();
       return before && !after;
     });
+    check("pick block: a milk cauldron gives a cauldron, a decorated rat cage the cage (vanilla getCloneItemStack)", () -> {
+      net.minecraft.core.BlockPos pos = net.minecraft.core.BlockPos.ZERO;
+      net.minecraft.world.level.block.Block cauldron = com.github.alexthe666.rats.registry.RatsBlockRegistry.MILK_CAULDRON.get();
+      net.minecraft.world.level.block.Block cage = com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_CAGE_DECORATED.get();
+      return cauldron.getCloneItemStack(level, pos, cauldron.defaultBlockState()).is(net.minecraft.world.item.Items.CAULDRON)
+        && cage.getCloneItemStack(level, pos, cage.defaultBlockState()).is(com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_CAGE.get().asItem());
+    });
     check("1.20.1 combined upgrade data (Items list in custom data) is read", () -> {
       ItemStack old = new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_COMBINED.get());
       com.github.alexthe666.rats.server.misc.RegistryAccessHolder.setServer(server);

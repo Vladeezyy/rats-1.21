@@ -83,7 +83,8 @@ public class CheeseCauldronBlock extends AbstractCauldronBlock {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	@Override
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		return new ItemStack(Items.CAULDRON);
 	}
 }

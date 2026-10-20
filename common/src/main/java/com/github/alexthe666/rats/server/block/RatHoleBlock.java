@@ -157,7 +157,8 @@ public class RatHoleBlock extends BaseEntityBlock {
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	@Override
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
 		if (level.getBlockEntity(pos) instanceof RatHoleBlockEntity hole) {
 			return new ItemStack(hole.getImitatedBlockState().getBlock());
 		}

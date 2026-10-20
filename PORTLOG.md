@@ -200,3 +200,10 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
 - `rat_cage_decoration`: the hammock and igloo criteria checked the used item with the 1.20 item predicate key
   `"tag"`, which 1.21 ignores, so any item used on a decorated cage counted. Now `"items": "#rats:hammocks"` /
   `"#rats:igloos"`.
+
+### Pick block on five blocks did nothing on Fabric (found during the 26.3 port)
+- The milk and cheese cauldrons, the decorated rat cage, the rat tube and the rat hole defined NeoForge's
+  `getCloneItemStack(state, hit, level, pos, player)`, which Fabric never calls (and NeoForge 26.x has another
+  signature): middle click gave nothing or the wrong item. Now they override vanilla's
+  `getCloneItemStack(level, pos, state)`, which NeoForge's version calls too (`tools/port/fix_lost_overrides.py`,
+  found with `tools/port/OverrideCheck.java`). A check in `SelfTest`.
