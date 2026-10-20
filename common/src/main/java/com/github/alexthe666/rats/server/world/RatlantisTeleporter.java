@@ -68,7 +68,8 @@ public class RatlantisTeleporter {
 			this.level.getChunk(chunkPos.x, chunkPos.z);
 		}
 		//set portal position to be on the ground (or rather, one block above it)
-		pos = this.level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE_WG, pos).above();
+		// the final heightmap: a loaded chunk has no worldgen one (1.21 builds it again each time, 26.x gives the bottom)
+		pos = this.level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, pos).above();
 
 		this.level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		this.level.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());

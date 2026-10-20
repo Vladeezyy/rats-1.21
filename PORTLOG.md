@@ -207,3 +207,5 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
   signature): middle click gave nothing or the wrong item. Now they override vanilla's
   `getCloneItemStack(level, pos, state)`, which NeoForge's version calls too (`tools/port/fix_lost_overrides.py`,
   found with `tools/port/OverrideCheck.java`). A check in `SelfTest`.
+- The Ratlantis portal on arrival read the worldgen heightmap of a loaded chunk, which 1.21 rebuilds every time (and
+  logs as an error in dev); the final one now (on 26.x the worldgen one is gone and the portal ended at the bottom).
