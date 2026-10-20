@@ -365,3 +365,17 @@ NeoForge, 3 in Fabric. The big part is data: worldgen, loot and advancements hav
   - thrown blocks were no longer solid for other entities in 26.x (`canBeCollidedWith(Entity)`).
 - The rat cage advancement accepted any item for the hammock and igloo criteria (1.20's `"tag"` key in item
   predicates, ignored since 1.21): fixed on `main`, the converter turns such keys into `"items": "#tag"`.
+
+### Tests
+- `tools/selftest.sh`: NeoForge 45/45, Fabric 45/45 (two new checks: pick block, thrown blocks). `tools/scenetest.sh`:
+  NeoForge 5/5, Fabric 5/5 (28 mobs, blocks, inventory, 488 translations, no errors in the log).
+  `tools/port/ServerLinkCheck.java` on the 26.3 server jar: as on 26.2, only the client branches of four packet
+  handlers (anonymous classes the dedicated server never loads) reference client classes.
+- Stress, NeoForge 26.3 dev server, `RATS=300 sh tools/stress.sh`: empty stage 1.42 ms, 300 wild wolves 2.23 ms, 300
+  working rats 9.25 ms mean tick (9452 items carried). Vanilla wolves are far cheaper in 26.3 (+0.81 ms against +5.08
+  ms on 26.2), so the old ratio does not compare; the rats add +7.83 ms (26.2: +6.74 ms). Profile (`tools/jfr_hot.py`):
+  vanilla movement and collisions 29 % of the server thread, path finding 14 %, goals 22 %, items on the ground 16 %;
+  no Rats method with notable time of its own.
+- FPS, `tools/scenetest.sh -Pscene=perf`, 26.2 and 26.3 one after the other on the same machine state (slower than the
+  earlier runs): 26.2 empty 70, 100 rats 52, 100 wolves 55 FPS; 26.3 63 / 53 / 59 FPS (rats −5…−10 % against wolves,
+  as before).
