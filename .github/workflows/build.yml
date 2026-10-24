@@ -1,0 +1,76 @@
+# Build on every push and pull request, then the functional self-test (tools/selftest.sh) on a headless dev server for
+# each loader. Rampart (the model and animation library) comes from Maven Local in this build, so it is built first from
+# Vladeezyy/rampart, the branch with the same name. The jars and the self-test logs are kept as artifacts.
+name: Build
+
+on:
+  push:
+    paths-ignore: ['**.md', 'docs/**', 'licenses/**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Vladeezyy/rampart
+          ref: ${{ github.base_ref || github.ref_name }}
+          path: rampart
+
+      # java_version from gradle.properties (21 for 1.21.x, 25 for 26.x); org.gradle.java.home points at a JDK on
+      # the dev Mac and does not exist here
+      - name: Prepare gradle.properties
+        id: props
+        run: |
+          sed -i '/^org\.gradle\.java\.home=/d' gradle.properties rampart/gradle.properties
+          v=$(sed -n 's/^java_version=//p' gradle.properties | tr -d '[:space:]')
+          echo "java=${v:-21}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.props.outputs.java }}
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Rampart into Maven Local
+        run: cd rampart && chmod +x gradlew && ./gradlew publishToMavenLocal --console=plain
+
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build --console=plain
+
+      - name: Self-test
+        run: |
+          for loader in neoforge fabric; do
+            LOADER=$loader sh tools/selftest.sh | tee selftest-summary-$loader.txt
+            mv build-selftest.log selftest-$loader.log
+            grep -q 'Rats selftest\] PASS' selftest-$loader.log
+            ! grep -qE 'Rats selftest\] FAIL|Minecraft Crash Report|crash report has been saved' selftest-$loader.log
+          done
+
+      - name: Upload jars
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: |
+            neoforge/build/libs/*.jar
+            fabric/build/libs/*.jar
+          if-no-files-found: ignore
+
+      - name: Upload self-test logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-logs
+          path: selftest-*
+          if-no-files-found: ignore
