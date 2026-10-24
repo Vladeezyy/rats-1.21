@@ -10,6 +10,7 @@
     "issues": "${mod_issues}"
   },
   "license": "${license}",
+  "icon": "rats_logo.png",
   "environment": "*",
   "entrypoints": {
     "main": ["dev.vladeezyy.rats.fabric.RatsFabric"],
@@ -21,7 +22,7 @@
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
-    "rampart": "*",
+    "rampart": ">=1.0.0",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"
   }
