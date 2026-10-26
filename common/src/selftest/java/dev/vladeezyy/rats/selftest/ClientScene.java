@@ -195,6 +195,55 @@ public final class ClientScene {
       checkNoMissingTexture(mc, "inventory");
       mc.gui.setScreen(null);
     });
+    // 1.21 enchantments go by item tags: the enchanting table offers enchantments for the plague doctor mask (the
+    // Ratlantis armor's tags come with the Ratlantis pack, off in this world; SelfTest checks them with it on)
+    at(t += 5, mc -> server(mc, p -> {
+      ServerLevel level = (ServerLevel) p.level();
+      BlockPos table = p.blockPosition().offset(0, 0, 3);
+      level.setBlockAndUpdate(table, Blocks.ENCHANTING_TABLE.defaultBlockState());
+      for (BlockPos offset : net.minecraft.world.level.block.EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+        level.setBlockAndUpdate(table.offset(offset), Blocks.BOOKSHELF.defaultBlockState());
+      }
+      p.setGameMode(GameType.SURVIVAL);
+      p.giveExperienceLevels(50);
+      p.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inventory, player) -> new net.minecraft.world.inventory.EnchantmentMenu(id, inventory,
+        net.minecraft.world.inventory.ContainerLevelAccess.create(level, table)), net.minecraft.network.chat.Component.translatable("container.enchant")));
+      var menu = (net.minecraft.world.inventory.EnchantmentMenu) p.containerMenu;
+      menu.getSlot(0).set(new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.PLAGUE_DOCTOR_MASK.get()));
+      menu.getSlot(1).set(new ItemStack(net.minecraft.world.item.Items.LAPIS_LAZULI, 64));
+      menu.slotsChanged(menu.getSlot(0).container);
+      check("the enchanting table offers enchantments for the plague doctor mask", menu.costs[2] > 0 && menu.enchantClue[2] >= 0,
+        "costs " + java.util.Arrays.toString(menu.costs) + ", clues " + java.util.Arrays.toString(menu.enchantClue));
+    }));
+    at(t += 20, mc -> {
+      shot(mc, "enchanting");
+      mc.player.closeContainer();
+    });
+    // the mob filter's preview: every entity type of every loaded mod is made and drawn without a crash
+    at(t += 10, mc -> {
+      int previews = 0;
+      for (var id : BuiltInRegistries.ENTITY_TYPE.keySet()) {
+        if (com.github.alexthe666.rats.client.util.EntityRenderingUtil.fetchEntity(id, mc.level) != null) {
+          previews++;
+        }
+      }
+      check("the mob filter makes a preview of every living entity type without a crash", previews > 50, previews + " previews");
+      mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_MOB_FILTER.get()));
+      var screen = new com.github.alexthe666.rats.client.gui.MobFilterScreen(net.minecraft.world.InteractionHand.MAIN_HAND);
+      try {
+        var hovered = com.github.alexthe666.rats.client.gui.MobFilterScreen.class.getDeclaredField("hoveredEntityName");
+        hovered.setAccessible(true);
+        hovered.set(screen, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "plague_doctor"));
+      } catch (ReflectiveOperationException e) {
+        check("mob filter preview set", false, e);
+      }
+      mc.gui.setScreen(screen);
+    });
+    at(t += 15, mc -> {
+      shot(mc, "mob_filter");
+      checkNoMissingTexture(mc, "mob_filter");
+      mc.gui.setScreen(null);
+    });
     at(t += 5, ClientScene::checkTranslations);
     at(t += 10, mc -> {
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));

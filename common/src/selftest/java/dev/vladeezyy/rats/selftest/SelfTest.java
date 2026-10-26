@@ -113,7 +113,8 @@ public final class SelfTest {
         failures.add("later checks crashed");
       }
     }
-    if (tick >= 20 && (GameplayTest.finished() || tick > 4000)) {
+    if (tick >= 20 && (GameplayTest.finished() || tick > Math.max(4000, GameplayTest.deadline()))) {
+      GameplayTest.failUnfinished();
       int passed = checks - failures.size();
       if (failures.isEmpty()) {
         RatsMod.LOGGER.info(PREFIX + "PASS {}/{}", passed, checks);
@@ -153,6 +154,26 @@ public final class SelfTest {
       net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "entities/rat"))) != net.minecraft.world.level.storage.loot.LootTable.EMPTY);
     check("banner patterns registered", () -> server.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BANNER_PATTERN)
       .containsKey(com.github.alexthe666.rats.registry.RatsBannerPatternRegistry.RAT_PATTERN));
+    // 1.21 enchantments go by item tags (1.20.1 by EnchantmentCategory): every armor piece, hat and weapon of the mod
+    // takes the enchantments its 1.20.1 category allowed
+    check("armor, hats, swords and the bow take their enchantments (1.21 item tags)", () -> {
+      var enchantments = server.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+      java.util.function.BiPredicate<net.minecraft.resources.ResourceKey<net.minecraft.world.item.enchantment.Enchantment>, net.minecraft.world.item.Item> supports =
+        (key, item) -> enchantments.getOrThrow(key).value().isSupportedItem(new net.minecraft.world.item.ItemStack(item));
+      boolean overworld = supports.test(net.minecraft.world.item.enchantment.Enchantments.PROTECTION, com.github.alexthe666.rats.registry.RatsItemRegistry.TOP_HAT.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.RESPIRATION, com.github.alexthe666.rats.registry.RatsItemRegistry.PLAGUE_DOCTOR_MASK.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, com.github.alexthe666.rats.registry.RatsItemRegistry.PLAGUE_SCYTHE.get());
+      if (!com.github.alexthe666.rats.RatsMod.RATLANTIS_DATAPACK_ENABLED) return overworld;
+      return overworld
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.PROTECTION, com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATLANTIS_CHESTPLATE.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.SWIFT_SNEAK, com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATLANTIS_LEGGINGS.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.FEATHER_FALLING, com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATLANTIS_BOOTS.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.AQUA_AFFINITY, com.github.alexthe666.rats.registry.RatlantisItemRegistry.MILITARY_HAT.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, com.github.alexthe666.rats.registry.RatlantisItemRegistry.PIRAT_CUTLASS.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.LOOTING, com.github.alexthe666.rats.registry.RatlantisItemRegistry.FERAL_BAGH_NAKHS.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.POWER, com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATLANTIS_BOW.get())
+        && supports.test(net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATLANTIS_BOW.get());
+    });
     check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().stream().anyMatch(id -> id.equals("ratlantis") || id.endsWith(":ratlantis") || id.endsWith("/ratlantis")));
     check("Ratlantis pack on means Ratlantis on (1.20.1 pack id)", () -> com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server) == com.github.alexthe666.rats.RatsMod.RATLANTIS_DATAPACK_ENABLED);
     check("wild rat spawns", () -> {
