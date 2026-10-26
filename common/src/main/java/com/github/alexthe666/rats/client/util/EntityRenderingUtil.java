@@ -43,7 +43,16 @@ public class EntityRenderingUtil {
 				} else {
 					// the mob filter lists every mod's entities; one that cannot be made on the client must not crash the game
 					try {
-						entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.getValue(t).create(level, net.minecraft.world.entity.EntitySpawnReason.LOAD));
+						entity = ENTITY_MAP.computeIfAbsent(entityName, t -> {
+							Entity created = BuiltInRegistries.ENTITY_TYPE.getValue(t).create(level, net.minecraft.world.entity.EntitySpawnReason.LOAD);
+							// 26.2+: an entity gets its id only when added to a level, and extracting its render state reads
+							// the id ("Tried to access entity ID before ID assignment"): the preview crashed the game.
+							// Negative ids never meet the level's own
+							if (created != null) {
+								created.setId(-1 - ENTITY_MAP.size());
+							}
+							return created;
+						});
 					} catch (RuntimeException | LinkageError e) {
 						RatsMod.LOGGER.warn("Rats: no preview for entity {}: {}", entityName, e.toString());
 						entity = null;
