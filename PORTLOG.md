@@ -210,6 +210,41 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
 - The Ratlantis portal on arrival read the worldgen heightmap of a loaded chunk, which 1.21 rebuilds every time (and
   logs as an error in dev); the final one now (on 26.x the worldgen one is gone and the portal ended at the bottom).
 
+### Bugs of the original found by comparing with another 1.21.1 port (8.1.3.2, 2026-10-27)
+Compared with ebaa67's "Rats Unofficial (Fixed)" (CurseForge 1549384), which fixed these on its own branch:
+- Mount upgrades: the mount (a `MISC` mob) could despawn like any mob, 128 blocks from the player or at random past
+  32, and the rat on it fell and died. Mounts are now persistent (a mount without its rat already discards itself).
+- Tamed rats share the `rats:rats` spawn category with wild ones and were not persistent, so vanilla's spawner
+  counted them: with many tamed rats wild rats stopped spawning, and garbage piles (they read the same counts, cap
+  2 × 25) too. `TamedRat.requiresCustomPersistence()` is true, as for any mob that never despawns.
+- Chef, Enchanter / Disenchanter and Archeologist upgrades ran their result on the client as well (every tick upgrade
+  runs on both sides): the client put its own result into the rat's paws while the server still had the input, and
+  the enchanter rolled its own enchantments. The result is now made on the server only; the progress still counts
+  on the client for the particles.
+- 1.21 enchantments go by item tags: the hats, the plague doctor and Black Death masks and the Ratlantis armor are in
+  `#minecraft:head_armor` / `chest_armor` / `leg_armor` / `foot_armor`, the plague scythe, the cutlasses and the bagh
+  nakhs in `#minecraft:swords`, the Ratlantis bow in `#minecraft:enchantable/bow` and `enchantable/durability`.
+  Before, none of them took the enchantments their 1.20.1 category allowed (only the Ratlantis sword and tools).
+- The mob filter preview made and rendered any mod's entity on the client unguarded; an entity that throws there
+  crashed the game. Both steps are guarded now, a failing entity type gets no preview.
+- Wild rats never raided a chest: `RatPathingHelper.canSeeOrDigToBlock` casts a ray to the target's center and took
+  only a miss as "seen", but a chest stops the ray on its own face. A hit on the target block counts now (found by the
+  new chest raid scenario; their port wrote a new goal for it).
+- Quarry rats got stuck in the pit with their blocks: the rat node evaluator made quarry platforms open, and the walk
+  evaluator tries a step up only where the cell ahead is blocked, so the path went under the staircase and never up
+  it. The platforms stay blocked now; the scenario digs past two layers (> 50 blocks back in the quarry, 3047 ticks;
+  before it stopped at ~47 for good). The scenes of `GameplayTest` float at y 120, so the quarry scene gets its own
+  stone underneath.
+- `SelfTest` stopped after 4000 ticks and dropped scenarios still running without a word; it now waits for the longest
+  scenario and counts an unfinished one as a failure.
+- Checked and unchanged: CTOV adds garbage heaps with `rats:garbage_pile`, `rat_trap`, `trash_can` and
+  `rat_attractor` to its villages (all registered); the follow goal keeps the original's 20 / 28 block teleport
+  distance (no 1.21 teleport every 12 blocks); the Pied Piper's spawn chance is the original's.
+- Tests: `GameplayTest` gained mounts that ride and stay (golem, chicken, beast), tamed rats persistent, a chef that
+  cooks, wild rats raiding crops and chests, a quarry rat digging past two layers, breeding in a cage with a
+  lantern, and (on its own, `-Drats.selftest.only=plague,doctor,night`) the plague doctor drinking invisibility once a
+  night; `SelfTest` checks the enchantment tags.
+
 ## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
 
 Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,

@@ -441,6 +441,13 @@ public class TamedRat extends InventoryRat {
 		return false;
 	}
 
+	// tamed rats share the rats spawn category with wild ones; vanilla's spawner (and the garbage piles, which read
+	// its counts) skips only persistent mobs, so without this many tamed rats stopped wild rats from spawning
+	@Override
+	public boolean requiresCustomPersistence() {
+		return true;
+	}
+
 	@Override
 	protected MovementEmission getMovementEmission() {
 		return RatUpgradeUtils.hasUpgrade(this, RatsItemRegistry.RAT_UPGRADE_SCULKED.get()) ? MovementEmission.SOUNDS : MovementEmission.ALL;

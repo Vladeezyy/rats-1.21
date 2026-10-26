@@ -50,6 +50,8 @@ public class RatQuarryPlatformBlock extends Block {
 		}
 	}
 
+	// blocked for the pathfinder: that is what makes the top of a platform a floor rats walk on (an open cell below a
+	// node means air to vanilla's WalkNodeEvaluator)
 	@Override
 	protected boolean isPathfindable(BlockState state, PathComputationType type) {
 		return false;

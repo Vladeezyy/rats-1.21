@@ -44,13 +44,17 @@ public class ChefRatUpgradeItem extends BaseRatUpgradeItem implements TickRatUpg
 		} else {
 			rat.cookingProgress++;
 			if (rat.cookingProgress == 100) {
-				heldItem.shrink(1);
-				if (heldItem.isEmpty()) {
-					rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);
-				} else {
-					if (!rat.tryDepositItemInContainers(burntItem)) {
-						if (!rat.level().isClientSide()) {
-							rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
+				// the result only on the server: the client used to run this too and showed its own result in the
+				// rat's paws while the server still had the input (its progress only drives the particles)
+				if (!rat.level().isClientSide()) {
+					heldItem.shrink(1);
+					if (heldItem.isEmpty()) {
+						rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);
+					} else {
+						if (!rat.tryDepositItemInContainers(burntItem)) {
+							if (!rat.level().isClientSide()) {
+								rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
+							}
 						}
 					}
 				}
