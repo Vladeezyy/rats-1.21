@@ -47,22 +47,26 @@ public class EnchanterRatUpgradeItem extends BaseRatUpgradeItem implements TickR
 		} else {
 			rat.cookingProgress++;
 			if (rat.cookingProgress == 1000) {
-				heldItem.shrink(1);
-				if (!disenchant) {
-					float power = 0;
-					for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
-						if (EnchantingTableBlock.isValidBookShelf(rat.level(), rat.blockPosition(), blockpos)) {
-							power += Platform.INSTANCE.enchantPowerBonus(rat.level().getBlockState(rat.blockPosition().offset(blockpos)), rat.level(), rat.blockPosition().offset(blockpos));
+				// the result only on the server: the client used to run this too and showed its own result in the
+				// rat's paws while the server still had the input (its progress only drives the particles)
+				if (!rat.level().isClientSide()) {
+					heldItem.shrink(1);
+					if (!disenchant) {
+						float power = 0;
+						for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+							if (EnchantingTableBlock.isValidBookShelf(rat.level(), rat.blockPosition(), blockpos)) {
+								power += Platform.INSTANCE.enchantPowerBonus(rat.level().getBlockState(rat.blockPosition().offset(blockpos)), rat.level(), rat.blockPosition().offset(blockpos));
+							}
 						}
+						burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), rat.level().registryAccess(), rat.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).get(net.minecraft.tags.EnchantmentTags.IN_ENCHANTING_TABLE));
 					}
-					burntItem = EnchantmentHelper.enchantItem(rat.getRandom(), burntItem, (int) (2.0F + rat.getRandom().nextInt(2) + power), rat.level().registryAccess(), rat.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).get(net.minecraft.tags.EnchantmentTags.IN_ENCHANTING_TABLE));
-				}
-				if (heldItem.isEmpty()) {
-					rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);
-				} else {
-					if (!rat.tryDepositItemInContainers(burntItem)) {
-						if (!rat.level().isClientSide()) {
-							rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
+					if (heldItem.isEmpty()) {
+						rat.setItemInHand(InteractionHand.MAIN_HAND, burntItem);
+					} else {
+						if (!rat.tryDepositItemInContainers(burntItem)) {
+							if (!rat.level().isClientSide()) {
+								rat.spawnAtLocation((net.minecraft.server.level.ServerLevel) rat.level(), burntItem, 0.25F);
+							}
 						}
 					}
 				}

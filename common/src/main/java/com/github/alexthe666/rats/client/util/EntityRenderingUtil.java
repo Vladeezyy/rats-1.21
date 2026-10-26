@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.registries.BuiltInRegistries;
+import com.github.alexthe666.rats.RatsMod;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -40,7 +41,13 @@ public class EntityRenderingUtil {
 				if (type == EntityType.PLAYER) {
 					entity = Minecraft.getInstance().player;
 				} else {
-					entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.getValue(t).create(level, net.minecraft.world.entity.EntitySpawnReason.LOAD));
+					// the mob filter lists every mod's entities; one that cannot be made on the client must not crash the game
+					try {
+						entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.getValue(t).create(level, net.minecraft.world.entity.EntitySpawnReason.LOAD));
+					} catch (RuntimeException | LinkageError e) {
+						RatsMod.LOGGER.warn("Rats: no preview for entity {}: {}", entityName, e.toString());
+						entity = null;
+					}
 				}
 				if (entity instanceof LivingEntity living) {
 					return living;
@@ -89,8 +96,18 @@ public class EntityRenderingUtil {
 			float rotate = (minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true) + (minecraft.player != null ? minecraft.player.tickCount : 0)) * 2F;
 			rotation.mul(Axis.YP.rotationDegrees(rotate));
 		}
-		EntityRenderer<? super LivingEntity, ?> renderer = minecraft.getEntityRenderDispatcher().getRenderer(entity);
-		EntityRenderState state = renderer.createRenderState(entity, 1.0F);
+		EntityRenderer<? super LivingEntity, ?> renderer;
+		EntityRenderState state;
+		try {
+			renderer = minecraft.getEntityRenderDispatcher().getRenderer(entity);
+			state = renderer.createRenderState(entity, 1.0F);
+		} catch (RuntimeException | LinkageError e) {
+			// a mod entity whose renderer fails outside a world: no preview instead of a crash
+			Identifier id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+			RatsMod.LOGGER.warn("Rats: no preview for entity {}: {}", id, e.toString());
+			addEntityToBlacklist(id);
+			return;
+		}
 		state.shadowPieces.clear();
 		state.outlineColor = 0;
 		if (state instanceof LivingEntityRenderState living) {

@@ -25,7 +25,9 @@ public class RatPathingHelper {
 
 	public static boolean canSeeOrDigToBlock(DiggingRat rat, BlockPos destination) {
 		BlockHitResult result = clipWithConditions(rat.level(), new ClipContext(rat.position(), Vec3.atCenterOf(destination), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, rat), !rat.isOnDiggingCooldown());
-		return result.getType() == HitResult.Type.MISS;
+		// the ray ends in the destination's center, so a solid destination (a chest) stops it on its own face: that
+		// counts as seen. The original only took a miss, so wild rats never raided a chest
+		return result.getType() == HitResult.Type.MISS || result.getBlockPos().equals(destination);
 	}
 
 	public static boolean canSeeBlock(AbstractRat rat, BlockPos destination) {
