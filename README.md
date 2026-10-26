@@ -59,7 +59,7 @@ The full list with causes: [PORTLOG.md](PORTLOG.md).
 ## Problems and fixes in detail
 
 <details>
-<summary><b>Tamed rat stuck holding cheese (#838)</b></summary>
+<summary><b>Tamed rat stuck holding cheese (<a href="https://github.com/AlexModGuy/Rats/issues/838">#838</a>)</b></summary>
 
 **Problem:** a freshly tamed rat holds the cheese forever and does no work.
 **Cause:** taming copied the cheese into the rat's hand, and a working rat only puts down items it is allowed to eat.
@@ -67,7 +67,7 @@ The full list with causes: [PORTLOG.md](PORTLOG.md).
 </details>
 
 <details>
-<summary><b>Rats stop working after a while (#818, #844, #887, #920, #902)</b></summary>
+<summary><b>Rats stop working after a while (<a href="https://github.com/AlexModGuy/Rats/issues/818">#818</a>, <a href="https://github.com/AlexModGuy/Rats/issues/844">#844</a>, <a href="https://github.com/AlexModGuy/Rats/issues/887">#887</a>, <a href="https://github.com/AlexModGuy/Rats/issues/920">#920</a>, <a href="https://github.com/AlexModGuy/Rats/issues/902">#902</a>)</b></summary>
 
 **Problem:** lumberjacks, farmers and carriers work for a while, then stand still.
 **Cause:** a rat that could not reach a tree or chest retried it forever; paths ended at the follow range (12 blocks),
@@ -77,7 +77,7 @@ farmland.
 </details>
 
 <details>
-<summary><b>Rats stop when the owner is offline or on LAN (#850, #945)</b></summary>
+<summary><b>Rats stop when the owner is offline or on LAN (<a href="https://github.com/AlexModGuy/Rats/issues/850">#850</a>, <a href="https://github.com/AlexModGuy/Rats/issues/945">#945</a>)</b></summary>
 
 **Problem:** rats sit down and do nothing while their owner is away.
 **Cause:** vanilla's sit goal sits every pet whose owner is offline.
@@ -85,7 +85,7 @@ farmland.
 </details>
 
 <details>
-<summary><b>Rat tubes do nothing (#907)</b></summary>
+<summary><b>Rat tubes do nothing (<a href="https://github.com/AlexModGuy/Rats/issues/907">#907</a>)</b></summary>
 
 **Problem:** rats ignore rat tubes.
 **Cause:** the tube navigation was lost in 1.14, and the 1.19+ tube was too narrow for a rat.
@@ -94,7 +94,7 @@ tube inside is 10 px again as in 1.12.
 </details>
 
 <details>
-<summary><b>Ethereal rat does not phase through blocks (#871)</b></summary>
+<summary><b>Ethereal rat does not phase through blocks (<a href="https://github.com/AlexModGuy/Rats/issues/871">#871</a>)</b></summary>
 
 **Problem:** the ethereal upgrade does nothing.
 **Cause:** since 1.19 the rat got its physics and gravity back every tick.
@@ -102,7 +102,7 @@ tube inside is 10 px again as in 1.12.
 </details>
 
 <details>
-<summary><b>Bee rat and Flying Dutchrat never melee (#822, #848)</b></summary>
+<summary><b>Bee rat and Flying Dutchrat never melee (<a href="https://github.com/AlexModGuy/Rats/issues/822">#822</a>, <a href="https://github.com/AlexModGuy/Rats/issues/848">#848</a>)</b></summary>
 
 **Problem:** a flying rat on *Follow Me* ignores the owner's target; the Flying Dutchrat never hits in melee.
 **Cause:** a flying rat in the air had no path, so its attack goal never started; 1.19 made the Dutchrat hover 4
@@ -111,7 +111,7 @@ blocks above its target and flee to the north-west after every sword throw.
 </details>
 
 <details>
-<summary><b>Smaller fixes (#787, #827, #847, #870, #864)</b></summary>
+<summary><b>Smaller fixes (<a href="https://github.com/AlexModGuy/Rats/issues/787">#787</a>, <a href="https://github.com/AlexModGuy/Rats/issues/827">#827</a>, <a href="https://github.com/AlexModGuy/Rats/issues/847">#847</a>, <a href="https://github.com/AlexModGuy/Rats/issues/870">#870</a>, <a href="https://github.com/AlexModGuy/Rats/issues/864">#864</a>)</b></summary>
 
 - Patrol paths were cleared on restart: the loaded path is now synced.
 - Crash `NoSuchElementException` with the Plague Doctor: damage sources without an owner are null-safe.
@@ -139,7 +139,7 @@ On each Minecraft version and both loaders:
 
 ## Performance
 
-Server load (issue #867), NeoForge 1.21.1, 300 cells of carriers and farmers working at once: **+2.2 ms per tick,
+Server load (issue [#867](https://github.com/AlexModGuy/Rats/issues/867)), NeoForge 1.21.1, 300 cells of carriers and farmers working at once: **+2.2 ms per tick,
 about 7.5 µs per rat**. The port removed the heaviest parts of the original: area scans now run the cheap block checks
 first, empty searches back off, item searches are throttled like vanilla's target goals, static maps no longer grow
 and the navigation is no longer re-created every 3 seconds. Path searches went from 31 % to 19 % of the rat phase.
@@ -152,6 +152,12 @@ Numbers for every version: [PORTLOG.md](PORTLOG.md).
 JDK 21 for `main` (1.21.1), JDK 25 for the `mc/26.*` branches. Rampart is taken from Maven Local: run
 `./gradlew publishToMavenLocal` in the Rampart repository (same branch name) first. Then `./gradlew build`; the jars
 are in `neoforge/build/libs` and `fabric/build/libs`.
+
+## Bug reports
+
+Found a bug in this port? Please report it in [our issues](https://github.com/Vladeezyy/rats-1.21/issues), not to the
+original authors: their tracker is for Rats 1.20.1 and older. Add the Minecraft version, the loader, the mod list and
+`logs/latest.log` (or the crash report).
 
 ## Credits and license
 
@@ -216,7 +222,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 ## Проблемы и исправления подробно
 
 <details>
-<summary><b>Приручённая крыса застревает с сыром (#838)</b></summary>
+<summary><b>Приручённая крыса застревает с сыром (<a href="https://github.com/AlexModGuy/Rats/issues/838">#838</a>)</b></summary>
 
 **Проблема:** только что приручённая крыса навсегда держит сыр и не работает.
 **Причина:** при приручении сыр копировался в лапы, а работающая крыса кладёт только то, что ей можно есть.
@@ -224,7 +230,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Крысы перестают работать со временем (#818, #844, #887, #920, #902)</b></summary>
+<summary><b>Крысы перестают работать со временем (<a href="https://github.com/AlexModGuy/Rats/issues/818">#818</a>, <a href="https://github.com/AlexModGuy/Rats/issues/844">#844</a>, <a href="https://github.com/AlexModGuy/Rats/issues/887">#887</a>, <a href="https://github.com/AlexModGuy/Rats/issues/920">#920</a>, <a href="https://github.com/AlexModGuy/Rats/issues/902">#902</a>)</b></summary>
 
 **Проблема:** лесорубы, фермеры и перевозчики какое-то время работают, потом стоят.
 **Причина:** крыса бесконечно пыталась дойти до недоступного дерева или сундука; пути заканчивались на дальности
@@ -234,7 +240,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Крысы встают, когда хозяин не в сети или на LAN (#850, #945)</b></summary>
+<summary><b>Крысы встают, когда хозяин не в сети или на LAN (<a href="https://github.com/AlexModGuy/Rats/issues/850">#850</a>, <a href="https://github.com/AlexModGuy/Rats/issues/945">#945</a>)</b></summary>
 
 **Проблема:** пока хозяина нет, крысы сидят и ничего не делают.
 **Причина:** ванильная цель «сидеть» сажает любого питомца, чей хозяин не в сети.
@@ -242,7 +248,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Крысиные трубы ничего не делают (#907)</b></summary>
+<summary><b>Крысиные трубы ничего не делают (<a href="https://github.com/AlexModGuy/Rats/issues/907">#907</a>)</b></summary>
 
 **Проблема:** крысы не пользуются трубами.
 **Причина:** навигация по трубам потерялась в 1.14, а труба в 1.19+ была слишком узкой для крысы.
@@ -251,7 +257,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Призрачная крыса не проходит сквозь блоки (#871)</b></summary>
+<summary><b>Призрачная крыса не проходит сквозь блоки (<a href="https://github.com/AlexModGuy/Rats/issues/871">#871</a>)</b></summary>
 
 **Проблема:** призрачное улучшение не работает.
 **Причина:** с 1.19 крыса каждый тик снова получала физику и гравитацию.
@@ -259,7 +265,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Пчелиная крыса и Летучий Голландкрыс не бьют вблизи (#822, #848)</b></summary>
+<summary><b>Пчелиная крыса и Летучий Голландкрыс не бьют вблизи (<a href="https://github.com/AlexModGuy/Rats/issues/822">#822</a>, <a href="https://github.com/AlexModGuy/Rats/issues/848">#848</a>)</b></summary>
 
 **Проблема:** летающая крыса в режиме *Следовать* не атакует цель хозяина; Летучий Голландкрыс никогда не бьёт вблизи.
 **Причина:** у летающей крысы в воздухе не было пути, и цель атаки не запускалась; в 1.19 Голландкрыс завис на 4 блока
@@ -268,7 +274,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 </details>
 
 <details>
-<summary><b>Мелкие исправления (#787, #827, #847, #870, #864)</b></summary>
+<summary><b>Мелкие исправления (<a href="https://github.com/AlexModGuy/Rats/issues/787">#787</a>, <a href="https://github.com/AlexModGuy/Rats/issues/827">#827</a>, <a href="https://github.com/AlexModGuy/Rats/issues/847">#847</a>, <a href="https://github.com/AlexModGuy/Rats/issues/870">#870</a>, <a href="https://github.com/AlexModGuy/Rats/issues/864">#864</a>)</b></summary>
 
 - Маршруты патруля пропадали после перезапуска: загруженный маршрут теперь синхронизируется.
 - Краш `NoSuchElementException` с чумным доктором: источники урона без владельца больше не падают.
@@ -295,7 +301,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 
 ## Производительность
 
-Нагрузка на сервер (issue #867), NeoForge 1.21.1, 300 ячеек перевозчиков и фермеров, работающих одновременно:
+Нагрузка на сервер (issue [#867](https://github.com/AlexModGuy/Rats/issues/867)), NeoForge 1.21.1, 300 ячеек перевозчиков и фермеров, работающих одновременно:
 **+2.2 мс на тик, около 7.5 мкс на крысу**. Порт убрал самые тяжёлые места оригинала: обход области сначала делает
 дешёвые проверки блока, пустые поиски реже повторяются, поиск предметов ограничен, как у ванильных целей, статические
 карты больше не растут, навигация не пересоздаётся каждые 3 секунды. Поиск путей — с 31 % до 19 % времени крыс.
@@ -308,6 +314,12 @@ Jar для своей версии Minecraft и загрузчика — на с
 JDK 21 для `main` (1.21.1), JDK 25 для веток `mc/26.*`. Rampart берётся из Maven Local: сначала
 `./gradlew publishToMavenLocal` в репозитории Rampart (ветка с тем же именем). Потом `./gradlew build`; jar лежат в
 `neoforge/build/libs` и `fabric/build/libs`.
+
+## Сообщить об ошибке
+
+Нашли ошибку в порте? Пишите в [наши issues](https://github.com/Vladeezyy/rats-1.21/issues), а не авторам оригинала:
+их трекер для Rats 1.20.1 и старше. Укажите версию Minecraft, загрузчик, список модов и `logs/latest.log` (или
+отчёт о краше).
 
 ## Авторы и лицензия
 

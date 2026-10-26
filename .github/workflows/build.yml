@@ -4,7 +4,10 @@
 name: Build
 
 on:
+  # branches only: a release tag (v8.1.3+26.3) would check out Rampart at a branch of that name, which does not
+  # exist, and fail
   push:
+    branches: ['**']
     paths-ignore: ['**.md', 'docs/**', 'licenses/**']
   pull_request:
   workflow_dispatch:
