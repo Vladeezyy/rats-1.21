@@ -56,6 +56,18 @@ public abstract class RatMountBase extends PathfinderMob implements RatMount, Ad
 		return this.getRat() != null ? this.getRat().canBeAffected(instance) : super.canBeAffected(instance);
 	}
 
+	// the original let the mount despawn like any mob (128 blocks away, randomly past 32): the rat on it fell and died.
+	// A mount without its rat discards itself in aiStep, so it never needs to despawn
+	@Override
+	public boolean requiresCustomPersistence() {
+		return true;
+	}
+
+	@Override
+	public boolean removeWhenFarAway(double dist) {
+		return false;
+	}
+
 	@Override
 	public boolean isCurrentlyGlowing() {
 		return super.isCurrentlyGlowing() || (this.getRat() != null && this.getRat().isCurrentlyGlowing());

@@ -119,6 +119,20 @@ blocks above its target and flee to the north-west after every sword throw.
 - The "disable plastic" option is back as "Plastic in Recipes" (glass recipes when off).
 </details>
 
+<details>
+<summary><b>More bugs of the original (8.1.3.2)</b></summary>
+
+- Rats on a mount upgrade died when the player went far away: the mount despawned. Mounts now stay.
+- Many tamed rats stopped wild rats from spawning (also from garbage piles): tamed rats no longer count.
+- Chef, Enchanter/Disenchanter and Archeologist rats showed the result in their paws before the server made it:
+  the result is made on the server only.
+- Ratlantis armor, the hats, the cutlasses, the plague scythe, the bagh nakhs and the Ratlantis bow take
+  enchantments again (1.21 item tags).
+- The mob filter no longer crashes on another mod's entity that cannot be shown.
+- Wild rats raid chests again (they never found one visible).
+- Quarry rats climb the quarry's platforms back up instead of staying in the pit with their blocks.
+</details>
+
 ## Compatibility
 
 - [JEI](https://modrinth.com/mod/jei) shows the rat crafting, cauldron and upgrade recipes (both loaders).
@@ -130,7 +144,7 @@ blocks above its target and flee to the north-west after every sword throw.
 ## Testing
 
 On each Minecraft version and both loaders:
-- self-test on a dedicated server: 45 checks (44 on 1.21.1), among them a gameplay scenario for every fixed issue;
+- self-test on a dedicated server: 55 checks (54 on 1.21.1), among them a gameplay scenario for every fixed issue;
 - client scene: all 28 mobs, the blocks and the inventory without missing textures or translations;
 - a check that no server class loads client code.
 
@@ -276,6 +290,20 @@ Jar для своей версии Minecraft и загрузчика — на с
 - Вернулась настройка отключения пластика — «Plastic in Recipes» (при выключенной — рецепты со стеклом).
 </details>
 
+<details>
+<summary><b>Ещё баги оригинала (8.1.3.2)</b></summary>
+
+- Крыса на маунте погибала, когда игрок уходил далеко: маунт деспавнился. Теперь маунты не пропадают.
+- Много ручных крыс мешали появлению диких (в том числе из мусора): ручные крысы больше не учитываются.
+- Крысы с улучшениями «Шеф-повар», «Колдун»/«Расколдовыватель» и «Археолог» показывали результат в лапах раньше,
+  чем его делал сервер: результат теперь только на сервере.
+- Броня Ратлантиса, шляпы, пиратские сабли, коса чёрной смерти, когти одичавшей крысы и лук Ратлантиса снова
+  зачаровываются (теги 1.21).
+- Фильтр мобов больше не крашит игру на сущности другого мода, которую нельзя показать.
+- Дикие крысы снова грабят сундуки (раньше ни один сундук не считался видимым).
+- Крысы в карьере поднимаются по платформам наверх, а не застревают в яме с добычей.
+</details>
+
 ## Совместимость
 
 - [JEI](https://modrinth.com/mod/jei) показывает рецепты крысиного верстака, котлов и улучшений (на обоих загрузчиках).
@@ -287,7 +315,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 ## Тестирование
 
 На каждой версии Minecraft и обоих загрузчиках:
-- самопроверка на выделенном сервере: 45 проверок (44 на 1.21.1), среди них игровой сценарий для каждого исправленного
+- самопроверка на выделенном сервере: 55 проверок (54 на 1.21.1), среди них игровой сценарий для каждого исправленного
   issue;
 - клиентская сцена: все 28 мобов, блоки и инвентарь без пропавших текстур и переводов;
 - проверка, что ни один серверный класс не загружает клиентский код.

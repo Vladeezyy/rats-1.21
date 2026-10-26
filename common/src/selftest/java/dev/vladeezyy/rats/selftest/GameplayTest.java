@@ -913,6 +913,261 @@ final class GameplayTest {
         return "east " + level.getBlockState(this.base.east()) + ", west " + level.getBlockState(this.base.west());
       }
     });
+    // mount upgrades: the rat rides its mount around, and the mount is kept like the rat (the original let it despawn
+    // 128 blocks from the player, the rat then fell and died)
+    for (var upgrade : List.of(RatsItemRegistry.RAT_UPGRADE_GOLEM_MOUNT, RatsItemRegistry.RAT_UPGRADE_CHICKEN_MOUNT, RatsItemRegistry.RAT_UPGRADE_BEAST_MOUNT)) {
+      String name = upgrade.getId().getPath().replace("rat_upgrade_", "");
+      SCENARIOS.add(new Scenario("a rat on its " + name + " wanders around, the mount never despawns", 1200) {
+        TamedRat rat;
+
+        @Override
+        boolean start(ServerLevel level) {
+          this.rat = tamedRat(level, this.base, RatCommand.WANDER);
+          this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(upgrade.get()));
+          this.rat.onUpgradeChanged();
+          return true;
+        }
+
+        @Override
+        boolean done(ServerLevel level) {
+          if (!(this.rat.getVehicle() instanceof com.github.alexthe666.rats.server.entity.mount.RatMountBase mount)) {
+            return false;
+          }
+          return mount.requiresCustomPersistence() && !mount.removeWhenFarAway(200 * 200) && mount.position().subtract(Vec3.atBottomCenterOf(this.base)).horizontalDistance() > 3;
+        }
+
+        @Override
+        String detail(ServerLevel level) {
+          Entity vehicle = this.rat.getVehicle();
+          return "rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", alive " + this.rat.isAlive() + ", vehicle " + (vehicle == null ? "none" : vehicle.getType() + " at "
+            + vehicle.position().subtract(Vec3.atBottomCenterOf(this.base)) + (vehicle instanceof Mob mob ? ", persistent " + mob.requiresCustomPersistence() + ", path " + mob.getNavigation().getPath() : ""));
+        }
+      });
+    }
+    SCENARIOS.add(new Scenario("tamed rats are persistent, so they leave the rats spawn cap to wild rats", 1) {
+      @Override
+      boolean start(ServerLevel level) {
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        // vanilla's spawner counts a category without the persistent mobs; the garbage piles read the same counts
+        TamedRat rat = tamedRat(level, this.base, RatCommand.SIT);
+        Rat wild = RatsEntityRegistry.RAT.get().spawn(level, this.base.east(2), MobSpawnType.COMMAND);
+        boolean result = rat.requiresCustomPersistence() && !wild.requiresCustomPersistence();
+        rat.discard();
+        wild.discard();
+        return result;
+      }
+    });
+    SCENARIOS.add(new Scenario("a chef rat cooks the food in its paws (on the server)", 400) {
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.rat = tamedRat(level, this.base, RatCommand.SIT);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_CHEF.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BEEF));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return this.rat.getMainHandItem().is(Items.COOKED_BEEF);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "holds " + this.rat.getMainHandItem() + ", progress " + this.rat.cookingProgress;
+      }
+    });
+    SCENARIOS.add(new Scenario("a wild rat raids crops: it eats a wheat plant", 1800) {
+      Rat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        for (int x = 2; x <= 4; x++) {
+          for (int z = -1; z <= 1; z++) {
+            level.setBlock(this.base.offset(x, -1, z), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);
+            level.setBlock(this.base.offset(x, 0, z), Blocks.WHEAT.defaultBlockState().setValue(net.minecraft.world.level.block.CropBlock.AGE, 7), Block.UPDATE_ALL);
+          }
+        }
+        this.rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, MobSpawnType.COMMAND);
+        this.rat.setPlagued(false);
+        this.rat.setBaby(false);
+        this.rat.raidCooldown = 0;
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        for (int x = 2; x <= 4; x++) {
+          for (int z = -1; z <= 1; z++) {
+            if (!level.getBlockState(this.base.offset(x, 0, z)).is(Blocks.WHEAT)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", alive " + this.rat.isAlive() + ", holds " + this.rat.getMainHandItem() + ", raid cooldown " + this.rat.raidCooldown;
+      }
+    });
+    SCENARIOS.add(new Scenario("a wild rat raids a chest: it takes food out", 1800) {
+      ChestBlockEntity chest;
+      Rat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.chest = chest(level, this.base.offset(4, 0, 0));
+        this.chest.setItem(0, new ItemStack(Items.BREAD, 16));
+        this.rat = RatsEntityRegistry.RAT.get().spawn(level, this.base, MobSpawnType.COMMAND);
+        this.rat.setPlagued(false);
+        this.rat.setBaby(false);
+        this.rat.raidCooldown = 0;
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.chest, Items.BREAD) < 16;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", alive " + this.rat.isAlive() + ", holds " + this.rat.getMainHandItem();
+      }
+    });
+    SCENARIOS.add(new Scenario("a quarry rat digs down its quarry and brings the blocks back up", 6000) {
+      Container quarry;
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        // the scenes float at y 120: solid ground under the quarry, wider than its 5 x 5 pit
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(-5, -12, -5), this.base.offset(5, -2, 5))) {
+          level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        level.setBlock(this.base, RatsBlockRegistry.RAT_QUARRY.get().defaultBlockState(), Block.UPDATE_ALL);
+        this.quarry = (Container) level.getBlockEntity(this.base);
+        this.rat = tamedRat(level, this.base.offset(-4, 0, 0), RatCommand.HARVEST);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_QUARRY.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setDepositPos(GlobalPos.of(level.dimension(), this.base));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        // more blocks than the first two layers of a radius 2 quarry have (25 each): the rat climbed the platforms
+        int items = 0;
+        for (int i = 0; i < this.quarry.getContainerSize(); i++) {
+          items += this.quarry.getItem(i).getCount();
+        }
+        return items > 50;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        int items = 0;
+        for (int i = 0; i < this.quarry.getContainerSize(); i++) {
+          items += this.quarry.getItem(i).getCount();
+        }
+        List<String> platforms = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(-2, -12, -2), this.base.offset(2, -1, 2))) {
+          if (level.getBlockState(pos).is(RatsBlockRegistry.RAT_QUARRY_PLATFORM.get())) {
+            platforms.add(pos.subtract(this.base).toShortString());
+          }
+        }
+        net.minecraft.world.level.pathfinder.Path back = this.rat.getNavigation().createPath(this.base.relative(this.rat.depositFacing), 0);
+        List<String> nodes = new ArrayList<>();
+        if (back != null) {
+          for (int n = 0; n < back.getNodeCount(); n++) {
+            nodes.add(back.getNode(n).asBlockPos().subtract(this.base).toShortString());
+          }
+        }
+        List<String> layers = new ArrayList<>();
+        for (int y = -1; y >= -4; y--) {
+          StringBuilder layer = new StringBuilder("y" + y + ":");
+          for (int z = -2; z <= 2; z++) {
+            layer.append(' ');
+            for (int x = -2; x <= 2; x++) {
+              BlockState state = level.getBlockState(this.base.offset(x, y, z));
+              layer.append(state.isAir() ? '.' : state.is(RatsBlockRegistry.RAT_QUARRY_PLATFORM.get()) ? 'P' : '#');
+            }
+          }
+          layers.add(layer.toString());
+        }
+        List<String> legs = new ArrayList<>();
+        for (BlockPos leg : List.of(this.base.offset(-1, -2, -1), this.base.offset(-2, -1, -1), this.base.offset(-2, 0, -2), this.base.offset(0, 0, -2), this.base.offset(0, 0, -1), this.base.offset(-3, 0, 0))) {
+          net.minecraft.world.level.pathfinder.Path legPath = this.rat.getNavigation().createPath(leg, 0);
+          legs.add(leg.subtract(this.base).toShortString() + "=" + (legPath == null ? "none" : legPath.canReach() + "/" + legPath.getNodeCount()));
+        }
+        return "legs " + legs + ", items in the quarry " + items + ", rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", holds " + this.rat.getMainHandItem() + ", facing " + this.rat.depositFacing
+          + ", working " + this.rat.isCurrentlyWorking
+          + ", path back " + (back == null ? "none" : "reaches " + back.canReach() + " " + nodes) + ", layers " + layers;
+      }
+    });
+    SCENARIOS.add(new Scenario("two tamed rats in a cage with a breeding lantern have babies", 1200) {
+      @Override
+      boolean start(ServerLevel level) {
+        level.setBlock(this.base.west(), RatsBlockRegistry.RAT_CAGE.get().defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(this.base, RatsBlockRegistry.RAT_CAGE_BREEDING_LANTERN.get().defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(this.base.east(), RatsBlockRegistry.RAT_CAGE.get().defaultBlockState(), Block.UPDATE_ALL);
+        for (boolean male : new boolean[] {true, false}) {
+          TamedRat rat = tamedRat(level, male ? this.base.west() : this.base.east(), RatCommand.SIT);
+          rat.setMale(male);
+          rat.setAge(0);
+        }
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return around(level, TamedRat.class, this.base).stream().anyMatch(TamedRat::isBaby);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return around(level, TamedRat.class, this.base).stream().map(r -> (r.isMale() ? "male" : "female") + " in cage " + r.isInCage() + " cooldown " + r.breedCooldown + " at " + r.position().subtract(Vec3.atBottomCenterOf(this.base))).toList().toString();
+      }
+    });
+    // the night changes the whole world, so this one runs on its own: -Drats.selftest.only=plague,doctor,night
+    if (System.getProperty("rats.selftest.only", "").contains("night")) {
+      SCENARIOS.add(new Scenario("a plague doctor drinks invisibility once a night, not over and over", 1000) {
+        com.github.alexthe666.rats.server.entity.misc.PlagueDoctor doctor;
+        int ticks;
+        int drinks;
+        boolean wasDrinking;
+
+        @Override
+        boolean start(ServerLevel level) {
+          level.setDayTime(18000);
+          this.doctor = RatsEntityRegistry.PLAGUE_DOCTOR.get().spawn(level, this.base, MobSpawnType.COMMAND);
+          return true;
+        }
+
+        @Override
+        boolean done(ServerLevel level) {
+          boolean drinking = this.doctor.isUsingItem() && this.doctor.getUseItem().is(Items.POTION);
+          if (drinking && !this.wasDrinking) {
+            this.drinks++;
+          }
+          this.wasDrinking = drinking;
+          return ++this.ticks >= 900 && this.drinks == 1 && this.doctor.isInvisible();
+        }
+
+        @Override
+        String detail(ServerLevel level) {
+          return "drinks " + this.drinks + " in " + this.ticks + " ticks, invisible " + this.doctor.isInvisible() + ", effects " + this.doctor.getActiveEffects() + ", night " + level.isNight();
+        }
+      });
+    }
     // -Drats.selftest.only=<part of a name>[,<part>...] runs only the matching scenarios (JAVA_TOOL_OPTIONS reaches the
     // dev run; it splits on spaces, so the parts have none)
     List<String> only = List.of(System.getProperty("rats.selftest.only", "").split(","));
@@ -924,6 +1179,21 @@ final class GameplayTest {
       flat(level, scenario.base);
     }
     tick = 0;
+  }
+
+  /** Ticks of the self-test until every scenario had its whole timeout (they all start at tick 20) */
+  static int deadline() {
+    return 60 + SCENARIOS.stream().mapToInt(s -> s.timeout).max().orElse(0);
+  }
+
+  /** A scenario still running when the self-test stops is a failure, not a silent skip */
+  static void failUnfinished() {
+    for (Scenario scenario : SCENARIOS) {
+      if (!scenario.finished) {
+        scenario.finished = true;
+        SelfTest.check("gameplay: " + scenario.name + " (did not finish)", () -> false);
+      }
+    }
   }
 
   static void tick(ServerLevel level) {

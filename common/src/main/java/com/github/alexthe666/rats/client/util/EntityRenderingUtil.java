@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.registries.BuiltInRegistries;
+import com.github.alexthe666.rats.RatsMod;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -34,7 +35,13 @@ public class EntityRenderingUtil {
 				if (type == EntityType.PLAYER) {
 					entity = Minecraft.getInstance().player;
 				} else {
-					entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.get(t).create(level));
+					// the mob filter lists every mod's entities; one that cannot be made on the client must not crash the game
+					try {
+						entity = ENTITY_MAP.computeIfAbsent(entityName, t -> BuiltInRegistries.ENTITY_TYPE.get(t).create(level));
+					} catch (RuntimeException | LinkageError e) {
+						RatsMod.LOGGER.warn("Rats: no preview for entity {}: {}", entityName, e.toString());
+						entity = null;
+					}
 				}
 				if (entity instanceof LivingEntity living) {
 					return living;
@@ -94,16 +101,24 @@ public class EntityRenderingUtil {
 			quaternion1.conjugate();
 			dispatcher.overrideCameraOrientation(quaternion1);
 			dispatcher.setRenderShadow(false);
-			RenderSystem.runAsFancy(() -> dispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, graphics.pose(), graphics.bufferSource(), 15728880));
-			graphics.flush();
-			dispatcher.setRenderShadow(true);
-			graphics.pose().popPose();
-			Lighting.setupFor3DItems();
-			entity.yBodyRot = f2;
-			entity.setYRot(f3);
-			entity.setXRot(f4);
-			entity.yHeadRotO = f5;
-			entity.yHeadRot = f6;
+			try {
+				RenderSystem.runAsFancy(() -> dispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, graphics.pose(), graphics.bufferSource(), 15728880));
+			} catch (RuntimeException | LinkageError e) {
+				// a mod entity whose renderer fails outside a world: no preview instead of a crash
+				ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
+				RatsMod.LOGGER.warn("Rats: no preview for entity {}: {}", id, e.toString());
+				addEntityToBlacklist(id);
+			} finally {
+				graphics.flush();
+				dispatcher.setRenderShadow(true);
+				graphics.pose().popPose();
+				Lighting.setupFor3DItems();
+				entity.yBodyRot = f2;
+				entity.setYRot(f3);
+				entity.setXRot(f4);
+				entity.yHeadRotO = f5;
+				entity.yHeadRot = f6;
+			}
 		}
 	}
 }

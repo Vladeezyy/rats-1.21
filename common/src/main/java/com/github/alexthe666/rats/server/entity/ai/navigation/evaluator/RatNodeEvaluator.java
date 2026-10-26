@@ -40,9 +40,9 @@ public class RatNodeEvaluator extends WalkNodeEvaluator {
 			if (block instanceof RatHoleBlock || block instanceof RatTrapBlock || block instanceof RatCageBlock || block instanceof RatTubeBlock) {
 				types = PathType.WALKABLE;
 			}
-			if (block instanceof RatQuarryPlatformBlock) {
-				types = PathType.OPEN;
-			}
+			// quarry platforms stay blocked (the original made them open): the walk evaluator only tries a step up where
+			// the cell ahead is blocked, so with open platforms a quarry rat walked under the staircase, never up it, and
+			// stayed in the pit with its blocks
 			if (block instanceof SlabBlock) {
 				types = PathType.WALKABLE;
 			}
