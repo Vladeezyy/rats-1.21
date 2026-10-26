@@ -936,6 +936,9 @@ final class GameplayTest {
 
         @Override
         boolean done(ServerLevel level) {
+          // as if a player stood by: the test player is far away, and from 26.3 vanilla resets a persistent mob's
+          // idle time only with a player within 32 blocks (idle past 100 ticks, the stroll goal never starts)
+          this.rat.setNoActionTime(0);
           if (!(this.rat.getVehicle() instanceof com.github.alexthe666.rats.server.entity.mount.RatMountBase mount)) {
             return false;
           }
