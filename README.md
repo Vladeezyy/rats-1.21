@@ -23,11 +23,10 @@ the original took from Citadel); Fabric also needs [Fabric API](https://modrinth
 
 The source of each version is on its branch: `main` (1.21.1), `mc/26.1.2`, `mc/26.2`, `mc/26.3`.
 
-## Installation
+## Requirements
 
-- **Single player**: put the Rats jar, the Rampart jar for the same Minecraft version and loader (and Fabric API on
-  Fabric) into `mods`.
-- **Server**: the same jars on the server and on every client.
+- **Rampart** for the same Minecraft version and loader; on Fabric also Fabric API.
+- Needed on the server and on every client.
 - Ratlantis is a built-in datapack and is on by default; a new world lists it under *More → Data Packs*.
 
 ## Features
@@ -147,12 +146,6 @@ Client: 100 tamed rats in view cost about 5 µs a frame each.
 
 Numbers for every version: [PORTLOG.md](PORTLOG.md).
 
-## Building
-
-JDK 21 for `main` (1.21.1), JDK 25 for the `mc/26.*` branches. Rampart is taken from Maven Local: run
-`./gradlew publishToMavenLocal` in the Rampart repository (same branch name) first. Then `./gradlew build`; the jars
-are in `neoforge/build/libs` and `fabric/build/libs`.
-
 ## Bug reports
 
 Found a bug in this port? Please report it in [our issues](https://github.com/Vladeezyy/rats-1.21/issues), not to the
@@ -185,10 +178,10 @@ Jar для своей версии Minecraft и загрузчика — на с
 
 Исходники каждой версии — в своей ветке: `main` (1.21.1), `mc/26.1.2`, `mc/26.2`, `mc/26.3`.
 
-## Установка
+## Требования
 
-- **Одиночная игра**: положить в `mods` jar Rats, jar Rampart для той же версии и загрузчика (и Fabric API на Fabric).
-- **Сервер**: те же jar на сервере и у каждого игрока.
+- **Rampart** для той же версии Minecraft и загрузчика; на Fabric ещё Fabric API.
+- Нужен на сервере и у каждого игрока.
 - Ратлантида — встроенный датапак, включён по умолчанию; в новом мире он виден в *Дополнительно → Наборы данных*.
 
 ## Что есть в моде
@@ -308,12 +301,6 @@ Jar для своей версии Minecraft и загрузчика — на с
 Клиент: 100 приручённых крыс в кадре — около 5 мкс на крысу за кадр.
 
 Цифры по всем версиям: [PORTLOG.md](PORTLOG.md).
-
-## Сборка
-
-JDK 21 для `main` (1.21.1), JDK 25 для веток `mc/26.*`. Rampart берётся из Maven Local: сначала
-`./gradlew publishToMavenLocal` в репозитории Rampart (ветка с тем же именем). Потом `./gradlew build`; jar лежат в
-`neoforge/build/libs` и `fabric/build/libs`.
 
 ## Сообщить об ошибке
 
