@@ -243,6 +243,15 @@ public final class ClientScene {
     at(t += 15, mc -> {
       shot(mc, "mob_filter");
       checkNoMissingTexture(mc, "mob_filter");
+      // a preview that failed to draw puts its entity type on the util's ignore list (26.3 threw for every entity)
+      try {
+        var ignored = com.github.alexthe666.rats.client.util.EntityRenderingUtil.class.getDeclaredField("IGNORED_ENTITIES");
+        ignored.setAccessible(true);
+        var names = ((java.util.Set<?>) ignored.get(null)).stream().map(Object::toString).toList();
+        check("the mob filter draws the plague doctor's preview", !names.contains(RatsMod.MODID + ":plague_doctor"), "ignored " + names);
+      } catch (ReflectiveOperationException e) {
+        check("the mob filter draws the plague doctor's preview", false, e);
+      }
       mc.setScreen(null);
     });
     at(t += 5, ClientScene::checkTranslations);
