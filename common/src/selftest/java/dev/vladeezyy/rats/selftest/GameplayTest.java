@@ -936,6 +936,12 @@ final class GameplayTest {
 
         @Override
         boolean start(ServerLevel level) {
+          // a glass pen: the scenes float at y 120 and a wandering rat must not walk off the edge
+          for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(-7, 0, -7), this.base.offset(7, 2, 7))) {
+            if (Math.abs(pos.getX() - this.base.getX()) == 7 || Math.abs(pos.getZ() - this.base.getZ()) == 7) {
+              level.setBlock(pos, Blocks.GLASS.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+          }
           this.rat = tamedRat(level, this.base, RatCommand.WANDER);
           this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(upgrade.get()));
           this.rat.onUpgradeChanged();
