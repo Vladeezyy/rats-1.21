@@ -139,7 +139,9 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 20.0D)
-				.add(Attributes.MOVEMENT_SPEED, 0.25D);
+				.add(Attributes.MOVEMENT_SPEED, 0.25D)
+				// 26.x TemptGoal reads its range from this attribute (1.20.1: a fixed 10 blocks)
+				.add(Attributes.TEMPT_RANGE, 10.0D);
 	}
 
 	@Override
