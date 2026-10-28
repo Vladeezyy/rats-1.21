@@ -245,8 +245,9 @@ public final class SelfTest {
       return com.github.alexthe666.rats.server.misc.StoredItems.view(old, 27).get(3).is(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_HEALTH.get());
     });
     // 26.x goals read attributes (TemptGoal: minecraft:tempt_range); a mob without one crashes the server on its first
-    // tick, so every mob of the mod runs its AI a few times here
-    check("every mob of the mod runs its AI (the attributes its goals read are there)", () -> {
+    // tick, so every mob of the mod runs its AI a few times here. It also takes a hit: hurtServer calling
+    // super.hurtOrSimulate comes back to itself (StackOverflowError, the golem mount)
+    check("every mob of the mod runs its AI and takes a hit (attributes its goals read, no hurt recursion)", () -> {
       List<String> broken = new ArrayList<>();
       for (var type : BuiltInRegistries.ENTITY_TYPE) {
         if (!BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(RatsMod.MODID)) continue;
@@ -255,7 +256,8 @@ public final class SelfTest {
         level.addFreshEntity(mob);
         try {
           for (int i = 0; i < 5; i++) mob.aiStep();
-        } catch (RuntimeException e) {
+          mob.hurtServer(level, level.damageSources().generic(), 1.0F);
+        } catch (RuntimeException | StackOverflowError e) {
           RatsMod.LOGGER.error(PREFIX + "{} AI", type, e);
           broken.add(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath());
         }
