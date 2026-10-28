@@ -292,6 +292,9 @@ JEI 29.47. The common code went from 4459 compile errors to 0, then the loaders 
   encoded one fixed instance); the humanoid `hat` part is a child of `head` in 26.x (black death, hats); the Ratlantis
   trim materials moved from the Ratlantis pack to the mod's data (the gem and the ingot provide them, a missing
   material stopped worlds without Ratlantis from loading); the pirat sign items take their block's name.
+- **The plague doctor crashed the server on its first tick** (reported for 8.1.3.2+26.3, Fabric; all 26.x, both
+  loaders): 26.x `TemptGoal` reads its range from the `minecraft:tempt_range` attribute, the doctor did not have it.
+  Now 10 (the fixed 1.20.1 range); `SelfTest` runs the AI of every mob of the mod a few ticks.
 
 ### Tests
 - `tools/selftest.sh` (26.x dev servers pause after 60 s without players: the script sets

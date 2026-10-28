@@ -244,6 +244,26 @@ public final class SelfTest {
       com.github.alexthe666.rats.server.misc.ItemNbt.setTag(old, tag);
       return com.github.alexthe666.rats.server.misc.StoredItems.view(old, 27).get(3).is(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_HEALTH.get());
     });
+    // 26.x goals read attributes (TemptGoal: minecraft:tempt_range); a mob without one crashes the server on its first
+    // tick, so every mob of the mod runs its AI a few times here
+    check("every mob of the mod runs its AI (the attributes its goals read are there)", () -> {
+      List<String> broken = new ArrayList<>();
+      for (var type : BuiltInRegistries.ENTITY_TYPE) {
+        if (!BuiltInRegistries.ENTITY_TYPE.getKey(type).getNamespace().equals(RatsMod.MODID)) continue;
+        if (!(type.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND) instanceof net.minecraft.world.entity.Mob mob)) continue;
+        mob.snapTo(Vec3.atBottomCenterOf(at(0, 0, -40)));
+        level.addFreshEntity(mob);
+        try {
+          for (int i = 0; i < 5; i++) mob.aiStep();
+        } catch (RuntimeException e) {
+          RatsMod.LOGGER.error(PREFIX + "{} AI", type, e);
+          broken.add(BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath());
+        }
+        mob.discard();
+      }
+      RatsMod.LOGGER.info(PREFIX + "mobs with a broken AI: {}", broken);
+      return broken.isEmpty();
+    });
   }
 
   /** Checks that need a few server ticks first */
