@@ -70,7 +70,7 @@ public class RatGolemMount extends RatMountBase {
 
 	public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		Cracks irongolementity$cracks = this.getCracks();
-		boolean flag = super.hurtOrSimulate(source, amount);
+		boolean flag = super.hurtServer(level, source, amount);
 		if (flag && this.getCracks() != irongolementity$cracks) {
 			this.playSound(SoundEvents.IRON_GOLEM_DAMAGE, 1.0F, 1.0F);
 		}

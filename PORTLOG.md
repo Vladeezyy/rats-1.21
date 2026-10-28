@@ -295,6 +295,12 @@ JEI 29.47. The common code went from 4459 compile errors to 0, then the loaders 
 - **The plague doctor crashed the server on its first tick** (reported for 8.1.3.2+26.3, Fabric; all 26.x, both
   loaders): 26.x `TemptGoal` reads its range from the `minecraft:tempt_range` attribute, the doctor did not have it.
   Now 10 (the fixed 1.20.1 range); `SelfTest` runs the AI of every mob of the mod a few ticks.
+- **Any damage to a golem mount overflowed the stack** (`StackOverflowError` in `RatGolemMount.hurtServer`, seen on
+  CI): the 26.x port called `super.hurtOrSimulate`, which comes back to `hurtServer`; now `super.hurtServer`. The
+  mob check of `SelfTest` hits every mob once.
+- Flaky scenarios on CI: the mount scenarios got a 25-block pen (in the 15-block one most stroll targets were behind
+  the glass) and 3600 ticks; the ground-gathering scenario counts any item (the lumberjack scenario next door drops
+  leaf litter there on 26.x, the rat took that first).
 
 ### Tests
 - `tools/selftest.sh` (26.x dev servers pause after 60 s without players: the script sets
