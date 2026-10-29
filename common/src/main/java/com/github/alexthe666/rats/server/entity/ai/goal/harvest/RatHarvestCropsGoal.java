@@ -109,7 +109,7 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 	 */
 	private static boolean isGrown(Level level, BlockPos pos, BlockState state) {
 		if (state.getBlock() instanceof CropBlock crop) return crop.isMaxAge(state);
-		if (state.getBlock() instanceof BonemealableBlock growing && growing.isValidBonemealTarget(level, pos, state)) return false;
+		if (state.getBlock() instanceof BonemealableBlock growing && growing.isValidBonemealTarget(level, pos, state, BonemealSource.MOB)) return false;
 		for (var property : state.getProperties()) {
 			if (property.getName().equals("age") && property instanceof net.minecraft.world.level.block.state.properties.IntegerProperty age) {
 				return state.getValue(age) >= age.getPossibleValues().stream().mapToInt(Integer::intValue).max().orElse(0);

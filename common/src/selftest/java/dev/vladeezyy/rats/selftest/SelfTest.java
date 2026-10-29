@@ -338,15 +338,9 @@ public final class SelfTest {
     });
     check("#944: the Pied Piper is a raider (a raid bell makes it glow)", () ->
       com.github.alexthe666.rats.registry.RatsEntityRegistry.PIED_PIPER.get().builtInRegistryHolder().is(net.minecraft.tags.EntityTypeTags.RAIDERS));
-    check("#940: no rats spawn in the Deep Dark", () -> {
-      var biome = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME).getOrThrow(net.minecraft.world.level.biome.Biomes.DEEP_DARK).value();
-      for (var category : net.minecraft.world.entity.MobCategory.values()) {
-        for (var data : biome.getMobSettings().getMobs(category).unwrap()) {
-          if (BuiltInRegistries.ENTITY_TYPE.getKey(data.value().type()).getNamespace().equals(RatsMod.MODID)) return false;
-        }
-      }
-      return true;
-    });
+    // 26.3 keeps a biome's spawns in an environment attribute; the mod adds its rats through this biome tag
+    check("#940: no rats spawn in the Deep Dark", () -> !level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME)
+      .getOrThrow(net.minecraft.world.level.biome.Biomes.DEEP_DARK).is(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BIOME, net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "rat_spawn_biomes"))));
     check("#918: ore doubling takes raw ores (what a mined ore drops since 1.17) and ore blocks", () ->
       com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.RAW_IRON))
         && com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.IRON_ORE))
