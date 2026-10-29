@@ -97,6 +97,8 @@ dependencies {
         localRuntime "maven.modrinth:ferrite-core:${compat_ferritecore}"
         localRuntime "maven.modrinth:modernfix:${compat_modernfix}"
         localRuntime "maven.modrinth:jade:${compat_jade}"
+        // #926, #868: farmer rats and its tomatoes
+        localRuntime "maven.modrinth:farmers-delight:${compat_farmersdelight}"
     }
 }
 
