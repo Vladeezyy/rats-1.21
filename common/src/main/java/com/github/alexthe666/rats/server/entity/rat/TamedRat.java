@@ -941,6 +941,9 @@ public class TamedRat extends InventoryRat {
 		// the copy is a new entity: not this one's id
 		tag.remove("UUID");
 		Values.load(copy, tag);
+		// #910: the attributes are not in this tag, so the upgrades' health, armor and speed are applied again (the
+		// angel came back with 8 health and kept it until an upgrade changed)
+		copy.onUpgradeChanged();
 		copy.setHealth(copy.getMaxHealth());
 		copy.copyPosition(this);
 		copy.setRespawnCountdown(1200);

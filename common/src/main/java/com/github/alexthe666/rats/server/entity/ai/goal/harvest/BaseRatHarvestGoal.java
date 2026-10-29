@@ -188,8 +188,9 @@ public abstract class BaseRatHarvestGoal extends Goal implements RatWorkGoal {
 		for (ItemStack stack : items) {
 			if (rat.getMainHandItem().isEmpty() && rat.canRatPickupItem(stack)) {
 				rat.setItemInHand(InteractionHand.MAIN_HAND, stack);
-			} else if (ItemStack.isSameItem(rat.getMainHandItem(), stack) && stack.getCount() + rat.getMainHandItem().getCount() <= 64) {
-				rat.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(rat.getMainHandItem().getItem(), rat.getMainHandItem().getCount() + stack.getCount()));
+			} else if (ItemStack.isSameItemSameComponents(rat.getMainHandItem(), stack) && stack.getCount() + rat.getMainHandItem().getCount() <= stack.getMaxStackSize()) {
+				// #916: the same item with the same data only, and the stack keeps that data
+				rat.setItemInHand(InteractionHand.MAIN_HAND, rat.getMainHandItem().copyWithCount(rat.getMainHandItem().getCount() + stack.getCount()));
 			} else {
 				ItemEntity item = new ItemEntity(this.rat.level(), this.rat.getX(), this.rat.getY(), this.rat.getZ(), stack);
 				item.setExtendedLifetime();

@@ -9,6 +9,8 @@ repositories {
         url = 'https://maven.fabricmc.net'
     }
     maven { url = 'https://maven.blamejared.com/' } // JEI
+    maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+    maven { url = 'https://jitpack.io'; content { includeGroup 'com.github.Chocohead' } }
     mavenLocal() { content { includeGroup 'dev.vladeezyy.rampart' } } // Rampart: ./gradlew publishToMavenLocal there
 }
 
@@ -30,6 +32,13 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly 'io.github.llamalad7:mixinextras-common:0.5.0'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.0'
+    // -Pwith_compat: other mods in the dev runs (#926, #868: farmer rats and Farmer's Delight's tomatoes)
+    if (project.hasProperty('with_compat')) {
+        modLocalRuntime "maven.modrinth:farmers-delight-refabricated:${compat_farmersdelight_fabric}"
+        // its enum extensions come from Fabric ASM, nested in its jar: dev runs do not load nested jars
+        modLocalRuntime 'com.github.Chocohead:Fabric-ASM:v2.3'
+
+    }
 }
 
 loom {
