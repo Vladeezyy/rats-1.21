@@ -210,6 +210,11 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
 - The Ratlantis portal on arrival read the worldgen heightmap of a loaded chunk, which 1.21 rebuilds every time (and
   logs as an error in dev); the final one now (on 26.x the worldgen one is gone and the portal ended at the bottom).
 
+### A right click on the plague doctor crashed the game (2026-10-29, reported on CurseForge)
+`IllegalStateException: Cannot load Villager offers on the client`: `mobInteract` asked for the offers on both sides,
+and 1.21 builds them on the server only (1.20.1 made them on the client too). The client now only answers; the server
+opens the trade. Client scene check: a right click on a client-side plague doctor.
+
 ### Bugs of the original found by comparing with another 1.21.1 port (8.1.3.2, 2026-10-27)
 Compared with ebaa67's "Rats Unofficial (Fixed)" (CurseForge 1549384), which fixed these on its own branch:
 - Mount upgrades: the mount (a `MISC` mob) could despawn like any mob, 128 blocks from the player or at random past

@@ -499,15 +499,17 @@ public class PlagueDoctor extends AbstractVillager implements RangedAttackMob {
 			if (hand == InteractionHand.MAIN_HAND) {
 				player.awardStat(Stats.TALKED_TO_VILLAGER);
 			}
+			// the offers live on the server: since 1.21 getOffers throws on the client ("Cannot load Villager offers on
+			// the client", the game crashed on a right click); 1.20.1 made them on the client too
+			if (this.level().isClientSide()) {
+				return InteractionResult.SUCCESS;
+			}
 			if (this.getOffers().isEmpty()) {
 				return super.mobInteract(player, hand);
 			} else {
-				if (!this.level().isClientSide()) {
-					this.setTradingPlayer(player);
-					this.openTradingScreen(player, this.getDisplayName(), 1);
-				}
-
-				return InteractionResult.sidedSuccess(this.level().isClientSide());
+				this.setTradingPlayer(player);
+				this.openTradingScreen(player, this.getDisplayName(), 1);
+				return InteractionResult.CONSUME;
 			}
 		}
 		return super.mobInteract(player, hand);
