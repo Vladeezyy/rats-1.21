@@ -228,6 +228,14 @@ public final class ClientScene {
         }
       }
       check("the mob filter makes a preview of every living entity type without a crash", previews > 50, previews + " previews");
+      // a right click on the plague doctor runs mobInteract on the client too: it must not ask for the offers there
+      try {
+        var doctor = com.github.alexthe666.rats.client.util.EntityRenderingUtil.fetchEntity(net.minecraft.resources.Identifier.fromNamespaceAndPath(RatsMod.MODID, "plague_doctor"), mc.level);
+        var result = ((net.minecraft.world.entity.Mob) doctor).interact(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.phys.Vec3.ZERO);
+        check("a right click on the plague doctor on the client (trading)", result.consumesAction(), result);
+      } catch (RuntimeException e) {
+        check("a right click on the plague doctor on the client (trading)", false, e);
+      }
       mc.player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_MOB_FILTER.get()));
       var screen = new com.github.alexthe666.rats.client.gui.MobFilterScreen(net.minecraft.world.InteractionHand.MAIN_HAND);
       try {
