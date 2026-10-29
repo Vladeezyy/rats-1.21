@@ -675,7 +675,7 @@ final class GameplayTest {
 
       @Override
       boolean start(ServerLevel level) {
-        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
+        this.pig = net.minecraft.world.entity.EntityTypes.PIG.spawn(level, this.base.offset(5, 0, 0), EntitySpawnReason.COMMAND);
         this.pig.setNoAi(true);
         this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
         this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
