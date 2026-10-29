@@ -210,6 +210,48 @@ Client, `tools/scenetest.sh -Pscene=perf` (NeoForge, 1600x900, no frame limit, a
 - The Ratlantis portal on arrival read the worldgen heightmap of a loaded chunk, which 1.21 rebuilds every time (and
   logs as an error in dev); the final one now (on 26.x the worldgen one is gone and the portal ended at the bottom).
 
+### Audit of every open issue of the original (73, 2026-10-29)
+Each bug report checked against the port's code and, where it can be, with a test (`SelfTest`, `GameplayTest`,
+`ClientScene`; `-Pwith_compat` adds Farmer's Delight on both loaders, Sodium/Iris/Lithium/FerriteCore/ModernFix/Jade on
+NeoForge). The 17 issues of the table above stay as they are.
+
+| Issue | Status in the port |
+|---|---|
+| [#946](https://github.com/AlexModGuy/Rats/issues/946) pickpocket never takes the last trade | Fixed: any offer (`nextInt(size - 1)` also threw for a trader with one offer). No automated test: the goal needs an online owner |
+| [#944](https://github.com/AlexModGuy/Rats/issues/944) Pied Piper not a raider | Fixed: in `#minecraft:raiders` (a bell makes it glow) (check) |
+| [#941](https://github.com/AlexModGuy/Rats/issues/941) halo does not show on a rat | Works in the port: the client scene puts one on a tamed rat (screenshot) |
+| [#940](https://github.com/AlexModGuy/Rats/issues/940) rats spawn in the Deep Dark | Not in the port: the spawn biome tag has no Deep Dark (check) |
+| [#936](https://github.com/AlexModGuy/Rats/issues/936) demon rats spawn on magma | As vanilla: magma lets fire-immune mobs spawn (zombified piglins too) |
+| [#935](https://github.com/AlexModGuy/Rats/issues/935), [#860](https://github.com/AlexModGuy/Rats/issues/860) flying rats do not attack | Fixed with #822 (test for the bee and the flight upgrade) |
+| [#860](https://github.com/AlexModGuy/Rats/issues/860) aquatic upgrade does not path under water | Works in the port (test: carries items between two chests at the bottom of a pool) |
+| [#860](https://github.com/AlexModGuy/Rats/issues/860) mob filter resets when picked up | Ticked as fixed in the issue; filters are item components in 1.21 |
+| [#929](https://github.com/AlexModGuy/Rats/issues/929), [#856](https://github.com/AlexModGuy/Rats/issues/856), [#837](https://github.com/AlexModGuy/Rats/issues/837) wild rats do not raid chests, rats do not spawn, chef rat ignores chests | Fixed in 8.1.3.2 / with #887 (tests) |
+| [#926](https://github.com/AlexModGuy/Rats/issues/926), [#868](https://github.com/AlexModGuy/Rats/issues/868) farmer rats break young Farmer's Delight tomatoes | Fixed: a crop that is no `CropBlock` is ripe when bone meal no longer grows it and its age is at the maximum (test with Farmer's Delight on both loaders; the old code broke every young plant and filled the chest with seeds) |
+| [#923](https://github.com/AlexModGuy/Rats/issues/923) sitting rat on a chicken mount dies of fall damage | Fixed in 8.1.3.2 (mounts no longer despawn under their rat, test) |
+| [#922](https://github.com/AlexModGuy/Rats/issues/922) flying rats do not fly to a chest they cannot walk to | Fixed: a goal more than a block up makes a rat with a flight upgrade take off (test: a chest on a 4-block pillar) |
+| [#919](https://github.com/AlexModGuy/Rats/issues/919) miner stops digging | The miner upgrades are switched off in the original 1.20.1 (not registered); the quarry rat works (test) |
+| [#918](https://github.com/AlexModGuy/Rats/issues/918) ore doubling does nothing | Fixed: raw ores count (a mined ore drops raw iron since 1.17; only ore blocks did) (check and test) |
+| [#917](https://github.com/AlexModGuy/Rats/issues/917) rat screen does not open | A Bukkit hybrid server's crash (`getBukkitEntity`); the port's `openGUI` does not use the owner |
+| [#916](https://github.com/AlexModGuy/Rats/issues/916) picked-up items lose enchantments, damage and name | Fixed: the stack keeps its data and joins only the same item with the same data (test with and without the platter) |
+| [#911](https://github.com/AlexModGuy/Rats/issues/911) cage z-fighting | Not reproduced in the client scene's cages |
+| [#910](https://github.com/AlexModGuy/Rats/issues/910) angel rat comes back with 8 health | Fixed, and the cause was bigger in the port: a rat's inventory (upgrades, hat, held item) was not saved at all (`ItemStack.save` returns the tag in 1.21), so every rat lost them on reload. Tests: a save and load, an angel's return |
+| [#904](https://github.com/AlexModGuy/Rats/issues/904) Pehkui: a rat on the head ignores the player's size | Open (compatibility; Pehkui has no 1.21.1 NeoForge build to test with) |
+| [#897](https://github.com/AlexModGuy/Rats/issues/897), [#884](https://github.com/AlexModGuy/Rats/issues/884) combat in packs; only one attack upgrade used | One attack goal per rat is the upgrade API's design (`ChangesAIUpgrade`: the last goal of a type wins); melee and flying attacks tested |
+| [#893](https://github.com/AlexModGuy/Rats/issues/893) world with Ratlantis does not load | Ratlantis on in every test world (portal test) |
+| [#885](https://github.com/AlexModGuy/Rats/issues/885) StackOverflowError | 1.16; on 26.x the golem mount had one (fixed in 8.1.3.4); every mob now takes a hit in the self-test |
+| [#872](https://github.com/AlexModGuy/Rats/issues/872) log a tamed rat's death | Vanilla logs named pets' deaths; not changed |
+| [#855](https://github.com/AlexModGuy/Rats/issues/855) rat crafting table keeps leftovers (buckets) | Fixed: a hopper below takes the buffer's items no ingredient of the recipe uses (check) |
+| [#851](https://github.com/AlexModGuy/Rats/issues/851) Cobblemon's mobs act like rats | Not reproduced in the code: the mod only gives golems, cats, ocelots and foxes a goal to hunt rats; its two mixins touch piglins and the warden |
+| [#648](https://github.com/AlexModGuy/Rats/issues/648) ethereal rat under bedrock | Not reproduced; ethereal rats move in straight lines to their targets since #871 |
+| [#932](https://github.com/AlexModGuy/Rats/issues/932), [#381](https://github.com/AlexModGuy/Rats/issues/381) | 1.16 and 1.12 versions |
+| [#921](https://github.com/AlexModGuy/Rats/issues/921) typo "breeed" | Not in the 8.1.3 text |
+| Suggestions: #933, #928, #925, #909, #861, #858, #741, #734, #677, #659, #609, #606, #567, #532, #467, #205, #197, #149, #144, #128, #115 | Feature requests, not bugs; the port keeps the original's features |
+| [#947](https://github.com/AlexModGuy/Rats/issues/947) | Not a bug report |
+
+New broad checks: every mob of the mod runs its AI and takes a hit; every upgrade (81) works on a rat under every
+command; every block (89) is placed, ticks, saves, random-ticks and breaks (the garbage pile threw before the first
+spawn tick: fixed).
+
 ### A right click on the plague doctor crashed the game (2026-10-29, reported on CurseForge)
 `IllegalStateException: Cannot load Villager offers on the client`: `mobInteract` asked for the offers on both sides,
 and 1.21 builds them on the server only (1.20.1 made them on the client too). The client now only answers; the server

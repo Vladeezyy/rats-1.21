@@ -297,6 +297,64 @@ final class GameplayTest {
         return count(this.to, Items.COBBLESTONE) > 0;
       }
     });
+    SCENARIOS.add(new Scenario("#922: a flying rat carries items up to a chest on a pillar it cannot walk to", 2400) {
+      ChestBlockEntity to;
+
+      @Override
+      boolean start(ServerLevel level) {
+        ChestBlockEntity from = chest(level, this.base.offset(-3, 0, 0));
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 32));
+        for (int y = 0; y < 4; y++) level.setBlock(this.base.offset(3, y, 0), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        this.to = chest(level, this.base.offset(3, 4, 0));
+        TamedRat rat = tamedRat(level, this.base, RatCommand.TRANSPORT);
+        rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
+        rat.onUpgradeChanged();
+        rat.setPickupPos(GlobalPos.of(level.dimension(), this.base.offset(-3, 0, 0)));
+        rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(3, 4, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.COBBLESTONE) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return around(level, TamedRat.class, this.base).stream().map(r -> "rat at " + r.position().subtract(Vec3.atBottomCenterOf(this.base)) + " flying " + r.isFlying() + " hand " + r.getMainHandItem() + " nav " + r.getNavigation().getClass().getSimpleName() + " path " + r.getNavigation().getPath()).toList().toString();
+      }
+    });
+    SCENARIOS.add(new Scenario("#860: an aquatic rat carries items between two chests under water", 2400) {
+      ChestBlockEntity to;
+
+      @Override
+      boolean start(ServerLevel level) {
+        // a pool 3 deep with glass walls, a chest at each end on its floor
+        for (BlockPos pos : BlockPos.betweenClosed(this.base.offset(-6, 0, -3), this.base.offset(6, 3, 3))) {
+          boolean wall = Math.abs(pos.getX() - this.base.getX()) == 6 || Math.abs(pos.getZ() - this.base.getZ()) == 3;
+          level.setBlock(pos, wall ? Blocks.GLASS.defaultBlockState() : pos.getY() - this.base.getY() < 3 ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        ChestBlockEntity from = chest(level, this.base.offset(-4, 0, 0));
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 32));
+        this.to = chest(level, this.base.offset(4, 0, 0));
+        TamedRat rat = tamedRat(level, this.base, RatCommand.TRANSPORT);
+        rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_AQUATIC.get()));
+        rat.onUpgradeChanged();
+        rat.setPickupPos(GlobalPos.of(level.dimension(), this.base.offset(-4, 0, 0)));
+        rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(4, 0, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.COBBLESTONE) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return around(level, TamedRat.class, this.base).stream().map(r -> "rat at " + r.position().subtract(Vec3.atBottomCenterOf(this.base)) + " in water " + r.isInWater() + " air " + r.getAirSupply() + " health " + r.getHealth() + " hand " + r.getMainHandItem() + " nav " + r.getNavigation().getClass().getSimpleName() + " path " + r.getNavigation().getPath()).toList().toString();
+      }
+    });
     SCENARIOS.add(new Scenario("#871: an ethereal rat carries items through stone into a walled-in chest", 1800) {
       ChestBlockEntity to;
       TamedRat rat;
@@ -589,6 +647,36 @@ final class GameplayTest {
         // hunting rats do not wander, so it stays in the air as a following one does (wandering, it lands and paths)
         this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
         this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_BEE.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setFlying(true);
+        this.rat.setNoGravity(true);
+        this.rat.setTarget(this.pig);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        if (this.rat.getTarget() == null && this.pig.isAlive()) {
+          this.rat.setTarget(this.pig);
+        }
+        return this.pig.getLastHurtByMob() == this.rat;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rat at " + this.rat.position() + " flying " + this.rat.isFlying() + ", target " + this.rat.getTarget() + ", pig at " + this.pig.position();
+      }
+    });
+    SCENARIOS.add(new Scenario("#935: a rat with the flight upgrade in the air flies down and bites its target", 400) {
+      TamedRat rat;
+      Mob pig;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.pig = EntityType.PIG.spawn(level, this.base.offset(5, 0, 0), MobSpawnType.COMMAND);
+        this.pig.setNoAi(true);
+        this.rat = tamedRat(level, this.base.above(4), RatCommand.HUNT);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_FLIGHT.get()));
         this.rat.onUpgradeChanged();
         this.rat.setFlying(true);
         this.rat.setNoGravity(true);
@@ -950,6 +1038,171 @@ final class GameplayTest {
           Entity vehicle = this.rat.getVehicle();
           return "rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", alive " + this.rat.isAlive() + ", vehicle " + (vehicle == null ? "none" : vehicle.getType() + " at "
             + vehicle.position().subtract(Vec3.atBottomCenterOf(this.base)) + (vehicle instanceof Mob mob ? ", persistent " + mob.requiresCustomPersistence() + ", path " + mob.getNavigation().getPath() : ""));
+        }
+      });
+    }
+    SCENARIOS.add(new Scenario("a tamed rat keeps its upgrades, hat and held item through a save and load", 1) {
+      @Override
+      boolean start(ServerLevel level) {
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        TamedRat rat = tamedRat(level, this.base, RatCommand.SIT);
+        rat.setItemSlot(EquipmentSlot.HEAD, new ItemStack(RatsItemRegistry.TOP_HAT.get()));
+        rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_HEALTH.get()));
+        rat.setItemSlot(EquipmentSlot.LEGS, new ItemStack(RatsItemRegistry.RAT_UPGRADE_SPEED.get()));
+        rat.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BREAD, 3));
+        rat.onUpgradeChanged();
+        double health = rat.getAttributeValue(Attributes.MAX_HEALTH);
+        net.minecraft.nbt.CompoundTag tag = rat.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        rat.discard();
+        TamedRat loaded = RatsEntityRegistry.TAMED_RAT.get().create(level);
+        loaded.load(tag);
+        level.addFreshEntity(loaded);
+        boolean ok = loaded.getItemBySlot(EquipmentSlot.HEAD).is(RatsItemRegistry.TOP_HAT.get()) && loaded.getItemBySlot(EquipmentSlot.CHEST).is(RatsItemRegistry.RAT_UPGRADE_HEALTH.get())
+          && loaded.getItemBySlot(EquipmentSlot.LEGS).is(RatsItemRegistry.RAT_UPGRADE_SPEED.get()) && loaded.getMainHandItem().is(Items.BREAD) && loaded.getMainHandItem().getCount() == 3
+          && loaded.getAttributeValue(Attributes.MAX_HEALTH) == health;
+        RatsMod.LOGGER.info("[Rats selftest] save and load: head {} chest {} legs {} hand {} health {}/{}", loaded.getItemBySlot(EquipmentSlot.HEAD), loaded.getItemBySlot(EquipmentSlot.CHEST), loaded.getItemBySlot(EquipmentSlot.LEGS), loaded.getMainHandItem(), loaded.getAttributeValue(Attributes.MAX_HEALTH), health);
+        loaded.discard();
+        return ok;
+      }
+    });
+    SCENARIOS.add(new Scenario("#910: an angel rat comes back with the health of its upgrades", 100) {
+      TamedRat rat;
+      double health;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.rat = tamedRat(level, this.base, RatCommand.SIT);
+        this.rat.setItemSlot(EquipmentSlot.LEGS, new ItemStack(RatsItemRegistry.RAT_UPGRADE_ANGEL.get()));
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_HEALTH.get()));
+        this.rat.onUpgradeChanged();
+        this.health = this.rat.getAttributeValue(Attributes.MAX_HEALTH);
+        this.rat.hurt(level.damageSources().genericKill(), 1000.0F);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return this.health > this.rat.getAttributeBaseValue(Attributes.MAX_HEALTH) && around(level, TamedRat.class, this.base).stream()
+          .anyMatch(r -> r != this.rat && r.isAlive() && r.getAttributeValue(Attributes.MAX_HEALTH) == this.health && r.getHealth() == (float) this.health);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "before " + this.health + ", rats " + around(level, TamedRat.class, this.base).stream().map(r -> r.getHealth() + "/" + r.getAttributeValue(Attributes.MAX_HEALTH) + (r.isAlive() ? "" : " dead") + " chest " + r.getItemBySlot(EquipmentSlot.CHEST) + " legs " + r.getItemBySlot(EquipmentSlot.LEGS) + " countdown " + r.getRespawnCountdown()).toList();
+      }
+    });
+    // #916: what a rat picks up keeps its data (enchantments, damage, name); with and without the platter upgrade
+    for (boolean platter : new boolean[] { false, true }) {
+      SCENARIOS.add(new Scenario("#916: a rat carries an enchanted, named, damaged sword into a chest unchanged" + (platter ? " (platter)" : ""), 1800) {
+        ChestBlockEntity to;
+        ItemStack sword;
+
+        @Override
+        boolean start(ServerLevel level) {
+          this.to = chest(level, this.base.offset(3, 0, 0));
+          TamedRat rat = tamedRat(level, this.base, RatCommand.GATHER);
+          if (platter) {
+            rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_PLATTER.get()));
+            rat.onUpgradeChanged();
+          }
+          rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(3, 0, 0)));
+          this.sword = new ItemStack(Items.IRON_SWORD);
+          this.sword.enchant(level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS), 3);
+          this.sword.setDamageValue(57);
+          this.sword.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Squeaker"));
+          // clear the ground the lumberjack next door may have covered
+          around(level, ItemEntity.class, this.base).forEach(Entity::discard);
+          level.addFreshEntity(new ItemEntity(level, this.base.getX() - 2.5, this.base.getY(), this.base.getZ() + 2.5, this.sword.copy()));
+          return true;
+        }
+
+        @Override
+        boolean done(ServerLevel level) {
+          for (int i = 0; i < this.to.getContainerSize(); i++) {
+            if (this.to.getItem(i).is(Items.IRON_SWORD)) return ItemStack.isSameItemSameComponents(this.to.getItem(i), this.sword);
+          }
+          return false;
+        }
+
+        @Override
+        String detail(ServerLevel level) {
+          StringBuilder chest = new StringBuilder();
+          for (int i = 0; i < this.to.getContainerSize(); i++) if (!this.to.getItem(i).isEmpty()) chest.append(this.to.getItem(i)).append(this.to.getItem(i).getComponentsPatch()).append(' ');
+          return "chest " + chest + ", rats " + around(level, TamedRat.class, this.base).stream().map(r -> r.getMainHandItem() + " " + r.getMainHandItem().getComponentsPatch()).toList();
+        }
+      });
+    }
+    SCENARIOS.add(new Scenario("#918: an ore doubling rat turns raw iron into two ore nuggets", 1200) {
+      TamedRat rat;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.rat = tamedRat(level, this.base, RatCommand.SIT);
+        this.rat.setItemSlot(EquipmentSlot.CHEST, new ItemStack(RatsItemRegistry.RAT_UPGRADE_ORE_DOUBLING.get()));
+        this.rat.onUpgradeChanged();
+        this.rat.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RAW_IRON, 4));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return around(level, ItemEntity.class, this.base).stream().filter(i -> i.getItem().is(RatsItemRegistry.RAT_NUGGET_ORE.get())).mapToInt(i -> i.getItem().getCount()).sum() >= 2
+          && com.github.alexthe666.rats.server.items.OreRatNuggetItem.getStoredItem(around(level, ItemEntity.class, this.base).stream().filter(i -> i.getItem().is(RatsItemRegistry.RAT_NUGGET_ORE.get())).findFirst().get().getItem(), ItemStack.EMPTY).is(Items.IRON_INGOT);
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "hand " + this.rat.getMainHandItem() + ", items " + around(level, ItemEntity.class, this.base).stream().map(i -> i.getItem().toString()).toList();
+      }
+    });
+    // with Farmer's Delight (-Pwith_compat): young budding tomatoes stay, a ripe tomato vine is harvested
+    var budding = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("farmersdelight", "budding_tomatoes"));
+    var vine = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("farmersdelight", "tomatoes"));
+    if (budding.isPresent() && vine.isPresent()) {
+      SCENARIOS.add(new Scenario("#926, #868: a farmer rat leaves young Farmer's Delight tomatoes and harvests a ripe one", 1800) {
+        TamedRat rat;
+        ChestBlockEntity to;
+
+        @Override
+        boolean start(ServerLevel level) {
+          for (int x = -2; x <= 2; x++) {
+            level.setBlock(this.base.offset(x, -1, 2), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);
+            level.setBlock(this.base.offset(x, 0, 2), budding.get().defaultBlockState(), Block.UPDATE_ALL);
+          }
+          level.setBlock(this.base.offset(0, -1, -2), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);
+          var ripe = vine.get().defaultBlockState();
+          for (var property : ripe.getProperties()) {
+            if (property.getName().equals("age") && property instanceof net.minecraft.world.level.block.state.properties.IntegerProperty age) {
+              ripe = ripe.setValue(age, age.getPossibleValues().stream().mapToInt(Integer::intValue).max().getAsInt());
+            }
+          }
+          level.setBlock(this.base.offset(0, 0, -2), ripe, Block.UPDATE_ALL);
+          this.to = chest(level, this.base.offset(4, 0, 0));
+          this.rat = tamedRat(level, this.base, RatCommand.HARVEST);
+          this.rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(4, 0, 0)));
+          return true;
+        }
+
+        @Override
+        boolean done(ServerLevel level) {
+          for (int x = -2; x <= 2; x++) {
+            if (!level.getBlockState(this.base.offset(x, 0, 2)).is(budding.get())) return false;
+          }
+          // harvested: gone, or replanted young (the replanter upgrade, or the config that keeps the plant)
+          var spot = level.getBlockState(this.base.offset(0, 0, -2));
+          boolean harvested = !spot.is(vine.get()) || spot.equals(vine.get().defaultBlockState());
+          return harvested && this.rat.tickCount > 600;
+        }
+
+        @Override
+        String detail(ServerLevel level) {
+          StringBuilder row = new StringBuilder();
+          for (int x = -2; x <= 2; x++) row.append(level.getBlockState(this.base.offset(x, 0, 2))).append(' ');
+          return "young row " + row + ", ripe spot " + level.getBlockState(this.base.offset(0, 0, -2)) + ", rat hand " + this.rat.getMainHandItem() + ", chest " + this.to.getItem(0);
         }
       });
     }

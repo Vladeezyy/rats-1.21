@@ -77,8 +77,9 @@ public abstract class InventoryRat extends DiggingRat implements ContainerListen
 			if (!itemstack.isEmpty()) {
 				CompoundTag compoundtag = new CompoundTag();
 				compoundtag.putByte("Slot", (byte) i);
-				itemstack.save(this.registryAccess(), compoundtag);
-				listtag.add(compoundtag);
+				// 1.21: save returns a new tag with the prefix's keys, it does not write into it (the port wrote only
+				// the slot numbers, so a rat lost its upgrades, hat and held item on every save: reload, angel copy)
+				listtag.add(itemstack.save(this.registryAccess(), compoundtag));
 			}
 		}
 		tag.put("Items", listtag);

@@ -62,7 +62,9 @@ public abstract class AbstractGarbageBlock extends FallingBlock {
 					if (!mob.isInWall() && mob.checkSpawnObstruction(level)) {
 						if (mob instanceof AbstractRat) {
 							if (!level.getGameRules().getBoolean(RatsMod.SPAWN_RATS)) return;
-							if (Objects.requireNonNull(level.getChunkSource().getLastSpawnState()).getMobCategoryCounts().getInt(RatsMod.RATS) >= RatsMod.RATS.getMaxInstancesPerChunk() * 2)
+							// no spawn state before the level's first spawning tick (the original threw there)
+							var spawnState = level.getChunkSource().getLastSpawnState();
+							if (spawnState != null && spawnState.getMobCategoryCounts().getInt(RatsMod.RATS) >= RatsMod.RATS.getMaxInstancesPerChunk() * 2)
 								return;
 							if (RatConfig.ratsSpawnLikeMonsters && !this.isDarkEnoughForMonsterSpawns(level, mob.blockPosition(), random))
 								return;

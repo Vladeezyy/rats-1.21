@@ -58,7 +58,7 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 			double distance = this.rat.getRatDistanceCenterSq(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ());
 			if (distance < this.rat.getRatHarvestDistance(0.0D)) {
 				if (block.is(BlockTags.CROPS) || block.is(Blocks.NETHER_WART)) {
-					if (block.getBlock() instanceof CropBlock crop && !crop.isMaxAge(block)) {
+					if (!isGrown(this.rat.level(), this.getTargetBlock(), block)) {
 						this.setTargetBlock(null);
 						this.stop();
 						return;
@@ -104,9 +104,26 @@ public class RatHarvestCropsGoal extends BaseRatHarvestGoal {
 		return this.isRipe(level, pos, state) && RatUtils.canRatBreakBlock(level, pos, this.rat);
 	}
 
+	/**
+	 * #926, #868: a crop of another mod that is no CropBlock (Farmer's Delight's budding tomatoes) counted as ripe at any
+	 * age: the rat broke it young, got its seeds, the replanter put it back, over and over. Such a crop is grown once
+	 * bone meal no longer grows it (a budding plant at its last age still turns into its vine) and its age property,
+	 * if it has one, is at the maximum.
+	 */
+	private static boolean isGrown(Level level, BlockPos pos, BlockState state) {
+		if (state.getBlock() instanceof CropBlock crop) return crop.isMaxAge(state);
+		if (state.getBlock() instanceof BonemealableBlock growing && growing.isValidBonemealTarget(level, pos, state)) return false;
+		for (var property : state.getProperties()) {
+			if (property.getName().equals("age") && property instanceof net.minecraft.world.level.block.state.properties.IntegerProperty age) {
+				return state.getValue(age) >= age.getPossibleValues().stream().mapToInt(Integer::intValue).max().orElse(0);
+			}
+		}
+		return true;
+	}
+
 	private boolean isRipe(Level level, BlockPos pos, BlockState state) {
 		if (state.is(BlockTags.CROPS)) {
-			if (state.getBlock() instanceof CropBlock crop && !crop.isMaxAge(state)) return false;
+			if (!isGrown(level, pos, state)) return false;
 			if (!(state.getBlock() instanceof StemBlock) && !(state.getBlock() instanceof AttachedStemBlock)) {
 				return true;
 			}

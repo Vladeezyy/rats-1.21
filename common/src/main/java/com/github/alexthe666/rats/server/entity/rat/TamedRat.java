@@ -932,6 +932,9 @@ public class TamedRat extends InventoryRat {
 		tag.putInt("HurtByTimestamp", 0);
 		tag.putShort("DeathTime", (short) 0);
 		copy.readAdditionalSaveData(tag);
+		// #910: the attributes are not in this tag, so the upgrades' health, armor and speed are applied again (the
+		// angel came back with 8 health and kept it until an upgrade changed)
+		copy.onUpgradeChanged();
 		copy.setHealth(copy.getMaxHealth());
 		copy.copyPosition(this);
 		copy.setRespawnCountdown(1200);

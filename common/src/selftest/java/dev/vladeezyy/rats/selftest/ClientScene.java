@@ -339,6 +339,10 @@ public final class ClientScene {
       }
       mob.setNoAi(true);
       mob.setPersistenceRequired();
+      // #941: a tamed rat wears the halo (the hat a player gives it, not the angel's)
+      if (mob instanceof com.github.alexthe666.rats.server.entity.rat.TamedRat) {
+        mob.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.HALO_HAT.get()));
+      }
       mob.moveTo(stage.getX() + (i % 6) * 2.5, stage.getY(), stage.getZ() - 3 - (i / 6) * 3.0, 180, 0);
       level.addFreshEntity(mob);
       i++;

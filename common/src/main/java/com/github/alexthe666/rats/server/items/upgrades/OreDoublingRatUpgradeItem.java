@@ -24,6 +24,7 @@ public class OreDoublingRatUpgradeItem extends BaseRatUpgradeItem {
 	}
 
 	public static boolean isProcessable(Level level, ItemStack stack) {
-		return stack.is(CommonTags.ORES) && !OreRatNuggetItem.getIngot(level, stack).isEmpty();
+		// #918: raw ores too (since 1.17 a mined ore drops raw iron, gold and copper, not the ore block)
+		return (stack.is(CommonTags.ORES) || stack.is(CommonTags.RAW_MATERIALS)) && !OreRatNuggetItem.getIngot(level, stack).isEmpty();
 	}
 }

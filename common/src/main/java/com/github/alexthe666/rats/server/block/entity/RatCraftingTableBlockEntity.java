@@ -293,10 +293,53 @@ public class RatCraftingTableBlockEntity extends BlockEntity implements MenuProv
 	}
 
 
-	/** Hoppers: the result below, the buffer on the other sides (registered as the block's item handler capability) */
+	/**
+	 * Hoppers: the result below, the buffer on the other sides (registered as the block's item handler capability).
+	 * #855: below, also the buffer's items that no ingredient of the recipe takes (the buckets of a cake go back into the
+	 * buffer, and nothing could take them out)
+	 */
 	public ItemHandler getItemHandler(@Nullable Direction side) {
-		return side == Direction.DOWN ? this.resultHandler.get() : this.bufferHandler.get();
+		return side == Direction.DOWN ? this.outputHandler : this.bufferHandler.get();
 	}
+
+	private boolean isIngredient(ItemStack stack) {
+		return this.recipeUsed.map(r -> r.value().getIngredients().stream().anyMatch(i -> !i.isEmpty() && i.test(stack))).orElse(false);
+	}
+
+	private final ItemHandler outputHandler = new ItemHandler() {
+		@Override
+		public int getSlots() {
+			return 10;
+		}
+
+		@Override
+		public ItemStack getStackInSlot(int slot) {
+			return slot == 0 ? RatCraftingTableBlockEntity.this.resultHandler.get().getStackInSlot(0) : RatCraftingTableBlockEntity.this.bufferHandler.get().getStackInSlot(slot - 1);
+		}
+
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+			return stack;
+		}
+
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			if (slot == 0) return RatCraftingTableBlockEntity.this.resultHandler.get().extractItem(0, amount, simulate);
+			ItemStack stack = RatCraftingTableBlockEntity.this.bufferHandler.get().getStackInSlot(slot - 1);
+			if (stack.isEmpty() || RatCraftingTableBlockEntity.this.isIngredient(stack)) return ItemStack.EMPTY;
+			return RatCraftingTableBlockEntity.this.bufferHandler.get().extractItem(slot - 1, amount, simulate);
+		}
+
+		@Override
+		public int getSlotLimit(int slot) {
+			return 64;
+		}
+
+		@Override
+		public boolean isItemValid(int slot, ItemStack stack) {
+			return false;
+		}
+	};
 
 	public void consumeIngredients(@Nullable Player player) {
 		this.recipeUsed.ifPresent(recipe -> {
