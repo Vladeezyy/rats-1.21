@@ -266,6 +266,91 @@ public final class SelfTest {
       RatsMod.LOGGER.info(PREFIX + "mobs with a broken AI: {}", broken);
       return broken.isEmpty();
     });
+    // every upgrade on a tamed rat: its goals are made and run, its tick runs (200+ upgrades, most never had a test)
+    check("every upgrade works on a rat for a few ticks without an error", () -> {
+      List<String> broken = new ArrayList<>();
+      int n = 0;
+      for (var item : BuiltInRegistries.ITEM) {
+        if (!(item instanceof com.github.alexthe666.rats.server.items.upgrades.BaseRatUpgradeItem)) continue;
+        n++;
+        var rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        rat.snapTo(Vec3.atBottomCenterOf(at(0, 0, -44)));
+        level.addFreshEntity(rat);
+        if (player != null) rat.tame(player);
+        try {
+          rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(item));
+          rat.onUpgradeChanged();
+          for (var command : com.github.alexthe666.rats.server.entity.rat.RatCommand.values()) {
+            rat.setCommand(command);
+            for (int i = 0; i < 3; i++) rat.aiStep();
+          }
+          rat.hurtServer(level, level.damageSources().generic(), 1.0F);
+        } catch (RuntimeException | StackOverflowError e) {
+          RatsMod.LOGGER.error(PREFIX + "{} upgrade", item, e);
+          broken.add(BuiltInRegistries.ITEM.getKey(item).getPath());
+        }
+        rat.discard();
+      }
+      RatsMod.LOGGER.info(PREFIX + "{} upgrades, broken: {}", n, broken);
+      return n > 70 && broken.isEmpty();
+    });
+    // every block of the mod: placed, its block entity ticks, broken with drops (the 1.21 port changed most of them)
+    check("every block can be placed, ticks and is broken without an error", () -> {
+      List<String> broken = new ArrayList<>();
+      BlockPos pos = at(0, 0, -48);
+      int n = 0;
+      for (Block block : BuiltInRegistries.BLOCK) {
+        if (!BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(RatsMod.MODID)) continue;
+        n++;
+        try {
+          var state = block.defaultBlockState();
+          level.setBlock(pos.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+          level.setBlock(pos, state, Block.UPDATE_ALL);
+          var be = level.getBlockEntity(pos);
+          if (be != null) {
+            @SuppressWarnings("unchecked")
+            var ticker = (net.minecraft.world.level.block.entity.BlockEntityTicker<net.minecraft.world.level.block.entity.BlockEntity>) level.getBlockState(pos).getTicker(level, be.getType());
+            if (ticker != null) for (int i = 0; i < 20; i++) ticker.tick(level, pos, level.getBlockState(pos), be);
+            be.saveWithFullMetadata(level.registryAccess());
+          }
+          level.getBlockState(pos).randomTick(level, pos, level.getRandom());
+          level.destroyBlock(pos, true);
+        } catch (RuntimeException | StackOverflowError e) {
+          RatsMod.LOGGER.error(PREFIX + "{} block", block, e);
+          broken.add(BuiltInRegistries.BLOCK.getKey(block).getPath());
+          level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        }
+      }
+      level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(4)).forEach(net.minecraft.world.entity.Entity::discard);
+      RatsMod.LOGGER.info(PREFIX + "{} blocks, broken: {}", n, broken);
+      return n > 80 && broken.isEmpty();
+    });
+    check("#855: a hopper below the rat crafting table takes leftovers (empty buckets) out of its buffer", () -> {
+      BlockPos pos = at(2, 0, -48);
+      level.setBlock(pos, com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_CRAFTING_TABLE.get().defaultBlockState(), Block.UPDATE_ALL);
+      var table = (com.github.alexthe666.rats.server.block.entity.RatCraftingTableBlockEntity) level.getBlockEntity(pos);
+      table.bufferHandler.get().insertItem(0, new ItemStack(Items.BUCKET, 3), false);
+      var below = table.getItemHandler(net.minecraft.core.Direction.DOWN);
+      ItemStack out = ItemStack.EMPTY;
+      for (int i = 0; i < below.getSlots() && out.isEmpty(); i++) out = below.extractItem(i, 64, false);
+      level.removeBlock(pos, false);
+      return out.is(Items.BUCKET) && out.getCount() == 3;
+    });
+    check("#944: the Pied Piper is a raider (a raid bell makes it glow)", () ->
+      com.github.alexthe666.rats.registry.RatsEntityRegistry.PIED_PIPER.get().builtInRegistryHolder().is(net.minecraft.tags.EntityTypeTags.RAIDERS));
+    check("#940: no rats spawn in the Deep Dark", () -> {
+      var biome = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME).getOrThrow(net.minecraft.world.level.biome.Biomes.DEEP_DARK).value();
+      for (var category : net.minecraft.world.entity.MobCategory.values()) {
+        for (var data : biome.getMobSettings().getMobs(category).unwrap()) {
+          if (BuiltInRegistries.ENTITY_TYPE.getKey(data.value().type()).getNamespace().equals(RatsMod.MODID)) return false;
+        }
+      }
+      return true;
+    });
+    check("#918: ore doubling takes raw ores (what a mined ore drops since 1.17) and ore blocks", () ->
+      com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.RAW_IRON))
+        && com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.IRON_ORE))
+        && !com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.IRON_INGOT)));
   }
 
   /** Checks that need a few server ticks first */

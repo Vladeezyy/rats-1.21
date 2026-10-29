@@ -107,10 +107,20 @@ public class RatTargetItemsGoal extends Goal {
 				ItemStack duplicate = this.targetItem.getItem().copy();
 				if (RatUpgradeUtils.hasUpgrade(this.rat, RatsItemRegistry.RAT_UPGRADE_PLATTER.get())) {
 					ItemStack alreadyHolding = this.rat.getItemInHand(InteractionHand.MAIN_HAND);
-					int extractSize = alreadyHolding.getCount() + duplicate.getCount() < 64 ? duplicate.getCount() : Math.min(64 - alreadyHolding.getCount(), duplicate.getCount());
-					duplicate.setCount(extractSize);
+					// #916: the stack keeps its enchantments, damage and name (the original made a new stack of the
+					// item), and only joins the same item with the same data, up to its own stack size
+					if (!alreadyHolding.isEmpty() && !ItemStack.isSameItemSameComponents(alreadyHolding, duplicate)) {
+						this.stop();
+						return;
+					}
+					int max = duplicate.getMaxStackSize();
+					int extractSize = Math.min(max - alreadyHolding.getCount(), duplicate.getCount());
+					if (extractSize <= 0) {
+						this.stop();
+						return;
+					}
 					this.targetItem.getItem().shrink(extractSize);
-					this.rat.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(duplicate.getItem(), alreadyHolding.getCount() + extractSize));
+					this.rat.setItemInHand(InteractionHand.MAIN_HAND, duplicate.copyWithCount(alreadyHolding.getCount() + extractSize));
 				} else {
 					duplicate.setCount(1);
 					this.targetItem.getItem().shrink(1);
