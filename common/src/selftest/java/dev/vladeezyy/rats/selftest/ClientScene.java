@@ -321,7 +321,7 @@ public final class ClientScene {
         var buttons = mc.gui.screen().children().stream().filter(c -> c instanceof net.minecraft.client.gui.components.Button).map(c -> (net.minecraft.client.gui.components.Button) c).toList();
         check("the staff screen offers the chest as a deposit point", !buttons.isEmpty() && buttons.get(0).visible, buttons.isEmpty() ? "no buttons" : buttons.get(0).getMessage().getString());
         if (!buttons.isEmpty()) {
-          buttons.get(0).onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
+          buttons.get(0).onPress(new net.minecraft.client.input.KeyEvent(com.mojang.blaze3d.platform.InputConstants.KEY_RETURN, 0, 0));
         }
       }
     });
