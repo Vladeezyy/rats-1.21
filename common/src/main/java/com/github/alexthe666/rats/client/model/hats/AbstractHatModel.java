@@ -36,7 +36,29 @@ public class AbstractHatModel extends HumanoidModel<HumanoidRenderState> {
 			this.rightLeg.setPos(-1.9F, 11.0F, 0.0F);
 		} else {
 			super.setupAnim(state);
+			// 1.21.1 copied the head pose of the rat's (never animated) armor model over the hat's: the offsets and
+			// tilts the hat models have on their head part (the aviator hat's 16, 32, 16) never showed. 26.x starts
+			// from the model's own pose, so they are taken out here; setupAnim's changes (crouching) stay
+			net.minecraft.client.model.geom.PartPose rest = this.head.getInitialPose();
+			this.head.x -= rest.x();
+			this.head.y -= rest.y();
+			this.head.z -= rest.z();
+			this.head.zRot -= rest.zRot();
 		}
+		if (this.onlyHead()) {
+			// a hat is a head piece: the body, arms and legs of the humanoid mesh under it are not drawn (1.21.1's
+			// armor layer hid them; without it they showed as loose boxes under the wearer)
+			this.body.visible = false;
+			this.rightArm.visible = false;
+			this.leftArm.visible = false;
+			this.rightLeg.visible = false;
+			this.leftLeg.visible = false;
+		}
+	}
+
+	/** Whether only the head (and its hat) of the model is drawn */
+	protected boolean onlyHead() {
+		return true;
 	}
 
 	private static void pose(ModelPart part, Rotations rotations) {

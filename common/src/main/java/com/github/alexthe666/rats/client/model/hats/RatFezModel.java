@@ -21,8 +21,7 @@ public class RatFezModel extends AbstractHatModel {
 
 		hat.addOrReplaceChild("ribbons", CubeListBuilder.create().texOffs(0, 11).addBox(0.0F, -1.0F, -1.0F, 3.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -6.0F, 0.0F, 0.0F, 0.0F, -0.2618F));
 
-		// 26.x: the humanoid hat part is a child of the head
-		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+		// 26.x: the hat's own geometry is the head's "hat" part that HumanoidModel needs (no empty one over it)
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }
