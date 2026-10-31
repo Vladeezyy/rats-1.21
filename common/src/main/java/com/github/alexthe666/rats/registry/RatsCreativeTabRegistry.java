@@ -376,7 +376,9 @@ public class RatsCreativeTabRegistry {
 			for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(CommonTags.ORES)) {
 			Item item = holder.value();
 				ItemStack oreDrop = OreRatNuggetItem.getIngot(level, new ItemStack(item));
-				if (!uniqueOres.contains(oreDrop) && !oreDrop.isEmpty()) {
+				// 1.21: ItemStack has no equals (contains never matched): iron ore and deepslate iron ore gave two iron
+				// nuggets and the tab threw "Accidentally adding the same item stack twice" (creative inventory crash)
+				if (!oreDrop.isEmpty() && uniqueOres.stream().noneMatch(o -> ItemStack.isSameItemSameComponents(o, oreDrop))) {
 					uniqueOres.add(oreDrop);
 				}
 			}

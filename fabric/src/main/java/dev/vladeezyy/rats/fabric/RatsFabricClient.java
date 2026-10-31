@@ -74,6 +74,7 @@ import java.util.function.BiConsumer;
 public final class RatsFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        renderLayers();
         FabricConfig.load(ConfigHolder.CLIENT_SPEC, "client");
         RatConfig.bakeClient();
         RegistryAccessHolder.setClientLevel(() -> Minecraft.getInstance().level);
@@ -90,7 +91,13 @@ public final class RatsFabricClient implements ClientModInitializer {
 
                     @Override
                     public void enqueueWork(Runnable work) {
-                        context.client().execute(work);
+                        // Fabric runs the handler on the client thread already: execute() would queue the work after the
+                        // packets received next (a rat's screen opened after its contents arrived and showed it empty)
+                        if (context.client().isSameThread()) {
+                            work.run();
+                        } else {
+                            context.client().execute(work);
+                        }
                     }
                 }));
             }
@@ -209,6 +216,80 @@ public final class RatsFabricClient implements ClientModInitializer {
             } else if (item instanceof RatsBlockItem) {
                 BuiltinItemRendererRegistry.INSTANCE.register(item, bewlr::renderByItem);
             }
+        }
+    }
+
+    /**
+     * The "render_type" of the mod's block models: NeoForge reads it, Fabric does not (Fabric drew every cutout and
+     * translucent block solid: the rat attractor's chains with white holes, the tubes opaque). Every block whose
+     * blockstate models (or their parents) ask for a layer is put in that layer.
+     */
+    private static void renderLayers() {
+        var mod = net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(RatsMod.MODID).orElseThrow();
+        for (net.minecraft.world.level.block.Block block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            net.minecraft.resources.ResourceLocation id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+            if (!id.getNamespace().equals(RatsMod.MODID)) {
+                continue;
+            }
+            var states = readJson(mod.findPath("assets/" + RatsMod.MODID + "/blockstates/" + id.getPath() + ".json"));
+            if (states.isEmpty()) {
+                continue;
+            }
+            java.util.List<String> models = new java.util.ArrayList<>();
+            collectModels(states.get(), models);
+            for (String model : models) {
+                String type = renderType(mod, net.minecraft.resources.ResourceLocation.parse(model), 0);
+                net.minecraft.client.renderer.RenderType layer = type == null ? null : switch (type) {
+                    case "minecraft:cutout", "cutout" -> net.minecraft.client.renderer.RenderType.cutout();
+                    case "minecraft:cutout_mipped", "cutout_mipped" -> net.minecraft.client.renderer.RenderType.cutoutMipped();
+                    case "minecraft:translucent", "translucent" -> net.minecraft.client.renderer.RenderType.translucent();
+                    case "minecraft:tripwire", "tripwire" -> net.minecraft.client.renderer.RenderType.tripwire();
+                    default -> null;
+                };
+                if (layer != null) {
+                    net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(block, layer);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void collectModels(com.google.gson.JsonElement element, java.util.List<String> models) {
+        if (element.isJsonObject()) {
+            com.google.gson.JsonObject object = element.getAsJsonObject();
+            if (object.has("model") && object.get("model").isJsonPrimitive()) {
+                models.add(object.get("model").getAsString());
+            }
+            object.entrySet().forEach(e -> collectModels(e.getValue(), models));
+        } else if (element.isJsonArray()) {
+            element.getAsJsonArray().forEach(e -> collectModels(e, models));
+        }
+    }
+
+    /** The model's render_type, or its parent's (the mod's models only) */
+    private static String renderType(net.fabricmc.loader.api.ModContainer mod, net.minecraft.resources.ResourceLocation model, int depth) {
+        if (!model.getNamespace().equals(RatsMod.MODID) || depth > 8) {
+            return null;
+        }
+        var json = readJson(mod.findPath("assets/" + RatsMod.MODID + "/models/" + model.getPath() + ".json"));
+        if (json.isEmpty()) {
+            return null;
+        }
+        if (json.get().has("render_type")) {
+            return json.get().get("render_type").getAsString();
+        }
+        return json.get().has("parent") ? renderType(mod, net.minecraft.resources.ResourceLocation.parse(json.get().get("parent").getAsString()), depth + 1) : null;
+    }
+
+    private static java.util.Optional<com.google.gson.JsonObject> readJson(java.util.Optional<java.nio.file.Path> path) {
+        if (path.isEmpty() || !java.nio.file.Files.exists(path.get())) {
+            return java.util.Optional.empty();
+        }
+        try (java.io.Reader reader = java.nio.file.Files.newBufferedReader(path.get())) {
+            return java.util.Optional.of(com.google.gson.JsonParser.parseReader(reader).getAsJsonObject());
+        } catch (java.io.IOException | RuntimeException e) {
+            RatsMod.LOGGER.warn("Could not read {}", path.get(), e);
+            return java.util.Optional.empty();
         }
     }
 }

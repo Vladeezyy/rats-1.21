@@ -75,7 +75,11 @@ public final class RatsFabric implements ModInitializer {
 
                     @Override
                     public void enqueueWork(Runnable work) {
-                        context.server().execute(work);
+                        if (context.server().isSameThread()) {
+                            work.run();
+                        } else {
+                            context.server().execute(work);
+                        }
                     }
                 }));
             }
@@ -121,7 +125,10 @@ public final class RatsFabric implements ModInitializer {
             }
             return InteractionResult.PASS;
         });
-        UseBlockCallback.EVENT.register((player, level, hand, hit) -> RatsEvents.onRightClickBlock(player, level, hand, hit) == InteractionResult.FAIL ? InteractionResult.FAIL : InteractionResult.PASS);
+        // a cancelled click (a rat staff): FAIL on the server; on the client SUCCESS, since Fabric sends the click to the
+        // server only for an accepted result (with FAIL the staff never reached the server: no deposit or pickup point)
+        UseBlockCallback.EVENT.register((player, level, hand, hit) -> RatsEvents.onRightClickBlock(player, level, hand, hit) == InteractionResult.FAIL
+            ? (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.FAIL) : InteractionResult.PASS);
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> !RatsEvents.onLivingDeath(entity));
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> !RatsEvents.onIncomingDamage(entity, source, amount));
         ServerWorldEvents.LOAD.register((server, level) -> {

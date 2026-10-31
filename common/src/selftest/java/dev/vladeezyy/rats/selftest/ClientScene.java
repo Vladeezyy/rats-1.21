@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  */
 public final class ClientScene {
   private static final String MODE = System.getProperty("rats.scene", "");
-  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf");
+  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf") || MODE.equals("bugs");
   /** -Pscene=perf: FPS with this many mobs in view (-Drats.scene.mobs) */
   private static final int PERF_MOBS = Integer.getInteger("rats.scene.mobs", 100);
   static final String LANG = System.getProperty("rats.scene.lang", "en_us");
@@ -90,6 +90,8 @@ public final class ClientScene {
   static {
     if (MODE.equals("perf")) {
       perfSteps();
+    } else if (MODE.equals("bugs")) {
+      bugSteps();
     } else {
       mainSteps();
     }
@@ -158,6 +160,179 @@ public final class ClientScene {
     at(t += 210, mc -> {
       shot(mc, "perf");
       RatsMod.LOGGER.info("[scene] PERF DONE " + String.join(" | ", perf));
+      RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
+      mc.level.disconnect();
+      mc.disconnect(new TitleScreen());
+      mc.stop();
+    });
+  }
+
+  // -Pscene=bugs: what players reported (CurseForge comments, 2026-11), each with real clicks: the creative inventory
+  // with every tab, hats on rats (a carved pumpkin, the aviator hat) from the side and from below, the rat's screen
+  // with upgrades, the rat attractor under a lantern, the cheese staff on a chest (deposit point)
+  private static final List<Integer> bugRats = new ArrayList<>();
+
+  private static com.github.alexthe666.rats.server.entity.rat.TamedRat bugRat(ServerPlayer player, double x, double y, double z, ItemStack head) {
+    var rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().spawn(player.serverLevel(), stage.offset((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z)), MobSpawnType.COMMAND);
+    rat.tame(player);
+    rat.moveTo(stage.getX() + x, stage.getY() + y, stage.getZ() + z, 180, 0);
+    rat.setYHeadRot(180);
+    rat.setYBodyRot(180);
+    rat.setNoAi(true);
+    rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, head);
+    bugRats.add(rat.getId());
+    return rat;
+  }
+
+  private static void selectTab(Minecraft mc, net.minecraft.world.item.CreativeModeTab tab) {
+    if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen) {
+      try {
+        var select = net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.class.getDeclaredMethod("selectTab", net.minecraft.world.item.CreativeModeTab.class);
+        select.setAccessible(true);
+        select.invoke(screen, tab);
+      } catch (ReflectiveOperationException e) {
+        check("select the creative tab " + tab.getDisplayName().getString(), false, e);
+      }
+    }
+  }
+
+  private static void bugSteps() {
+    int t = 40;
+    // a pad of its own, 30 blocks west of the main stage: stone floor, air above
+    at(t, mc -> server(mc, p -> {
+      build(p);
+      stage = stage.offset(-30, 0, 0);
+      ServerLevel level = p.serverLevel();
+      for (int x = -2; x <= 9; x++) {
+        for (int z = -2; z <= 10; z++) {
+          level.setBlockAndUpdate(stage.offset(x, -1, z), Blocks.STONE.defaultBlockState());
+          for (int y = 0; y <= 6; y++) {
+            level.setBlockAndUpdate(stage.offset(x, y, z), Blocks.AIR.defaultBlockState());
+          }
+        }
+      }
+    }));
+    // the creative inventory: every tab drawn for a few frames (a crash ends the run; the step catches exceptions)
+    at(t += 40, mc -> server(mc, p -> {
+      p.setGameMode(GameType.CREATIVE);
+      lookAt(p, 3.5, 0, 0.5, 3.5, 0, 7);
+    }));
+    at(t += 10, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), mc.options.operatorItemsTab().get())));
+    for (int k = 0; k < 40; k++) {
+      int index = k;
+      at(t + 5 + k * 6, mc -> {
+        var tabs = net.minecraft.world.item.CreativeModeTabs.allTabs();
+        if (index < tabs.size()) {
+          var tab = tabs.get(index);
+          selectTab(mc, tab);
+          var key = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab);
+          RatsMod.LOGGER.info("[scene] creative tab " + key);
+          if (key != null && (key.getNamespace().equals(RatsMod.MODID) || tab.getType() == net.minecraft.world.item.CreativeModeTab.Type.INVENTORY)) {
+            shot(mc, "bug_creative_" + key.getPath());
+          }
+        }
+      });
+    }
+    t += 5 + 40 * 6;
+    at(t, mc -> {
+      check("the creative inventory draws every tab", mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen, mc.screen);
+      mc.setScreen(null);
+    });
+    // hats: a carved pumpkin, the aviator hat, a top hat (as it should look) on rats standing on glass, 2 blocks up
+    at(t += 5, mc -> server(mc, p -> {
+      ServerLevel level = p.serverLevel();
+      for (int x = 1; x <= 6; x++) {
+        for (int z = 4; z <= 7; z++) {
+          level.setBlockAndUpdate(stage.offset(x, 1, z), Blocks.GLASS.defaultBlockState());
+        }
+      }
+      bugRat(p, 2.5, 2, 5.5, new ItemStack(Blocks.CARVED_PUMPKIN));
+      bugRat(p, 3.5, 2, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatlantisItemRegistry.AVIATOR_HAT.get()));
+      bugRat(p, 4.5, 2, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.TOP_HAT.get()));
+      lookAt(p, 3.5, 0.5, 3.7, 3.5, 2.2, 5.5);
+    }));
+    at(t += 30, mc -> shot(mc, "bug_hats_side"));
+    at(t += 5, mc -> server(mc, p -> lookAt(p, 3.5, 0.2, 5.2, 3.5, 2.1, 5.6)));
+    at(t += 20, mc -> shot(mc, "bug_hats_below"));
+    // the rat's screen with three upgrades
+    at(t += 5, mc -> server(mc, p -> {
+      lookAt(p, 3.5, 0, 0.5, 3.5, 0, 7);
+      var rat = bugRat(p, 3.5, 0, 2.5, ItemStack.EMPTY);
+      rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get()));
+      rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_HEALTH.get()));
+      rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.FEET, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_BASIC.get()));
+      rat.openGUI(p);
+    }));
+    at(t += 20, mc -> {
+      shot(mc, "bug_rat_screen");
+      if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen) {
+        var menu = screen.getMenu();
+        boolean all = !menu.getSlot(3).getItem().isEmpty() && !menu.getSlot(4).getItem().isEmpty() && !menu.getSlot(5).getItem().isEmpty();
+        check("the rat's screen shows its three upgrades", all, menu.getSlot(3).getItem() + ", " + menu.getSlot(4).getItem() + ", " + menu.getSlot(5).getItem());
+      } else {
+        check("the rat's screen opens", false, mc.screen);
+      }
+      mc.player.closeContainer();
+    });
+    // the rat attractor: alone, and with a lantern right above it
+    at(t += 5, mc -> server(mc, p -> {
+      ServerLevel level = p.serverLevel();
+      level.setBlockAndUpdate(stage.offset(2, 0, 3), com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
+      level.setBlockAndUpdate(stage.offset(4, 0, 3), com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
+      // hanging: a block right above it shows the chains (the original's "up" state, any block)
+      level.setBlockAndUpdate(stage.offset(4, 1, 3), Blocks.STONE.defaultBlockState());
+      bugRats.forEach(id -> { var e = level.getEntity(id); if (e != null) e.discard(); });
+      bugRats.clear();
+      for (int x = 1; x <= 6; x++) for (int z = 4; z <= 7; z++) level.setBlockAndUpdate(stage.offset(x, 1, z), Blocks.AIR.defaultBlockState());
+      lookAt(p, 3, 0.4, 1.9, 3, 0.8, 3.5);
+    }));
+    at(t += 25, mc -> {
+      shot(mc, "bug_attractor");
+      checkNoMissingTexture(mc, "attractor");
+    });
+    // the cheese staff: select a rat with it, click a chest, press the deposit button, then the server has the point
+    final BlockPos[] chest = new BlockPos[1];
+    final int[] ratId = new int[1];
+    at(t += 5, mc -> server(mc, p -> {
+      ServerLevel level = p.serverLevel();
+      chest[0] = stage.offset(3, 0, 5);
+      level.setBlockAndUpdate(chest[0], Blocks.CHEST.defaultBlockState());
+      var rat = bugRat(p, 4.5, 0, 3.5, ItemStack.EMPTY);
+      ratId[0] = rat.getId();
+      p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.CHEESE_STICK.get()));
+      lookAt(p, 3.5, 0, 2.5, 3.5, 0, 5.5);
+    }));
+    at(t += 20, mc -> {
+      var rat = mc.level.getEntity(ratId[0]);
+      check("the staff's rat is on the client", rat != null, ratId[0]);
+      if (rat != null) {
+        var result = mc.gameMode.interact(mc.player, rat, net.minecraft.world.InteractionHand.MAIN_HAND);
+        check("a click with the staff selects the rat", result.consumesAction(), result);
+      }
+    });
+    at(t += 10, mc -> {
+      var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(chest[0]).add(0, 0.5, 0), Direction.UP, chest[0], false);
+      var result = mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+      RatsMod.LOGGER.info("[scene] staff on the chest: " + result + ", screen " + mc.screen);
+    });
+    at(t += 15, mc -> {
+      shot(mc, "bug_staff_screen");
+      boolean screen = mc.screen instanceof com.github.alexthe666.rats.client.gui.CheeseStaffScreen;
+      check("a click on a chest with the staff opens the staff screen", screen, mc.screen);
+      if (screen) {
+        var buttons = mc.screen.children().stream().filter(c -> c instanceof net.minecraft.client.gui.components.Button).map(c -> (net.minecraft.client.gui.components.Button) c).toList();
+        check("the staff screen offers the chest as a deposit point", !buttons.isEmpty() && buttons.get(0).visible, buttons.isEmpty() ? "no buttons" : buttons.get(0).getMessage().getString());
+        if (!buttons.isEmpty()) {
+          buttons.get(0).onPress();
+        }
+      }
+    });
+    at(t += 15, mc -> server(mc, p -> {
+      var rat = (com.github.alexthe666.rats.server.entity.rat.TamedRat) p.serverLevel().getEntity(ratId[0]);
+      check("the server keeps the chest as the rat's deposit point", rat != null && rat.getDepositPos().map(g -> g.pos().equals(chest[0])).orElse(false), rat == null ? "no rat" : rat.getDepositPos());
+    }));
+    at(t += 10, mc -> {
+      mc.setScreen(null);
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
       mc.level.disconnect();
       mc.disconnect(new TitleScreen());
