@@ -99,7 +99,13 @@ public final class RatsFabricClient implements ClientModInitializer {
 
                     @Override
                     public void enqueueWork(Runnable work) {
-                        context.client().execute(work);
+                        // Fabric runs the handler on the client thread already: execute() would queue the work after the
+                        // packets received next (a rat's screen opened after its contents arrived and showed it empty)
+                        if (context.client().isSameThread()) {
+                            work.run();
+                        } else {
+                            context.client().execute(work);
+                        }
                     }
                 }));
             }
