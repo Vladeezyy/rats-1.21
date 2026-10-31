@@ -22,8 +22,7 @@ public class HaloHatModel extends AbstractHatModel {
 						.addBox(-4.0F, -4.0F, -4.0F, 8, 4, 8),
 				PartPose.offset(0.0F, -10.0F, 0.0F));
 
-		// 26.x: the humanoid hat part is a child of the head
-		partDefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+		// 26.x: the hat's own geometry is the head's "hat" part that HumanoidModel needs (no empty one over it)
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

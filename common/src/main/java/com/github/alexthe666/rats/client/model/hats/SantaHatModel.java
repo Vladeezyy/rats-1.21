@@ -48,8 +48,7 @@ public class SantaHatModel extends AbstractHatModel {
 						.addBox(-2.0F, -4.0F, -2.0F, 4.0F, 4.0F, 4.0F),
 				PartPose.offsetAndRotation(0.0F, -1.0F, 0.0F, 0.0F, 0.7854F, 0.1745F));
 
-		// 26.x: the humanoid hat part is a child of the head
-		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+		// 26.x: the hat's own geometry is the head's "hat" part that HumanoidModel needs (no empty one over it)
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }

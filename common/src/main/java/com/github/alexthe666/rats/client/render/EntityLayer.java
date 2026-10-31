@@ -30,6 +30,21 @@ public abstract class EntityLayer<T extends LivingEntity, S extends RampartLivin
 
 	protected abstract void submit(PoseStack poseStack, SubmitNodeCollector collector, int light, S state, T entity);
 
+	/** The render state the parent model was last posed for here (states are new every frame) */
+	private static Object posedFor;
+
+	/**
+	 * Poses the parent model for this state now, for layers that read its parts (translateToHead: hats, the item in the
+	 * mouth). 1.21.1 posed it before the layers; 26.x poses it when it is drawn, after the layers ran, so they read the
+	 * pose of the rat drawn before (hats floated above or beside the head). Once per entity and frame.
+	 */
+	protected void poseParent(S state) {
+		if (posedFor != state) {
+			this.getParentModel().setupAnim(state);
+			posedFor = state;
+		}
+	}
+
 	/**
 	 * The parent model again (posed from the state when it is drawn) with another render type. {@code order} draws it
 	 * after the body (vanilla's overlays use 1; stacked overlays count up).

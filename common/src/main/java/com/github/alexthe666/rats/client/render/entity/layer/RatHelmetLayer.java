@@ -69,6 +69,7 @@ public class RatHelmetLayer<T extends AbstractRat, S extends RampartLivingRender
 			Optional<ResourceKey<EquipmentAsset>> asset = equippable != null && equippable.slot() == EquipmentSlot.HEAD ? equippable.assetId() : Optional.empty();
 			if (asset.isPresent() || itemstack.getItem() instanceof HatItem) {
 				//Rats: do some extra transforms based on which model is being used and what item is rendering.
+				this.poseParent(state);
 				this.getParentModel().translateToHead(stack);
 				if (rat.isBaby()) {
 					stack.translate(0.0D, 0.025D, -0.05D);
@@ -78,14 +79,17 @@ public class RatHelmetLayer<T extends AbstractRat, S extends RampartLivingRender
 				stack.scale(0.55F, 0.55F, 0.55F);
 				if (itemstack.getItem() instanceof HatItem hat) {
 					hat.transformOnHead(rat, stack);
+					babyHead(stack);
 					HatRendering.submitHat(itemstack, HatRendering.REST, stack, collector, light, state.outlineColor);
 				} else {
 					// vanilla's armor layers: dyed leather, trims and the glint; the Ratlantis helmet has its own model
 					HumanoidModel<HumanoidRenderState> model = itemstack.getItem() instanceof RatlantisArmorItem ? RatsArmorModels.ratlantisArmorModel(EquipmentSlot.HEAD) : this.helmetModel;
+					babyHead(stack);
 					this.equipment.renderLayers(EquipmentClientInfo.LayerType.HUMANOID, asset.get(), model, HatRendering.REST, itemstack, stack, collector, light, state.outlineColor);
 				}
 			} else if (!itemstack.is(RatsItemRegistry.PARTY_HAT.get())) {
 				//Rats: handle some special case hats in the mod
+				this.poseParent(state);
 				this.getParentModel().translateToHead(stack);
 				stack.translate(0, 0.025F, -0.15F);
 				stack.rotate(Axis.XP.rotationDegrees(180));
@@ -117,6 +121,7 @@ public class RatHelmetLayer<T extends AbstractRat, S extends RampartLivingRender
 			ItemStack banner = rat.getItemBySlot(EquipmentSlot.OFFHAND);
 			if (banner.getItem() instanceof BannerItem) {
 				stack.pushPose();
+				this.poseParent(state);
 				this.getParentModel().translateToBody(stack);
 				stack.translate(0.0D, -0.5D, -0.2D);
 				stack.rotate(Axis.ZP.rotationDegrees(180.0F));
@@ -128,5 +133,16 @@ public class RatHelmetLayer<T extends AbstractRat, S extends RampartLivingRender
 				stack.popPose();
 			}
 		}
+	}
+
+	/**
+	 * 1.21.1 drew the helmets and hats of rats as a baby's head: the armor model a rat wears is never posed, so it kept
+	 * EntityModel's default young = true, and AgeableListModel scaled the head parts by 1.5 / 2 and moved them down by
+	 * 16 / 16 (HumanoidModel's baby head). The rat layer's offsets are made for that; 26.x models have no young flag,
+	 * so the same transform is applied here (hats were a third bigger and floated above the head)
+	 */
+	private static void babyHead(PoseStack stack) {
+		stack.scale(0.75F, 0.75F, 0.75F);
+		stack.translate(0.0F, 1.0F, 0.0F);
 	}
 }
