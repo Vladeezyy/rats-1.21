@@ -57,7 +57,8 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 			if (!itemstack.isEmpty()) {
 				stack.pushPose();
 				if (!entity.isHoldingItemInHands()) {
-					this.getParentModel().translateToHead(stack);
+					this.poseParent(state);
+				this.getParentModel().translateToHead(stack);
 					stack.mulPose(Axis.ZP.rotationDegrees(180));
 					stack.mulPose(Axis.YP.rotationDegrees(180));
 					stack.mulPose(Axis.XP.rotationDegrees(90));
@@ -115,7 +116,8 @@ public class RatHeldItemLayer<T extends AbstractRat, S extends RampartLivingRend
 					stack.pushPose();
 					float wingAngle = 0;
 					float wingFold = -45.0F;
-					this.getParentModel().translateToBody(stack);
+					this.poseParent(state);
+				this.getParentModel().translateToBody(stack);
 					stack.pushPose();
 					stack.mulPose(Axis.ZN.rotationDegrees(wingAngle));
 					stack.mulPose(Axis.YP.rotationDegrees(wingFold));

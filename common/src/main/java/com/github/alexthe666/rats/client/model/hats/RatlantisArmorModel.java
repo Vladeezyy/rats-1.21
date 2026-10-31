@@ -38,6 +38,11 @@ public class RatlantisArmorModel extends AbstractHatModel {
 	}
 
 	@Override
+	protected boolean onlyHead() {
+		return false;
+	}
+
+	@Override
 	public void setupAnim(HumanoidRenderState state) {
 		super.setupAnim(state);
 		float limbSwing = state.walkAnimationPos;

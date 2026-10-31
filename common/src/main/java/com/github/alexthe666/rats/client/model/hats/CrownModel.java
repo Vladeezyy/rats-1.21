@@ -22,8 +22,7 @@ public class CrownModel extends AbstractHatModel {
 						.addBox(-4.0F, -11.0F, -4.0F, 8.0F, 4.0F, 8.0F, new CubeDeformation(-0.25F)),
 				PartPose.ZERO);
 
-		// 26.x: the humanoid hat part is a child of the head
-		partdefinition.getChild("head").addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+		// 26.x: the hat's own geometry is the head's "hat" part that HumanoidModel needs (no empty one over it)
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 }
