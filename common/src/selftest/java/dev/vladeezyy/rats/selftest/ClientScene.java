@@ -183,7 +183,7 @@ public final class ClientScene {
   }
 
   private static void selectTab(Minecraft mc, net.minecraft.world.item.CreativeModeTab tab) {
-    if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen) {
+    if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen screen) {
       try {
         var select = net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.class.getDeclaredMethod("selectTab", net.minecraft.world.item.CreativeModeTab.class);
         select.setAccessible(true);
@@ -215,7 +215,7 @@ public final class ClientScene {
       p.setGameMode(GameType.CREATIVE);
       lookAt(p, 3.5, 0, 0.5, 3.5, 0, 7);
     }));
-    at(t += 10, mc -> mc.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), mc.options.operatorItemsTab().get())));
+    at(t += 10, mc -> mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), mc.options.operatorItemsTab().get())));
     for (int k = 0; k < 40; k++) {
       int index = k;
       at(t + 5 + k * 6, mc -> {
@@ -233,8 +233,8 @@ public final class ClientScene {
     }
     t += 5 + 40 * 6;
     at(t, mc -> {
-      check("the creative inventory draws every tab", mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen, mc.screen);
-      mc.setScreen(null);
+      check("the creative inventory draws every tab", mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen, mc.gui.screen());
+      mc.gui.setScreen(null);
     });
     // hats: a carved pumpkin, the aviator hat, a top hat (as it should look) on rats standing on glass, 2 blocks up
     at(t += 5, mc -> server(mc, p -> {
@@ -263,12 +263,12 @@ public final class ClientScene {
     }));
     at(t += 20, mc -> {
       shot(mc, "bug_rat_screen");
-      if (mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen) {
+      if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen) {
         var menu = screen.getMenu();
         boolean all = !menu.getSlot(3).getItem().isEmpty() && !menu.getSlot(4).getItem().isEmpty() && !menu.getSlot(5).getItem().isEmpty();
         check("the rat's screen shows its three upgrades", all, menu.getSlot(3).getItem() + ", " + menu.getSlot(4).getItem() + ", " + menu.getSlot(5).getItem());
       } else {
-        check("the rat's screen opens", false, mc.screen);
+        check("the rat's screen opens", false, mc.gui.screen());
       }
       mc.player.closeContainer();
     });
@@ -311,14 +311,14 @@ public final class ClientScene {
     at(t += 10, mc -> {
       var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(chest[0]).add(0, 0.5, 0), Direction.UP, chest[0], false);
       var result = mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
-      RatsMod.LOGGER.info("[scene] staff on the chest: " + result + ", screen " + mc.screen);
+      RatsMod.LOGGER.info("[scene] staff on the chest: " + result + ", screen " + mc.gui.screen());
     });
     at(t += 15, mc -> {
       shot(mc, "bug_staff_screen");
-      boolean screen = mc.screen instanceof com.github.alexthe666.rats.client.gui.CheeseStaffScreen;
-      check("a click on a chest with the staff opens the staff screen", screen, mc.screen);
+      boolean screen = mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.CheeseStaffScreen;
+      check("a click on a chest with the staff opens the staff screen", screen, mc.gui.screen());
       if (screen) {
-        var buttons = mc.screen.children().stream().filter(c -> c instanceof net.minecraft.client.gui.components.Button).map(c -> (net.minecraft.client.gui.components.Button) c).toList();
+        var buttons = mc.gui.screen().children().stream().filter(c -> c instanceof net.minecraft.client.gui.components.Button).map(c -> (net.minecraft.client.gui.components.Button) c).toList();
         check("the staff screen offers the chest as a deposit point", !buttons.isEmpty() && buttons.get(0).visible, buttons.isEmpty() ? "no buttons" : buttons.get(0).getMessage().getString());
         if (!buttons.isEmpty()) {
           buttons.get(0).onPress(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER, 0, 0));
@@ -330,7 +330,7 @@ public final class ClientScene {
       check("the server keeps the chest as the rat's deposit point", rat != null && rat.getDepositPos().map(g -> g.pos().equals(chest[0])).orElse(false), rat == null ? "no rat" : rat.getDepositPos());
     }));
     at(t += 10, mc -> {
-      mc.setScreen(null);
+      mc.gui.setScreen(null);
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
       mc.disconnectWithSavingScreen();
       mc.stop();
