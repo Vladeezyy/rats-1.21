@@ -310,6 +310,14 @@ The full comment also names the aviator hat. Checked with `-Pscene=bugs` on both
 - The scene's views from below were taken from inside the glass and the player fell from the side views (a creative
   player that touches the ground stops flying); both fixed, with armor stands wearing the same hats beside the rats.
 
+### Self-test on a flat world (CI, 2026-11-01)
+The quarry scenario failed once in CI on 26.3 NeoForge (32 blocks after 6000 ticks; alone and in every other run it
+finishes after 3050–3075 ticks on both loaders). Every dug cell of the pit was non-air again except the platforms, and
+the rat floated at y −0.49: a fluid had filled the pit. The scenes float at y 120, and CI makes a new random world
+every run, so mountains (and their water) sometimes reach a scene; the other single gameplay failures seen in CI on
+26.x (bee rat, farmer, lumberjack, mounts) fit the same cause. `tools/selftest.sh` now makes a flat world; the quarry
+scenario's report names the blocks other than stone and platforms and the mobs around it.
+
 ## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
 
 Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,
