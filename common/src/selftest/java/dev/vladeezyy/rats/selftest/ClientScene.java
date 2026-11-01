@@ -167,8 +167,9 @@ public final class ClientScene {
   }
 
   // -Pscene=bugs: what players reported (CurseForge comments, 2026-11), each with real clicks: the creative inventory
-  // with every tab, hats on rats (a carved pumpkin, the aviator hat) from the side and from below, the rat's screen
-  // with upgrades, the rat attractor under a lantern, the cheese staff on a chest (deposit point)
+  // with every tab, hats on rats (a carved pumpkin, the aviator hat) and on armor stands (as a player wears them) from
+  // the side and from below, the rat's screen with upgrades, the rat attractor hanging from a block (its chains drawn
+  // cutout), the cheese staff on a chest (deposit point)
   private static final List<Integer> bugRats = new ArrayList<>();
 
   private static com.github.alexthe666.rats.server.entity.rat.TamedRat bugRat(ServerPlayer player, double x, double y, double z, ItemStack head) {
@@ -181,6 +182,21 @@ public final class ClientScene {
     rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, head);
     bugRats.add(rat.getId());
     return rat;
+  }
+
+  /** lookAt, flying: a creative player that touched the ground stops flying and would fall from the next view */
+  private static void bugLook(ServerPlayer player, double x, double y, double z, double tx, double ty, double tz) {
+    player.getAbilities().flying = true;
+    player.onUpdateAbilities();
+    lookAt(player, x, y, z, tx, ty, tz);
+  }
+
+  private static void bugStand(ServerPlayer player, double x, ItemStack head) {
+    var stand = net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(player.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+    stand.snapTo(stage.getX() + x, stage.getY() + 3, stage.getZ() + 5.5, 180, 0);
+    stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, head);
+    player.level().addFreshEntity(stand);
+    bugRats.add(stand.getId());
   }
 
   private static void selectTab(Minecraft mc, net.minecraft.world.item.CreativeModeTab tab) {
@@ -214,7 +230,7 @@ public final class ClientScene {
     // the creative inventory: every tab drawn for a few frames (a crash ends the run; the step catches exceptions)
     at(t += 40, mc -> server(mc, p -> {
       p.setGameMode(GameType.CREATIVE);
-      lookAt(p, 3.5, 0, 0.5, 3.5, 0, 7);
+      bugLook(p, 3.5, 0, 0.5, 3.5, 0, 7);
     }));
     at(t += 10, mc -> mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), mc.options.operatorItemsTab().get())));
     for (int k = 0; k < 40; k++) {
@@ -237,25 +253,35 @@ public final class ClientScene {
       check("the creative inventory draws every tab", mc.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen, mc.gui.screen());
       mc.gui.setScreen(null);
     });
-    // hats: a carved pumpkin, the aviator hat, a top hat (as it should look) on rats standing on glass, 2 blocks up
+    // hats: a carved pumpkin, the aviator hat, a top hat (as it should look) on rats standing on glass 2 blocks up, and
+    // the pumpkin and the aviator hat on armor stands (drawn as on a player); seen level with them and from below
+    // (the eye under the glass)
     at(t += 5, mc -> server(mc, p -> {
       ServerLevel level = p.level();
-      for (int x = 1; x <= 6; x++) {
+      for (int x = 0; x <= 7; x++) {
         for (int z = 4; z <= 7; z++) {
-          level.setBlockAndUpdate(stage.offset(x, 1, z), Blocks.GLASS.defaultBlockState());
+          level.setBlockAndUpdate(stage.offset(x, 2, z), Blocks.GLASS.defaultBlockState());
         }
       }
-      bugRat(p, 2.5, 2, 5.5, new ItemStack(Blocks.CARVED_PUMPKIN));
-      bugRat(p, 3.5, 2, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatlantisItemRegistry.AVIATOR_HAT.get()));
-      bugRat(p, 4.5, 2, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.TOP_HAT.get()));
-      lookAt(p, 3.5, 0.5, 3.7, 3.5, 2.2, 5.5);
+      bugRat(p, 2.5, 3, 5.5, new ItemStack(Blocks.CARVED_PUMPKIN));
+      bugRat(p, 3.5, 3, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatlantisItemRegistry.AVIATOR_HAT.get()));
+      bugRat(p, 4.5, 3, 5.5, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.TOP_HAT.get()));
+      bugStand(p, 1.0, new ItemStack(Blocks.CARVED_PUMPKIN));
+      bugStand(p, 6.0, new ItemStack(com.github.alexthe666.rats.registry.RatlantisItemRegistry.AVIATOR_HAT.get()));
+      bugLook(p, 3.5, 1.75, 3.9, 3.5, 3.2, 5.5);
     }));
     at(t += 30, mc -> shot(mc, "bug_hats_side"));
-    at(t += 5, mc -> server(mc, p -> lookAt(p, 3.5, 0.2, 5.2, 3.5, 2.1, 5.6)));
+    at(t += 5, mc -> server(mc, p -> bugLook(p, 3.5, 0, 3.4, 3.5, 3.2, 5.5)));
     at(t += 20, mc -> shot(mc, "bug_hats_below"));
+    at(t += 5, mc -> server(mc, p -> bugLook(p, 2.5, 0, 5.0, 2.5, 3.2, 5.6)));
+    at(t += 20, mc -> shot(mc, "bug_hats_below_pumpkin"));
+    at(t += 5, mc -> server(mc, p -> bugLook(p, 3.5, 0, 5.0, 3.5, 3.2, 5.6)));
+    at(t += 20, mc -> shot(mc, "bug_hats_below_aviator"));
+    at(t += 5, mc -> server(mc, p -> bugLook(p, 1.0, 0, 2.5, 1.0, 4.6, 5.5)));
+    at(t += 20, mc -> shot(mc, "bug_hats_below_stand"));
     // the rat's screen with three upgrades
     at(t += 5, mc -> server(mc, p -> {
-      lookAt(p, 3.5, 0, 0.5, 3.5, 0, 7);
+      bugLook(p, 3.5, 0, 0.5, 3.5, 0, 7);
       var rat = bugRat(p, 3.5, 0, 2.5, ItemStack.EMPTY);
       rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_SPEED.get()));
       rat.setItemSlot(net.minecraft.world.entity.EquipmentSlot.LEGS, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_UPGRADE_HEALTH.get()));
@@ -273,33 +299,55 @@ public final class ClientScene {
       }
       mc.player.closeContainer();
     });
-    // the rat attractor: alone, and with a lantern right above it
+    // the rat attractor: alone, and hanging from a block (the original's "up" state: any block right above it shows the
+    // chains, a lantern too); then the hanging one close up, level with its chains, a lime wall behind: cutout shows the
+    // wall through the chains, a solid layer (Fabric before 8.1.3.6) white holes
+    final BlockPos[] hanging = new BlockPos[1];
     at(t += 5, mc -> server(mc, p -> {
       ServerLevel level = p.level();
-      level.setBlockAndUpdate(stage.offset(2, 0, 3), com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
-      level.setBlockAndUpdate(stage.offset(4, 0, 3), com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
-      // hanging: a block right above it shows the chains (the original's "up" state, any block)
-      level.setBlockAndUpdate(stage.offset(4, 1, 3), Blocks.STONE.defaultBlockState());
       bugRats.forEach(id -> { var e = level.getEntity(id); if (e != null) e.discard(); });
       bugRats.clear();
-      for (int x = 1; x <= 6; x++) for (int z = 4; z <= 7; z++) level.setBlockAndUpdate(stage.offset(x, 1, z), Blocks.AIR.defaultBlockState());
-      lookAt(p, 3, 0.4, 1.9, 3, 0.8, 3.5);
+      for (int x = 0; x <= 7; x++) for (int z = 4; z <= 7; z++) level.setBlockAndUpdate(stage.offset(x, 2, z), Blocks.AIR.defaultBlockState());
+      level.setBlockAndUpdate(stage.offset(2, 0, 3), com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
+      hanging[0] = stage.offset(4, 2, 3);
+      level.setBlockAndUpdate(hanging[0].below(2), Blocks.STONE.defaultBlockState());
+      level.setBlockAndUpdate(hanging[0].below(), Blocks.STONE.defaultBlockState());
+      level.setBlockAndUpdate(hanging[0], com.github.alexthe666.rats.registry.RatsBlockRegistry.RAT_ATTRACTOR.get().defaultBlockState());
+      level.setBlockAndUpdate(hanging[0].above(), Blocks.STONE.defaultBlockState());
+      for (int x = 5; x <= 7; x++) for (int z = 4; z <= 6; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), Blocks.WOOL.lime().defaultBlockState());
+      check("a block placed above the attractor makes it hang (up)", level.getBlockState(hanging[0]).getValue(com.github.alexthe666.rats.server.block.RatAttractorBlock.CONNECTED_UP), level.getBlockState(hanging[0]));
+      bugLook(p, 3, 1.4, 1.9, 3.5, 1.8, 3.5);
     }));
     at(t += 25, mc -> {
       shot(mc, "bug_attractor");
       checkNoMissingTexture(mc, "attractor");
+    });
+    // the eye 1.2 blocks from the chains' axis on the diagonal, at the chains' middle (3/4 of the block up)
+    at(t += 5, mc -> server(mc, p -> bugLook(p, 4.5 - 0.85, 2.75 - p.getEyeHeight(), 3.5 - 0.85, 4.5, 2.75, 3.5)));
+    at(t += 20, mc -> {
+      if (!mc.gui.hud.isHidden()) {
+        mc.gui.hud.toggle();
+      }
+    });
+    at(t += 3, mc -> {
+      shot(mc, "bug_attractor_chain");
+      checkChainHoles(mc);
+      if (mc.gui.hud.isHidden()) {
+        mc.gui.hud.toggle();
+      }
     });
     // the cheese staff: select a rat with it, click a chest, press the deposit button, then the server has the point
     final BlockPos[] chest = new BlockPos[1];
     final int[] ratId = new int[1];
     at(t += 5, mc -> server(mc, p -> {
       ServerLevel level = p.level();
+      for (int x = 2; x <= 7; x++) for (int z = 3; z <= 6; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), Blocks.AIR.defaultBlockState());
       chest[0] = stage.offset(3, 0, 5);
       level.setBlockAndUpdate(chest[0], Blocks.CHEST.defaultBlockState());
       var rat = bugRat(p, 4.5, 0, 3.5, ItemStack.EMPTY);
       ratId[0] = rat.getId();
       p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.CHEESE_STICK.get()));
-      lookAt(p, 3.5, 0, 2.5, 3.5, 0, 5.5);
+      bugLook(p, 3.5, 0, 2.5, 3.5, 0, 5.5);
     }));
     at(t += 20, mc -> {
       var rat = mc.level.getEntity(ratId[0]);
@@ -577,6 +625,33 @@ public final class ClientScene {
     Language language = Language.getInstance();
     List<String> missing = needed.stream().distinct().filter(key -> !language.has(key)).toList();
     check("translations: every item, block, entity and tab in " + LANG + " (" + needed.size() + " keys)", missing.isEmpty(), missing);
+  }
+
+  /**
+   * The rat attractor's chains in the middle of the screen (1.2 blocks away, FOV 70: a block is 0.6 screen heights): the
+   * chain planes' transparent texels are white or black, the opaque ones dark blue, the wall behind lime; white or black
+   * pixels there mean the chains were drawn solid
+   */
+  private static void checkChainHoles(Minecraft mc) {
+    // the screenshot is read back from the GPU asynchronously in 26.x
+    Screenshot.takeScreenshot(mc.gameRenderer.mainRenderTarget(), image -> {
+      try (image) {
+        int w = image.getWidth(), h = image.getHeight();
+        int[] pixels = image.getPixelsABGR();
+        int holes = 0, all = 0;
+        for (int y = h / 2 - h / 9; y < h / 2 + h / 9; y++) {
+          for (int x = w / 2 - h / 16; x < w / 2 + h / 16; x++) {
+            int pixel = pixels[y * w + x];
+            int r = pixel & 0xFF, g = pixel >> 8 & 0xFF, b = pixel >> 16 & 0xFF;
+            all++;
+            if (Math.min(r, Math.min(g, b)) > 215 || Math.max(r, Math.max(g, b)) < 16) {
+              holes++;
+            }
+          }
+        }
+        check("the rat attractor's chains are cutout (no white or black holes)", holes * 100 < all, holes + " of " + all + " pixels white or black");
+      }
+    });
   }
 
   private static void checkNoMissingTexture(Minecraft mc, String name) {
