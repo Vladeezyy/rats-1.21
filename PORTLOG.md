@@ -291,3 +291,21 @@ Compared with ebaa67's "Rats Unofficial (Fixed)" (CurseForge 1549384), which fix
   cooks, wild rats raiding crops and chests, a quarry rat digging past two layers, breeding in a cage with a
   lantern, and (on its own, `-Drats.selftest.only=plague,doctor,night`) the plague doctor drinking invisibility once a
   night; `SelfTest` checks the enchantment tags.
+
+### CurseForge report of 2026-10-31 (ucigfufug), what 8.1.3.6 left
+The full comment also names the aviator hat. Checked with `-Pscene=bugs` on both loaders of every version:
+- "Broken chain texture on the rat attractor": the chains are two crossed planes cut out of `rat_attractor.png`; the
+  holes are white and black transparent texels, so a solid layer draws white blocks in the chain. That was Fabric
+  before 8.1.3.6 (no `render_type` reader). The scene now looks at the hanging attractor's chains up close against a
+  lime wall and counts white/black pixels: 0 with the fix, 8 % with the reader turned off (fails as it should). The
+  models, the texture and the blockstate are the original's; nothing references vanilla `block/chain` (26.x
+  `iron_chain` only in the hanging sign recipe).
+- "It connects to lanterns placed above": the original's `up` state is any non-air block above (`updateState`), the
+  port keeps it on every version. Not changed.
+- "The pumpkin hat on a rat has its top on the bottom": a vanilla carved pumpkin's bottom face uses the top texture
+  (`block/orientable` sets `bottom` to `#top`), on any head, an armor stand's or a player's too; the rat layer is the
+  original's (same transforms). Not a port bug, not changed.
+- "Aviator hat rendering is broken (on rats)": the hats-off-the-head bug fixed in 8.1.3.6 (Fabric 1.21.1: 4225def;
+  26.x: 45423c3). Seen level with the rats and from below on both loaders: on the head, as the item icon shows it.
+- The scene's views from below were taken from inside the glass and the player fell from the side views (a creative
+  player that touches the ground stops flying); both fixed, with armor stands wearing the same hats beside the rats.
