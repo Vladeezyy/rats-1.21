@@ -13,6 +13,14 @@ esac
 pkill -f "$PROC" 2>/dev/null
 rm -rf $LOADER/run/world build-selftest.log
 mkdir -p $LOADER/run/config && echo "eula=true" > $LOADER/run/eula.txt
+# a flat world: the scenes float at y 120, where a random world's mountains reach them (in CI, 2026-11-01, a fluid,
+# most likely water from the terrain, filled the quarry scenario's pit); a flat world has nothing there
+PROPS=$LOADER/run/server.properties
+if [ -f $PROPS ] && grep -q '^level-type=' $PROPS; then
+	perl -pi -e 's/^level-type=.*/level-type=minecraft\\:flat/' $PROPS
+else
+	printf '%s\n' 'level-type=minecraft\:flat' >> $PROPS
+fi
 # the test world has the Ratlantis datapack on (the gameplay checks go through its portal)
 CFG=$LOADER/run/config/rats-common.toml
 if [ -f $CFG ]; then

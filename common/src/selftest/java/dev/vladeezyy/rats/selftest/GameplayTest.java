@@ -1353,14 +1353,24 @@ final class GameplayTest {
             nodes.add(back.getNode(n).asBlockPos().subtract(this.base).toShortString());
           }
         }
+        // '.' air, 'P' platform, '#' stone, a digit: another block, named after the layers
         List<String> layers = new ArrayList<>();
+        List<String> others = new ArrayList<>();
         for (int y = -1; y >= -4; y--) {
           StringBuilder layer = new StringBuilder("y" + y + ":");
           for (int z = -2; z <= 2; z++) {
             layer.append(' ');
             for (int x = -2; x <= 2; x++) {
               BlockState state = level.getBlockState(this.base.offset(x, y, z));
-              layer.append(state.isAir() ? '.' : state.is(RatsBlockRegistry.RAT_QUARRY_PLATFORM.get()) ? 'P' : '#');
+              if (state.isAir() || state.is(RatsBlockRegistry.RAT_QUARRY_PLATFORM.get()) || state.is(Blocks.STONE)) {
+                layer.append(state.isAir() ? '.' : state.is(Blocks.STONE) ? '#' : 'P');
+              } else {
+                String name = state.toString();
+                if (!others.contains(name)) {
+                  others.add(name);
+                }
+                layer.append(others.indexOf(name) % 10);
+              }
             }
           }
           layers.add(layer.toString());
@@ -1372,7 +1382,9 @@ final class GameplayTest {
         }
         return "legs " + legs + ", items in the quarry " + items + ", rat at " + this.rat.position().subtract(Vec3.atBottomCenterOf(this.base)) + ", holds " + this.rat.getMainHandItem() + ", facing " + this.rat.depositFacing
           + ", working " + this.rat.isCurrentlyWorking
-          + ", path back " + (back == null ? "none" : "reaches " + back.canReach() + " " + nodes) + ", layers " + layers;
+          + ", path back " + (back == null ? "none" : "reaches " + back.canReach() + " " + nodes) + ", layers " + layers + (others.isEmpty() ? "" : ", other blocks " + others)
+          + ", mobs around " + level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(this.base).inflate(8), mob -> mob != this.rat).stream()
+            .map(mob -> net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getPath() + "@" + mob.blockPosition().subtract(this.base).toShortString()).toList();
       }
     });
     SCENARIOS.add(new Scenario("two tamed rats in a cage with a breeding lantern have babies", 1200) {
