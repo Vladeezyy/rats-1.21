@@ -13,8 +13,15 @@ esac
 pkill -f "$PROC" 2>/dev/null
 rm -rf $LOADER/run/world build-selftest.log
 mkdir -p $LOADER/run/config && echo "eula=true" > $LOADER/run/eula.txt
-# 26.x servers stop ticking after 60 s without players: the scenarios need the ticks
+# a flat world: the scenes float at y 120, where a random world's mountains reach them (in CI, 2026-11-01, a fluid,
+# most likely water from the terrain, filled the quarry scenario's pit); a flat world has nothing there
 PROPS=$LOADER/run/server.properties
+if [ -f $PROPS ] && grep -q '^level-type=' $PROPS; then
+	perl -pi -e 's/^level-type=.*/level-type=minecraft\\:flat/' $PROPS
+else
+	printf '%s\n' 'level-type=minecraft\:flat' >> $PROPS
+fi
+# 26.x servers stop ticking after 60 s without players: the scenarios need the ticks
 if [ -f $PROPS ] && grep -q '^pause-when-empty-seconds=' $PROPS; then
 	perl -pi -e 's/^pause-when-empty-seconds=.*/pause-when-empty-seconds=0/' $PROPS
 else
