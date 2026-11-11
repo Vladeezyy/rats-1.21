@@ -34,8 +34,9 @@ public class RatArrow extends AbstractArrow {
 		this.stack = new ItemStack(RatsItemRegistry.RAT_ARROW.get());
 	}
 
-	public RatArrow(EntityType<? extends AbstractArrow> type, Level level, LivingEntity shooter, ItemStack stack) {
-		super(type, shooter, level, stack.copyWithCount(1), null);
+	// 1.21: the bow's Power, Punch and Piercing act through the weapon the arrow remembers
+	public RatArrow(EntityType<? extends AbstractArrow> type, Level level, LivingEntity shooter, ItemStack stack, @Nullable ItemStack weapon) {
+		super(type, shooter, level, stack.copyWithCount(1), weapon);
 		this.stack = stack;
 	}
 

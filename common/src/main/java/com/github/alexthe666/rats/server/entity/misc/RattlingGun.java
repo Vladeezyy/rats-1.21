@@ -157,7 +157,10 @@ public class RattlingGun extends Entity implements AdjustsRatTail {
 				return flag ? InteractionResult.SUCCESS : InteractionResult.PASS;
 			} else {
 				if (player.isShiftKeyDown()) {
-					this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), RatlantisItemRegistry.RATTLING_GUN.get());
+					// the client runs interact too: there the level is a ClientLevel (a cast crashed the game)
+					if (this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+						this.spawnAtLocation(serverLevel, RatlantisItemRegistry.RATTLING_GUN.get());
+					}
 					this.discard();
 					return InteractionResult.SUCCESS;
 				}
