@@ -50,7 +50,7 @@ public class RatArrowItem extends ArrowItem {
 
 	@Override
 	public AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter, @org.jetbrains.annotations.Nullable ItemStack weapon) {
-		return new RatArrow(RatsEntityRegistry.RAT_ARROW.get(), level, shooter, stack);
+		return new RatArrow(RatsEntityRegistry.RAT_ARROW.get(), level, shooter, stack, weapon);
 	}
 
 	// NeoForge extension method (vanilla types): NeoForge calls it, Fabric does not
