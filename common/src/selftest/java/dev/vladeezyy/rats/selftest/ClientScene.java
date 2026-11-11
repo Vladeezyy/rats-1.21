@@ -381,12 +381,12 @@ public final class ClientScene {
     // CurseForge report (2026-11-11): the tinted items' icons in the hotbar (1.21.1 drew them with the tint's alpha 0),
     // each against the empty slot 7, cheese as the control; a lime wall behind the hotbar
     at(t += 10, mc -> {
-      mc.setScreen(null);
+      mc.gui.setScreen(null);
       server(mc, p -> {
         ServerLevel level = p.level();
         bugRats.forEach(id -> { var e = level.getEntity(id); if (e != null) e.discard(); });
         bugRats.clear();
-        for (int x = 0; x <= 7; x++) for (int z = 2; z <= 7; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), z == 7 ? Blocks.LIME_WOOL.defaultBlockState() : Blocks.AIR.defaultBlockState());
+        for (int x = 0; x <= 7; x++) for (int z = 2; z <= 7; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), z == 7 ? Blocks.WOOL.lime().defaultBlockState() : Blocks.AIR.defaultBlockState());
         p.getInventory().clearContent();
         for (int slot = 0; slot < icons().size(); slot++) {
           p.getInventory().setItem(slot, new ItemStack(icons().get(slot)));
@@ -718,7 +718,7 @@ public final class ClientScene {
 
   private static void checkIcons(Minecraft mc) {
     // the screenshot is read back from the GPU asynchronously in 26.x
-    Screenshot.takeScreenshot(mc.getMainRenderTarget(), image -> {
+    Screenshot.takeScreenshot(mc.gameRenderer.mainRenderTarget(), image -> {
       try (image) {
         checkIcons(mc, image.getPixelsABGR(), image.getWidth(), image.getHeight());
       }
