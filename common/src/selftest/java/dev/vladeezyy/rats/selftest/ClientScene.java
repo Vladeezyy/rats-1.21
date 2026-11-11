@@ -375,6 +375,58 @@ public final class ClientScene {
       var rat = (com.github.alexthe666.rats.server.entity.rat.TamedRat) p.serverLevel().getEntity(ratId[0]);
       check("the server keeps the chest as the rat's deposit point", rat != null && rat.getDepositPos().map(g -> g.pos().equals(chest[0])).orElse(false), rat == null ? "no rat" : rat.getDepositPos());
     }));
+    // CurseForge report (2026-11-11): the tinted items' icons in the hotbar (1.21.1 drew them with the tint's alpha 0),
+    // each against the empty slot 7, cheese as the control; a lime wall behind the hotbar
+    at(t += 10, mc -> {
+      mc.setScreen(null);
+      server(mc, p -> {
+        ServerLevel level = p.serverLevel();
+        bugRats.forEach(id -> { var e = level.getEntity(id); if (e != null) e.discard(); });
+        bugRats.clear();
+        for (int x = 0; x <= 7; x++) for (int z = 2; z <= 7; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), z == 7 ? Blocks.LIME_WOOL.defaultBlockState() : Blocks.AIR.defaultBlockState());
+        p.getInventory().clearContent();
+        for (int slot = 0; slot < ICONS.size(); slot++) {
+          p.getInventory().setItem(slot, new ItemStack(ICONS.get(slot)));
+        }
+        p.getInventory().selected = 8;
+        bugLook(p, 3.5, 0, 5.5, 3.5, p.getEyeHeight(), 7);
+      });
+      mc.player.getInventory().selected = 8;
+    });
+    at(t += 25, mc -> {
+      shot(mc, "bug_icons");
+      checkIcons(mc);
+    });
+    // the rattling gun: sneak + right click picks it up; the client runs interact too (26.x cast its level to the
+    // server's there: a ClassCastException crashed the game)
+    final int[] gunId = new int[1];
+    at(t += 5, mc -> server(mc, p -> {
+      var gun = com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RATTLING_GUN.get().create(p.serverLevel());
+      gun.moveTo(stage.getX() + 3.5, stage.getY(), stage.getZ() + 4.5, 0, 0);
+      p.serverLevel().addFreshEntity(gun);
+      gunId[0] = gun.getId();
+      bugLook(p, 3.5, 0, 2.5, 3.5, 0.8, 4.5);
+    }));
+    at(t += 20, mc -> {
+      var gun = mc.level.getEntity(gunId[0]);
+      check("the rattling gun is on the client", gun != null, gunId[0]);
+      if (gun != null) {
+        mc.player.setShiftKeyDown(true);
+        try {
+          var result = mc.gameMode.interact(mc.player, gun, net.minecraft.world.InteractionHand.MAIN_HAND);
+          check("sneak + right click on the rattling gun (the client side)", result.consumesAction(), result);
+        } catch (RuntimeException e) {
+          check("sneak + right click on the rattling gun (the client side)", false, e);
+        } finally {
+          mc.player.setShiftKeyDown(false);
+        }
+      }
+    });
+    at(t += 15, mc -> server(mc, p -> {
+      var gun = p.serverLevel().getEntity(gunId[0]);
+      var items = p.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(stage).inflate(10)).stream().map(net.minecraft.world.entity.item.ItemEntity::getItem).toList();
+      check("sneak + right click picked the rattling gun up", gun == null && items.stream().anyMatch(i -> i.is(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATTLING_GUN.get())), "gun " + gun + ", items " + items);
+    }));
     at(t += 10, mc -> {
       mc.setScreen(null);
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
@@ -646,6 +698,44 @@ public final class ClientScene {
         }
       }
       check("the rat attractor's chains are cutout (no white or black holes)", holes * 100 < all, holes + " of " + all + " pixels white or black");
+    }
+  }
+
+  /** The hotbar's first slots, checked by checkIcons: the tinted items of the report, cheese last as the control */
+  private static final List<net.minecraft.world.level.ItemLike> ICONS = List.of(
+    com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_TUBES[0].get(), com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_IGLOOS[0].get(),
+    com.github.alexthe666.rats.registry.RatsItemRegistry.RAT_HAMMOCKS[0].get(), com.github.alexthe666.rats.registry.RatsItemRegistry.PARTY_HAT.get(),
+    com.github.alexthe666.rats.registry.RatsItemRegistry.CHEESE.get());
+
+  private static void checkIcons(Minecraft mc) {
+    try (NativeImage image = Screenshot.takeScreenshot(mc.getMainRenderTarget())) {
+      checkIcons(mc, image.getPixelsRGBA(), image.getWidth(), image.getHeight());
+    }
+  }
+
+  /**
+   * The vanilla hotbar: slot l's item at gui (width / 2 - 88 + 20 l, height - 19), 16 x 16; a drawn icon changes at least
+   * a tenth of its square against the same square of the empty slot 7
+   */
+  private static void checkIcons(Minecraft mc, int[] pixels, int w, int h) {
+    double scale = mc.getWindow().getGuiScale();
+    int center = mc.getWindow().getGuiScaledWidth() / 2, top = (int) ((mc.getWindow().getGuiScaledHeight() - 19) * scale), size = (int) (16 * scale);
+    int empty = (int) ((center - 88 + 20 * 7) * scale);
+    for (int slot = 0; slot < ICONS.size(); slot++) {
+      int left = (int) ((center - 88 + 20 * slot) * scale), changed = 0;
+      for (int y = top; y < Math.min(h, top + size); y++) {
+        for (int x = 0; x < size; x++) {
+          int a = pixels[y * w + left + x], b = pixels[y * w + empty + x];
+          for (int shift = 0; shift < 24; shift += 8) {
+            if (Math.abs((a >> shift & 0xFF) - (b >> shift & 0xFF)) > 40) {
+              changed++;
+              break;
+            }
+          }
+        }
+      }
+      var key = BuiltInRegistries.ITEM.getKey(ICONS.get(slot).asItem());
+      check("the hotbar draws the icon of " + key, changed * 10 >= size * size, changed + " of " + size * size + " pixels differ from an empty slot");
     }
   }
 

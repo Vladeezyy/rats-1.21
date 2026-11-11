@@ -311,7 +311,10 @@ public final class RatsClientSetup {
 		void register(ItemColor color, ItemLike... items);
 	}
 
-	public static void registerItemColors(ItemColorSink sink) {
+	public static void registerItemColors(ItemColorSink target) {
+		// 1.21: the item renderer takes the alpha from the tint too, and the original's colors are RGB (the dye firework
+		// colors, the party hat's 0x25C9E7): alpha 0 drew the tubes, igloos, hammocks and the party hat invisible
+		ItemColorSink sink = (color, items) -> target.register((stack, tint) -> net.minecraft.util.FastColor.ARGB32.opaque(color.getColor(stack, tint)), items);
 		sink.register((stack, tint) -> FoliageColor.get(0.5D, 1.0D), RatlantisBlockRegistry.MARBLED_CHEESE_GRASS.get().asItem());
 
 		for (RegistryEntry<Item, Item> item : RatsItemRegistry.RAT_TUBES) {

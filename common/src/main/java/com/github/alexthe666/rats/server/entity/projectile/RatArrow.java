@@ -45,8 +45,9 @@ public class RatArrow extends AbstractArrow {
 		this.stack = new ItemStack(RatsItemRegistry.RAT_ARROW.get());
 	}
 
-	public RatArrow(EntityType<? extends AbstractArrow> type, Level level, LivingEntity shooter, ItemStack stack) {
-		super(type, shooter, level, stack.copyWithCount(1), null);
+	// 1.21: the bow's Power, Punch and Piercing act through the weapon the arrow remembers
+	public RatArrow(EntityType<? extends AbstractArrow> type, Level level, LivingEntity shooter, ItemStack stack, @Nullable ItemStack weapon) {
+		super(type, shooter, level, stack.copyWithCount(1), weapon);
 		this.stack = stack;
 	}
 
@@ -87,7 +88,13 @@ public class RatArrow extends AbstractArrow {
 	protected void onHitEntity(EntityHitResult result) {
 		Entity entity = result.getEntity();
 		float f = (float) this.getDeltaMovement().length();
-		int i = Mth.ceil(Mth.clamp((double) f * this.getBaseDamage(), 0, Integer.MAX_VALUE));
+		double damage = this.getBaseDamage();
+		// 1.21: Power is an enchantment effect of the bow, read from the weapon on hit (as vanilla arrows do)
+		if (this.getWeaponItem() != null && this.level() instanceof ServerLevel serverLevel) {
+			Entity owner = this.getOwner();
+			damage = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), entity, this.damageSources().arrow(this, owner != null ? owner : this), (float) damage);
+		}
+		int i = Mth.ceil(Mth.clamp((double) f * damage, 0, Integer.MAX_VALUE));
 		if (this.getPierceLevel() > 0) {
 			if (this.piercingIgnoreEntityIds == null) {
 				this.piercingIgnoreEntityIds = new IntOpenHashSet(5);
