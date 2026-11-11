@@ -411,14 +411,16 @@ public final class ClientScene {
       var gun = mc.level.getEntity(gunId[0]);
       check("the rattling gun is on the client", gun != null, gunId[0]);
       if (gun != null) {
-        mc.player.setShiftKeyDown(true);
+        // the local player's sneaking is the shift key of its input (sent in the interact packet), not the entity flag
+        boolean shift = mc.player.input.shiftKeyDown;
+        mc.player.input.shiftKeyDown = true;
         try {
           var result = mc.gameMode.interact(mc.player, gun, net.minecraft.world.InteractionHand.MAIN_HAND);
           check("sneak + right click on the rattling gun (the client side)", result.consumesAction(), result);
         } catch (RuntimeException e) {
           check("sneak + right click on the rattling gun (the client side)", false, e);
         } finally {
-          mc.player.setShiftKeyDown(false);
+          mc.player.input.shiftKeyDown = shift;
         }
       }
     });
