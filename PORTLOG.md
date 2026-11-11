@@ -318,6 +318,28 @@ every run, so mountains (and their water) sometimes reach a scene; the other sin
 26.x (bee rat, farmer, lumberjack, mounts) fit the same cause. `tools/selftest.sh` now makes a flat world; the quarry
 scenario's report names the blocks other than stone and platforms and the mobs around it.
 
+### CurseForge report of 2026-11-11 (ucigfufug), on 8.1.3.6
+- "Party hat, tubes, igloos and hammocks lack inventory rendering": 1.21.1 only. Since 1.21 the item renderer takes
+  the tint's alpha too, and the original's item colors are RGB (dye firework colors, the party hat's 0x25C9E7): alpha
+  0 drew those layers invisible, in the inventory and in hand. `RatsClientSetup.registerItemColors` makes every item
+  color opaque now. 26.x takes the tints from the item models, opaque already. The bugs scene compares the hotbar
+  slots of the four items with an empty slot (cheese as the control): all drawn with the fix; with the old colors
+  0 of 2304 pixels differ from the empty slot (NeoForge 1.21.1).
+- "The rattling gun appears to be unbreakable": as in the original, hits do not break it; sneak + right click (no rat
+  in it or on the player) picks it up. On 26.x that click crashed the client: `interact` runs on the client too and
+  cast its level to `ServerLevel` (ClassCastException). The same cast was in `Rat.mobInteract` (filth corruption on a
+  rat that holds an item) and `Rat.aiStep` (a rat king transformation stopped on peaceful); all three check the level
+  now. The scene clicks the gun for real (the sneaking goes through the local player's input: `LocalPlayer`
+  reads the shift key from it, not the entity flag); the self-test picks it up on the server.
+- "The rat on an arrow doesn't spawn a rat, it just drops the arrow": as in the original. Only an arrow that can be
+  picked up lets its rat out, and a creative bow's arrows cannot; where it lands a plain arrow drops. Found on the
+  way: the rat arrow dropped the bow it was shot from, so Power, Punch and Piercing did nothing; it keeps it now, and
+  on 1.21.1 the hit reads Power from it (the 26.x hit is vanilla's). Self-test: a rat arrow a player shot lets a
+  tamed rat out where it lands, drops a plain arrow and keeps the bow.
+- Checked: 1.21.1 self-test (`-Drats.selftest.only=arrow,rattling`) 28/28 and bugs scene 18/18 on both loaders;
+  bugs scene 18/18 on 26.1.2, 26.2 and 26.3, both loaders. With the old cast back, 26.3 NeoForge: 17/18, the click
+  fails with the ClassCastException (the test catches it). CI (full self-test) passed on every branch.
+
 ## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
 
 Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,
