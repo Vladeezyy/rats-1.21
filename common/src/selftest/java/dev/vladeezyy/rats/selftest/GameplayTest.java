@@ -1446,6 +1446,58 @@ final class GameplayTest {
         return around(level, TamedRat.class, this.base).stream().map(r -> (r.isMale() ? "male" : "female") + " in cage " + r.isInCage() + " cooldown " + r.breedCooldown + " at " + r.position().subtract(Vec3.atBottomCenterOf(this.base))).toList().toString();
       }
     });
+    // CurseForge report (2026-11-11): a rat arrow a player shot lets its rat out where it lands (the original: only an
+    // arrow that can be picked up, so not one from a creative bow) and drops a plain arrow; it keeps the bow for Power
+    SCENARIOS.add(new Scenario("a rat arrow a player shot lets a tamed rat out where it lands", 200) {
+      @Override
+      boolean start(ServerLevel level) {
+        ItemStack bow = new ItemStack(Items.BOW);
+        var arrow = ((com.github.alexthe666.rats.server.items.RatArrowItem) RatsItemRegistry.RAT_ARROW.get()).createArrow(level, new ItemStack(RatsItemRegistry.RAT_ARROW.get()), player, bow);
+        SelfTest.check("a rat arrow keeps the bow it was shot from (Power, Punch)", () -> arrow.getWeaponItem() != null && arrow.getWeaponItem().is(Items.BOW));
+        arrow.setPos(this.base.getX() + 0.5, this.base.getY() + 3, this.base.getZ() + 0.5);
+        arrow.shoot(0, -1, 0, 1.5F, 0);
+        level.addFreshEntity(arrow);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return around(level, TamedRat.class, this.base).stream().anyMatch(rat -> rat.isOwnedBy(player))
+          && around(level, ItemEntity.class, this.base).stream().anyMatch(item -> item.getItem().is(Items.ARROW));
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "rats " + around(level, TamedRat.class, this.base).stream().map(r -> "owned by the tester " + r.isOwnedBy(player)).toList()
+          + ", arrows " + around(level, net.minecraft.world.entity.projectile.arrow.AbstractArrow.class, this.base).stream().map(a -> a.getClass().getSimpleName() + " pickup " + a.pickup + " at " + a.position().subtract(Vec3.atLowerCornerOf(this.base))).toList()
+          + ", items " + around(level, ItemEntity.class, this.base).stream().map(ItemEntity::getItem).toList();
+      }
+    });
+    // the rattling gun does not break from hits (the original): sneak + right click picks it up
+    SCENARIOS.add(new Scenario("sneak + right click picks up a rattling gun", 40) {
+      Entity gun;
+
+      @Override
+      boolean start(ServerLevel level) {
+        this.gun = com.github.alexthe666.rats.registry.RatlantisEntityRegistry.RATTLING_GUN.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        this.gun.snapTo(this.base.getX() + 0.5, this.base.getY(), this.base.getZ() + 0.5, 0, 0);
+        level.addFreshEntity(this.gun);
+        player.setShiftKeyDown(true);
+        this.gun.interact(player, InteractionHand.MAIN_HAND, Vec3.ZERO);
+        player.setShiftKeyDown(false);
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return this.gun.isRemoved() && around(level, ItemEntity.class, this.base).stream().anyMatch(item -> item.getItem().is(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATTLING_GUN.get()));
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "gun removed " + this.gun.isRemoved() + ", items " + around(level, ItemEntity.class, this.base).stream().map(ItemEntity::getItem).toList();
+      }
+    });
     // the night changes the whole world, so this one runs on its own: -Drats.selftest.only=plague,doctor,night
     if (System.getProperty("rats.selftest.only", "").contains("night")) {
       SCENARIOS.add(new Scenario("a plague doctor drinks invisibility once a night, not over and over", 1000) {

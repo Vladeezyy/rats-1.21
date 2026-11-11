@@ -155,7 +155,10 @@ public class Rat extends DiggingRat {
 		if (this.isBecomingRatKing() && (!this.getMainHandItem().is(RatsItemRegistry.FILTH_CORRUPTION.get()) || this.level().getDifficulty() == Difficulty.PEACEFUL)) {
 			this.getEntityData().set(RAT_KING_TRANSFORMATION, false);
 			if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
-				this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), this.getMainHandItem());
+				// aiStep runs on the client too, where the level is a ClientLevel
+				if (this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+					this.spawnAtLocation(serverLevel, this.getMainHandItem());
+				}
 				this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 			}
 		}
@@ -282,8 +285,9 @@ public class Rat extends DiggingRat {
 		if (!this.hasPlague()) {
 			if (itemstack.is(RatsItemRegistry.FILTH_CORRUPTION.get()) && this.level().getDifficulty() != Difficulty.PEACEFUL) {
 				this.playSound(RatsSoundRegistry.RAT_KING_SUMMON.get(), 1F, 1.5F);
-				if (!this.getMainHandItem().isEmpty()) {
-					this.spawnAtLocation((net.minecraft.server.level.ServerLevel) this.level(), this.getMainHandItem());
+				// mobInteract runs on the client too, where the level is a ClientLevel
+				if (!this.getMainHandItem().isEmpty() && this.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+					this.spawnAtLocation(serverLevel, this.getMainHandItem());
 					this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 				}
 				this.setItemInHand(InteractionHand.MAIN_HAND, player.getItemInHand(hand).copyWithCount(1));
