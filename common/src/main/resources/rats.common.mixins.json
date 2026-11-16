@@ -4,8 +4,12 @@
   "package": "com.github.alexthe666.rats.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EntityRidePlayerMixin",
     "PiglinAiMixin",
     "WardenMixin"
+  ],
+  "client": [
+    "client.HumanoidMobRendererMixin"
   ],
   "injectors": {"defaultRequire": 1}
 }
