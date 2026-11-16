@@ -351,6 +351,25 @@ public final class SelfTest {
       com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.RAW_IRON))
         && com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.IRON_ORE))
         && !com.github.alexthe666.rats.server.items.upgrades.OreDoublingRatUpgradeItem.isProcessable(level, new ItemStack(Items.IRON_INGOT)));
+    // GitHub #3: since 1.21.11 the server seated nothing on a player, so the rat stayed behind and came back there
+    check("GitHub #3: sneak + right click seats a tamed rat on its owner on the server, and it gets off by the owner", () -> {
+      com.github.alexthe666.rats.server.entity.rat.TamedRat rat = com.github.alexthe666.rats.registry.RatsEntityRegistry.TAMED_RAT.get().spawn(level, at(-7, 0, -6), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+      rat.tame(player);
+      net.minecraft.world.phys.Vec3 start = rat.position();
+      player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+      player.setShiftKeyDown(true);
+      net.minecraft.world.InteractionResult result = rat.interact(player, net.minecraft.world.InteractionHand.MAIN_HAND, rat.position());
+      player.setShiftKeyDown(false);
+      boolean seated = rat.getVehicle() == player;
+      rat.stopRiding();
+      double fromOwner = rat.distanceTo(player);
+      double fromStart = rat.position().distanceTo(start);
+      rat.discard();
+      if (!seated || fromOwner > 3.0) {
+        RatsMod.LOGGER.info(PREFIX + "rat on player: result " + result + ", seated " + seated + ", " + fromOwner + " from the owner, " + fromStart + " from where it was picked up");
+      }
+      return seated && fromOwner < 3.0 && fromStart > 3.0;
+    });
   }
 
   /** Checks that need a few server ticks first */

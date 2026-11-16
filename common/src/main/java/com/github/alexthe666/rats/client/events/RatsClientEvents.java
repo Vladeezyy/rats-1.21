@@ -158,6 +158,14 @@ public final class RatsClientEvents {
 	 * plague overlay's flag ({@link #isPlagued}) is stored by the loader in the state.
 	 */
 	public static void afterLivingExtract(LivingEntity entity, LivingEntityRenderState state) {
+		// The hats have no vanilla equipment asset, so vanilla also puts them into the head item that its head layer
+		// draws as a small item above the head (GitHub #4). Humanoids get the model from HatLayer (their head
+		// equipment: HumanoidMobRendererMixin); other mobs keep the item. On Fabric this runs before the humanoid
+		// part of the state is filled, so the entity's slot is read, not headEquipment
+		if (state instanceof net.minecraft.client.renderer.entity.state.HumanoidRenderState && !state.headItem.isEmpty()
+				&& com.github.alexthe666.rats.client.render.HatRendering.drawsHat(entity.getItemBySlot(EquipmentSlot.HEAD))) {
+			state.headItem.clear();
+		}
 		if (state instanceof AvatarRenderState avatar) {
 			ItemStack stack = entity.getItemBySlot(EquipmentSlot.HEAD);
 			if (stack.is(RatsItemRegistry.BLACK_DEATH_MASK.get()) || stack.is(RatsItemRegistry.PLAGUE_DOCTOR_MASK.get()) || stack.is(RatlantisBlockRegistry.MARBLED_CHEESE_RAT_HEAD.get().asItem())) {
