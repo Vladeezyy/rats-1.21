@@ -278,6 +278,52 @@ public final class ClientScene {
     at(t += 20, mc -> shot(mc, "bug_hats_below_aviator"));
     at(t += 5, mc -> server(mc, p -> bugLook(p, 1.0, 0, 2.5, 1.0, 4.6, 5.5)));
     at(t += 20, mc -> shot(mc, "bug_hats_below_stand"));
+    // GitHub #4: a hat worn by a player (or an armor stand) was drawn as its flat item by vanilla's head layer over the
+    // hat's model: the render state's head item must stay empty for the mod's hats (a carved pumpkin keeps it)
+    at(t += 5, mc -> server(mc, p -> {
+      p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new ItemStack(com.github.alexthe666.rats.registry.RatsItemRegistry.BLACK_DEATH_MASK.get()));
+      bugLook(p, 3.5, 3, 3.0, 3.5, 3, 7);
+    }));
+    at(t += 10, mc -> {
+      mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+      List<String> flat = new ArrayList<>();
+      int seen = 0;
+      boolean pumpkinKept = false;
+      for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering()) {
+        if (!(e instanceof net.minecraft.world.entity.LivingEntity living) || !(e instanceof net.minecraft.world.entity.player.Player || e instanceof net.minecraft.world.entity.decoration.ArmorStand)) {
+          continue;
+        }
+        ItemStack head = living.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD);
+        if (head.isEmpty()) {
+          continue;
+        }
+        @SuppressWarnings("unchecked")
+        var renderer = (net.minecraft.client.renderer.entity.EntityRenderer<net.minecraft.world.entity.Entity, ?>) mc.getEntityRenderDispatcher().getRenderer(e);
+        var state = renderer.createRenderState(e, 1.0F);
+        if (!(state instanceof net.minecraft.client.renderer.entity.state.LivingEntityRenderState livingState)) {
+          continue;
+        }
+        if (head.is(Blocks.CARVED_PUMPKIN.asItem())) {
+          pumpkinKept |= !livingState.headItem.isEmpty();
+        } else {
+          seen++;
+          if (!livingState.headItem.isEmpty()) {
+            flat.add(e.getType().toShortString() + " " + head.getItem() + " as an item");
+          }
+          // the hat layer draws the hat's model from the head equipment
+          if (!(state instanceof net.minecraft.client.renderer.entity.state.HumanoidRenderState humanoid) || !ItemStack.isSameItem(humanoid.headEquipment, head)) {
+            flat.add(e.getType().toShortString() + " " + head.getItem() + " without its model");
+          }
+        }
+      }
+      check("GitHub #4: the mod's hats on a player and an armor stand are drawn as their model on the head, not as an item (" + seen + " checked)", seen >= 2 && flat.isEmpty(), flat);
+      check("a carved pumpkin on an armor stand is still drawn as its block (control)", pumpkinKept, pumpkinKept);
+    });
+    at(t += 10, mc -> shot(mc, "bug_mask_player"));
+    at(t += 5, mc -> {
+      mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+      server(mc, p -> p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, ItemStack.EMPTY));
+    });
     // the rat's screen with three upgrades
     at(t += 5, mc -> server(mc, p -> {
       bugLook(p, 3.5, 0, 0.5, 3.5, 0, 7);

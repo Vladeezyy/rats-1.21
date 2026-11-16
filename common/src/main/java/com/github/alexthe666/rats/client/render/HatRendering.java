@@ -22,6 +22,12 @@ public final class HatRendering {
 	private HatRendering() {
 	}
 
+	/** Whether {@link com.github.alexthe666.rats.client.render.entity.layer.HatLayer} draws this head stack itself */
+	public static boolean drawsHat(ItemStack stack) {
+		return stack.getItem() instanceof com.github.alexthe666.rats.server.items.PartyHatItem
+				|| stack.getItem() instanceof HatItem && RatsArmorModels.hatModel(stack.getItem()) != null;
+	}
+
 	/** Submits the hat's model posed from {@code state}; false when the stack is no hat with a model */
 	public static boolean submitHat(ItemStack stack, HumanoidRenderState state, PoseStack poseStack, SubmitNodeCollector collector, int light, int outlineColor) {
 		if (!(stack.getItem() instanceof HatItem hat)) {
