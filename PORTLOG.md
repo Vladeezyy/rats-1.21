@@ -340,6 +340,21 @@ scenario's report names the blocks other than stone and platforms and the mobs a
   bugs scene 18/18 on 26.1.2, 26.2 and 26.3, both loaders. With the old cast back, 26.3 NeoForge: 17/18, the click
   fails with the ClassCastException (the test catches it). CI (full self-test) passed on every branch.
 
+### CurseForge report of 2026-11-21, on 8.1.3.8 (version and loader not named)
+- "Interacting with the curdling station when it's empty crashes the game; filling it with a milk bucket still works,
+  but the moment it turns to cheese the game crashes": 1.21.1 only, both loaders (`IllegalStateException:
+  BufferBuilder was empty` from the screen's own buffer for a 0 px tank; fixed there). 26.x draws the tank's tiles
+  with `GuiGraphicsExtractor.blit`, no buffer of its own, and does not crash: checked on 26.1.2, 26.2 and 26.3, both
+  loaders, before any change.
+- The bugs scene clicks the curdler for real in survival (`-Pscene=curdler` runs these steps alone): an empty hand on
+  the empty curdler (the screen opens and draws), a milk bucket fills it, the cheese is made (a) with the screen open
+  and (b) with it closed while the player looks at the curdler (its renderer, the milk bubbles), then the screen on
+  the emptied tank and a shift click takes the two blocks; 20/20 on every 26.x branch and loader. The rattling gun
+  step left the server player sneaking (the interact packet carries the shift key), so the curdler steps reset it;
+  the gun check also counts the gun when the player picked it up before the check.
+- Checked on 26.1.2: bugs scene 40/40 and self-test 74/74 on NeoForge and Fabric; the curdler steps alone
+  (`-Pscene=curdler`) 20/20 on both loaders before any change.
+
 ## 2026-10-20 — 26.1.2 (branch `mc/26.1.2`): NeoForge + Fabric
 
 Rampart `1.0.0+26.1.2` (render states). Unobfuscated Minecraft, Java 25, NeoForge 26.1.2.121, Fabric API 0.155.3,
