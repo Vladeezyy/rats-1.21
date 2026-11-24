@@ -4,7 +4,7 @@ import dev.vladeezyy.rats.platform.ConfigSpec;
 
 public class ServerConfig {
 
-	public final ConfigSpec.BooleanValue ratlantisEnabledByDefault;
+	public final ConfigSpec.BooleanValue ratlantisAlwaysOn;
 
 	public final ConfigSpec.IntValue ratSpawnDecrease;
 	public final ConfigSpec.IntValue piperSpawnDecrease;
@@ -109,7 +109,9 @@ public class ServerConfig {
 
 	public ServerConfig(final ConfigSpec.Builder builder) {
 		builder.push("Ratlantis");
-		this.ratlantisEnabledByDefault = buildBoolean(builder, "Ratlantis Datapack Enabled by Default", false, "If true, the ratlantis datapack will automatically be enabled when creating a new world.");
+		// a new key: every earlier version wrote "Ratlantis Datapack Enabled by Default" = false into the file (its default),
+		// so that key is not read any more and existing installs get Ratlantis too
+		this.ratlantisAlwaysOn = buildBoolean(builder, "Ratlantis Datapack Always On", true, "True: the built-in Ratlantis datapack is on in every world, existing ones too (restart the game or server after a change). False: only in worlds that enable it themselves (Data Packs screen on world creation, or /datapack enable and a restart). Replaces \"Ratlantis Datapack Enabled by Default\" of 8.1.3.8 and older, which is not read.");
 
 		builder.pop().push("Spawning");
 		this.garbageSpawnRate = buildDouble(builder, "Garbage Pile Spawn Chance", 0.15F, 0F, 1.0F, "Percentage for every random tick to spawn a rat for a garbage pile.");

@@ -176,6 +176,19 @@ public final class SelfTest {
     });
     check("Ratlantis pack is available", () -> server.getPackRepository().getAvailableIds().stream().anyMatch(id -> id.equals("ratlantis") || id.endsWith(":ratlantis") || id.endsWith("/ratlantis")));
     check("Ratlantis pack on means Ratlantis on (1.20.1 pack id)", () -> com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server) == com.github.alexthe666.rats.RatsMod.RATLANTIS_DATAPACK_ENABLED);
+    // the option makes the pack required: on in every world, existing ones too. The loaders build the pack once
+    // (Fabric in onInitialize, NeoForge in AddPackFindersEvent), so config/rats-common.toml must be read by then
+    net.minecraft.server.packs.repository.Pack ratlantisPack = server.getPackRepository().getAvailablePacks().stream()
+      .filter(pack -> pack.getId().equals("ratlantis") || pack.getId().endsWith(":ratlantis")).findFirst().orElse(null);
+    boolean ratlantisOption = com.github.alexthe666.rats.RatConfig.ratlantisAlwaysOn;
+    boolean ratlantisOn = com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server);
+    boolean ratlantisDimension = server.getLevel(com.github.alexthe666.rats.registry.worldgen.RatlantisDimensionRegistry.DIMENSION_KEY) != null;
+    RatsMod.LOGGER.info(PREFIX + "Ratlantis: option {}, pack {} required {}, on {} (enabled packs {}), flag {}, dimension {}", ratlantisOption,
+      ratlantisPack == null ? null : ratlantisPack.getId(), ratlantisPack != null && ratlantisPack.isRequired(), ratlantisOn,
+      server.getWorldData().getDataConfiguration().dataPacks().getEnabled(), RatsMod.RATLANTIS_DATAPACK_ENABLED, ratlantisDimension);
+    check("Ratlantis pack is required exactly when the option is on (the config is read before the pack is built)", () -> ratlantisPack != null && ratlantisPack.isRequired() == ratlantisOption);
+    check("Ratlantis option on means the pack is on in this world", () -> !ratlantisOption || ratlantisOn);
+    check("Ratlantis pack on means the Ratlantis dimension exists", () -> !ratlantisOn || ratlantisDimension);
     check("wild rat spawns", () -> {
       spawned = com.github.alexthe666.rats.registry.RatsEntityRegistry.RAT.get().spawn(level, at(1, 0, 1), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
       return spawned != null && spawned.isAlive();

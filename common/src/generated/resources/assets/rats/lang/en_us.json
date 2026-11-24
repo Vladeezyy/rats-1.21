@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "Chestplate of Ratlantis",
   "item.rats.ratlantis_disabled.desc0": "Ratlantis content is disabled in this world.",
   "item.rats.ratlantis_disabled.desc1": "None of the items, blocks, or entities from ratlantis can be obtained legitimately in survival.",
-  "item.rats.ratlantis_disabled.desc2": "If you would like to have Ratlantis related content in your world make sure to enable the builtin datapack on world creation or turn the 'ratlantisEnabledByDefault' config option to true.",
+  "item.rats.ratlantis_disabled.desc2": "To turn it on, set \"Ratlantis Datapack Always On\" to true in config/rats-common.toml and restart the game or server.",
   "item.rats.ratlantis_helmet": "Helmet of Ratlantis",
   "item.rats.ratlantis_hoe": "Hoe of Ratlantis",
   "item.rats.ratlantis_hoe.desc0": "Bounty of Ratlantis",
