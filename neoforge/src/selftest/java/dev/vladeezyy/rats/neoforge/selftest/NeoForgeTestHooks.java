@@ -22,6 +22,7 @@ public final class NeoForgeTestHooks {
   static final class Server {
     static {
       TestHooks.fakePlayer = FakePlayerFactory::get;
+      TestHooks.thaumaturge = ThaumaturgeCheck::run;
     }
 
     private Server() {}

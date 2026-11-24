@@ -339,3 +339,23 @@ scenario's report names the blocks other than stone and platforms and the mobs a
 - Checked: 1.21.1 self-test (`-Drats.selftest.only=arrow,rattling`) 28/28 and bugs scene 18/18 on both loaders;
   bugs scene 18/18 on 26.1.2, 26.2 and 26.3, both loaders. With the old cast back, 26.3 NeoForge: 17/18, the click
   fails with the ClassCastException (the test catches it). CI (full self-test) passed on every branch.
+
+## 2026-11-24 — Thaumaturge compat (NeoForge 1.21.1 and 26.1.2)
+
+Player request on CurseForge (blackfenrirxiii): a cheese aspect for Thaumaturge.
+- Thaumaturge (Leclowndu93150, CurseForge 1628024) is NeoForge only, 1.21.1 and 26.1.2. Aspects are data: a datapack
+  registry (`data/<ns>/thaumaturge/aspect/`) and the data maps `thaumaturge:base_aspects` (items) and
+  `thaumaturge:entity_aspects` (mobs); items with no entry get their aspects from their recipes.
+- New aspect `rats:caseus` (Caseus, cheese: Victus + Permutatio, own icon, six languages), aspects for 84 items (cheese
+  and its blocks, rat parts, plague and garbage, plants and food, Ratlantis materials) and 20 mobs. Source table:
+  `tools/gen_thaumaturge.py`, which writes the built-in pack `data/rats/datapacks/thaumaturge` (neoforge module).
+- The pack is added only with Thaumaturge loaded (`ThaumaturgeCompat`): data map files of a type that does not exist
+  make NeoForge warn on every start. Required pack, on in new and existing worlds.
+- Tests: `-Pwith_thaumaturge` adds Thaumaturge (Curse Maven), Lithostitched and Curios to the dev runs. The self-test
+  checks the pack, the aspect, the data map entries and the aspect index (without Thaumaturge: no pack), and lists the
+  mod's items with no aspects at all. `tools/scenetest.sh -Pscene=thaumaturge -Pwith_thaumaturge` draws item tooltips
+  with their aspects and checks the client's index and the translation.
+- Checked on 1.21.1: self-test with Thaumaturge 73/73 (323 of 348 items have aspects; without: creative upgrades,
+  cauldrons, the portal, spawn eggs), without it 73/73 on NeoForge and 72/72 on Fabric; scene 3/3 in English and
+  Russian. 26.1.2: self-test with Thaumaturge 75/75, without it 75/75; scene 3/3 in both languages.
+

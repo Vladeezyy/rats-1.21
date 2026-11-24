@@ -1,0 +1,1088 @@
+{
+  "values": {
+    "rats:cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 2
+      }
+    ],
+    "rats:blue_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 2
+      }
+    ],
+    "rats:nether_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      }
+    ],
+    "rats:string_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 1
+      }
+    ],
+    "rats:creative_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 50
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 20
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 20
+      }
+    ],
+    "rats:block_of_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 25
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 8
+      }
+    ],
+    "rats:block_of_blue_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 25
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 8
+      },
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 8
+      }
+    ],
+    "rats:block_of_nether_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 25
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 12
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 4
+      }
+    ],
+    "rats:cheese_ore": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      }
+    ],
+    "rats:cheese_cannonball": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 2
+      }
+    ],
+    "rats:chunky_cheese_token": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      }
+    ],
+    "rats:token_fragment": [
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 1
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 1
+      }
+    ],
+    "rats:marbled_cheese_raw": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 1
+      }
+    ],
+    "rats:marbled_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 1
+      }
+    ],
+    "rats:black_marbled_cheese": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:tenebrae",
+        "amount": 2
+      }
+    ],
+    "rats:marbled_cheese_dirt": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      }
+    ],
+    "rats:marbled_cheese_grass": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 2
+      }
+    ],
+    "rats:raw_rat": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 1
+      }
+    ],
+    "rats:rat_pelt": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:praemunio",
+        "amount": 2
+      }
+    ],
+    "rats:rat_paw": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:motus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 2
+      }
+    ],
+    "rats:rat_skull": [
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 5
+      }
+    ],
+    "rats:rat_nugget": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 1
+      }
+    ],
+    "rats:tangled_rat_tails": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:vinculum",
+        "amount": 5
+      }
+    ],
+    "rats:feral_rat_claw": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 5
+      }
+    ],
+    "rats:psionic_rat_brain": [
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:alienis",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      }
+    ],
+    "rats:rat_papers": [
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 1
+      }
+    ],
+    "rats:rat_king_crown": [
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 5
+      }
+    ],
+    "rats:ratfish": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      }
+    ],
+    "rats:plague_essence": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 5
+      }
+    ],
+    "rats:plague_leech": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 2
+      }
+    ],
+    "rats:filth": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 2
+      }
+    ],
+    "rats:filth_corruption": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:tenebrae",
+        "amount": 5
+      }
+    ],
+    "rats:contaminated_food": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      }
+    ],
+    "rats:plastic_waste": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 1
+      }
+    ],
+    "rats:raw_plastic": [
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:permutatio",
+        "amount": 1
+      }
+    ],
+    "rats:garbage_pile": [
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 3
+      }
+    ],
+    "rats:crimson_liquid": [
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      }
+    ],
+    "rats:purifying_liquid": [
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 2
+      }
+    ],
+    "rats:ratglove_petals": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 2
+      }
+    ],
+    "rats:ratglove_flower": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      }
+    ],
+    "rats:herb_bundle": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 2
+      }
+    ],
+    "rats:assorted_vegetables": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      }
+    ],
+    "rats:centipede": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:motus",
+        "amount": 2
+      }
+    ],
+    "rats:little_black_worm": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      }
+    ],
+    "rats:pirat_log": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 2
+      }
+    ],
+    "rats:pirat_wood": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 2
+      }
+    ],
+    "rats:stripped_pirat_log": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 2
+      }
+    ],
+    "rats:stripped_pirat_wood": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 2
+      }
+    ],
+    "rats:pirat_leaves": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      }
+    ],
+    "rats:pirat_sapling": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 1
+      }
+    ],
+    "rats:gem_of_ratlantis": [
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 10
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      }
+    ],
+    "rats:idol_of_ratlantis": [
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 20
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 15
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      }
+    ],
+    "rats:raw_oratchalcum": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      }
+    ],
+    "rats:oratchalcum_ingot": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ordo",
+        "amount": 2
+      }
+    ],
+    "rats:oratchalcum_ore": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      }
+    ],
+    "rats:ratlantean_gem_ore": [
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      }
+    ],
+    "rats:ratlantean_flame": [
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 3
+      }
+    ],
+    "rats:ghost_pirat_ectoplasm": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:exanimis",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 3
+      }
+    ],
+    "rats:charged_creeper_chunk": [
+      {
+        "aspect": "thaumaturge:potentia",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 3
+      }
+    ],
+    "rats:arcane_technology": [
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 5
+      }
+    ],
+    "rats:ancient_sawblade": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:instrumentum",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 5
+      }
+    ],
+    "rats:dragon_wing": [
+      {
+        "aspect": "thaumaturge:volatus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 5
+      }
+    ],
+    "rats:feathery_wing": [
+      {
+        "aspect": "thaumaturge:volatus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      }
+    ],
+    "rats:ratbow_essence": [
+      {
+        "aspect": "thaumaturge:lux",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 5
+      }
+    ],
+    "rats:vial_of_sentience": [
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 10
+      }
+    ],
+    "rats:tiny_coin": [
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 1
+      }
+    ],
+    "rats:rat_arrow": [
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 2
+      }
+    ],
+    "rats:treacle": [
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 1
+      }
+    ],
+    "rats:plague_tome": [
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 5
+      }
+    ],
+    "rats:confit_byaldi": [
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 3
+      }
+    ],
+    "rats:little_black_squash_balls": [
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 2
+      }
+    ],
+    "rats:potato_knishes": [
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 1
+      }
+    ],
+    "rats:party_hat": [
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 1
+      }
+    ],
+    "rats:music_disc_mice_on_venus": [
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:aer",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 10
+      }
+    ],
+    "rats:music_disc_living_mice": [
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:aer",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 10
+      }
+    ],
+    "rats:rat_nugget_ore": [
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 2
+      }
+    ],
+    "rats:rat_toga": [
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:humanus",
+        "amount": 1
+      }
+    ],
+    "rats:dutchrat_wheel": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:instrumentum",
+        "amount": 3
+      }
+    ],
+    "rats:biplane_wing": [
+      {
+        "aspect": "thaumaturge:volatus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 3
+      }
+    ],
+    "rats:ratfish_bucket": [
+      {
+        "aspect": "thaumaturge:vacuos",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 10
+      }
+    ],
+    "rats:ratbot_barrel": [
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:potentia",
+        "amount": 3
+      }
+    ],
+    "rats:ratlantis_reactor": [
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:potentia",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 10
+      }
+    ],
+    "rats:marbled_cheese_rat_head": [
+      {
+        "aspect": "rats:caseus",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 2
+      }
+    ],
+    "rats:rat_quarry_platform": [
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:instrumentum",
+        "amount": 2
+      }
+    ]
+  }
+}

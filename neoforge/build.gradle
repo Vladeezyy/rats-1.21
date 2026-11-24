@@ -84,6 +84,7 @@ configurations {
 repositories {
     maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
     maven { url = 'https://maven.blamejared.com/' } // JEI
+    maven { url = 'https://cursemaven.com'; content { includeGroup 'curse.maven' } } // Thaumaturge (CurseForge only)
     mavenLocal() { content { includeGroup 'dev.vladeezyy.rampart' } } // Rampart: ./gradlew publishToMavenLocal there
 }
 
@@ -102,6 +103,12 @@ dependencies {
         localRuntime "maven.modrinth:jade:${compat_jade}"
         // #926, #868: farmer rats and its tomatoes
         localRuntime "maven.modrinth:farmers-delight:${compat_farmersdelight}"
+    }
+    // -Pwith_thaumaturge: Thaumaturge and what it needs (the compat pack, ThaumaturgeCompat)
+    if (project.hasProperty('with_thaumaturge')) {
+        localRuntime "curse.maven:thaumaturge-1628024:${compat_thaumaturge}"
+        localRuntime "maven.modrinth:lithostitched:${compat_lithostitched}"
+        localRuntime "maven.modrinth:curios:${compat_curios}"
     }
 }
 

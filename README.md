@@ -140,6 +140,10 @@ blocks above its target and flee to the north-west after every sword throw.
   reactor) is NeoForge only: Fabric has no common energy API.
 - 1.20.1 worlds keep their rats and items: item NBT moves to 1.21 data components on load.
 - Rampart replaces Citadel and does not conflict with it.
+- [Thaumaturge](https://www.curseforge.com/minecraft/mc-mods/thaumaturge) (NeoForge, 1.21.1 and 26.1.2): a new aspect,
+  **Caseus** (cheese, Victus + Permutatio), and aspects for Rats items and mobs: cheese and its blocks, rat parts, plague
+  and garbage, Ratlantis materials, the mobs for the thaumometer. Items crafted from them (cheese staff, rat crafting table)
+  get their aspects from the recipe. A built-in data pack, loaded only with Thaumaturge installed.
 
 ## Testing
 
@@ -311,6 +315,10 @@ Jar для своей версии Minecraft и загрузчика — на с
   Энергия (ратлантийский реактор) — только на NeoForge: у Fabric нет общего API энергии.
 - Миры 1.20.1 сохраняют крыс и предметы: NBT предметов при загрузке переносится в компоненты 1.21.
 - Rampart заменяет Citadel и не конфликтует с ним.
+- [Thaumaturge](https://www.curseforge.com/minecraft/mc-mods/thaumaturge) (NeoForge, 1.21.1 и 26.1.2): новый аспект
+  **Caseus** (сыр, Victus + Permutatio) и аспекты предметов и мобов Rats: сыр и его блоки, части крыс, чума и мусор,
+  материалы Ратлантиды, мобы для таумометра. Предметы, скрафченные из них (сырный посох, крысиный верстак), получают
+  аспекты из рецепта. Встроенный датапак, грузится только при установленном Thaumaturge.
 
 ## Тестирование
 
