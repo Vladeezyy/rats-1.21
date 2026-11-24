@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  */
 public final class ClientScene {
   private static final String MODE = System.getProperty("rats.scene", "");
-  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf") || MODE.equals("bugs");
+  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf") || MODE.equals("bugs") || MODE.equals("curdler");
   /** -Pscene=perf: FPS with this many mobs in view (-Drats.scene.mobs) */
   private static final int PERF_MOBS = Integer.getInteger("rats.scene.mobs", 100);
   static final String LANG = System.getProperty("rats.scene.lang", "en_us");
@@ -92,6 +92,9 @@ public final class ClientScene {
       perfSteps();
     } else if (MODE.equals("bugs")) {
       bugSteps();
+    } else if (MODE.equals("curdler")) {
+      // -Pscene=curdler: only the auto curdler steps of the bugs scene (a quick run)
+      bugEnd(curdlerSteps(bugPad()));
     } else {
       mainSteps();
     }
@@ -211,7 +214,8 @@ public final class ClientScene {
     }
   }
 
-  private static void bugSteps() {
+  /** The bugs scene's pad: 30 blocks west of the main stage, a stone floor, air above; the tick after it */
+  private static int bugPad() {
     int t = 40;
     // a pad of its own, 30 blocks west of the main stage: stone floor, air above
     at(t, mc -> server(mc, p -> {
@@ -227,6 +231,11 @@ public final class ClientScene {
         }
       }
     }));
+    return t;
+  }
+
+  private static void bugSteps() {
+    int t = bugPad();
     // the creative inventory: every tab drawn for a few frames (a crash ends the run; the step catches exceptions)
     at(t += 40, mc -> server(mc, p -> {
       p.setGameMode(GameType.CREATIVE);
@@ -476,8 +485,129 @@ public final class ClientScene {
     at(t += 15, mc -> server(mc, p -> {
       var gun = p.level().getEntity(gunId[0]);
       var items = p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(stage).inflate(10)).stream().map(net.minecraft.world.entity.item.ItemEntity::getItem).toList();
-      check("sneak + right click picked the rattling gun up", gun == null && items.stream().anyMatch(i -> i.is(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATTLING_GUN.get())), "gun " + gun + ", items " + items);
+      // the dropped gun lands 2 blocks from the player, who sometimes picks it up before this check
+      boolean picked = p.getInventory().countItem(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATTLING_GUN.get()) > 0;
+      check("sneak + right click picked the rattling gun up", gun == null && (picked || items.stream().anyMatch(i -> i.is(com.github.alexthe666.rats.registry.RatlantisItemRegistry.RATTLING_GUN.get()))), "gun " + gun + ", items " + items + ", in the inventory " + picked);
     }));
+    bugEnd(curdlerSteps(t));
+  }
+
+  // CurseForge report (2026-11-21): a click on the empty auto curdler crashed the game, and so did the cheese made from
+  // the milk (the tank empty again). Real clicks in survival: an empty hand on the empty curdler (its screen opens and
+  // draws the empty tank), a milk bucket fills it, the cheese is made (a) with the screen open and (b) with it closed,
+  // the player looking at the curdler; then the screen once more on the emptied tank and the cheese taken by shift click
+  private static int curdlerSteps(int t) {
+    final BlockPos[] pos = new BlockPos[1];
+    at(t += 5, mc -> {
+      mc.gui.setScreen(null);
+      server(mc, p -> {
+        ServerLevel level = p.level();
+        bugRats.forEach(id -> { var e = level.getEntity(id); if (e != null) e.discard(); });
+        bugRats.clear();
+        for (int x = 0; x <= 7; x++) for (int z = 2; z <= 7; z++) for (int y = 0; y <= 5; y++) level.setBlockAndUpdate(stage.offset(x, y, z), Blocks.AIR.defaultBlockState());
+        level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(stage).inflate(12)).forEach(net.minecraft.world.entity.Entity::discard);
+        pos[0] = stage.offset(3, 0, 4);
+        // facing north, toward the player
+        level.setBlockAndUpdate(pos[0], com.github.alexthe666.rats.registry.RatsBlockRegistry.AUTO_CURDLER.get().defaultBlockState());
+        p.setGameMode(GameType.SURVIVAL);
+        // the rattling gun step left the server player sneaking (the interact packet carries the shift key): a sneaking
+        // click skips the curdler
+        p.setShiftKeyDown(false);
+        p.getInventory().clearContent();
+        p.getInventory().setSelectedSlot(0);
+        lookAt(p, 3.5, 0, 2.2, 3.5, 0.6, 4.5);
+      });
+      mc.player.getInventory().setSelectedSlot(0);
+    });
+    at(t += 20, mc -> curdlerClick(mc, pos[0], "an empty hand on the empty auto curdler"));
+    at(t += 10, mc -> check("an empty hand on the empty auto curdler opens its screen", mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen, mc.gui.screen()));
+    at(t += 20, mc -> {
+      shot(mc, "bug_curdler_empty");
+      check("the auto curdler's screen draws the empty tank", mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen, mc.gui.screen());
+      mc.player.closeContainer();
+      server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET)));
+    });
+    // (a) filled, the screen opened with an empty hand, the cheese made 150 ticks after the milk went in
+    at(t += 10, mc -> curdlerClick(mc, pos[0], "a milk bucket on the auto curdler"));
+    at(t += 10, mc -> {
+      var curdler = curdler(mc, pos[0]);
+      check("the client's curdler shows the bucket of milk", curdler != null && curdler.getTank().getFluidAmount() == 1000, curdler == null ? "no block entity" : curdler.getTank().getFluid());
+      check("the milk bucket became an empty bucket", mc.player.getMainHandItem().is(net.minecraft.world.item.Items.BUCKET), mc.player.getMainHandItem());
+      server(mc, p -> p.getInventory().clearContent());
+    });
+    at(t += 5, mc -> curdlerClick(mc, pos[0], "an empty hand on the filled auto curdler"));
+    at(t += 15, mc -> {
+      shot(mc, "bug_curdler_milk");
+      check("the auto curdler's screen opens on the milk", mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen, mc.gui.screen());
+    });
+    at(t += 180, mc -> {
+      shot(mc, "bug_curdler_cheese_open");
+      var curdler = curdler(mc, pos[0]);
+      check("the cheese made with the screen open (the screen stays)", mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen, mc.gui.screen());
+      check("the screen's output slot has the block of cheese", mc.player.containerMenu instanceof com.github.alexthe666.rats.server.inventory.AutoCurdlerMenu menu && menu.getSlot(1).getItem().is(com.github.alexthe666.rats.registry.RatsBlockRegistry.BLOCK_OF_CHEESE.get().asItem()), mc.player.containerMenu.getSlot(1).getItem());
+      check("the client's curdler is empty after the cheese", curdler != null && curdler.getTank().isEmpty(), curdler == null ? "no block entity" : curdler.getTank().getFluid());
+    });
+    // (b) the screen closed, the player looking at the curdler while the cheese is made
+    at(t += 10, mc -> {
+      mc.player.closeContainer();
+      server(mc, p -> p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(net.minecraft.world.item.Items.MILK_BUCKET)));
+    });
+    at(t += 10, mc -> curdlerClick(mc, pos[0], "a milk bucket on the auto curdler with cheese in it"));
+    at(t += 10, mc -> {
+      var curdler = curdler(mc, pos[0]);
+      check("the client's curdler shows the second bucket of milk", curdler != null && curdler.getTank().getFluidAmount() == 1000, curdler == null ? "no block entity" : curdler.getTank().getFluid());
+      server(mc, p -> p.getInventory().clearContent());
+    });
+    at(t += 20, mc -> shot(mc, "bug_curdler_milk_closed"));
+    at(t += 180, mc -> {
+      shot(mc, "bug_curdler_cheese_closed");
+      var curdler = curdler(mc, pos[0]);
+      check("the cheese made with the screen closed (no screen)", mc.gui.screen() == null, mc.gui.screen());
+      check("the client's curdler is empty after the second cheese", curdler != null && curdler.getTank().isEmpty(), curdler == null ? "no block entity" : curdler.getTank().getFluid());
+      server(mc, p -> {
+        var be = p.level().getBlockEntity(pos[0]) instanceof com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity c ? c : null;
+        check("the server's curdler made two blocks of cheese", be != null && be.getItem(1).getCount() == 2 && be.getTank().isEmpty(), be == null ? "no block entity" : be.getItem(1) + ", " + be.getTank().getFluid());
+      });
+    });
+    // the screen on the emptied tank, the cheese taken with a shift click
+    at(t += 10, mc -> curdlerClick(mc, pos[0], "an empty hand on the emptied auto curdler"));
+    at(t += 15, mc -> {
+      shot(mc, "bug_curdler_emptied");
+      boolean open = mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen;
+      check("the auto curdler's screen opens on the emptied tank", open, mc.gui.screen());
+      if (open) {
+        mc.gameMode.handleContainerInput(mc.player.containerMenu.containerId, 1, 0, net.minecraft.world.inventory.ContainerInput.QUICK_MOVE, mc.player);
+      }
+    });
+    at(t += 15, mc -> {
+      check("the screen still draws after the cheese was taken", mc.gui.screen() instanceof com.github.alexthe666.rats.client.gui.AutoCurdlerScreen, mc.gui.screen());
+      mc.player.closeContainer();
+      server(mc, p -> {
+        int cheese = p.getInventory().countItem(com.github.alexthe666.rats.registry.RatsBlockRegistry.BLOCK_OF_CHEESE.get().asItem());
+        check("a shift click took the two blocks of cheese", cheese == 2, cheese);
+        p.setGameMode(GameType.CREATIVE);
+      });
+    });
+    return t;
+  }
+
+  private static com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity curdler(Minecraft mc, BlockPos pos) {
+    return mc.level.getBlockEntity(pos) instanceof com.github.alexthe666.rats.server.block.entity.AutoCurdlerBlockEntity curdler ? curdler : null;
+  }
+
+  /** A right click on the curdler's front (the base, facing north), as the game sends it */
+  private static void curdlerClick(Minecraft mc, BlockPos pos, String what) {
+    var hit = new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.0625), Direction.NORTH, pos, false);
+    try {
+      var result = mc.gameMode.useItemOn(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+      check(what + " (the client side)", result.consumesAction(), result);
+    } catch (RuntimeException e) {
+      check(what + " (the client side)", false, e);
+      RatsMod.LOGGER.error("[scene] " + what, e);
+    }
+  }
+
+  private static void bugEnd(int t) {
     at(t += 10, mc -> {
       mc.gui.setScreen(null);
       RatsMod.LOGGER.info("[scene] DONE " + (checks - failures) + "/" + checks + (failures == 0 ? " passed" : " (" + failures + " failed)"));
