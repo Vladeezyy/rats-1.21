@@ -170,7 +170,7 @@ public final class RatsNeoForge {
             var contents = ModList.get().getModFileById(RatsMod.MODID).getFile().getContents();
             var info = new PackLocationInfo(RatlantisPack.PACK_ID, Component.literal("Ratlantis"), PackSource.FEATURE, Optional.empty());
             var pack = Pack.readMetaAndCreate(info, new JarContentsPackResources.JarContentsResourcesSupplier(contents, "data/minecraft/datapacks/ratlantis"), PackType.SERVER_DATA,
-                new PackSelectionConfig(RatConfig.ratlantisEnabledByDefault, Pack.Position.TOP, false));
+                new PackSelectionConfig(RatConfig.ratlantisAlwaysOn, Pack.Position.TOP, false));
             if (pack != null) {
                 event.addRepositorySource(packConsumer -> packConsumer.accept(pack));
             }
