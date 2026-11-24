@@ -518,3 +518,23 @@ NeoForge, 3 in Fabric. The big part is data: worldgen, loot and advancements hav
 - FPS, `tools/scenetest.sh -Pscene=perf`, 26.2 and 26.3 one after the other on the same machine state (slower than the
   earlier runs): 26.2 empty 70, 100 rats 52, 100 wolves 55 FPS; 26.3 63 / 53 / 59 FPS (rats −5…−10 % against wolves,
   as before).
+
+### CurseForge report of 2026-11-22: "Ratlantis is not active in my world"
+- The README says Ratlantis is on by default, the code kept the original's `false` for "Ratlantis Datapack Enabled by
+  Default". The default is `true` now (same key: a config file already written keeps its value, and every earlier
+  version wrote `false` into it, so those installs have to change it by hand; README says so). The option makes the
+  pack required, as in 1.20.1: on in every world, an existing one included, after a restart.
+- Both loaders read `config/rats-common.toml` before the pack is built (Fabric: `FabricConfig.load` before
+  `registerBuiltin…` in `onInitialize`; NeoForge: the config is loaded before `AddPackFindersEvent`, which builds the
+  pack each time a pack repository is made). The self-test checks it: the pack is required exactly when the option is
+  on, the option on means the pack on, the pack on means the dimension exists, and it logs the state.
+- Checked on dev dedicated servers, both loaders: default config and a new world → pack on, `rats:ratlantis` exists,
+  the portal takes a mob there; option `false` → no pack, no dimension, no errors; that world with the option switched
+  to `true` → pack and dimension on after the restart; option `false` and `/datapack enable "ratlantis"` (NeoForge) or
+  `"rats:ratlantis"` (Fabric, the quotes are needed) → the pack is on at once, the dimension only after a restart, and
+  until then twelve biome tags fail to load (`Couldn't load tag minecraft:has_structure/mineshaft …`: they list the
+  Ratlantis biome, which is not registered yet).
+- Fabric dedicated server: the first start writes the packs it enabled into `initial-enabled-packs` of
+  `server.properties` (Fabric API's default data configuration), so with the option turned off later a new world still
+  got the pack. README: drop `rats:ratlantis` from there too.
+- The tooltip on Ratlantis items in a world without it names the real option and file (all languages).
