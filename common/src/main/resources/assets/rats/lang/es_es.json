@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "Peto de Ratlantis",
   "item.rats.ratlantis_disabled.desc0": "El contenido de Ratlantis está desactivado en este mundo.",
   "item.rats.ratlantis_disabled.desc1": "Ningún objeto, bloque ni entidad de Ratlantis se puede conseguir legítimamente en supervivencia.",
-  "item.rats.ratlantis_disabled.desc2": "Si quieres Ratlantis en tu mundo, activa el paquete de datos integrado al crear el mundo o pon la opción de configuración «ratlantisEnabledByDefault» en true.",
+  "item.rats.ratlantis_disabled.desc2": "Para activarlo, pon «Ratlantis Datapack Always On» en true en config/rats-common.toml y reinicia el juego o el servidor.",
   "item.rats.ratlantis_helmet": "Casco de Ratlantis",
   "item.rats.ratlantis_hoe": "Azada de Ratlantis",
   "item.rats.ratlantis_hoe.desc0": "Abundancia de Ratlantis",

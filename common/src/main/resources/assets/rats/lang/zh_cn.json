@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "鼠西洲胸甲",
   "item.rats.ratlantis_disabled.desc0": "在正常的世界中，鼠西州的内容已被禁用。",
   "item.rats.ratlantis_disabled.desc1": "在生存模式下无法获得鼠西州中的其物品、方块或实体。",
-  "item.rats.ratlantis_disabled.desc2": "如果想在正常的世界中使用鼠西州相关内容，还请确保在创建世界时启用鼠西州数据包。",
+  "item.rats.ratlantis_disabled.desc2": "如需启用，请在 config/rats-common.toml 中将“Ratlantis Datapack Always On”设为 true，然后重启游戏或服务器。",
   "item.rats.ratlantis_helmet": "鼠西洲头盔",
   "item.rats.ratlantis_hoe": "鼠西族锄",
   "item.rats.ratlantis_hoe.desc0": "鼠西洲的恩赐",

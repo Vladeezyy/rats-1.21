@@ -25,9 +25,14 @@ The source of each version is on its branch: `main` (1.21.1), `mc/26.1.2`, `mc/2
 
 ## Requirements
 
-- **Rampart** for the same Minecraft version and loader; on Fabric also Fabric API.
+- **Rampart** for the same Minecraft version and loader (on 26.x 1.1.0 or newer); on Fabric also Fabric API.
 - Needed on the server and on every client.
-- Ratlantis is a built-in datapack and is on by default; a new world lists it under *More → Data Packs*.
+- Ratlantis is a built-in datapack and is on by default, in every world, existing ones too:
+  `"Ratlantis Datapack Always On" = true` in `config/rats-common.toml` (it replaces `"Ratlantis Datapack Enabled by
+  Default"` of 8.1.3.8 and older, which is not read). To turn Ratlantis off, set it to `false` (Fabric server: also
+  drop `rats:ratlantis` from `initial-enabled-packs` in `server.properties`). With the option off, one world can still
+  get it: `/datapack enable "ratlantis"` (NeoForge) or `/datapack enable "rats:ratlantis"` (Fabric), then restart the
+  server (single player: reopen the world) right away: the dimension appears only after that.
 
 ## Features
 
@@ -194,9 +199,14 @@ Jar для своей версии Minecraft и загрузчика — на с
 
 ## Требования
 
-- **Rampart** для той же версии Minecraft и загрузчика; на Fabric ещё Fabric API.
+- **Rampart** для той же версии Minecraft и загрузчика (на 26.x версии 1.1.0 или новее); на Fabric ещё Fabric API.
 - Нужен на сервере и у каждого игрока.
-- Ратлантида — встроенный датапак, включён по умолчанию; в новом мире он виден в *Дополнительно → Наборы данных*.
+- Ратлантида — встроенный датапак, по умолчанию включена во всех мирах, и в уже созданных тоже:
+  `"Ratlantis Datapack Always On" = true` в `config/rats-common.toml` (заменяет `"Ratlantis Datapack Enabled by
+  Default"` версий 8.1.3.8 и раньше, его мод больше не читает). Выключить Ратлантиду: поставить `false` (на сервере
+  Fabric ещё убрать `rats:ratlantis` из `initial-enabled-packs` в `server.properties`). С выключенной опцией её можно
+  включить в одном мире: `/datapack enable "ratlantis"` (NeoForge) или `/datapack enable "rats:ratlantis"` (Fabric),
+  затем сразу перезапустить сервер (в одиночной игре перезайти в мир): измерение появляется только после этого.
 
 ## Что есть в моде
 
