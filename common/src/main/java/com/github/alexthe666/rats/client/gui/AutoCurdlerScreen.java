@@ -78,6 +78,12 @@ public class AutoCurdlerScreen extends AbstractContainerScreen<AutoCurdlerMenu> 
 		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, i + 29, j + 12, 0, 166, tankWidth, tankHeight, 256, 256);
 	}
 
+	// No title and no "Inventory": the original (and 1.21.1) overrides renderLabels without super, the milk tank of the
+	// texture covers both labels
+	@Override
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+	}
+
 	@Override
 	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		super.extractTooltip(graphics, mouseX, mouseY);
