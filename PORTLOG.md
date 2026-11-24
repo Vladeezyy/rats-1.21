@@ -352,6 +352,10 @@ scenario's report names the blocks other than stone and platforms and the mobs a
   the emptied tank and a shift click takes the two blocks; 20/20 on every 26.x branch and loader. The rattling gun
   step left the server player sneaking (the interact packet carries the shift key), so the curdler steps reset it;
   the gun check also counts the gun when the player picked it up before the check.
+- The screen drew the vanilla title ("Curdling Station") and "Inventory" over its texture, under the milk tank (the
+  1.21.1 screen overrides `renderLabels` without super and draws neither): `AutoCurdlerScreen` overrides
+  `extractLabels` with nothing (8.1.3.9). The bugs scene screenshots (`scene_bug_curdler_*.png`) show no labels on
+  both loaders.
 - Checked on 26.2: bugs scene 40/40 and self-test 74/74 on NeoForge and Fabric; the curdler steps alone
   (`-Pscene=curdler`) 20/20 on both loaders before any change.
 
