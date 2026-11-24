@@ -357,5 +357,5 @@ Player request on CurseForge (blackfenrirxiii): a cheese aspect for Thaumaturge.
   with their aspects and checks the client's index and the translation.
 - Checked on 1.21.1: self-test with Thaumaturge 73/73 (323 of 348 items have aspects; without: creative upgrades,
   cauldrons, the portal, spawn eggs), without it 73/73 on NeoForge and 72/72 on Fabric; scene 3/3 in English and
-  Russian. 26.1.2: self-test with Thaumaturge 75/75, without it 75/75; scene 3/3 in both languages.
-
+  Russian. 26.1.2: self-test with Thaumaturge 75/75, without it 75/75 on NeoForge and 74/74 on Fabric; scene 3/3 in
+  both languages.
