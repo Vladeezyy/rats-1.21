@@ -109,7 +109,7 @@ public class ServerConfig {
 
 	public ServerConfig(final ConfigSpec.Builder builder) {
 		builder.push("Ratlantis");
-		this.ratlantisEnabledByDefault = buildBoolean(builder, "Ratlantis Datapack Enabled by Default", false, "If true, the ratlantis datapack will automatically be enabled when creating a new world.");
+		this.ratlantisEnabledByDefault = buildBoolean(builder, "Ratlantis Datapack Enabled by Default", true, "True: the built-in Ratlantis datapack is on in every world, existing ones too (restart the game or server after a change). False: only in worlds that enable it themselves (Data Packs screen on world creation, or /datapack enable and a restart).");
 
 		builder.pop().push("Spawning");
 		this.garbageSpawnRate = buildDouble(builder, "Garbage Pile Spawn Chance", 0.15F, 0F, 1.0F, "Percentage for every random tick to spawn a rat for a garbage pile.");

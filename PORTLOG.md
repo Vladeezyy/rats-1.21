@@ -448,3 +448,23 @@ none in Fabric.
 - Stress, NeoForge 26.2 dev server, `RATS=300 sh tools/stress.sh`: empty stage 2.87 ms, 300 wild wolves 7.95 ms, 300
   working rats 9.61 ms mean tick (9494 items carried); the rats add 1.33× what the wolves add (+6.74 ms against +5.08
   ms; 26.1.2: 1.36×).
+
+### CurseForge report of 2026-11-22: "Ratlantis is not active in my world"
+- The README says Ratlantis is on by default, the code kept the original's `false` for "Ratlantis Datapack Enabled by
+  Default". The default is `true` now (same key: a config file already written keeps its value, and every earlier
+  version wrote `false` into it, so those installs have to change it by hand; README says so). The option makes the
+  pack required, as in 1.20.1: on in every world, an existing one included, after a restart.
+- Both loaders read `config/rats-common.toml` before the pack is built (Fabric: `FabricConfig.load` before
+  `registerBuiltin…` in `onInitialize`; NeoForge: the config is loaded before `AddPackFindersEvent`, which builds the
+  pack each time a pack repository is made). The self-test checks it: the pack is required exactly when the option is
+  on, the option on means the pack on, the pack on means the dimension exists, and it logs the state.
+- Checked on dev dedicated servers, both loaders: default config and a new world → pack on, `rats:ratlantis` exists,
+  the portal takes a mob there; option `false` → no pack, no dimension, no errors; that world with the option switched
+  to `true` → pack and dimension on after the restart; option `false` and `/datapack enable "ratlantis"` (NeoForge) or
+  `"rats:ratlantis"` (Fabric, the quotes are needed) → the pack is on at once, the dimension only after a restart, and
+  until then twelve biome tags fail to load (`Couldn't load tag minecraft:has_structure/mineshaft …`: they list the
+  Ratlantis biome, which is not registered yet).
+- Fabric dedicated server: the first start writes the packs it enabled into `initial-enabled-packs` of
+  `server.properties` (Fabric API's default data configuration), so with the option turned off later a new world still
+  got the pack. README: drop `rats:ratlantis` from there too.
+- The tooltip on Ratlantis items in a world without it names the real option and file (all languages).
