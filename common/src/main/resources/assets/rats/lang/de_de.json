@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "Brustpanzer von Ratlantis",
   "item.rats.ratlantis_disabled.desc0": "Ratlantis ist in dieser Welt deaktiviert.",
   "item.rats.ratlantis_disabled.desc1": "Keine Gegenstände, Blöcke oder Wesen aus Ratlantis sind im Überlebensmodus regulär erhältlich.",
-  "item.rats.ratlantis_disabled.desc2": "Wenn du Ratlantis in deiner Welt willst, aktiviere beim Erstellen der Welt das eingebaute Datenpaket oder setze die Konfigurationsoption „ratlantisEnabledByDefault“ auf true.",
+  "item.rats.ratlantis_disabled.desc2": "Zum Aktivieren in config/rats-common.toml „Ratlantis Datapack Enabled by Default“ auf true setzen und das Spiel oder den Server neu starten.",
   "item.rats.ratlantis_helmet": "Helm von Ratlantis",
   "item.rats.ratlantis_hoe": "Hacke von Ratlantis",
   "item.rats.ratlantis_hoe.desc0": "Fülle von Ratlantis",

@@ -594,7 +594,7 @@
   "item.rats.tangled_rat_tails": "Dolaşmış Fare Kuyrukları",
   "item.rats.ratlantis_disabled.desc0": "Farelantis içeriği bu dünyada devre dışı bırakılmıştır.",
   "item.rats.ratlantis_disabled.desc1": "Farelantis'teki hiçbir eşya, blok veya varlık hayatta kalma modunda yasal olarak elde edilemez.",
-  "item.rats.ratlantis_disabled.desc2": "Dünyanızda Farelantis ile ilgili içeriklere sahip olmak istiyorsanız, dünya oluştururken yerleşik veri paketini etkinleştirdiğinizden emin olun.",
+  "item.rats.ratlantis_disabled.desc2": "Etkinleştirmek için config/rats-common.toml dosyasında \"Ratlantis Datapack Enabled by Default\" ayarını true yapın ve oyunu ya da sunucuyu yeniden başlatın.",
   "entity.rats.rat": "Fare",
   "entity.rats.tamed_rat": "Fare",
   "entity.rats.plague_rat": "Veba Faresi",

@@ -594,7 +594,7 @@
   "item.rats.tangled_rat_tails": "Tangled Rat Tails",
   "item.rats.ratlantis_disabled.desc0": "Ratlantis content is disabled in this world.",
   "item.rats.ratlantis_disabled.desc1": "None of the items, blocks, or entities from ratlantis can be obtained legitimately in survival.",
-  "item.rats.ratlantis_disabled.desc2": "If you would like to have Ratlantis related content in your world make sure to enable the builtin datapack on world creation.",
+  "item.rats.ratlantis_disabled.desc2": "To turn it on, set \"Ratlantis Datapack Enabled by Default\" to true in config/rats-common.toml and restart the game or server.",
   "entity.rats.rat": "老鼠",
   "entity.rats.tamed_rat": "Rat",
   "entity.rats.plague_rat": "疫鼠",
