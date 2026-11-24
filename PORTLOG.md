@@ -451,9 +451,12 @@ none in Fabric.
 
 ### CurseForge report of 2026-11-22: "Ratlantis is not active in my world"
 - The README says Ratlantis is on by default, the code kept the original's `false` for "Ratlantis Datapack Enabled by
-  Default". The default is `true` now (same key: a config file already written keeps its value, and every earlier
-  version wrote `false` into it, so those installs have to change it by hand; README says so). The option makes the
-  pack required, as in 1.20.1: on in every world, an existing one included, after a restart.
+  Default". Every earlier version wrote that `false` into `config/rats-common.toml` (the config writes all its
+  defaults), so nobody chose it and a new default alone would not reach existing installs. The option is a new key
+  now, "Ratlantis Datapack Always On" = `true`; the old key is not read, and both loaders drop it from the file on
+  the next save. The option makes the pack required, as in 1.20.1: on in every world, an existing one included,
+  after a restart. Checked with the config and a world of the released version: after the update the pack and the
+  dimension are on.
 - Both loaders read `config/rats-common.toml` before the pack is built (Fabric: `FabricConfig.load` before
   `registerBuiltin…` in `onInitialize`; NeoForge: the config is loaded before `AddPackFindersEvent`, which builds the
   pack each time a pack repository is made). The self-test checks it: the pack is required exactly when the option is
