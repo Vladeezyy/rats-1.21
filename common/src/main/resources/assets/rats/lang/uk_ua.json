@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "Нагрудник ратлантійця",
   "item.rats.ratlantis_disabled.desc0": "Контент з моду «Ratlantis» вимкнено у цьому світі.",
   "item.rats.ratlantis_disabled.desc1": "Жоден з предметів, блоків чи сутностей із «Ratlantis» не можна отримати законним шляхом у виживанні.",
-  "item.rats.ratlantis_disabled.desc2": "Якщо ви хочете, щоб у вашому світі з'явився контент, пов'язаний з «Ratlantis», не забудьте увімкнути вбудований датапак при створенні світу.",
+  "item.rats.ratlantis_disabled.desc2": "Щоб увімкнути його, встановіть «Ratlantis Datapack Always On» = true у config/rats-common.toml і перезапустіть гру або сервер.",
   "item.rats.ratlantis_helmet": "Шолом ратлантійця",
   "item.rats.ratlantis_hoe": "Мотика ратлантійця",
   "item.rats.ratlantis_hoe.desc0": "Щедрість ратлантиди",
