@@ -42,7 +42,7 @@ import java.util.function.Consumer;
  */
 public final class ClientScene {
   private static final String MODE = System.getProperty("rats.scene", "");
-  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf") || MODE.equals("bugs") || MODE.equals("curdler");
+  private static final boolean ENABLED = MODE.equals("main") || MODE.equals("perf") || MODE.equals("bugs") || MODE.equals("curdler") || MODE.equals("thaumaturge");
   /** -Pscene=perf: FPS with this many mobs in view (-Drats.scene.mobs) */
   private static final int PERF_MOBS = Integer.getInteger("rats.scene.mobs", 100);
   static final String LANG = System.getProperty("rats.scene.lang", "en_us");
@@ -50,6 +50,14 @@ public final class ClientScene {
   private static final List<Pair<Integer, Consumer<Minecraft>>> STEPS = new ArrayList<>();
   private static boolean opened;
   private static int tick, checks, failures;
+
+  static int checks() {
+    return checks;
+  }
+
+  static int passed() {
+    return checks - failures;
+  }
   private static BlockPos stage;
 
   static void at(int t, Consumer<Minecraft> action) {
@@ -95,6 +103,8 @@ public final class ClientScene {
     } else if (MODE.equals("curdler")) {
       // -Pscene=curdler: only the auto curdler steps of the bugs scene (a quick run)
       bugEnd(curdlerSteps(bugPad()));
+    } else if (MODE.equals("thaumaturge")) {
+      ThaumaturgeScene.steps();
     } else {
       mainSteps();
     }

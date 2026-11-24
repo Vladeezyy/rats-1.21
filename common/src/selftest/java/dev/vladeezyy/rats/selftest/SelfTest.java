@@ -369,5 +369,9 @@ public final class SelfTest {
     check("wild rat still alive after 10 ticks", () -> spawned != null && spawned.isAlive());
     check("tamed rat applied the speed boost", () -> tamed != null && tamed.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)
       > tamed.getAttributeBaseValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED));
+    // after a few ticks: Thaumaturge builds its aspect index on the first server tick
+    if (TestHooks.thaumaturge != null) {
+      check("Thaumaturge: the Caseus aspect and the Rats aspects with it, no compat pack without it", () -> TestHooks.thaumaturge.test(level.getServer()));
+    }
   }
 }

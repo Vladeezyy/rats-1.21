@@ -1,0 +1,308 @@
+{
+  "values": {
+    "rats:rat": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 2
+      }
+    ],
+    "rats:tamed_rat": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 2
+      }
+    ],
+    "rats:demon_rat": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 3
+      }
+    ],
+    "rats:rat_king": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 20
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:vinculum",
+        "amount": 5
+      }
+    ],
+    "rats:black_death": [
+      {
+        "aspect": "thaumaturge:humanus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 10
+      }
+    ],
+    "rats:plague_beast": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 5
+      }
+    ],
+    "rats:plague_cloud": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:aer",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 5
+      }
+    ],
+    "rats:plague_doctor": [
+      {
+        "aspect": "thaumaturge:humanus",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:alkimia",
+        "amount": 5
+      }
+    ],
+    "rats:pied_piper": [
+      {
+        "aspect": "thaumaturge:humanus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      }
+    ],
+    "rats:pirat": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:humanus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 3
+      }
+    ],
+    "rats:ghost_pirat": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:exanimis",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 3
+      }
+    ],
+    "rats:dutchrat": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:exanimis",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 5
+      }
+    ],
+    "rats:rat_baron": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:volatus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 5
+      }
+    ],
+    "rats:ratfish": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:aqua",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 2
+      }
+    ],
+    "rats:ratlantean_spirit": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:ignis",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      }
+    ],
+    "rats:ratlantean_automaton": [
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 20
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 10
+      },
+      {
+        "aspect": "rats:caseus",
+        "amount": 5
+      }
+    ],
+    "rats:ratlantean_ratbot": [
+      {
+        "aspect": "thaumaturge:machina",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:metallum",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      }
+    ],
+    "rats:feral_ratlantean": [
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 15
+      },
+      {
+        "aspect": "thaumaturge:aversio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 5
+      }
+    ],
+    "rats:neo_ratlantean": [
+      {
+        "aspect": "thaumaturge:alienis",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:praecantatio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:cognitio",
+        "amount": 5
+      }
+    ],
+    "rats:rat_protector": [
+      {
+        "aspect": "thaumaturge:spiritus",
+        "amount": 5
+      },
+      {
+        "aspect": "thaumaturge:praemunio",
+        "amount": 10
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 3
+      }
+    ]
+  }
+}
