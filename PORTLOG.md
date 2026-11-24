@@ -339,3 +339,23 @@ scenario's report names the blocks other than stone and platforms and the mobs a
 - Checked: 1.21.1 self-test (`-Drats.selftest.only=arrow,rattling`) 28/28 and bugs scene 18/18 on both loaders;
   bugs scene 18/18 on 26.1.2, 26.2 and 26.3, both loaders. With the old cast back, 26.3 NeoForge: 17/18, the click
   fails with the ClassCastException (the test catches it). CI (full self-test) passed on every branch.
+
+### CurseForge report of 2026-11-21, on 8.1.3.8 (version and loader not named)
+- "Interacting with the curdling station when it's empty crashes the game; filling it with a milk bucket still works,
+  but the moment it turns to cheese the game crashes": 1.21.1 only, both loaders. The auto curdler's screen draws the
+  tank as tiles of the milk sprite into its own `BufferBuilder`; an empty tank (or one under 43 mB: 0 px high) adds no
+  vertex, and 1.21's `buildOrThrow` throws (`IllegalStateException: BufferBuilder was empty`, "Rendering screen").
+  An empty hand opens the screen, so the first click on a new curdler crashed, and an open screen crashed the moment
+  the last bucket became cheese. `AutoCurdlerScreen.renderFluidStack` returns for a 0 px tank and draws only a
+  non-empty mesh (`build()`, null when empty). The world was not affected (the server made the cheese). 26.x draws the
+  tiles with `GuiGraphicsExtractor.blit` (no buffer of its own) and does not crash: checked on 26.1.2, 26.2 and 26.3,
+  both loaders, before any change (the new steps 20/20).
+- The bugs scene clicks the curdler for real in survival (`-Pscene=curdler` runs these steps alone): an empty hand on
+  the empty curdler (the screen opens and draws), a milk bucket fills it, the cheese is made (a) with the screen open
+  and (b) with it closed while the player looks at the curdler (its renderer, the milk bubbles), then the screen on
+  the emptied tank and a shift click takes the two blocks. Without the fix NeoForge and Fabric 1.21.1 crash on the
+  first screen (the scene never reaches DONE); with it 20/20. The rattling gun step left the server player sneaking
+  (the interact packet carries the shift key), so the curdler steps reset it; the gun check also counts the gun when
+  the player picked it up before the check (one Fabric run failed so).
+- Checked: bugs scene 38/38 and self-test 72/72 on NeoForge and Fabric 1.21.1; the curdler steps alone (`-Pscene=curdler`)
+  20/20 with the fix, a crash on the first screen without it, on both loaders.
