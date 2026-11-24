@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "§eНагрудник Ратлантиса",
   "item.rats.ratlantis_disabled.desc0": "Ратлантис выключен в этом мире.",
   "item.rats.ratlantis_disabled.desc1": "Предметы, блоки и существа Ратлантиса нельзя честно получить в режиме выживания.",
-  "item.rats.ratlantis_disabled.desc2": "Чтобы включить его, поставьте «Ratlantis Datapack Enabled by Default» = true в config/rats-common.toml и перезапустите игру или сервер.",
+  "item.rats.ratlantis_disabled.desc2": "Чтобы включить его, поставьте «Ratlantis Datapack Always On» = true в config/rats-common.toml и перезапустите игру или сервер.",
   "item.rats.ratlantis_helmet": "§eШлем Ратлантиса",
   "item.rats.ratlantis_hoe": "§eМотыга Ратлантиса",
   "item.rats.ratlantis_hoe.desc0": "§Щедрость Ратлантиса",
