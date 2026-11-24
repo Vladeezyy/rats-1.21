@@ -180,7 +180,7 @@ public final class SelfTest {
     // (Fabric in onInitialize, NeoForge in AddPackFindersEvent), so config/rats-common.toml must be read by then
     net.minecraft.server.packs.repository.Pack ratlantisPack = server.getPackRepository().getAvailablePacks().stream()
       .filter(pack -> pack.getId().equals("ratlantis") || pack.getId().endsWith(":ratlantis")).findFirst().orElse(null);
-    boolean ratlantisOption = com.github.alexthe666.rats.RatConfig.ratlantisEnabledByDefault;
+    boolean ratlantisOption = com.github.alexthe666.rats.RatConfig.ratlantisAlwaysOn;
     boolean ratlantisOn = com.github.alexthe666.rats.server.events.RatlantisPack.isEnabled(server);
     boolean ratlantisDimension = server.getLevel(com.github.alexthe666.rats.registry.worldgen.RatlantisDimensionRegistry.DIMENSION_KEY) != null;
     RatsMod.LOGGER.info(PREFIX + "Ratlantis: option {}, pack {} required {}, on {} (enabled packs {}), flag {}, dimension {}", ratlantisOption,
