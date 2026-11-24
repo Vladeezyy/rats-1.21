@@ -891,7 +891,7 @@
   "item.rats.ratlantis_chestplate": "Peitoral de Ratlantis",
   "item.rats.ratlantis_disabled.desc0": "O conteúdo de Ratlantis está desativado neste mundo.",
   "item.rats.ratlantis_disabled.desc1": "Nenhum item, bloco ou entidade de Ratlantis pode ser obtido legitimamente no modo sobrevivência.",
-  "item.rats.ratlantis_disabled.desc2": "Para ativar, defina \"Ratlantis Datapack Enabled by Default\" como true em config/rats-common.toml e reinicie o jogo ou o servidor.",
+  "item.rats.ratlantis_disabled.desc2": "Para ativar, defina \"Ratlantis Datapack Always On\" como true em config/rats-common.toml e reinicie o jogo ou o servidor.",
   "item.rats.ratlantis_helmet": "Capacete de Ratlantis",
   "item.rats.ratlantis_hoe": "Enxada de Ratlantis",
   "item.rats.ratlantis_hoe.desc0": "Fartura de Ratlantis",

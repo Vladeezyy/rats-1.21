@@ -24,9 +24,9 @@ fi
 # the test world has the Ratlantis datapack on (the gameplay checks go through its portal)
 CFG=$LOADER/run/config/rats-common.toml
 if [ -f $CFG ]; then
-	perl -pi -e 's/"Ratlantis Datapack Enabled by Default" = false/"Ratlantis Datapack Enabled by Default" = true/' $CFG
+	perl -pi -e 's/"Ratlantis Datapack Always On" = false/"Ratlantis Datapack Always On" = true/' $CFG
 else
-	printf '[Ratlantis]\n\t"Ratlantis Datapack Enabled by Default" = true\n' > $CFG
+	printf '[Ratlantis]\n\t"Ratlantis Datapack Always On" = true\n' > $CFG
 fi
 ./gradlew :$LOADER:runSelftest --console=plain "$@" > build-selftest.log 2>&1 &
 i=0

@@ -106,7 +106,7 @@ public final class RatsFabric implements ModInitializer {
         ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(RatsMod.MODID, "ratlantis"),
             FabricLoader.getInstance().getModContainer(RatsMod.MODID).orElseThrow(), Component.literal("Ratlantis"),
             // NeoForge (and 1.20.1) make the pack required when the option is on: always enabled
-            RatConfig.ratlantisEnabledByDefault ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
+            RatConfig.ratlantisAlwaysOn ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             RegistryAccessHolder.setServer(server);
