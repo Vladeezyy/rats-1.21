@@ -25,7 +25,7 @@ The source of each version is on its branch: `main` (1.21.1), `mc/26.1.2`, `mc/2
 
 ## Requirements
 
-- **Rampart** for the same Minecraft version and loader; on Fabric also Fabric API.
+- **Rampart** for the same Minecraft version and loader (on 26.x 1.1.0 or newer); on Fabric also Fabric API.
 - Needed on the server and on every client.
 - Ratlantis is a built-in datapack and is on by default, in every world: `"Ratlantis Datapack Enabled by Default" =
   true` in `config/rats-common.toml`. A config written by 8.1.3.8 or older still says `false`: set it to `true` and
@@ -199,7 +199,7 @@ Jar для своей версии Minecraft и загрузчика — на с
 
 ## Требования
 
-- **Rampart** для той же версии Minecraft и загрузчика; на Fabric ещё Fabric API.
+- **Rampart** для той же версии Minecraft и загрузчика (на 26.x версии 1.1.0 или новее); на Fabric ещё Fabric API.
 - Нужен на сервере и у каждого игрока.
 - Ратлантида — встроенный датапак, по умолчанию включена во всех мирах: `"Ratlantis Datapack Enabled by Default" =
   true` в `config/rats-common.toml`. В конфиге, записанном версией 8.1.3.8 или более ранней, стоит `false`: поставьте
