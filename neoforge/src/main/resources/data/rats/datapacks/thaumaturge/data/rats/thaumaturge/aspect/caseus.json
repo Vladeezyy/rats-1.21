@@ -1,0 +1,9 @@
+{
+  "tag": "caseus",
+  "color": 15905597,
+  "components": [
+    "thaumaturge:victus",
+    "thaumaturge:permutatio"
+  ],
+  "texture": "rats:textures/aspects/caseus.png"
+}
