@@ -2,7 +2,7 @@
 # Runs a client test scene (max 15 min): -Pscene=main (common/src/selftest/.../ClientScene).
 # Screenshots in $LOADER/run/screenshots/scene_*.png; prints the checks and the errors of the run. Every run starts from the
 # default configs and a new world. Extra gradle arguments are passed on (-Pscene_lang=ru_ru, -Pwith_compat,
-# -Pneo_version=21.1.197 -Pno_jei).
+# -Pneo_version=21.1.197 -Pno_jei, -Pscene=thaumaturge -Pwith_thaumaturge).
 cd "$(dirname "$0")/.."
 # LOADER=neoforge (default) or LOADER=fabric
 LOADER=${LOADER:-neoforge}
@@ -14,6 +14,11 @@ case $LOADER in
 esac
 rm -rf $LOADER/run/saves/rats_scene $LOADER/run/screenshots/scene_*.png build-scene.log
 rm -f $LOADER/run/config/rats-*.toml
+# -Pscene=thaumaturge: Thaumaturge draws the aspects on every tooltip (no Shift needed)
+case " $* " in
+	*" -Pscene=thaumaturge "*) printf '[tooltip]\nshow_aspects_by_default = true\n' > $LOADER/run/config/thaumaturge-client.toml ;;
+	*) rm -f $LOADER/run/config/thaumaturge-client.toml ;;
+esac
 # the hang watchdog of the knowledge base (testing/hang-watchdog.md): stops the run on a crash, a hang or 15 min
 . tools/watchdog.sh
 kill_dev() { pkill -f "$PROC" 2>/dev/null; }

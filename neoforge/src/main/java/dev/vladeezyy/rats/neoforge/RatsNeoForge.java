@@ -92,6 +92,7 @@ public final class RatsNeoForge {
         bus.addListener((EntityAttributeCreationEvent event) -> RatsEntitySetup.registerAttributes(event::put));
         bus.addListener(RatsNeoForge::registerSpawnPlacements);
         bus.addListener(RatsNeoForge::addRatlantisDatapack);
+        bus.addListener(dev.vladeezyy.rats.neoforge.compat.ThaumaturgeCompat::addPack);
         bus.addListener((BuildCreativeModeTabContentsEvent event) ->
             RatsCreativeTabRegistry.addToVanillaTabs(event.getTabKey(), event.hasPermissions(), stack -> event.accept(stack)));
 
