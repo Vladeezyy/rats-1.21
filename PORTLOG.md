@@ -538,3 +538,8 @@ NeoForge, 3 in Fabric. The big part is data: worldgen, loot and advancements hav
   `server.properties` (Fabric API's default data configuration), so with the option turned off later a new world still
   got the pack. README: drop `rats:ratlantis` from there too.
 - The tooltip on Ratlantis items in a world without it names the real option and file (all languages).
+- Rampart minimum 1.1.0 (`>=1.1.0` in fabric.mod.json, `[1.1.0,)` in neoforge.mods.toml). A 26.3 Fabric player had
+  giant models with tiled UVs on Rampart 1.0.1 (Rampart #1: the vanilla cubes were built with a 1×1 texture, and
+  Sodium builds its own cubes from those arguments). The fix shipped in 1.0.2, but Rats 26.x is built and tested
+  against 1.1.0 (it also copies young/attack/riding to the models before setupAnim), and 1.1.0 is published for
+  26.1.2, 26.2 and 26.3. Published versions read `1.1.0+<mc>` (Fabric, build metadata ignored) and `1.1.0` (NeoForge).
