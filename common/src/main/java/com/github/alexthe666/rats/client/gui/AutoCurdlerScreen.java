@@ -35,6 +35,11 @@ public class AutoCurdlerScreen extends AbstractContainerScreen<AutoCurdlerMenu> 
 	}
 
 	public static void renderFluidStack(PoseStack stack, int xPosition, int yPosition, int desiredWidth, int desiredHeight, Fluid fluid) {
+		// an empty tank (0 px high) adds no vertex: buildOrThrow crashed the game ("BufferBuilder was empty",
+		// CurseForge report of 2026-11-21: the screen of an empty curdler, and of one whose milk just became cheese)
+		if (desiredWidth <= 0 || desiredHeight <= 0) {
+			return;
+		}
 		TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ClientPlatform.INSTANCE.fluidStillTexture(fluid));
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
@@ -76,7 +81,10 @@ public class AutoCurdlerScreen extends AbstractContainerScreen<AutoCurdlerMenu> 
 				vertexBuffer.addVertex(matrix4f, x, y + maskTop, 0).setUv(uMin + uLocalDif, vMin + vLocalDif);
 			}
 		}
-		BufferUploader.drawWithShader(vertexBuffer.buildOrThrow());
+		MeshData mesh = vertexBuffer.build();
+		if (mesh != null) {
+			BufferUploader.drawWithShader(mesh);
+		}
 		RenderSystem.disableBlend();
 	}
 
