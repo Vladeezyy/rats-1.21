@@ -511,6 +511,66 @@ final class GameplayTest {
         return text.toString();
       }
     });
+    // CurseForge report 2026-11-28: "the rats are harvesting wheat but aren't getting materials from it, and the rats set
+    // to gather refuse to work"; a harvesting rat without upgrades and a gathering rat next to broken wheat
+    SCENARIOS.add(new Scenario("a harvesting rat without upgrades brings ripe wheat into a chest", 1800) {
+      ChestBlockEntity to;
+
+      @Override
+      boolean start(ServerLevel level) {
+        for (int x = 2; x <= 4; x++) {
+          for (int z = -1; z <= 1; z++) {
+            level.setBlock(this.base.offset(x, -1, z), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);
+            level.setBlock(this.base.offset(x, 0, z), ((net.minecraft.world.level.block.CropBlock) Blocks.WHEAT).getStateForAge(7), Block.UPDATE_ALL);
+          }
+        }
+        this.to = chest(level, this.base.offset(-3, 0, 0));
+        TamedRat rat = tamedRat(level, this.base, RatCommand.HARVEST);
+        rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(-3, 0, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.WHEAT) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "chest " + java.util.stream.IntStream.range(0, this.to.getContainerSize()).mapToObj(this.to::getItem).filter(s -> !s.isEmpty()).toList()
+          + ", rats: " + around(level, TamedRat.class, this.base).stream().map(r -> r.getCommand() + " hand " + r.getMainHandItem() + " at " + r.blockPosition()
+          + " working " + r.isCurrentlyWorking).toList() + ", items: " + around(level, ItemEntity.class, this.base).stream()
+          .map(i -> i.getItem() + " ground " + i.onGround() + " at " + i.blockPosition()).toList();
+      }
+    });
+    SCENARIOS.add(new Scenario("a gathering rat brings the drops of broken wheat into a chest", 1800) {
+      ChestBlockEntity to;
+
+      @Override
+      boolean start(ServerLevel level) {
+        BlockPos crop = this.base.offset(-3, 0, 2);
+        level.setBlock(crop.below(), Blocks.FARMLAND.defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(crop, ((net.minecraft.world.level.block.CropBlock) Blocks.WHEAT).getStateForAge(7), Block.UPDATE_ALL);
+        level.destroyBlock(crop, true);
+        this.to = chest(level, this.base.offset(3, 0, 0));
+        TamedRat rat = tamedRat(level, this.base, RatCommand.GATHER);
+        rat.setDepositPos(GlobalPos.of(level.dimension(), this.base.offset(3, 0, 0)));
+        return true;
+      }
+
+      @Override
+      boolean done(ServerLevel level) {
+        return count(this.to, Items.WHEAT) > 0 || count(this.to, Items.WHEAT_SEEDS) > 0;
+      }
+
+      @Override
+      String detail(ServerLevel level) {
+        return "chest " + java.util.stream.IntStream.range(0, this.to.getContainerSize()).mapToObj(this.to::getItem).filter(s -> !s.isEmpty()).toList()
+          + ", rats: " + around(level, TamedRat.class, this.base).stream().map(r -> r.getCommand() + " hand " + r.getMainHandItem() + " at " + r.blockPosition()
+          + " working " + r.isCurrentlyWorking).toList() + ", items: " + around(level, ItemEntity.class, this.base).stream()
+          .map(i -> i.getItem() + " ground " + i.onGround() + " at " + i.blockPosition()).toList();
+      }
+    });
     SCENARIOS.add(new Scenario("a rat gathers items from the ground into a chest", 1800) {
       ChestBlockEntity to;
 
